@@ -107,6 +107,10 @@ public class SymbolRegistry {
         return sym != null ? sym : "<?>";
     }
 
+    public String methodDesc(int mid) {
+        int[] cms = methodDef(mid);
+        return cms != null ? symbolName(cms[0]) + "." + symbolName(cms[1]) + "()" : "<?>";
+    }
 
     /**
      * Adds new symbol to registry (with predefined ID).

@@ -105,11 +105,13 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
             if (thread == null) {
                 try {
                     open();
-                    thread = new Thread(this);
-                    thread.setName(name);
-                    thread.setDaemon(true);
-                    running.set(true);
-                    thread.start();
+                    if (qlen > 0) {
+                        thread = new Thread(this);
+                        thread.setName(name);
+                        thread.setDaemon(true);
+                        running.set(true);
+                        thread.start();
+                    }
                 } catch (Exception e) {
                     handleError("Error starting thread", e);
                 }
@@ -247,5 +249,9 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
 
     public BlockingQueue<T> getSubmitQueue() {
         return submitQueue;
+    }
+
+    public int getQueueLength() {
+        return qlen;
     }
 }

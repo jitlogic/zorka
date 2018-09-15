@@ -28,6 +28,7 @@ import static com.jitlogic.zorka.core.test.support.CoreTestUtil.getField;
 import static com.jitlogic.zorka.core.test.support.CoreTestUtil.instantiate;
 import static com.jitlogic.zorka.core.test.support.CoreTestUtil.invoke;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixture {
 
@@ -70,7 +71,10 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
         assertEquals(2, traceBuilder.size());
         assertEquals(1, submitter.size());
-        assertEquals("trivialMethod", symbols.symbolName((Integer) traceBuilder.getData().get(0).get("methodId")));
+        int[] cms = symbols.methodDef((Integer)traceBuilder.getData().get(0).get("mid"));
+        assertNotNull(cms);
+        assertEquals(TCLASS1, symbols.symbolName(cms[0]));
+        assertEquals("trivialMethod", symbols.symbolName(cms[1]));
     }
 
 
@@ -95,7 +99,6 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
         assertEquals(2, traceBuilder.getData().size());
         assertEquals(rslt, traceBuilder.getData().get(1).get("exception"));
-        assertEquals("errorMethod", symbols.symbolName((Integer) traceBuilder.getData().get(0).get("methodId")));
     }
 
 

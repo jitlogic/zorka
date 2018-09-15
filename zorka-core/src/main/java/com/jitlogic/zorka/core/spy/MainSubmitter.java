@@ -42,15 +42,6 @@ public class MainSubmitter {
 
     private static volatile Tracer t;
 
-    /**
-     * Local tracer (old implementation)
-     */
-    private static volatile LTracer lt;
-
-    /**
-     * Streaming tracer (new implementation)
-     */
-    private static volatile STracer st;
 
     /**
      * Thread local
@@ -105,14 +96,13 @@ public class MainSubmitter {
     /**
      * This method is called by tracer probes at method start.
      *
-     * @param classId  class ID (registered)
-     * @param methodId method ID (registered)
+     * @param mid method def id
      */
-    public static void traceEnter(int mid, int classId, int methodId, int signatureId) {
+    public static void traceEnter(int mid) {
 
-        if (lt != null) {
+        if (t != null) {
             try {
-                lt.getLtHandler().traceEnter(mid, classId, methodId, signatureId, System.nanoTime());
+                t.getHandler().traceEnter(mid, System.nanoTime());
             } catch (Throwable e) {
                 // This is special case. We must catch everything going out of agent, even OOM errors.
                 log.debug("Error executing traceEnter", e);
@@ -124,34 +114,15 @@ public class MainSubmitter {
 
     }
 
-    /**
-     * This method is called by tracer probes at method start.
-     *
-     * @param methodId method ID (registered)
-     */
-    public static void traceEnterS(int methodId) {
-        if (st != null) {
-            try {
-                st.getStHandler().traceEnter(methodId);
-            } catch (Throwable e) {
-                // This is special case. We must catch everything going out of agent, even OOM errors.
-                log.debug("Error executing traceEnterS", e);
-                AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
-            }
-        } else if (log.isTraceEnabled()) {
-            log.trace("Submitter is null !");
-        }
-    }
-
 
     /**
      * This method is called by tracer probes at method exit.
      */
     public static void traceReturn() {
 
-        if (lt != null) {
+        if (t != null) {
             try {
-                lt.getLtHandler().traceReturn(System.nanoTime());
+                t.getHandler().traceReturn(System.nanoTime());
             } catch (Throwable e) {
                 // This is special case. We must catch everything going out of agent, even OOM errors.
                 log.debug("Error executing traceReturn", e);
@@ -159,24 +130,6 @@ public class MainSubmitter {
             }
         } else if (log.isWarnEnabled()) {
             log.warn("Submitter is null !");
-        }
-    }
-
-    /**
-     * This method is called by tracer probes at method exit.
-     */
-    public static void traceReturnS() {
-
-        if (st != null) {
-            try {
-                st.getStHandler().traceReturn();
-            } catch (Throwable e) {
-                // This is special case. We must catch everything going out of agent, even OOM errors.
-                log.debug("Error executing traceReturn", e);
-                AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
-            }
-        } else if (log.isTraceEnabled()) {
-            log.trace("Submitter is null !");
         }
     }
 
@@ -188,9 +141,9 @@ public class MainSubmitter {
      */
     public static void traceError(Throwable exception) {
 
-        if (lt != null) {
+        if (t != null) {
             try {
-                lt.getLtHandler().traceError(exception, System.nanoTime());
+                t.getHandler().traceError(exception, System.nanoTime());
             } catch (Throwable e) {
                 // This is special case. We must catch everything going out of agent, even OOM errors.
                 log.debug("Error executing traceError", e);
@@ -201,24 +154,6 @@ public class MainSubmitter {
         }
     }
 
-    /**
-     * This method is called by tracer probes at method error point.
-     *
-     * @param exception exception thrown
-     */
-    public static void traceErrorS(Throwable exception) {
-        if (st != null) {
-            try {
-                st.getStHandler().traceError(exception);
-            } catch (Throwable e) {
-                // This is special case. We must catch everything going out of agent, even OOM errors.
-                log.debug("Error executing traceError", e);
-                AgentDiagnostics.inc(AgentDiagnostics.TRACER_ERRORS);
-            }
-        } else if (log.isTraceEnabled()) {
-            log.warn("Submitter is null !");
-        }
-    }
 
     /**
      * Sets backing spy submitter
@@ -229,21 +164,11 @@ public class MainSubmitter {
         MainSubmitter.submitter = submitter;
     }
 
-
-    /**
-     * Sets backing trace event handler.
-     *
-     * @param tracer
-     */
-    public synchronized static void setLTracer(LTracer tracer) {
-        t = lt = tracer;
-    }
-
-    public synchronized static void setSTracer(STracer tracer) {
-        t = st = tracer;
+    public synchronized static void setTracer(Tracer tracer) {
+        t = tracer;
     }
 
     public synchronized static boolean isStreamingTracer() {
-        return MainSubmitter.st != null;
+        return t != null && t.getClass() == STracer.class;
     }
 }

@@ -469,7 +469,7 @@ public class TraceRecord implements SymbolicRecord, Serializable {
      */
     public void clean() {
         time = 0;
-        classId = methodId = signatureId = 0;
+        classId = methodId = signatureId = mid = 0;
         attrs = null;
         children = null;
         marker = parent != null ? parent.getMarker() : null;
@@ -527,7 +527,7 @@ public class TraceRecord implements SymbolicRecord, Serializable {
      * @return true if record is empty
      */
     public boolean isEmpty() {
-        return classId == 0;
+        return mid == 0;
     }
 
 

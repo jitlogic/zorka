@@ -16,6 +16,10 @@
 
 package com.jitlogic.zorka.core.spy.lt;
 
+import com.jitlogic.zorka.core.spy.Tracer;
+import com.jitlogic.zorka.core.spy.tuner.TraceDetailStats;
+import com.jitlogic.zorka.core.spy.tuner.TraceSummaryStats;
+import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +28,16 @@ public abstract class TraceHandler {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
     protected boolean disabled;
+
+    protected long tunCalls = 0;
+    protected long tunDrops = 0;
+    protected long tunErrors = 0;
+    protected long tunLCalls = 0;
+
+    protected TracerTuner tuner;
+    protected TraceSummaryStats tunStats = null;
+
+    protected long tunLastExchange = 0;
 
     public abstract void traceBegin(int traceId, long clock, int flags);
 
@@ -46,6 +60,50 @@ public abstract class TraceHandler {
         disabled = false;
     }
 
+    protected void tuningProbe(int mid, long tstamp, long ttime) {
+
+        if (tunStats == null || tstamp > tunLastExchange + Tracer.getTuningDefaultExchInterval()) {
+            tuningExchange(tstamp);
+        }
+
+        tunCalls++;
+        if (ttime < LTracer.getMinMethodTime()) tunDrops++;
+
+        if (Tracer.getTuningMode() == Tracer.TUNING_DET) {
+
+            if (ttime > Tracer.getTuningLongThreshold()) tunLCalls++;
+
+            if (tunStats.getDetails() == null) {
+                tuningExchange(tstamp);
+            }
+
+            TraceDetailStats details = tunStats.getDetails();
+
+            if (!details.markCall(mid)) tunStats = tuner.exchange(tunStats);
+            if (ttime < LTracer.getMinMethodTime()) details.markDrop(mid);
+            if (ttime > Tracer.getTuningLongThreshold()) details.markLCall(mid);
+        }
+    }
+
+    private void tuningExchange(long tstamp) {
+
+        if (tunStats != null) {
+            tunStats.setCalls(tunCalls);
+            tunStats.setDrops(tunDrops);
+            tunStats.setErrors(tunErrors);
+            tunStats.setLcalls(tunLCalls);
+            tunStats.setTstamp(tstamp);
+            tunCalls = 0;
+            tunDrops = 0;
+            tunErrors = 0;
+            tunLCalls = 0;
+        }
+
+        tunStats = tuner.exchange(tunStats);
+        tunLastExchange = tstamp;
+    }
+
+
     /**
      * Sets minimum trace execution time for currently recorded trace.
      * If there is no trace being recorded just yet, this method will
@@ -60,4 +118,10 @@ public abstract class TraceHandler {
     public abstract void markRecordFlags(int flag);
 
     public abstract boolean isInTrace(int traceId);
+
+    public abstract void traceReturn(long tstamp);
+
+    public abstract void traceEnter(int mid, long tstamp);
+
+    public abstract void traceError(Object e, long tstamp);
 }

@@ -22,6 +22,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
@@ -43,7 +44,7 @@ import static com.jitlogic.zorka.core.util.ZorkaUnsafe.*;
  */
 public class STraceHandler extends TraceHandler {
 
-    public static final int STACK_DEFAULT_SIZE = 256;
+    public static final int STACK_DEFAULT_SIZE = 384;
 
     public static final int TICK_SHIFT = 16;
     public static final int BPOS_SHIFT = 32;
@@ -125,18 +126,23 @@ public class STraceHandler extends TraceHandler {
     /**
      * Contains 'image' of traced thread call stack containing basic information needed to manage tracing process.
      *
-     * Each stack frame is represented by two entries:
-     * Entry 0: [tstamp|tid|flags]
-     * Entry 1: [calls|bufpos]
+     * Each stack frame is represented by 3 entries:
+     * W0: [tstamp|tid|flags]
+     * W1: [calls|bufpos]
+     * W2: [mid|---]
      *
      * Where:
      * tstamp [40 bit] - timestamp (ticks, 65536ns each)
      * tid    [16 bit] - trace ID  (only for frames marking trace beginning)
      * flags  [8 bit]  - additional flags: TF_ERROR [1], TF_SUBMIT_TRACE[2], TF_SPLIT [4]
-     * calls  [24 bit] - counts (encountered) calls;
-     * bufpos [32bit]  - start position in output buffer (used in retracting unneeded records)
+     * calls  [32 bit] - counts (encountered) calls;
+     * bufpos [32 bit]  - start position in output buffer (used in retracting unneeded records)
      */
     private long[] stack = new long[STACK_DEFAULT_SIZE];
+
+    private final static int W0_OFF = 3;
+    private final static int W1_OFF = 2;
+    private final static int W2_OFF = 1;
 
     /** Position of first unused slot in stack[]. If non-zero, Entry0 is at [stackPos-2], Entry1 is at [stackPos-1]. */
     private int stackPos = 0;
@@ -153,8 +159,6 @@ public class STraceHandler extends TraceHandler {
     /** Used to generate UUIDs of traces. */
     private Random random = new Random();
 
-    private TracerTuner tracerTuner;
-
     public STraceHandler(boolean streamingEnabled, long minMethodTime, STraceBufManager bufManager,
                          SymbolRegistry symbols, TracerTuner tracerTuner, ZorkaSubmitter<SymbolicRecord> output) {
 
@@ -162,7 +166,7 @@ public class STraceHandler extends TraceHandler {
         this.minMethodTime = minMethodTime;
 
         this.bufManager = bufManager;
-        this.tracerTuner = tracerTuner;
+        this.tuner = tracerTuner;
         this.symbols = symbols;
         this.output = output;
 
@@ -171,14 +175,14 @@ public class STraceHandler extends TraceHandler {
     }
 
 
-    public void traceEnter(int methodId) {
+    public void traceEnter(int methodId, long tstamp) {
         if (disabled) return;
 
         disabled = true;
 
         if (stackPos == 1 && 0 == (stack[0] >> TSTAMP_BITS)) {
             bufPos = 0;
-        } else if (stackLen - stackPos < 2) {
+        } else if (stackLen - stackPos < 3) {
             extendStack();
         }
 
@@ -186,7 +190,7 @@ public class STraceHandler extends TraceHandler {
             nextChunk();
         }
 
-        long tst = ticks();
+        long tst = tstamp >>> 16;
         long tr0 = tst | ((long)methodId << TSTAMP_BITS);
 
         lastPos = bufPos;
@@ -195,36 +199,43 @@ public class STraceHandler extends TraceHandler {
 
         stack[stackPos] = tst;
         stack[stackPos+1] = 1 + ((long)(bufPos + bufOffs) << 32);
+        stack[stackPos+2] = methodId;
 
         bufPos += 12;
-        stackPos += 2;
+        stackPos += 3;
 
         disabled = false;
     }
 
+    private final static int MID_MASK = 0x00ffffff;
 
-    public void traceReturn() {
+    public void traceReturn(long tstamp) {
         if (disabled) return;
         if (stackPos == 0) return;
 
         disabled = true;
 
-        long tst = ticks();
+        long tst = tstamp >>> 16;
 
-        long sp1 = stack[stackPos-1];
-        long sp2 = stack[stackPos-2];
+        long w2 = stack[stackPos-W2_OFF];
+        long w1 = stack[stackPos-W1_OFF];
+        long w0 = stack[stackPos-W0_OFF];
 
-        long dur = tst - (sp2 & TSTAMP_MASK);
-        int tid = (int)((sp2 & TRACEID_MASK) >> TSTAMP_BITS);
-        int pos = (int)(sp1 >> TPOS_BITS);
-        long calls = sp1 & CALLS_MASK;
+        long dur = tst - (w0 & TSTAMP_MASK);
+        int tid = (int)((w0 & TRACEID_MASK) >> TSTAMP_BITS);
+        int pos = (int)(w1 >> TPOS_BITS);
+        long calls = w1 & CALLS_MASK;
 
-        boolean fsm = 0 != (sp2 & TF_SUBMIT_METHOD);
+        boolean fsm = 0 != (w0 & TF_SUBMIT_METHOD);
+
+        if (Tracer.getTuningMode() != Tracer.TUNING_OFF) {
+            tuningProbe((int)(w2 & MID_MASK), tstamp, dur << 16);
+        }
 
         if (dur >= minMethodTime || fsm || pos < bufOffs || tid != 0) {
 
             // Output trace flags (if any)
-            int flags = (int)(sp1 >>> TF_BITS);
+            int flags = (int)(w1 >>> TF_BITS);
             if (flags != 0) {
                 if (bufLen - bufPos < 2) nextChunk();
                 buffer[bufPos] = (byte)(CBOR.TAG_BASE+TAG_TRACE_FLAGS);
@@ -255,13 +266,13 @@ public class STraceHandler extends TraceHandler {
             bufPos = pos - bufOffs;
         }
 
-        stackPos -= 2;
+        stackPos -= 3;
 
         if (tid != 0) {
 
             tracePos--;
 
-            boolean forceSubmit = 0 != (sp2 & TF_SUBMIT_TRACE);
+            boolean forceSubmit = 0 != (w0 & TF_SUBMIT_TRACE);
 
             if (traceEnabled) {
                 log.trace("TraceReturn: streamingEnabled=" + streamingEnabled + ", tracePos=" + tracePos
@@ -280,10 +291,10 @@ public class STraceHandler extends TraceHandler {
         }
 
         if (stackPos > 0) {
-            long spp = stack[stackPos-1];
-            stack[stackPos-1] =  ((spp & CALLS_MASK) + calls) | (spp & TPOS_MASK);
+            long spp = stack[stackPos-W1_OFF];
+            stack[stackPos-W1_OFF] =  ((spp & CALLS_MASK) + calls) | (spp & TPOS_MASK);
             if (fsm) {
-                stack[stackPos - 2] |= TF_SUBMIT_METHOD;
+                stack[stackPos-W0_OFF] |= TF_SUBMIT_METHOD;
             }
         } else  {
             if (bufOffs == 0) {
@@ -322,7 +333,7 @@ public class STraceHandler extends TraceHandler {
             writeInt(symbols.symbolId(e.getClass().getName()));
 
             // Message
-            writeString(e.getMessage());
+            writeString(e.getMessage() != null ? e.getMessage() : "");
 
             writeInt(0); // TODO generate proper causeId
             //Throwable cause = e.getCause();
@@ -347,24 +358,33 @@ public class STraceHandler extends TraceHandler {
     }
 
 
-    public void traceError(Throwable e) {
+    public void traceError(Object e, long tstamp) {
         if (disabled) return;
         if (stackPos == 0) return;
 
-        serializeException(e);
+        serializeException((Throwable)e);
         exceptionId = System.identityHashCode(e);
 
-        stack[stackPos-2] |= TF_SUBMIT_METHOD;
+        int mid = (int)(stack[stackPos-W2_OFF] & MID_MASK);
 
-        traceReturn();
+        stack[stackPos-W0_OFF] |= (TF_SUBMIT_METHOD|TF_ERROR_MARK);
+
+        traceReturn(tstamp);
+
+        if (Tracer.getTuningMode() != Tracer.TUNING_OFF) {
+            tunErrors++;
+            if (Tracer.getTuningMode() == Tracer.TUNING_DET) {
+                tunStats.getDetails().markError(mid);
+            }
+        }
     }
 
     @Override
     public void traceBegin(int traceId, long clock, int flags) {
         if (stackPos == 0) return;
 
-        long sp2 = stack[stackPos-2];
-        stack[stackPos-2] = (sp2 & TSTAMP_MASK) | ((long)traceId << TSTAMP_BITS);
+        long w0 = stack[stackPos-W0_OFF];
+        stack[stackPos-W0_OFF] = (w0 & TSTAMP_MASK) | ((long)traceId << TSTAMP_BITS);
 
         writeUInt(CBOR.TAG_BASE, TAG_TRACE_BEGIN);
         writeUInt(CBOR.ARR_BASE, 2);
@@ -397,7 +417,7 @@ public class STraceHandler extends TraceHandler {
         if (bufLen - bufPos < 2) nextChunk();
         buffer[bufPos++] = (byte) (CBOR.MAP_BASE+1);
         buffer[bufPos++] = (byte)(CBOR.TAG_BASE + TAG_STRING_REF);
-        stack[stackPos-2] |= TF_SUBMIT_METHOD; // TODO submit force behavior is controlled by API, make this thing configurable as in LTracer
+        stack[stackPos-W0_OFF] |= TF_SUBMIT_METHOD; // TODO submit force behavior is controlled by API, make this thing configurable as in LTracer
 
         writeUInt(0,attrId);
         writeObject(attrVal);
@@ -429,9 +449,10 @@ public class STraceHandler extends TraceHandler {
         long lfbits = flags2bits(flags);
 
         if (lfbits != 0) {
-            for (int i = stackPos - 2; i >= 0; i -= 2) {
+            for (int i = stackPos - W0_OFF; i >= 0; i -= 3) {
                 if ((int) ((stack[i] & TRACEID_MASK) >> TSTAMP_BITS) == traceId) {
                     stack[i] |= lfbits;
+                    break;
                 }
             }
         }
@@ -443,14 +464,14 @@ public class STraceHandler extends TraceHandler {
 
         long lfbits = flags2bits(flags);
 
-        if (lfbits != 0 && stackPos >= 2) {
-            stack[stackPos-2] |= lfbits;
+        if (lfbits != 0 && stackPos >= 3) {
+            stack[stackPos-W0_OFF] |= lfbits;
         }
     }
 
 
     public boolean isInTrace(int traceId) {
-        for (int i = stackPos - 2; i >= 0; i -= 2) {
+        for (int i = stackPos - W0_OFF; i >= 0; i -= 3) {
             if ((int) ((stack[i] & TRACEID_MASK) >> TSTAMP_BITS) == traceId) {
                 return true;
             }
@@ -461,7 +482,7 @@ public class STraceHandler extends TraceHandler {
 
 
     private void extendStack() {
-        stack = ZorkaUtil.clipArray(stack, stack.length * 2);
+        stack = ZorkaUtil.clipArray(stack, stack.length + 384);
         stackLen = stack.length;
     }
 

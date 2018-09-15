@@ -23,6 +23,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 
 /**
@@ -50,7 +51,7 @@ public class LTraceHandler extends TraceHandler {
      */
     private int numRecords = 0;
 
-    private TracerTuner tracerTuner;
+
 
     /**
      * Creates new trace builder object.
@@ -60,7 +61,7 @@ public class LTraceHandler extends TraceHandler {
     public LTraceHandler(ZorkaSubmitter<SymbolicRecord> output, SymbolRegistry symbols, TracerTuner tracerTuner) {
         this.output = output;
         this.symbols = symbols;
-        this.tracerTuner = tracerTuner;
+        this.tuner = tracerTuner;
     }
 
 
@@ -83,7 +84,7 @@ public class LTraceHandler extends TraceHandler {
     }
 
 
-    public void traceEnter(int mid, int classId, int methodId, int signatureId, long tstamp) {
+    public void traceEnter(int mid, long tstamp) {
 
         if (disabled) {
             return;
@@ -92,7 +93,7 @@ public class LTraceHandler extends TraceHandler {
 
         if (log.isTraceEnabled()) {
             if ((ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
-                log.trace("traceEnter(" + symbols.symbolName(classId) + "." + symbols.symbolName(methodId) + ")");
+                log.trace("traceEnter(" + symbols.methodDesc(mid) + ")");
             }
         }
 
@@ -109,9 +110,6 @@ public class LTraceHandler extends TraceHandler {
         }
 
         ttop.setMid(mid);
-        ttop.setClassId(classId);
-        ttop.setMethodId(methodId);
-        ttop.setSignatureId(signatureId);
         ttop.setTime(tstamp);
         ttop.setCalls(ttop.getCalls() + 1);
 
@@ -131,18 +129,23 @@ public class LTraceHandler extends TraceHandler {
         if (log.isTraceEnabled()) {
             if ((ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 TraceRecord tr = ttop;
-                if (tr.getClassId() == 0 && tr.getParent() != null) {
+                if (tr.getMid() == 0 && tr.getParent() != null) {
                     tr = tr.getParent();
                 }
-                log.trace("traceReturn(" + symbols.symbolName(tr.getClassId()) + "." + symbols.symbolName(tr.getMethodId()) + ")");
+                log.trace("traceReturn(" + symbols.methodDesc(tr.getMid()) + ")");
             }
         }
 
-        while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
+        while (ttop.getMid() == 0 && ttop.getParent() != null) {
             ttop = ttop.getParent();
         }
 
-        ttop.setTime(tstamp - ttop.getTime());
+
+        long ttime = tstamp - ttop.getTime();
+        ttop.setTime(ttime);
+
+        if (Tracer.getTuningMode() != Tracer.TUNING_OFF)
+            tuningProbe(ttop.getMid(), tstamp, ttime);
 
         pop();
     }
@@ -157,21 +160,30 @@ public class LTraceHandler extends TraceHandler {
         if (log.isTraceEnabled()) {
             if ((ttop.inTrace() && ttop.getMarker().hasFlag(TraceMarker.TRACE_CALLS))) {
                 TraceRecord tr = ttop;
-                if (tr.getClassId() == 0 && tr.getParent() != null) {
+                if (tr.getMid() == 0 && tr.getParent() != null) {
                     tr = tr.getParent();
                 }
-                log.trace("traceError(" + symbols.symbolName(tr.getClassId()) +
-                        "." + symbols.symbolName(tr.getMethodId()) + ")", (Throwable) exception);
+                log.trace("traceError(" + symbols.methodDesc(tr.getMid()) + ")", (Throwable) exception);
             }
         }
 
-        while (!(ttop.getClassId() != 0) && ttop.getParent() != null) {
+        while (!(ttop.getMid() != 0) && ttop.getParent() != null) {
             ttop = ttop.getParent();
         }
 
         ttop.setException(exception);
-        ttop.setTime(tstamp - ttop.getTime());
+        long ttime = tstamp - ttop.getTime();
+        ttop.setTime(ttime);
         ttop.setErrors(ttop.getErrors() + 1);
+
+        if (Tracer.getTuningMode() != Tracer.TUNING_OFF) {
+            tunErrors++;
+
+            tuningProbe(ttop.getMid(), tstamp, ttime);
+
+            if (Tracer.getTuningMode() == Tracer.TUNING_DET)
+                tunStats.getDetails().markError(ttop.getMid());
+        }
 
         pop();
     }
@@ -201,6 +213,7 @@ public class LTraceHandler extends TraceHandler {
     }
 
 
+
     /**
      * This method it called at method return (normal or error). In general it pops current
      * trace record from top of stack but it also implements quite a bit of logic handling
@@ -214,7 +227,6 @@ public class LTraceHandler extends TraceHandler {
         TraceRecord parent = ttop.getParent();
 
         popException();
-
 
         // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {

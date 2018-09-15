@@ -74,14 +74,13 @@ public class BytecodeInstrumentationFixture extends ZorkaFixture {
                 return traceBuilder;
             }
         };
-        MainSubmitter.setLTracer(tracerObj);
+        MainSubmitter.setTracer(tracerObj);
         symbols = agentInstance.getSymbolRegistry();
     }
 
     @After
     public void tearDown() throws Exception {
         MainSubmitter.setSubmitter(null);
-        MainSubmitter.setLTracer(null);
-        MainSubmitter.setSTracer(null);
+        MainSubmitter.setTracer(null);
     }
 }

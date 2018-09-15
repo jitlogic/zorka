@@ -72,8 +72,8 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
     @Test
     public void testStrayShortTraceFragment(){
-        r.t = 1; r.traceEnter(10);
-        r.t = 3; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceReturn(3<<16);
 
         assertNull(o.getChunks());
 
@@ -83,8 +83,8 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
     @Test
     public void testStrayLongTraceFragment(){
-        r.t = 1; r.traceEnter(10);
-        r.t = 9; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceReturn(9<<16);
 
         assertNull(o.getChunks());
 
@@ -97,9 +97,9 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         r.setMinimumTraceTime(0);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 9; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceReturn(9<<16);
 
         assertEquals(1, chunksCount(o.getChunks()));
 
@@ -112,11 +112,11 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
     public void testTraceSingleCallWithTwoMethods() throws Exception {
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.traceEnter(12);
-        r.t = 8; r.traceReturn();
-        r.t = 9; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
+        r.traceReturn(8<<16);
+        r.traceReturn(9<<16);
 
 
         assertEquals(m(
@@ -131,11 +131,11 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
     public void testTraceSingleCallWithSkippedMethod() throws Exception {
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.traceEnter(12);
-        r.t = 6; r.traceReturn();
-        r.t = 9; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
+        r.traceReturn(6<<16);
+        r.traceReturn(9<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 2L,
@@ -147,10 +147,10 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
     public void testTraceSampleMethodCallsWithSomeAttributes() throws Exception {
         r.setMinimumTraceTime(0);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.newAttr(-1, 99, "OJAAA!");
-        r.t = 9; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.newAttr(-1, 99, "OJAAA!");
+        r.traceReturn(9<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 1L,
@@ -163,12 +163,12 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
     public void testTraceSampleMethodCallWithAttrsBelowTraceBegin() throws Exception {
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.traceEnter(12);
-        r.t = 3; r.newAttr(-1, 99, "OJAAA!");
-        r.t = 8; r.traceReturn();
-        r.t = 9; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
+        r.newAttr(-1, 99, "OJAAA!");
+        r.traceReturn(8<<16);
+        r.traceReturn(9<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 2L,
@@ -183,14 +183,14 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
     public void testIfAttrsForceMethodNotToBeExcludedInTraceTransitiveness() throws Exception {
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.traceEnter(12);
-        r.t = 4; r.traceEnter(14);
-        r.t = 4; r.newAttr(-1, 99, "OJAAA!");
-        r.t = 9; r.traceReturn();
-        r.t = 10; r.traceReturn();
-        r.t = 11; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
+        r.traceEnter(14, 4<<16);
+        r.newAttr(-1, 99, "OJAAA!");
+        r.traceReturn(9<<16);
+        r.traceReturn(10<<16);
+        r.traceReturn(11<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
@@ -225,9 +225,9 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
         Exception e = new RuntimeException("test");
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 8; r.traceError(e);
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceError(e, 8<<16);
 
         assertEquals(
             m("_", "T", "method", 10L, "tstart", 1L, "tstop", 8L, "calls", 1L,
@@ -242,13 +242,13 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
         Exception e = new RuntimeException("test");
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.traceEnter(12);
-        r.t = 4; r.traceEnter(14);
-        r.t = 9; r.traceError(e);
-        r.t = 10; r.traceReturn();
-        r.t = 11; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
+        r.traceEnter(14, 4<<16);
+        r.traceError(e, 9<<16);
+        r.traceReturn(10<<16);
+        r.traceReturn(11<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
@@ -265,14 +265,14 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
         Exception e = new RuntimeException("test");
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.traceEnter(12);
-        r.t = 4; r.traceEnter(14);
-        r.t = 4; r.newAttr(-1, 99, "OJAAA!");
-        r.t = 9; r.traceError(e);
-        r.t = 10; r.traceReturn();
-        r.t = 11; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
+        r.traceEnter(14, 4<<16);
+        r.newAttr(-1, 99, "OJAAA!");
+        r.traceError(e, 9<<16);
+        r.traceReturn(10<<16);
+        r.traceReturn(11<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
@@ -290,13 +290,13 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
         int id = System.identityHashCode(e);
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.traceEnter(12);
-        r.t = 4; r.traceEnter(14);
-        r.t = 9; r.traceError(e);
-        r.t = 10; r.traceError(e);
-        r.t = 11; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
+        r.traceEnter(14, 4<<16);
+        r.traceError(e, 9<<16);
+        r.traceError(e, 10<<16);
+        r.traceReturn(11<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
@@ -324,13 +324,13 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.traceEnter(12);
-        r.t = 4; r.traceEnter(14);
-        r.t = 9; r.traceError(e1);
-        r.t = 10; r.traceError(e2);
-        r.t = 11; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
+        r.traceEnter(14, 4<<16);
+        r.traceError(e1, 9<<16);
+        r.traceError(e2, 10<<16);
+        r.traceReturn(11<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
@@ -346,13 +346,13 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
     public void testDisableEnableTracer() throws Exception {
         r.setMinimumTraceTime(5);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 3; r.disable();;
-        r.t = 3; r.traceEnter(12);
-        r.t = 8; r.traceReturn();
-        r.t = 8; r.enable();
-        r.t = 9; r.traceReturn();
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.disable();
+        r.traceEnter(12, 3<<16);
+        r.traceReturn(8<<16);
+        r.enable();
+        r.traceReturn(9<<16);
 
         assertEquals(1, chunksCount(o.getChunks()));
 
@@ -369,15 +369,14 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
         r.setMinimumTraceTime(5);
         String s = mkString(104);
 
-        r.t = 1; r.traceEnter(10);
-        r.t = 2; r.traceBegin(1, 11, 0);
-        r.t = 2;
-        r.t = 3; r.traceEnter(12);
+        r.traceEnter(10, 1<<16);
+        r.traceBegin(1, 11, 0);
+        r.traceEnter(12, 3<<16);
         assertEquals(1, chunksCount((STraceBufChunk)ObjectInspector.getField(r, "chunk")));
         r.newAttr(-1, 1, s);
         assertEquals(2, chunksCount((STraceBufChunk)ObjectInspector.getField(r, "chunk")));
-        r.t = 6; r.traceReturn();
-        r.t = 9; r.traceReturn();
+        r.traceReturn(6<<16);
+        r.traceReturn(9<<16);
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 2L,

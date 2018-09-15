@@ -21,6 +21,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class STracerLib extends TracerLib {
     private MetricsRegistry metricsRegistry;
     private ZorkaConfig config;
 
-    public STracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, STracer tracer, ZorkaConfig config) {
+    public STracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
         super(tracer);
         this.symbolRegistry = symbolRegistry;
         this.metricsRegistry = metricsRegistry;

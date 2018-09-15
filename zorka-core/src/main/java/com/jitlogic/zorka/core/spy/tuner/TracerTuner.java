@@ -60,14 +60,14 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     private Deque<TraceSummaryStats> statCache = new LinkedList<TraceSummaryStats>();
 
     public TracerTuner(ZorkaConfig config, SymbolRegistry registry, SpyRetransformer retransformer) {
-        super("TRACER-TUNER", 1024, 1);
+        super("TRACER-TUNER", config.intCfg("tracer.tuner.qlen", 1024), 2);
 
         this.registry = registry;
         this.retransformer = retransformer;
 
         this.rankSize = config.intCfg("tracer.tuner.ranks", 31);
         this.interval = config.intCfg("tracer.tuner.interval", 30000) * 1000000L;
-        this.auto = config.boolCfg("tracer.tuner.auto", false);
+        this.auto = config.boolCfg("tracer.tuner.auto", true);
         this.autoCalls = config.longCfg("tracer.tuner.auto.calls", 100L) * 1000000;
         this.autoRatio = config.intCfg("tracer.tuner.auto.ratio", 50);
         this.autoMpc = config.intCfg("tracer.tuner.auto.mpc", 10);
@@ -176,15 +176,17 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         lcallsv = ZorkaUtil.clipArray(lcallsv, sz);
     }
 
-    private synchronized void processStats(TraceSummaryStats ss, long tstamp) {
-        calls += ss.getCalls();
-        drops += ss.getDrops();
-        errors += ss.getErrors();
-        lcalls += ss.getLcalls();
+    private synchronized void processStats(TraceSummaryStats stats) {
+        calls += stats.getCalls();
+        drops += stats.getDrops();
+        errors += stats.getErrors();
+        lcalls += stats.getLcalls();
 
-        if (ss.getDetails() != null) {
-            processDetails(ss.getDetails());
+        if (stats.getDetails() != null) {
+            processDetails(stats.getDetails());
         }
+
+        long tstamp = stats.getTstamp();
 
         if (tstamp - tstlast > interval) {
             if (tstlast != 0) {
@@ -193,18 +195,19 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             tstlast = tstamp;
         }
 
-        ss.clear();
+        // Return stats struct to reuse
+        stats.clear();
         switch (Tracer.getTuningMode()) {
             case Tracer.TUNING_SUM:
-                ss.setDetails(null);
+                stats.setDetails(null);
                 if (statCache.size() < statCacheMax)
-                    statCache.addFirst(ss);
+                    statCache.addFirst(stats);
                 break;
             case Tracer.TUNING_DET:
                 if (statCache.size() < statCacheMax &&
-                        ss.getDetails() != null &&
-                        ss.getDetails().getSize() == dsize)
-                    statCache.addFirst(ss);
+                        stats.getDetails() != null &&
+                        stats.getDetails().getSize() == dsize)
+                    statCache.addFirst(stats);
                 break;
             default:
                 break;
@@ -214,7 +217,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     @Override
     protected void process(List<TraceSummaryStats> obj) {
         for (TraceSummaryStats stats : obj) {
-            processStats(stats, System.nanoTime());
+            processStats(stats);
         }
     }
 
@@ -233,7 +236,8 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     }
 
     public TraceSummaryStats exchange(TraceSummaryStats stats) {
-        submit(stats);
+
+        if (stats != null) submit(stats);
 
         for (TraceSummaryStats s  = statCache.pollLast(); s != null; s = statCache.pollLast()) {
             if (Tracer.getTuningMode() == Tracer.TUNING_SUM) {
@@ -250,5 +254,21 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             s.setDetails(new TraceDetailStats(dsize));
         }
         return s;
+    }
+
+    public long getLastCalls() {
+        return lastCalls;
+    }
+
+    public long getLastDrops() {
+        return lastDrops;
+    }
+
+    public long getLastErrors() {
+        return lastErrors;
+    }
+
+    public long getLastLCalls() {
+        return lastLCalls;
     }
 }

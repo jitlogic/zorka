@@ -38,8 +38,8 @@ public class TestTraceBuilder extends LTraceHandler {
     }
 
     @Override
-    public void traceEnter(int mid, int classId, int methodId, int signatureId, long tstamp) {
-        data.add(ZorkaUtil.map("action", "traceEnter", "classId", classId, "methodId", methodId, "signatureId", signatureId, "tstamp", tstamp));
+    public void traceEnter(int mid, long tstamp) {
+        data.add(ZorkaUtil.map("action", "traceEnter", "mid", mid, "tstamp", tstamp));
     }
 
     @Override

@@ -35,8 +35,7 @@ import com.jitlogic.zorka.common.test.support.CommonTestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.SpyClassLookup;
 import com.jitlogic.zorka.core.spy.lt.LTracer;
-import com.jitlogic.zorka.core.spy.lt.LTracerLib;
-import com.jitlogic.zorka.core.spy.st.STracer;
+import com.jitlogic.zorka.core.test.spy.support.TestSpyRetransformer;
 import org.junit.After;
 import org.junit.Before;
 
@@ -53,6 +52,7 @@ public class ZorkaFixture extends CommonFixture {
 
     protected AgentInstance agentInstance;
     protected SpyClassTransformer spyTransformer;
+    protected TestSpyRetransformer spyRetransformer;
 
     protected TestTaskScheduler taskScheduler;
 
@@ -103,7 +103,8 @@ public class ZorkaFixture extends CommonFixture {
         taskScheduler = TestTaskScheduler.instance();
 
         config = new AgentConfig(configProperties);
-        agentInstance = new AgentInstance(config, new DummySpyRetransformer(null, config));
+        spyRetransformer = new TestSpyRetransformer();
+        agentInstance = new AgentInstance(config, spyRetransformer);
         agentInstance.start();
 
         // Get all agent components used by tests
@@ -129,9 +130,9 @@ public class ZorkaFixture extends CommonFixture {
         MainSubmitter.setSubmitter(agentInstance.getSubmitter());
         Tracer tracer = agentInstance.getTracer();
         if (tracer instanceof LTracer) {
-            MainSubmitter.setLTracer((LTracer)tracer);
+            MainSubmitter.setTracer(tracer);
         } else {
-            MainSubmitter.setSTracer((STracer)tracer);
+            MainSubmitter.setTracer(tracer);
         }
 
         symbols = agentInstance.getSymbolRegistry();
@@ -150,8 +151,13 @@ public class ZorkaFixture extends CommonFixture {
         // Uninstall test MBean server
         mBeanServerRegistry.unregister("test");
 
+        MainSubmitter.setTracer(null);
         MainSubmitter.setSubmitter(null);
-        MainSubmitter.setLTracer(null);
+
+        Tracer.setMinMethodTime(Tracer.DEFAULT_MIN_METHOD_TIME);
+        Tracer.setTuningMode(Tracer.TUNING_OFF);
+        Tracer.setTuningLongThreshold(Tracer.TUNING_DEFAULT_LCALL_THRESHOLD);
+        Tracer.setTuningDefaultExchInterval(Tracer.TUNING_DEFAULT_EXCH_INTERVAL);
     }
 
 

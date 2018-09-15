@@ -31,14 +31,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRecord> {
 
-    /**
-     * Minimum default method execution time required to attach method to trace.
-     */
-    protected static long minMethodTime = 250000;
+    public final static long DEFAULT_MIN_METHOD_TIME = 250000;
 
-    /**
-     * Maximum number of records inside trace
-     */
+    /** Minimum default method execution time required to attach method to trace. */
+    protected static long minMethodTime = DEFAULT_MIN_METHOD_TIME;
+
+    /**Maximum number of records inside trace */
     protected static int maxTraceRecords = 4096;
 
     protected static int minTraceCalls = 262144;
@@ -52,22 +50,28 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
     /** Detail statistics are collected. */
     public static final int TUNING_DET = 0x02;
 
+    /** Default long call threshold for automated tracer tuning: 100ms */
+    public static final long TUNING_DEFAULT_LCALL_THRESHOLD = 100 * 1000000L;
 
+    /** Default handler-tuner exchange interval. */
+    public static final long TUNING_DEFAULT_EXCH_INTERVAL = 30 * 1000000000L;
+
+    /** Automated tracer tuning mode is disabled by default. */
     protected static int tuningMode = TUNING_OFF;
 
-    /**
-     * If true, methods instrumented by SPY will also be traced by default.
-     */
+    /** Threshold above which method call will be considered long-duration. */
+    protected static long tuningLongThreshold = TUNING_DEFAULT_LCALL_THRESHOLD;
+
+    /** Interval between handler-tuner exchanges. */
+    protected static long tuningExchInterval = TUNING_DEFAULT_EXCH_INTERVAL;
+
+    /** If true, methods instrumented by SPY will also be traced by default. */
     protected boolean traceSpyMethods = true;
 
-    /**
-     * Defines which classes and methods should be traced.
-     */
+    /** Defines which classes and methods should be traced. */
     protected ZtxMatcherSet matcherSet;
 
-    /**
-     * Symbol registry containing names of all symbols tracer knows about.
-     */
+    /** Symbol registry containing names of all symbols tracer knows about. */
     protected SymbolRegistry symbolRegistry;
 
     protected TracerTuner tracerTuner;
@@ -142,6 +146,22 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
 
     public static void setTuningMode(int tuningMode) {
         Tracer.tuningMode = tuningMode;
+    }
+
+    public static long getTuningLongThreshold() {
+        return tuningLongThreshold;
+    }
+
+    public static void setTuningLongThreshold(long tuningLongThreshold) {
+        Tracer.tuningLongThreshold = tuningLongThreshold;
+    }
+
+    public static long getTuningDefaultExchInterval() {
+        return tuningExchInterval;
+    }
+
+    public static void setTuningDefaultExchInterval(long tuningDefaultExchInterval) {
+        Tracer.tuningExchInterval = tuningDefaultExchInterval;
     }
 
     public void setMatcherSet(ZtxMatcherSet matcherSet) {

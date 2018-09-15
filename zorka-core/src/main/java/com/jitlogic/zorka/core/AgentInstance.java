@@ -345,6 +345,7 @@ public class AgentInstance implements ZorkaService {
         if (tracerTuner == null) {
             if (config.boolCfg("tracer.tuner", false)) {
                 tracerTuner = new TracerTuner(getConfig(), getSymbolRegistry(), getRetransformer());
+                tracerTuner.start();
             }
         }
         return tracerTuner;
@@ -355,11 +356,11 @@ public class AgentInstance implements ZorkaService {
             if ("streaming".equals(config.stringCfg("tracer.type", "local"))) {
                 log.info("STREAMING tracer selected.");
                 tracer = new STracer(config, getTracerMatcherSet(), getSymbolRegistry(), getTracerTuner(), getBufManager());
-                MainSubmitter.setSTracer((STracer)tracer);
+                MainSubmitter.setTracer(tracer);
             } else {
                 log.info("LOCAL tracer selected.");
                 tracer = new LTracer(getTracerMatcherSet(), getSymbolRegistry(), getTracerTuner());
-                MainSubmitter.setLTracer((LTracer)tracer);
+                MainSubmitter.setTracer(tracer);
             }
         }
         return tracer;
@@ -488,11 +489,10 @@ public class AgentInstance implements ZorkaService {
     public synchronized TracerLib getTracerLib() {
 
         if (tracerLib == null) {
-            Tracer tracer = getTracer();
             if (tracer instanceof LTracer) {
-                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), (LTracer)tracer, config);
+                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
             } else {
-                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), (STracer)tracer, config);
+                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
             }
         }
 

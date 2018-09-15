@@ -52,6 +52,12 @@ public class TraceDetailStats {
         }
     }
 
+    public long getCalls(int mid) {
+        if (mid > size) return 0;
+        long rslt = stats[mid] & CALL_MASK;
+        return rslt;
+    }
+
     public boolean markDrop(int mid) {
         if (mid < size) {
             long l = stats[mid];
@@ -65,6 +71,12 @@ public class TraceDetailStats {
         } else {
             return false;
         }
+    }
+
+    public long getDrops(int mid) {
+        if (mid > size) return 0;
+        long l = (stats[mid] & DROP_MASK) >>> DROP_BITS;
+        return l;
     }
 
     public boolean markError(int mid) {
@@ -82,7 +94,12 @@ public class TraceDetailStats {
         }
     }
 
-    public boolean markLong(int mid) {
+    public long getErrors(int mid) {
+        if (mid > size) return 0;
+        return (stats[mid] & ERR_MASK) >>> ERR_BITS;
+    }
+
+    public boolean markLCall(int mid) {
         if (mid < size) {
             long l = stats[mid];
             long c = ((l & LONG_MASK) >>> LONG_BITS) + 1;
@@ -95,5 +112,10 @@ public class TraceDetailStats {
         } else {
             return false;
         }
+    }
+
+    public long getLCalls(int mid) {
+        if (mid > size) return 0;
+        return (stats[mid] & LONG_MASK) >>> LONG_BITS;
     }
 }
