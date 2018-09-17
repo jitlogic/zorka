@@ -79,6 +79,9 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     }
 
     private synchronized void tuningCycle() {
+
+        log.info("Starting tuning cycle ...");
+
         lastCalls = calls;
         lastDrops = drops;
         lastErrors = errors;
@@ -93,8 +96,12 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     }
 
     public synchronized void exclude(int nitems) {
+
         long cmax = lastCalls * 100L / autoRatio;
         long lcur = 0;
+
+        log.debug("Looking for classes to exclude ...");
+
         Set<String> classNames = new HashSet<String>();
         for (int i = 0; i < Math.min(nitems, rankList.size()); i++) {
             RankItem ri = rankList.get(i);
@@ -112,8 +119,10 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         }
 
         if (!classNames.isEmpty()) {
-            log.info("Excluding classes: " + classNames);
+            log.info("Reinstrumenting classes: " + classNames);
             retransformer.retransform(classNames);
+        } else {
+            log.debug("No classes to reinstrument.");
         }
 
     }
@@ -177,6 +186,10 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     }
 
     private synchronized void processStats(TraceSummaryStats stats) {
+
+        if (log.isDebugEnabled())
+            log.debug("Processing stats: (tst=" + stats.getTstamp() + ")");
+
         calls += stats.getCalls();
         drops += stats.getDrops();
         errors += stats.getErrors();

@@ -5,6 +5,7 @@ package com.jitlogic.zorka.core.spy.tuner;
  */
 public class TraceSummaryStats {
 
+    private long threadId;
     private long tstamp;
     private long calls;
     private long drops;
@@ -12,6 +13,14 @@ public class TraceSummaryStats {
     private long lcalls;
 
     private TraceDetailStats details;
+
+    public long getThreadId() {
+        return threadId;
+    }
+
+    public void setThreadId(long threadId) {
+        this.threadId = threadId;
+    }
 
     public long getTstamp() {
         return tstamp;

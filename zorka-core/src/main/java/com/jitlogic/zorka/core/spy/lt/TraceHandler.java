@@ -88,6 +88,7 @@ public abstract class TraceHandler {
     private void tuningExchange(long tstamp) {
 
         if (tunStats != null) {
+            tunStats.setThreadId(Thread.currentThread().getId());
             tunStats.setCalls(tunCalls);
             tunStats.setDrops(tunDrops);
             tunStats.setErrors(tunErrors);
