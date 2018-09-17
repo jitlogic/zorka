@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class TraceTunerUnitTest {
+public class ZtxFileProcessingUnitTest {
 
     private final List<String> lst = new ArrayList<String>();
     private final File ztxLog = new File("/tmp/_log.ztx");

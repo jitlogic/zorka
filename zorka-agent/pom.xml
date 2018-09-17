@@ -38,6 +38,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
+                            <Main-Class>com.jitlogic.zorka.util.ZorkaUtilMain</Main-Class>
                             <Premain-Class>com.jitlogic.zorka.agent.AgentMain</Premain-Class>
                             <Boot-Class-Path>zorka.jar</Boot-Class-Path>
                             <Can-Redefine-Classes>true</Can-Redefine-Classes>
