@@ -249,7 +249,7 @@ __was() {
 
   // Tracer tuning
 
-  if (zorka.boolCfg("tracer")) {
+  if (zorka.boolCfg("tracer.exclude.compat")) {
     tracer.exclude(
       "com.ibm.websphere.models.config.**",
       "com.ibm.websphere.pmi.**",

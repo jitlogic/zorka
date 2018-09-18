@@ -107,7 +107,7 @@ __wls() {
       ));
 
 
-  if (zorka.boolCfg("tracer")) {
+  if (zorka.boolCfg("tracer.exclude.compat")) {
     tracer.exclude(
       "com.bea.console.handles.**",
       "com.bea.jsptools.**",

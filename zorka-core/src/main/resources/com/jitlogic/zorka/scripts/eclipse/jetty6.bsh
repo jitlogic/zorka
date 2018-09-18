@@ -64,7 +64,7 @@ __jetty6() {
       spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "handle")));
 
 
-  if (http._trace) {
+  if (zorka.boolCfg("tracer.exclude.compat")) {
     tracer.exclude(
       "org.mortbay.io.*Buff*",
       "org.mortbay.io.Buff*",

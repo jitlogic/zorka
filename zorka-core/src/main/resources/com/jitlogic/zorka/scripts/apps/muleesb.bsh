@@ -180,7 +180,7 @@ __muleesb() {
     // org.mule.execution.EndProcessPhase
     // org.mule.execution.ValidationPhase
 
-    if (zorka.boolCfg("mule.trace")) {
+    if (zorka.boolCfg("tracer.exclude.compat")) {
         tracer.exclude(
             "org.mule.DefaultMuleMessage",
             "org.mule.api.transport.PropertyScope$ScopeComparator",

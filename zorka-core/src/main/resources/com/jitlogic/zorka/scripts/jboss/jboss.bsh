@@ -154,7 +154,7 @@ __jboss() {
     .include(spy.byMethod(0, "org.jboss.naming.NamingService", "startService", null)));
 
 
-  if (zorka.boolCfg("tracer")) {
+  if (zorka.boolCfg("tracer.exclude.compat")) {
       tracer.exclude(
           "250:org.jboss.jms.client.delegate.**",
 

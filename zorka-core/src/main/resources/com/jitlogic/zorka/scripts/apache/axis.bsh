@@ -159,7 +159,7 @@ __axis() {
         "org.apache.axis.MessageContext")));
 
 
-  if (zorka.boolCfg("tracer")) {
+  if (zorka.boolCfg("tracer.exclude.compat")) {
     tracer.exclude(
       "org.apache.axis.utils.**",
       "org.apache.axis.encoding.**",

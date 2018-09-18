@@ -17,7 +17,7 @@
 
   // Tracer tuning
 
-  if (zorka.boolCfg("tracer")) {
+  if (zorka.boolCfg("tracer.exclude.compat")) {
     tracer.exclude(
       "com.ibm.cds.CDSBundleFile",
       "com.ibm.cds.CDSHookImpls",

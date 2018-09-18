@@ -303,16 +303,17 @@ __cxf() {
     zabbix.tagMetadata("CXF");
   }
 
-  tracer.exclude(
-    "org.apache.cxf.bus.extension.Extension",
-    "org.apache.cxf.common.logging.**",
-    "org.apache.cxf.message.MessageImpl",
-    "org.apache.cxf.message.StringMapImpl",
-    "org.apache.cxf.helpers.HttpHeaderHelper",
-    "org.apache.cxf.phase.Phase",
-    "org.apache.cxf.common.util.**"
-  );
-
+  if (zorka.boolCfg("tracer.exclude.compat")) {
+    tracer.exclude(
+      "org.apache.cxf.bus.extension.Extension",
+      "org.apache.cxf.common.logging.**",
+      "org.apache.cxf.message.MessageImpl",
+      "org.apache.cxf.message.StringMapImpl",
+      "org.apache.cxf.helpers.HttpHeaderHelper",
+      "org.apache.cxf.phase.Phase",
+      "org.apache.cxf.common.util.**"
+    );
+  }
 
   return this;
 }

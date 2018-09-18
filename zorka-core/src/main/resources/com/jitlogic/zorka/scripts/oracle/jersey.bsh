@@ -37,12 +37,14 @@ __jersey() {
       ) : null)
     .include(spy.byMethod("org.glassfish.jersey.server.ApplicationHandler","handle")));
 
-  tracer.exclude(
-    "org.glassfish.jersey.message.internal.**",
-    "org.glassfish.jersey.uri.internal.**",
-    "org.glassfish.jersey.internal.util.**",
-    "com.sun.jersey.core.reflection.**"
-  );
+  if (zorka.boolCfg("tracer.exclude.compat")) {
+    tracer.exclude(
+      "org.glassfish.jersey.message.internal.**",
+      "org.glassfish.jersey.uri.internal.**",
+      "org.glassfish.jersey.internal.util.**",
+      "com.sun.jersey.core.reflection.**"
+    );
+  }
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

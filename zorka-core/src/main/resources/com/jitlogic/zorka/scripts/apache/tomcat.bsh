@@ -97,7 +97,7 @@ __tomcat() {
 
   jsp = __jsp();
 
-  if (zorka.boolCfg("tracer")) {
+  if (zorka.boolCfg("tracer.exclude.compat")) {
     tracer.exclude(
       "org.apache.tomcat.jdbc.pool.**"
     );

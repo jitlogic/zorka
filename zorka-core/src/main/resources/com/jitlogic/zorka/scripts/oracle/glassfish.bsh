@@ -65,19 +65,21 @@ __glassfish() {
 
   }
 
-  tracer.exclude(
-    "com.sun.appserv.connectors.internal.**",
-    "com.sun.enterprise.container.**",
-    "com.sun.enterprise.deployment.**",
-    "com.sun.enterprise.loader.ASURLClassL**",
-    "com.sun.enterprise.module.ModuleMetadata",
-    "org.glassfish.hk2.utilities.**",
-    "org.glassfish.jersey.message.internal.**",
-    "org.glassfish.jersey.uri.internal.**",
-    "org.glassfish.jersey.internal.util.**",
-    "org.glassfish.web.deployment.descriptor.**",
-    "org.jvnet.hk2.**"
-  );
+  if (zorka.boolCfg("tracer.exclude.compat")) {
+    tracer.exclude(
+      "com.sun.appserv.connectors.internal.**",
+      "com.sun.enterprise.container.**",
+      "com.sun.enterprise.deployment.**",
+      "com.sun.enterprise.loader.ASURLClassL**",
+      "com.sun.enterprise.module.ModuleMetadata",
+      "org.glassfish.hk2.utilities.**",
+      "org.glassfish.jersey.message.internal.**",
+      "org.glassfish.jersey.uri.internal.**",
+      "org.glassfish.jersey.internal.util.**",
+      "org.glassfish.web.deployment.descriptor.**",
+      "org.jvnet.hk2.**"
+    );
+  }
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

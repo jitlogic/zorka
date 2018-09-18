@@ -65,7 +65,7 @@ __jetty() {
     .include(
       spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
 
-  if (http._trace) {
+  if (zorka.boolCfg("tracer.exclude.compat")) {
     tracer.exclude(
       "org.eclipse.jetty.util.**",
       "org.eclipse.jetty.http.Http*",

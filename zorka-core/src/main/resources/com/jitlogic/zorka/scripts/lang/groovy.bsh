@@ -22,7 +22,7 @@ zorka.require(
 );
 
 // Tracer tuning
-if (zorka.boolCfg("tracer")) {
+if (zorka.boolCfg("tracer.exclude.compat")) {
     tracer.exclude(
         "org.codehaus.groovy.**",
         "groovy**"
