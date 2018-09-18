@@ -143,7 +143,13 @@ if (zorka.boolCfg("tracer")) {
   }
 
   if (zorka.boolCfg("tracer.tuner", false)) {
-    tracer.setTuningMode(tracer.TUNING_DET);
+    if (zorka.boolCfg("tracer.tuner.detail", true)) {
+      zorka.logInfo("Tuner level set to DETAIL.");
+      tracer.setTuningMode(tracer.TUNING_DET);
+    } else {
+      zorka.logInfo("Tuner level set to SUMMARY.");
+      tracer.setTuningMode(tracer.TUNING_SUM);
+    }
   }
 
   tracer.setTraceSpyMethods(true);

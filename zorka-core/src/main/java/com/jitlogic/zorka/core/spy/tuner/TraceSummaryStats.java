@@ -88,6 +88,7 @@ public class TraceSummaryStats {
 
     public void clear() {
         tstamp = calls = drops = errors = lcalls = 0;
+        if (details != null) details.clear();
     }
 
     @Override

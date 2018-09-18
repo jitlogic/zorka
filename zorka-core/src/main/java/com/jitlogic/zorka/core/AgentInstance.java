@@ -345,7 +345,7 @@ public class AgentInstance implements ZorkaService {
         if (tracerTuner == null) {
             if (config.boolCfg("tracer.tuner", false)) {
                 log.info("Enabling automatic tracer tuner.");
-                tracerTuner = new TracerTuner(getConfig(), getSymbolRegistry(), getRetransformer());
+                tracerTuner = new TracerTuner(getConfig(), getSymbolRegistry(), getRetransformer(), getTracerMatcherSet());
                 tracerTuner.start();
             }
         }

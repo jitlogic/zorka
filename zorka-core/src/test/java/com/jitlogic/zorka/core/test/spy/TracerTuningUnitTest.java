@@ -146,7 +146,8 @@ public class TracerTuningUnitTest extends ZorkaFixture {
     public void detExchangeCycleRetransformUnitTest() throws Exception {
         Tracer.setTuningDefaultExchInterval(100);
         setField(tuner, "interval", 100L);
-        setField(tuner, "autoCalls", 5L);
+        setField(tuner, "minTotalCalls", 5L);
+        setField(tuner, "minMethodCalls", 0L);
         setField(tuner, "autoMpc", 1);
         setField(tuner, "auto", true);
 

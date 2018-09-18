@@ -39,7 +39,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
 
     private SymbolRegistry registry;
 
-    private PatternMatcherSet patternMatcherSet;
+    private volatile PatternMatcherSet patternMatcherSet;
 
     private CidsMidsZtxReader reader;
 
@@ -92,7 +92,11 @@ public class ZtxMatcherSet implements SpyMatcherSet {
     public boolean classMatch(String className) {
         int classId = registry.symbolId(className);
 
-        return patternMatcherSet.classMatch(className) && !(cids.get(classId) || (probe(className) && cids.get(classId)));
+        if (!patternMatcherSet.classMatch(className)) return false;
+
+        synchronized (this) {
+            return !(cids.get(classId) || (probe(className) && cids.get(classId)));
+        }
     }
 
     @Override
@@ -100,32 +104,38 @@ public class ZtxMatcherSet implements SpyMatcherSet {
         String className = clazz.getName();
         int classId = registry.symbolId(className);
 
-        return patternMatcherSet.classMatch(className) && !(cids.get(classId) || (probe(className) && cids.get(classId)));
+        if (!patternMatcherSet.classMatch(className)) return false;
+
+        synchronized (this) {
+            return !(cids.get(classId) || (probe(className) && cids.get(classId)));
+        }
     }
 
     @Override
     public boolean methodMatch(String cn, List<String> sc, List<String> ca, List<String> ci, int acc,
                                String mn, String ms, List<String> ma) {
 
-        boolean pm = patternMatcherSet.methodMatch(cn, sc, ca, ci, acc, mn, ms, ma);
-        boolean mm = !mids.get(registry.methodId(cn, mn, ms));
-        return pm && mm;
+        if (!patternMatcherSet.methodMatch(cn, sc, ca, ci, acc, mn, ms, ma)) return false;
+
+        synchronized (this) {
+            return !mids.get(registry.methodId(cn, mn, ms));
+        }
     }
 
     @Override
-    public void clear() {
+    public synchronized void clear() {
         cids.reset();
         mids.reset();
         patternMatcherSet.clear();
     }
 
 
-    public void include(SpyMatcher... includes) {
+    public synchronized void include(SpyMatcher... includes) {
         patternMatcherSet = patternMatcherSet.include(includes);
     }
 
 
-    private void scanZtxDir() {
+    private synchronized void scanZtxDir() {
         String[] lst = ztxDir.list();
         if (lst != null) {
             for (String fname : lst) {
@@ -143,7 +153,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
     }
 
 
-    private void scanZtxClasspath() {
+    private synchronized void scanZtxClasspath() {
         InputStream is = getClass().getResourceAsStream("/com/jitlogic/zorka/ztx/pkgs.lst");
 
         if (is != null) {
@@ -170,11 +180,11 @@ public class ZtxMatcherSet implements SpyMatcherSet {
 
     }
 
-    private void loadZtx(File f) {
+    private synchronized void loadZtx(File f) {
         loadZtx("file:"+f.getPath());
     }
 
-    private void loadZtx(String path) {
+    private synchronized void loadZtx(String path) {
         InputStream is = null;
         try {
             if (path.startsWith("file:")) {
@@ -204,16 +214,14 @@ public class ZtxMatcherSet implements SpyMatcherSet {
     }
 
 
-    private boolean probe(String className) {
+    private synchronized boolean probe(String className) {
 
         List<Integer> found = new ArrayList<Integer>();
 
-        synchronized (this) {
-            for (int i = 0; i < ztxPkgs.size(); i++) {
-                if (className.startsWith(ztxPkgs.get(i))) {
-                    found.add(i);
-                    loadZtx(ztxPaths.get(i));
-                }
+        for (int i = 0; i < ztxPkgs.size(); i++) {
+            if (className.startsWith(ztxPkgs.get(i))) {
+                found.add(i);
+                loadZtx(ztxPaths.get(i));
             }
         }
 
@@ -238,7 +246,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
             try {
                 int idx = className.lastIndexOf('.');
                 String pkg = idx > 0 ? className.substring(0, idx) : "";
-                String cls = idx > 0 ? className.substring(idx+1, className.length()-1) : className;
+                String cls = idx > 0 ? className.substring(idx+1, className.length()) : className;
                 String s = pkg+"|"+cls+"|"+methodName+"|"+methodSignature+"\n";
                 os = new FileOutputStream(ztxLog, true);
                 os.write(s.getBytes());
@@ -254,6 +262,10 @@ public class ZtxMatcherSet implements SpyMatcherSet {
         }
     }
 
+    public synchronized boolean isExcluded(int mid) {
+        return mids.get(mid);
+    }
+
     public List<SpyMatcher> getMatchers() {
         return patternMatcherSet.getMatchers();
     }
@@ -262,7 +274,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
         return patternMatcherSet;
     }
 
-    public void setPatternMatcherSet(PatternMatcherSet newSet) {
+    public synchronized void setPatternMatcherSet(PatternMatcherSet newSet) {
         this.patternMatcherSet = newSet;
     }
 }

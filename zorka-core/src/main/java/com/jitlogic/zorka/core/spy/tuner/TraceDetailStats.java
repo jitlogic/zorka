@@ -47,6 +47,10 @@ public class TraceDetailStats {
         this.stats = new long[size];
     }
 
+    public void clear() {
+        for (int i = 0; i < stats.length; i++) stats[i] = 0L;
+    }
+
     public int getSize() {
         return size;
     }
@@ -58,6 +62,7 @@ public class TraceDetailStats {
     public boolean markCall(int mid) {
         if (mid >= size) {
             stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
+            size = stats.length;
         }
         long l = stats[mid];
         long c = (l & CALL_MASK) + 1;
@@ -78,6 +83,7 @@ public class TraceDetailStats {
     public boolean markDrop(int mid) {
         if (mid >= size) {
             stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
+            size = stats.length;
         }
         long l = stats[mid];
         long c = ((l & DROP_MASK) >>> DROP_BITS) + 1;
@@ -98,6 +104,7 @@ public class TraceDetailStats {
     public boolean markError(int mid) {
         if (mid >= size) {
             stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
+            size = stats.length;
         }
         long l = stats[mid];
         long c = ((l & ERR_MASK) >>> ERR_BITS) + 1;
@@ -117,6 +124,7 @@ public class TraceDetailStats {
     public boolean markLCall(int mid) {
         if (mid >= size) {
             stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
+            size = stats.length;
         }
         long l = stats[mid];
         long c = ((l & LONG_MASK) >>> LONG_BITS) + 1;

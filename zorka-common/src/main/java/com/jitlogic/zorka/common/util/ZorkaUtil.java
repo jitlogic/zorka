@@ -925,4 +925,11 @@ public class ZorkaUtil {
         return sb.toString();
     }
 
+    public static void reverseList(List lst) {
+        for (int i = 0; i < lst.size()/2; i++) {
+            Object obj = lst.get(i);
+            lst.set(i, lst.get(lst.size()-i-1));
+            lst.set(lst.size()-i-1, obj);
+        }
+    }
 }
