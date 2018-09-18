@@ -48,6 +48,9 @@
                                         <include name="**"/>
                                     </fileset>
                                 </copy>
+                                <mkdir dir="${project.build.outputDirectory}/zorka-${project.version}/tuner"/>
+                                <copy file="src/_log.ztx"
+                                      toDir="${project.build.outputDirectory}/zorka-${project.version}/tuner"/>
                                 <zip destfile="${project.build.directory}/zorka-${project.version}.zip">
                                     <fileset dir="${project.build.outputDirectory}" defaultexcludes="false">
                                         <include name="**"/>

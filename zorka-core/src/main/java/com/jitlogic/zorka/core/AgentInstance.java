@@ -274,7 +274,7 @@ public class AgentInstance implements ZorkaService {
 
             File ztxDir = config.hasCfg("tracer.tuner.dir")
                     ? new File(config.stringCfg("tracer.tuner.dir", null))
-                    : new File(config.getHomeDir(), "ztx");
+                    : new File(config.getHomeDir(), "tuner");
 
             File ztxLog = config.hasCfg("tracer.tuner.xlog")
                     ? new File(config.stringCfg("tracer.tuner.xlog", null))
