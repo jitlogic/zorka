@@ -57,6 +57,11 @@ public abstract class TracerLib {
     public final static String DTRACE_TID_HDR  = "x-zorka-dtrace-tid";
     public final static String DTRACE_XTT_HDR  = "x-zorka-dtrace-xtt";
 
+    public static final int TUNING_OFF = 0x00;
+    public static final int TUNING_SUM = 0x01;
+    public static final int TUNING_DET = 0x02;
+
+
     protected Tracer tracer;
     protected SymbolRegistry symbolRegistry;
     protected int defaultTraceFlags = TraceMarker.DROP_INTERIM;
@@ -501,5 +506,9 @@ public abstract class TracerLib {
         if (tt == null) return "Tuner is disabled.";
 
         return "Excluded: " +  tt.exclude(nitems, true) + " (items left: " + tt.getRankList().size() + ")";
+    }
+
+    public void setTuningMode(int mode) {
+        Tracer.setTuningMode(mode);
     }
 }

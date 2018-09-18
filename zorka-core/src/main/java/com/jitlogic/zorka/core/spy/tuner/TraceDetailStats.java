@@ -16,6 +16,8 @@
 
 package com.jitlogic.zorka.core.spy.tuner;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
 public class TraceDetailStats {
 
     public static final long CALL_MASK = 0x0000000000FFFFFFL;
@@ -54,15 +56,14 @@ public class TraceDetailStats {
     }
 
     public boolean markCall(int mid) {
-        if (mid < size) {
-            long l = stats[mid];
-            long c = (l & CALL_MASK) + 1;
-            if (c <= CALL_MAX) {
-                stats[mid] = (l & CALL_INV) | c;
-                return true;
-            } else {
-                return false;
-            }
+        if (mid >= size) {
+            stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
+        }
+        long l = stats[mid];
+        long c = (l & CALL_MASK) + 1;
+        if (c <= CALL_MAX) {
+            stats[mid] = (l & CALL_INV) | c;
+            return true;
         } else {
             return false;
         }
@@ -75,15 +76,14 @@ public class TraceDetailStats {
     }
 
     public boolean markDrop(int mid) {
-        if (mid < size) {
-            long l = stats[mid];
-            long c = ((l & DROP_MASK) >>> DROP_BITS) + 1;
-            if (c <= DROP_MAX) {
-                stats[mid] = (l & DROP_INV) | (c << DROP_BITS);
-                return true;
-            } else {
-                return false;
-            }
+        if (mid >= size) {
+            stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
+        }
+        long l = stats[mid];
+        long c = ((l & DROP_MASK) >>> DROP_BITS) + 1;
+        if (c <= DROP_MAX) {
+            stats[mid] = (l & DROP_INV) | (c << DROP_BITS);
+            return true;
         } else {
             return false;
         }
@@ -96,15 +96,14 @@ public class TraceDetailStats {
     }
 
     public boolean markError(int mid) {
-        if (mid < size) {
-            long l = stats[mid];
-            long c = ((l & ERR_MASK) >>> ERR_BITS) + 1;
-            if (c <= ERR_MAX) {
-                stats[mid] = (l & ERR_INV) | (c << ERR_BITS);
-                return true;
-            } else {
-                return false;
-            }
+        if (mid >= size) {
+            stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
+        }
+        long l = stats[mid];
+        long c = ((l & ERR_MASK) >>> ERR_BITS) + 1;
+        if (c <= ERR_MAX) {
+            stats[mid] = (l & ERR_INV) | (c << ERR_BITS);
+            return true;
         } else {
             return false;
         }
@@ -116,15 +115,14 @@ public class TraceDetailStats {
     }
 
     public boolean markLCall(int mid) {
-        if (mid < size) {
-            long l = stats[mid];
-            long c = ((l & LONG_MASK) >>> LONG_BITS) + 1;
-            if (c <= LONG_MAX) {
-                stats[mid] = (l & LONG_INV) | (c << LONG_BITS);
-                return true;
-            } else {
-                return false;
-            }
+        if (mid >= size) {
+            stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
+        }
+        long l = stats[mid];
+        long c = ((l & LONG_MASK) >>> LONG_BITS) + 1;
+        if (c <= LONG_MAX) {
+            stats[mid] = (l & LONG_INV) | (c << LONG_BITS);
+            return true;
         } else {
             return false;
         }

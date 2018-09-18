@@ -89,4 +89,9 @@ public class TraceSummaryStats {
     public void clear() {
         tstamp = calls = drops = errors = lcalls = 0;
     }
+
+    @Override
+    public String toString() {
+        return "TSS(id=" + threadId + ",t=" + tstamp + ",calls=" + calls+")";
+    }
 }

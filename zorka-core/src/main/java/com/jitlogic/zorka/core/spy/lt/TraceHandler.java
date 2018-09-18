@@ -79,7 +79,9 @@ public abstract class TraceHandler {
 
             TraceDetailStats details = tunStats.getDetails();
 
-            if (!details.markCall(mid)) tunStats = tuner.exchange(tunStats);
+            if (!details.markCall(mid)) {
+                tuningExchange(tstamp);
+            }
             if (ttime < LTracer.getMinMethodTime()) details.markDrop(mid);
             if (ttime > Tracer.getTuningLongThreshold()) details.markLCall(mid);
         }

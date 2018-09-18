@@ -86,7 +86,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         this.rankSize = config.intCfg("tracer.tuner.ranks", 31);
         this.interval = config.intCfg("tracer.tuner.interval", 30000) * 1000000L;
         this.auto = config.boolCfg("tracer.tuner.auto", true);
-        this.autoCalls = config.longCfg("tracer.tuner.auto.calls", 100L) * 1000000;
+        this.autoCalls = config.longCfg("tracer.tuner.auto.threshold", 100L) * 1000000;
         this.autoRatio = config.intCfg("tracer.tuner.auto.ratio", 50);
         this.autoMpc = config.intCfg("tracer.tuner.auto.mpc", 10);
 
@@ -94,6 +94,9 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         dropsv = new long[dsize];
         errorsv = new int[dsize];
         lcallsv = new int[dsize];
+
+        log.info("Tracer tuner: auto=" + auto + ", interval=" + interval + "ns, rankSize=" + rankSize +
+                ", threshold=" + autoCalls + "methods/cycle" + ", ratio=" + autoRatio + "pct, mpc=" + autoMpc);
     }
 
     private synchronized void tuningCycle() {
@@ -113,6 +116,11 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
         calcRanks();
         clearStats();
+
+
+        if (log.isDebugEnabled()) {
+            log.debug("Tuner status (before exclusion): " + getStatus());
+        }
 
         if (auto && lastCalls >= autoCalls) {
             exclude(autoMpc, false);
@@ -221,7 +229,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     private synchronized void processStats(TraceSummaryStats stats) {
 
         if (log.isDebugEnabled())
-            log.debug("Processing stats: (tst=" + stats.getTstamp() + ")");
+            log.debug("Processing stats: " + stats);
 
         calls += stats.getCalls();
         drops += stats.getDrops();

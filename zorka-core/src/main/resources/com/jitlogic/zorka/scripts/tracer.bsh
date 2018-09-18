@@ -141,6 +141,10 @@ if (zorka.boolCfg("tracer")) {
     tracer.setDefaultTraceFlags(zfl);
   }
 
+  if (zorka.boolCfg("tracer.tuner", false)) {
+    tracer.setTuningMode(tracer.TUNING_DET);
+  }
+
   tracer.setTraceSpyMethods(true);
 } else {
   tracer.setTraceSpyMethods(false);
