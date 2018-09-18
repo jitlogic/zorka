@@ -58,44 +58,56 @@ public class AgentDiagnostics {
     public static final int ZICO_PACKETS_DROPPED = 32;  // Packets dropped due to queue overflow
     public static final int ZICO_PACKETS_LOST = 33;     // Packets lost due to communication errors
     public static final int ZICO_RECONNECTS = 34;       // ZICO reconnects
+    public static final int TUNER_CALLS      = 35;
+    public static final int TUNER_DROPS      = 36;
+    public static final int TUNER_ECALLS     = 37;
+    public static final int TUNER_LCALLS     = 38;
+    public static final int TUNER_CYCLES     = 39;
+    public static final int TUNER_EXCLUSIONS = 40;
 
 
     private static final String[] counterNames = {
-            "MethodsInstrumented",  // METHODS_INSTRUMENTED = 1
-            "SpyErrors",            // SPY_ERRORS           = 2
-            "TracerErrors",         // TRACER_ERRORS        = 3
-            "AgentRequests",        // AGENT_REQUESTS       = 4
-            "AgentErrors",          // AGENT_ERRORS         = 5
-            "AgentTime",            // AGENT_TIME           = 6
-            "TrapsSubmitted",       // TRAPS_SUBMITTED      = 7
-            "TrapsSent",            // TRAPS_SENT           = 8
-            "TrapsDropped",         // TRAPS_DROPPED        = 9
-            "ZabbixRequests",       // ZABBIX_REQUESTS      = 10
-            "ZabbixErrors",         // ZABBIX_ERRORS        = 11
-            "ZabbixTime",           // ZABBIX_TIME          = 12
-            "NagiosRequests",       // NAGIOS_REQUESTS      = 13
-            "NagiosErrors",         // NAGIOS_ERRORS        = 14
-            "NagiosTime",           // NAGIOS_TIME          = 15
-            "PerfMonCycles",        // PMON_CYCLES          = 16
-            "PerfMonTime",          // PMON_TIME            = 17
-            "PerfPacketsSent",      // PMON_PACKETS_SENT    = 18
-            "PerfSamplesSent",      // PMON_SAMPLES_SENT    = 19
-            "PerfMonWarnings",      // PMON_WARNINGS        = 20
-            "PerfMonErrors",        // PMON_ERRORS          = 21
-            "PerfMonNulls",         // PMON_NULLS           = 22
-            "PerfMonQueries",       // PMON_QUERIES         = 23
-            "TracesSubmitted",      // TRACES_SUBMITTED     = 24
-            "TracesDropped",        // TRACES_DROPPED       = 25
-            "MetricsCreated",       // METRICS_CREATED      = 26
-            "AvgCounterErrors",     // AVG_CNT_ERRORS       = 27
-            "AvgCountersCreated",   // AVG_CNT_CREATED      = 28
-            "ConfigErrors",         // CONFIG_ERRORS        = 29
-            "SpySubmissions",       // SPY_SUBMISSIONS      = 30
-            "ZorkaStatsCreated",    // ZORKA_STATS_CREATED  = 31
-            "ZicoPacketsSent",      // ZICO_PACKETS_SENT    = 32
-            "ZicoPacketsDropped",   // ZICO_PACKETS_DROPPED = 33
-            "ZicoPacketsLost",      // ZICO_PACKETS_LOST    = 34
-            "ZicoReconnects",       // ZICO_RECONNECTS      = 35;
+            "MethodsInstrumented",  //  0
+            "SpyErrors",            //  1
+            "TracerErrors",         //  2
+            "AgentRequests",        //  3
+            "AgentErrors",          //  4
+            "AgentTime",            //  5
+            "TrapsSubmitted",       //  6
+            "TrapsSent",            //  7
+            "TrapsDropped",         //  8
+            "ZabbixRequests",       //  9
+            "ZabbixErrors",         // 10
+            "ZabbixTime",           // 11
+            "NagiosRequests",       // 12
+            "NagiosErrors",         // 13
+            "NagiosTime",           // 14
+            "PerfMonCycles",        // 15
+            "PerfMonTime",          // 16
+            "PerfPacketsSent",      // 17
+            "PerfSamplesSent",      // 18
+            "PerfMonWarnings",      // 19
+            "PerfMonErrors",        // 20
+            "PerfMonNulls",         // 21
+            "PerfMonQueries",       // 22
+            "TracesSubmitted",      // 23
+            "TracesDropped",        // 24
+            "MetricsCreated",       // 25
+            "AvgCounterErrors",     // 26
+            "AvgCountersCreated",   // 27
+            "ConfigErrors",         // 28
+            "SpySubmissions",       // 29
+            "ZorkaStatsCreated",    // 30
+            "ZicoPacketsSent",      // 31
+            "ZicoPacketsDropped",   // 32
+            "ZicoPacketsLost",      // 33
+            "ZicoReconnects",       // 34
+            "TunerCalls",           // 35
+            "TunerDrops",           // 36
+            "TunerECalls",          // 37
+            "TunerLCalls",          // 38
+            "TunerCycles",          // 39
+            "TunerExclusions",      // 40
     };
 
 

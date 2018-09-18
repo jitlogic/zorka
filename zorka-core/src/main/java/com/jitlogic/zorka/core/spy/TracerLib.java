@@ -22,6 +22,7 @@ import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.spy.lt.LTracer;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 import com.jitlogic.zorka.core.spy.plugins.*;
+import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -486,5 +487,19 @@ public abstract class TracerLib {
      */
     public void output(ZorkaSubmitter<SymbolicRecord> output) {
         tracer.addOutput(output);
+    }
+
+    public String tunerStatus() {
+        TracerTuner tt = tracer.getTracerTuner();
+        if (tt == null) return "N/A";
+
+        return tt.getStatus();
+    }
+
+    public String tunerExclude(int nitems) {
+        TracerTuner tt = tracer.getTracerTuner();
+        if (tt == null) return "Tuner is disabled.";
+
+        return "Excluded: " +  tt.exclude(nitems, true) + " (items left: " + tt.getRankList().size() + ")";
     }
 }

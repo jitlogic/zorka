@@ -74,6 +74,7 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
     /** Symbol registry containing names of all symbols tracer knows about. */
     protected SymbolRegistry symbolRegistry;
 
+    /** Tracer tuner instance. */
     protected TracerTuner tracerTuner;
 
     public Tracer(ZtxMatcherSet matcherSet, SymbolRegistry symbolRegistry, TracerTuner tracerTuner) {
@@ -191,5 +192,7 @@ public abstract class Tracer implements ZorkaService, ZorkaSubmitter<SymbolicRec
         return Collections.unmodifiableList(outputs.get());
     }
 
-
+    public TracerTuner getTracerTuner() {
+        return tracerTuner;
+    }
 }

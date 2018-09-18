@@ -165,15 +165,15 @@ public class SymbolRegistry {
     }
 
 
-    public void putMethod(int methodId, String className, String methodName, String methodDescription) {
-        putMethod(methodId, symbolId(className), symbolId(methodName), symbolId(methodDescription));
+    public void putMethod(int methodId, String className, String methodName, String methodSignature) {
+        putMethod(methodId, symbolId(className), symbolId(methodName), symbolId(methodSignature));
     }
 
 
-    public void putMethod(int methodId, int className, int methodName, int methodDescription) {
+    public void putMethod(int methodId, int className, int methodName, int methodSignature) {
         long mdef = (className & MDEF_MASK)
                 | ((methodName & MDEF_MASK) << 21)
-                | ((methodDescription & MDEF_MASK) << 42);
+                | ((methodSignature & MDEF_MASK) << 42);
         methodIds.put(mdef, methodId);
         methodDefs.put(methodId, mdef);
         if (methodId > lastMethodId.get()) {
@@ -181,6 +181,14 @@ public class SymbolRegistry {
         }
     }
 
+    public String getMethod(int mid) {
+        int[] m = methodDef(mid);
+        if (m != null) {
+            return symbolName(m[0]) + "." + symbolName(m[1]) + "()";
+        } else {
+            return "<?>";
+        }
+    }
 
     protected void persist(int id, String name) {
     }

@@ -1,5 +1,6 @@
 package com.jitlogic.zorka.core.spy.tuner;
 
+import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.KVSortingHeap;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
@@ -10,6 +11,7 @@ import com.jitlogic.zorka.core.spy.Tracer;
 
 import java.util.*;
 
+import static com.jitlogic.zorka.common.stats.AgentDiagnostics.*;
 import static com.jitlogic.zorka.core.spy.tuner.TraceDetailStats.*;
 
 public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
@@ -21,7 +23,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
     private volatile long lastCalls;
     private volatile long lastDrops;
-    private volatile long lastErrors;
+    private volatile long lastECalls;
     private volatile long lastLCalls;
 
     private long[] callsv;
@@ -84,27 +86,35 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
         lastCalls = calls;
         lastDrops = drops;
-        lastErrors = errors;
+        lastECalls = errors;
         lastLCalls = lcalls;
+
+        AgentDiagnostics.inc(TUNER_CYCLES);
+        AgentDiagnostics.inc(TUNER_CALLS, calls);
+        AgentDiagnostics.inc(TUNER_DROPS, drops);
+        AgentDiagnostics.inc(TUNER_ECALLS, errors);
+        AgentDiagnostics.inc(TUNER_LCALLS, lcalls);
 
         calcRanks();
         clearStats();
 
         if (auto && lastCalls >= autoCalls) {
-            exclude(autoMpc);
+            exclude(autoMpc, false);
         }
     }
 
-    public synchronized void exclude(int nitems) {
+    public synchronized int exclude(int nitems, boolean force) {
 
-        long cmax = lastCalls * 100L / autoRatio;
         long lcur = 0;
+        long lmax = force ? Long.MAX_VALUE : (lastCalls * 100L / autoRatio);
 
         log.debug("Looking for classes to exclude ...");
 
+        int rc;
+
         Set<String> classNames = new HashSet<String>();
-        for (int i = 0; i < Math.min(nitems, rankList.size()); i++) {
-            RankItem ri = rankList.get(i);
+        for (rc = 0; rc < Math.min(nitems, rankList.size()); rc++) {
+            RankItem ri = rankList.get(rc);
             int mid = ri.getMid();
             int[] cms = registry.methodDef(mid);
             if (cms != null) {
@@ -115,7 +125,12 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             }
 
             lcur += ri.getCalls();
-            if (lcur > cmax) break;
+            if (lcur > lmax) break;
+        }
+
+        if (rc > 0) {
+            rankList = rankList.subList(rc, rankList.size());
+            AgentDiagnostics.inc(TUNER_EXCLUSIONS, rc);
         }
 
         if (!classNames.isEmpty()) {
@@ -125,6 +140,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             log.debug("No classes to reinstrument.");
         }
 
+        return rc;
     }
 
     private synchronized void clearStats() {
@@ -150,6 +166,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             int r = rank(i);
             rl.add(new RankItem(i, r, callsv[i], dropsv[i]));
         }
+
         this.rankList = rl;
     }
 
@@ -242,8 +259,20 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         StringBuilder sb = new StringBuilder();
 
         sb.append(String.format("Status: interval=%dms%n", interval/1000000));
-        sb.append(String.format("calls=%d, drops=%d, errs=%d, lcalls=%d%n", lastCalls, lastDrops, lastErrors, lastLCalls));
+        sb.append(String.format("calls=%d, drops=%d, errs=%d, lcalls=%d%n", lastCalls, lastDrops, lastECalls, lastLCalls));
+        sb.append("--------------------------------------------------\n");
 
+        List<RankItem> lst = rankList;
+
+        if (lst != null && !lst.isEmpty()) {
+            for (RankItem itm : lst) {
+                sb.append(String.format("R=%d c=%d d=%d  %s",
+                        itm.getRank(), itm.getCalls(), itm.getDrops(),
+                        registry.getMethod(itm.getMid())));
+            }
+        } else {
+            sb.append("N/A");
+        }
 
         return sb.toString();
     }
@@ -277,8 +306,8 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         return lastDrops;
     }
 
-    public long getLastErrors() {
-        return lastErrors;
+    public long getLastECalls() {
+        return lastECalls;
     }
 
     public long getLastLCalls() {
