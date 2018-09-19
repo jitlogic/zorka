@@ -1,0 +1,238 @@
+com.liferay.ibm.icu.impl
+ CharTrie
+  getCodePointValue|(I)C
+  getLeadValue|(C)C
+ Trie$DefaultGetFoldingOffset
+  getFoldingOffset|(I)I
+ UCharacterProperty
+  isRuleWhiteSpace|(I)Z
+com.liferay.ibm.icu.lang|UCharacter|getType|(I)I
+com.liferay.ibm.icu.text
+ UTF16
+  charAt|(Ljava/lang/String;I)I
+  getCharCount|(I)I
+  getLeadSurrogate|(I)C
+  getTrailSurrogate|(I)C
+ UnicodeSet
+  add|(I)Lcom/liferay/ibm/icu/text/UnicodeSet;
+  getRangeEnd|(I)I
+  getRangeStart|(I)I
+com.liferay.portal.cache|ThreadLocalCacheAdvice|before|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
+com.liferay.portal.cache.ehcache
+ EhcachePortalCache
+  get|(Ljava/io/Serializable;)Ljava/lang/Object;
+  remove|(Ljava/io/Serializable;)V
+com.liferay.portal.cache.key
+ HashCodeCacheKeyGenerator
+  getCacheKey
+   (Lcom/liferay/portal/kernel/util/StringBundler;)Ljava/io/Serializable;
+   (Lcom/liferay/portal/kernel/util/StringBundler;)Ljava/lang/Long;
+ SimpleCacheKeyGenerator
+  getCacheKey
+   (Lcom/liferay/portal/kernel/util/StringBundler;)Ljava/io/Serializable;
+   (Lcom/liferay/portal/kernel/util/StringBundler;)Ljava/lang/String;
+com.liferay.portal.cache.transactional
+ TransactionalPortalCache
+  get|(Ljava/io/Serializable;)Ljava/lang/Object;
+  put|(Ljava/io/Serializable;Ljava/lang/Object;)V
+  remove|(Ljava/io/Serializable;)V
+com.liferay.portal.dao.orm.common|FinderCacheImpl|removeResult|(Lcom/liferay/portal/kernel/dao/orm/FinderPath;[Ljava/lang/Object;)V
+com.liferay.portal.dao.orm.hibernate
+ StringType
+  deepCopy|(Ljava/lang/Object;)Ljava/lang/Object;
+  nullSafeSet|(Ljava/sql/PreparedStatement;Ljava/lang/Object;ILorg/hibernate/engine/SessionImplementor;)V
+com.liferay.portal.jsonwebservice|JSONWebServiceActionConfig|compareTo|(Lcom/liferay/portal/jsonwebservice/JSONWebServiceActionConfig;)I
+com.liferay.portal.kernel.cache|ThreadLocalCache|get|(Ljava/lang/String;)Ljava/lang/Object;
+com.liferay.portal.kernel.dao.jdbc
+ PrimaryKeyRowMapper
+  mapRow
+   (Ljava/sql/ResultSet;I)Ljava/lang/Long;
+   (Ljava/sql/ResultSet;I)Ljava/lang/Object;
+com.liferay.portal.kernel.dao.orm
+ EntityCacheUtil
+  getResult|(ZLjava/lang/Class;Ljava/io/Serializable;)Ljava/io/Serializable;
+ FinderCacheUtil
+  removeResult|(Lcom/liferay/portal/kernel/dao/orm/FinderPath;[Ljava/lang/Object;)V
+ FinderPath
+  encodeCacheKey|(Z[Ljava/lang/Object;)Ljava/io/Serializable;
+  encodeLocalCacheKey|(Z[Ljava/lang/Object;)Ljava/io/Serializable;
+com.liferay.portal.kernel.io
+ OutputStreamWriter
+  write
+   (I)V
+   (Ljava/lang/String;II)V
+ RestrictedByteArrayCacheOutputStream
+  write|([BII)V
+com.liferay.portal.kernel.io.unsync
+ UnsyncBufferedReader
+  readLine|()Ljava/lang/String;
+ UnsyncByteArrayInputStream
+  read|()I
+ UnsyncPrintWriter
+  write
+   (I)V
+   (Ljava/lang/String;II)V
+ UnsyncStringReader
+  read|()I
+ UnsyncStringWriter
+  write
+   (I)V
+   (Ljava/lang/String;)V
+   (Ljava/lang/String;II)V
+com.liferay.portal.kernel.language|LanguageUtil|getLocale|(Ljava/lang/String;)Ljava/util/Locale;
+com.liferay.portal.kernel.log
+ LogWrapper
+  debug|(Ljava/lang/Object;)V
+  trace
+   (Ljava/lang/Object;)V
+   (Ljava/lang/Object;Ljava/lang/Throwable;)V
+ SanitizerLogWrapper
+  debug|(Ljava/lang/Object;)V
+  trace
+   (Ljava/lang/Object;)V
+   (Ljava/lang/Object;Ljava/lang/Throwable;)V
+com.liferay.portal.kernel.portlet
+ RestrictPortletServletRequest
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  removeAttribute|(Ljava/lang/String;)V
+com.liferay.portal.kernel.security.pacl.permission
+ PortalRuntimePermission
+  checkGetBeanProperty|(Ljava/lang/Class;)V
+ PortalRuntimePermission$NoPACL
+  checkGetBeanProperty|(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;)V
+com.liferay.portal.kernel.servlet
+ BodyContentWrapper
+  write
+   (I)V
+   (Ljava/lang/String;)V
+ FileTimestampUtil
+  getTimestamp|(Ljavax/servlet/ServletContext;Ljava/lang/String;)J
+ PageContextWrapper
+  findAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+ RequestDispatcherAttributeNames
+  contains|(Ljava/lang/String;)Z
+ ServletOutputStreamAdapter
+  write|([BII)V
+com.liferay.portal.kernel.servlet.filters.invoker|FilterMapping|isMatch|(Ljavax/servlet/http/HttpServletRequest;Lcom/liferay/portal/kernel/servlet/filters/invoker/Dispatcher;Ljava/lang/String;)Z
+com.liferay.portal.kernel.servlet.taglib|TagSupport|doEndTag|()I
+com.liferay.portal.kernel.util
+ CentralizedThreadLocal$ThreadLocalMap
+  getEntry|(Lcom/liferay/portal/kernel/util/CentralizedThreadLocal;)Lcom/liferay/portal/kernel/util/CentralizedThreadLocal$Entry;
+  putEntry|(Lcom/liferay/portal/kernel/util/CentralizedThreadLocal;Ljava/lang/Object;)V
+ GetterUtil
+  get
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Z)Z
+  getBoolean
+   (Ljava/lang/String;)Z
+   (Ljava/lang/String;Z)Z
+  getString
+   (Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ HttpUtil
+  encodeURL|(Ljava/lang/String;)Ljava/lang/String;
+ ListWrapper
+  get|(I)Ljava/lang/Object;
+  iterator|()Ljava/util/Iterator;
+  size|()I
+ LocaleUtil
+  fromLanguageId|(Ljava/lang/String;ZZ)Ljava/util/Locale;
+ ResourceBundleUtil
+  getString|(Ljava/util/ResourceBundle;Ljava/lang/String;)Ljava/lang/String;
+ StringBundler
+  append
+   (C)Lcom/liferay/portal/kernel/util/StringBundler;
+   (Ljava/lang/String;)Lcom/liferay/portal/kernel/util/StringBundler;
+  index|()I
+  stringAt|(I)Ljava/lang/String;
+ StringUtil
+  count|(Ljava/lang/String;Ljava/lang/String;)I
+  equalsIgnoreCase|(Ljava/lang/String;Ljava/lang/String;)Z
+  replace
+   (Ljava/lang/String;CC)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;
+  startsWith|(Ljava/lang/String;Ljava/lang/String;)Z
+  toHexString
+   (I)Ljava/lang/String;
+   (J)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+  toLowerCase
+   (Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/util/Locale;)Ljava/lang/String;
+ URLCodec
+  encodeURL|(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
+ UnmodifiableList$1
+  next|()Ljava/lang/Object;
+ Validator
+  isNotNull|(Ljava/lang/String;)Z
+  isNull|(Ljava/lang/String;)Z
+com.liferay.portal.language
+ LanguageImpl
+  getLocale|(Ljava/lang/String;)Ljava/util/Locale;
+ LanguageResources
+  fixValue|(Ljava/lang/String;)Ljava/lang/String;
+  getMessage|(Ljava/util/Locale;Ljava/lang/String;)Ljava/lang/String;
+  getSuperLocale|(Ljava/util/Locale;)Ljava/util/Locale;
+com.liferay.portal.log
+ Log4jLogImpl
+  debug|(Ljava/lang/Object;)V
+  trace
+   (Ljava/lang/Object;)V
+   (Ljava/lang/Object;Ljava/lang/Throwable;)V
+com.liferay.portal.model|PortletConstants|getRootPortletId|(Ljava/lang/String;)Ljava/lang/String;
+com.liferay.portal.model.impl|PortletImpl|compareTo|(Lcom/liferay/portal/model/Portlet;)I
+com.liferay.portal.search.lucene|PerFieldAnalyzer|getAnalyzer|(Ljava/lang/String;)Lorg/apache/lucene/analysis/Analyzer;
+com.liferay.portal.security.xml|StripDoctypeFilter|read|()I
+com.liferay.portal.service
+ ClassNameLocalServiceUtil
+  getClassNameId|(Ljava/lang/Class;)J
+ GroupLocalServiceUtil
+  getGroup|(J)Lcom/liferay/portal/model/Group;
+com.liferay.portal.spring.aop
+ ChainableMethodAdvice
+  invoke|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
+ ServiceBeanAopCacheManager
+  getAnnotation|(Lorg/aopalliance/intercept/MethodInvocation;Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
+  getMethodInterceptorsBag|(Lorg/aopalliance/intercept/MethodInvocation;)Lcom/liferay/portal/spring/aop/MethodInterceptorsBag;
+ ServiceBeanAopProxy
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+ ServiceBeanMethodInvocation
+  proceed|()Ljava/lang/Object;
+  toCacheKeyModel|()Lcom/liferay/portal/spring/aop/ServiceBeanMethodInvocation;
+com.liferay.portal.spring.bean|BeanReferenceRefreshUtil$NoPACL|getNewReferencedBean|(Ljava/lang/String;Lorg/springframework/beans/factory/BeanFactory;)Ljava/lang/Object;
+com.liferay.portal.spring.transaction
+ AnnotationTransactionAttributeSource
+  getTransactionAttribute|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
+ DefaultTransactionExecutor
+  execute|(Lorg/springframework/transaction/PlatformTransactionManager;Lorg/springframework/transaction/interceptor/TransactionAttribute;Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
+ TransactionInterceptor
+  invoke|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
+com.liferay.portal.util|PortalUtil|getClassNameId|(Ljava/lang/Class;)J
+com.liferay.portal.velocity|FastExtendedProperties|get|(Ljava/lang/Object;)Ljava/lang/Object;
+com.liferay.portal.xml
+ ElementImpl
+  elementText|(Ljava/lang/String;)Ljava/lang/String;
+ SAXReaderImpl
+  toNewElements|(Ljava/util/List;)Ljava/util/List;
+com.liferay.portlet
+ PortletConfigImpl
+  getResourceBundle|(Ljava/util/Locale;)Ljava/util/ResourceBundle;
+ PortletRequestImpl
+  removeAttribute|(Ljava/lang/String;)V
+ PortletServletRequest
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  removeAttribute|(Ljava/lang/String;)V
+ PortletURLImpl
+  isParameterIncludedInPath|(Ljava/lang/String;)Z
+com.liferay.taglib.core
+ ChooseTag
+  canRun|()Z
+ ConditionalTagSupport
+  doStartTag|()I
+ WhenTag
+  doStartTag|()I
+com.liferay.util.sl4fj
+ LiferayLoggerAdapter
+  debug|(Ljava/lang/String;)V
+  log|(Lorg/slf4j/Marker;Ljava/lang/String;ILjava/lang/String;[Ljava/lang/Object;Ljava/lang/Throwable;)V
+  trace|(Ljava/lang/String;)V

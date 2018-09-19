@@ -1,4 +1,10 @@
 org.json
+ JSONObject
+  put|(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+  quote
+   (Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/io/Writer;)Ljava/io/Writer;
+  testValidity|(Ljava/lang/Object;)V
  JSONTokener
   back|()V
   next|()C

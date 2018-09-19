@@ -1,0 +1,29 @@
+org.terracotta.context.extractor
+ LazyContextElement
+  attributes|()Ljava/util/Map;
+  identifier|()Ljava/lang/Class;
+org.terracotta.context.query
+ ChainedQuery
+  execute|(Ljava/util/Set;)Ljava/util/Set;
+ Children
+  execute|(Ljava/util/Set;)Ljava/util/Set;
+ Matcher
+  matches|(Ljava/lang/Object;)Z
+ Matchers
+  context|(Lorg/terracotta/context/query/Matcher;)Lorg/terracotta/context/query/Matcher;
+  hasAttribute|(Ljava/lang/String;Ljava/lang/Object;)Lorg/terracotta/context/query/Matcher;
+ NullQuery
+  execute|(Ljava/util/Set;)Ljava/util/Set;
+ QueryBuilder
+  build|()Lorg/terracotta/context/query/Query;
+  chain|(Lorg/terracotta/context/query/Query;)Lorg/terracotta/context/query/QueryBuilder;
+  queryBuilder|()Lorg/terracotta/context/query/QueryBuilder;
+org.terracotta.statistics
+ AbstractOperationStatistic
+  begin|()V
+ GeneralOperationStatistic
+  end|(Ljava/lang/Enum;)V
+org.terracotta.statistics.jsr166e
+ LongAdder
+  add|(J)V
+  increment|()V

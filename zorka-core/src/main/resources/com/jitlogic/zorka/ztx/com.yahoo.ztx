@@ -16,3 +16,17 @@ com.yahoo.platform.yui.javascript
  ScriptOrFnNode
   getDefiningScope|(Ljava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node$Scope;
   putSymbol|(Ljava/lang/String;Lcom/yahoo/platform/yui/javascript/Node$Symbol;)V
+com.yahoo.platform.yui.mozilla.javascript
+ Node
+  addChildToBack|(Lcom/yahoo/platform/yui/mozilla/javascript/Node;)V
+  newString
+   (ILjava/lang/String;)Lcom/yahoo/platform/yui/mozilla/javascript/Node;
+   (Ljava/lang/String;)Lcom/yahoo/platform/yui/mozilla/javascript/Node;
+ ObjArray
+  add|(Ljava/lang/Object;)V
+  get|(I)Ljava/lang/Object;
+  size|()I
+ ObjToIntMap
+  get|(Ljava/lang/Object;I)I
+  intern|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;I)V

@@ -5,6 +5,7 @@ org.springframework.aop.framework
   invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
  ReflectiveMethodInvocation
   proceed|()Ljava/lang/Object;
+org.springframework.aop.framework.autoproxy|AbstractAutoProxyCreator|predictBeanType|(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Class;
 org.springframework.aop.support
  AopUtils
   getTargetClass|(Ljava/lang/Object;)Ljava/lang/Class;
@@ -40,7 +41,11 @@ org.springframework.beans.factory
  BeanFactoryUtils
   isFactoryDereference|(Ljava/lang/String;)Z
   transformedBeanName|(Ljava/lang/String;)Ljava/lang/String;
-org.springframework.beans.factory.config|ConstructorArgumentValues|addArgumentValues|(Lorg/springframework/beans/factory/config/ConstructorArgumentValues;)V
+org.springframework.beans.factory.config
+ ConstructorArgumentValues
+  addArgumentValues|(Lorg/springframework/beans/factory/config/ConstructorArgumentValues;)V
+ InstantiationAwareBeanPostProcessorAdapter
+  predictBeanType|(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Class;
 org.springframework.beans.factory.parsing
  NullSourceExtractor
   extractSource|(Ljava/lang/Object;Lorg/springframework/core/io/Resource;)Ljava/lang/Object;
@@ -53,6 +58,9 @@ org.springframework.beans.factory.support
  AbstractBeanFactory
   getBean|(Ljava/lang/String;)Ljava/lang/Object;
   getRegisteredScope|(Ljava/lang/String;)Lorg/springframework/beans/factory/config/Scope;
+ AutowireUtils
+  isExcludedFromDependencyCheck|(Ljava/beans/PropertyDescriptor;)Z
+  isSetterDefinedInInterface|(Ljava/beans/PropertyDescriptor;Ljava/util/Set;)Z
  DefaultListableBeanFactory
   containsBeanDefinition|(Ljava/lang/String;)Z
   getBeanDefinition|(Ljava/lang/String;)Lorg/springframework/beans/factory/config/BeanDefinition;
@@ -219,6 +227,13 @@ org.springframework.http.converter.xml
  SourceHttpMessageConverter
   supports|(Ljava/lang/Class;)Z
 org.springframework.http.server|ServletServerHttpResponse$ServletResponseHttpHeaders|getFirst|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.jdbc.datasource|LazyConnectionDataSourceProxy$LazyConnectionInvocationHandler|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+org.springframework.jdbc.object|MappingSqlQueryWithParameters$RowMapperImpl|mapRow|(Ljava/sql/ResultSet;I)Ljava/lang/Object;
+org.springframework.orm.hibernate3
+ SessionHolder
+  getSession|(Ljava/lang/Object;)Lorg/hibernate/Session;
+ SpringTransactionFactory
+  areCallbacksLocalToHibernateTransactions|()Z
 org.springframework.transaction.interceptor
  NameMatchTransactionAttributeSource
   getTransactionAttribute|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
@@ -233,7 +248,16 @@ org.springframework.transaction.support
   commit|(Lorg/springframework/transaction/TransactionStatus;)V
   getTransaction|(Lorg/springframework/transaction/TransactionDefinition;)Lorg/springframework/transaction/TransactionStatus;
  TransactionSynchronizationManager
+  clear|()V
+  clearSynchronization|()V
   getResource|(Ljava/lang/Object;)Ljava/lang/Object;
+  initSynchronization|()V
+ TransactionSynchronizationUtils
+  invokeAfterCommit|(Ljava/util/List;)V
+  invokeAfterCompletion|(Ljava/util/List;I)V
+  triggerAfterCommit|()V
+  triggerBeforeCommit|(Z)V
+  triggerBeforeCompletion|()V
  TransactionSynchronizationUtils$ScopedProxyUnwrapper
   unwrapIfNecessary|(Ljava/lang/Object;)Ljava/lang/Object;
 org.springframework.ui
@@ -292,6 +316,8 @@ org.springframework.util
   isEqualsMethod|(Ljava/lang/reflect/Method;)Z
   isHashCodeMethod|(Ljava/lang/reflect/Method;)Z
   makeAccessible|(Ljava/lang/reflect/Method;)V
+ ReflectionUtils$4
+  doWith|(Ljava/lang/reflect/Method;)V
  StreamUtils
   copy|(Ljava/lang/String;Ljava/nio/charset/Charset;Ljava/io/OutputStream;)V
   copyToString|(Ljava/io/InputStream;Ljava/nio/charset/Charset;)Ljava/lang/String;

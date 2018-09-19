@@ -51,10 +51,18 @@ org.apache.catalina.connector
  ResponseFacade
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
 org.apache.catalina.core
+ ApplicationContext
+  getRealPath|(Ljava/lang/String;)Ljava/lang/String;
+ ApplicationContextFacade
+  getRealPath|(Ljava/lang/String;)Ljava/lang/String;
  ApplicationFilterChain
   doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
  ApplicationFilterFactory
   createFilterChain|(Ljavax/servlet/ServletRequest;Lorg/apache/catalina/Wrapper;Ljavax/servlet/Servlet;)Lorg/apache/catalina/core/ApplicationFilterChain;
+ ApplicationHttpRequest
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  getSession|(Z)Ljavax/servlet/http/HttpSession;
+  removeAttribute|(Ljava/lang/String;)V
  ApplicationMapping
   recycle|()V
  ContainerBase
@@ -79,7 +87,9 @@ org.apache.catalina.core
   invoke|(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V
 org.apache.catalina.loader
  WebappClassLoader
+  findResource|(Ljava/lang/String;)Ljava/net/URL;
   findResources|(Ljava/lang/String;)Ljava/util/Enumeration;
+  getResourceAsStream|(Ljava/lang/String;)Ljava/io/InputStream;
   loadClass
    (Ljava/lang/String;)Ljava/lang/Class;
    (Ljava/lang/String;Z)Ljava/lang/Class;
@@ -91,6 +101,8 @@ org.apache.catalina.mapper
 org.apache.catalina.util
  ParameterMap
   clear|()V
+ ResourceSet
+  add|(Ljava/lang/Object;)Z
  SessionConfig
   getSessionUriParamName|(Lorg/apache/catalina/Context;)Ljava/lang/String;
  TLSUtil
@@ -99,38 +111,6 @@ org.apache.catalina.valves|ErrorReportValve|invoke|(Lorg/apache/catalina/connect
 org.apache.catalina.webresources|StandardRoot|getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
 org.apache.chemistry.opencmis.commons.enums|BaseTypeId|value|()Ljava/lang/String;
 org.apache.chemistry.opencmis.commons.impl.dataobjects|AbstractTypeDefinition|addPropertyDefinition|(Lorg/apache/chemistry/opencmis/commons/definitions/PropertyDefinition;)V
-org.apache.commons.beanutils
- PropertyUtilsBean
-  getPropertyDescriptor|(Ljava/lang/Object;Ljava/lang/String;)Ljava/beans/PropertyDescriptor;
-  getPropertyDescriptors
-   (Ljava/lang/Class;)[Ljava/beans/PropertyDescriptor;
-   (Ljava/lang/Object;)[Ljava/beans/PropertyDescriptor;
-org.apache.commons.collections|FastHashMap|get|(Ljava/lang/Object;)Ljava/lang/Object;
-org.apache.commons.dbcp
- DelegatingResultSet
-  getLong|(Ljava/lang/String;)J
-  getString|(Ljava/lang/String;)Ljava/lang/String;
-  next|()Z
-  wasNull|()Z
-org.apache.commons.fileupload
- MultipartStream
-  readByte|()B
- MultipartStream$ItemInputStream
-  available|()I
-  read|([BII)I
-org.apache.commons.httpclient.params|DefaultHttpParams|getParameter|(Ljava/lang/String;)Ljava/lang/Object;
-org.apache.commons.io.output|ThresholdingOutputStream|write|([BII)V
-org.apache.commons.logging
- LogFactory
-  getLog
-   (Ljava/lang/Class;)Lorg/apache/commons/logging/Log;
-   (Ljava/lang/String;)Lorg/apache/commons/logging/Log;
- LogFactory$Log4jDelegate
-  createLog|(Ljava/lang/String;)Lorg/apache/commons/logging/Log;
-org.apache.commons.logging.impl
- Log4JLogger
-  debug|(Ljava/lang/Object;)V
-  trace|(Ljava/lang/Object;)V
 org.apache.coyote
  AbstractProcessor
   action|(Lorg/apache/coyote/ActionCode;Ljava/lang/Object;)V
@@ -318,6 +298,89 @@ org.apache.ibatis.type
   hasTypeHandler
    (Ljava/lang/Class;)Z
    (Ljava/lang/Class;Lorg/apache/ibatis/type/JdbcType;)Z
+org.apache.jasper.compiler
+ AttributeParser
+  getUnquoted|(Ljava/lang/String;CZZ)Ljava/lang/String;
+ Generator$1DeclarationVisitor
+  visit|(Lorg/apache/jasper/compiler/Node$PageDirective;)V
+ JDTCompiler$1
+  findType
+   ([C[[C)Lorg/eclipse/jdt/internal/compiler/env/NameEnvironmentAnswer;
+   ([[C)Lorg/eclipse/jdt/internal/compiler/env/NameEnvironmentAnswer;
+ JDTCompiler$1CompilationUnit
+  ignoreOptionalProblems|()Z
+ JspUtil
+  booleanValue|(Ljava/lang/String;)Z
+  checkAttributes|(Ljava/lang/String;Lorg/apache/jasper/compiler/Node;[Lorg/apache/jasper/compiler/JspUtil$ValidAttribute;Lorg/apache/jasper/compiler/ErrorDispatcher;)V
+  escapeXml|(Ljava/lang/String;)Ljava/lang/String;
+  getExprInXml|(Ljava/lang/String;)Ljava/lang/String;
+  mangleChar|(C)Ljava/lang/String;
+ Node
+  getAttributeValue|(Ljava/lang/String;)Ljava/lang/String;
+  getNamedAttributeNode|(Ljava/lang/String;)Lorg/apache/jasper/compiler/Node$NamedAttribute;
+ Node$CustomTag
+  accept|(Lorg/apache/jasper/compiler/Node$Visitor;)V
+  getNamedAttributeNode|(Ljava/lang/String;)Lorg/apache/jasper/compiler/Node$NamedAttribute;
+  implementsTryCatchFinally|()Z
+ Node$Nodes
+  add|(Lorg/apache/jasper/compiler/Node;)V
+  size|()I
+  visit|(Lorg/apache/jasper/compiler/Node$Visitor;)V
+ Node$PageDirective
+  accept|(Lorg/apache/jasper/compiler/Node$Visitor;)V
+  addImport|(Ljava/lang/String;)V
+  getAttributeValue|(Ljava/lang/String;)Ljava/lang/String;
+ Node$TaglibDirective
+  accept|(Lorg/apache/jasper/compiler/Node$Visitor;)V
+ Node$TemplateText
+  accept|(Lorg/apache/jasper/compiler/Node$Visitor;)V
+  addSmap|(I)V
+ Node$Visitor
+  visit
+   (Lorg/apache/jasper/compiler/Node$PageDirective;)V
+   (Lorg/apache/jasper/compiler/Node$TaglibDirective;)V
+   (Lorg/apache/jasper/compiler/Node$TemplateText;)V
+ PageDataImpl$SecondPassVisitor
+  visit|(Lorg/apache/jasper/compiler/Node$PageDirective;)V
+ PageInfo
+  addImports|(Ljava/util/List;)V
+ Parser
+  parseAttributes|(Lorg/apache/jasper/compiler/ParserController;Lorg/apache/jasper/compiler/JspReader;)Lorg/xml/sax/Attributes;
+ ServletWriter
+  print|(Ljava/lang/String;)V
+  printil|(Ljava/lang/String;)V
+  printin
+   ()V
+   (Ljava/lang/String;)V
+  println|(Ljava/lang/String;)V
+ SmapStratum
+  addFile|(Ljava/lang/String;Ljava/lang/String;)V
+  addLineData|(ILjava/lang/String;III)V
+ SmapUtil$PreScanVisitor
+  doVisit|(Lorg/apache/jasper/compiler/Node;)V
+ TextOptimizer$TextCatVisitor
+  visit|(Lorg/apache/jasper/compiler/Node$PageDirective;)V
+ Validator$DirectiveVisitor
+  visit|(Lorg/apache/jasper/compiler/Node$PageDirective;)V
+org.apache.jasper.runtime
+ BodyContentImpl
+  write
+   (I)V
+   (Ljava/lang/String;)V
+   (Ljava/lang/String;II)V
+ JspWriterImpl
+  print|(Ljava/lang/String;)V
+  write
+   (I)V
+   (Ljava/lang/String;II)V
+ PageContextImpl
+  findAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+org.apache.jasper.servlet|JasperLoader|getResourceAsStream|(Ljava/lang/String;)Ljava/io/InputStream;
+org.apache.jasper.util|UniqueAttributesImpl|addAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+org.apache.jasper.xmlparser
+ TreeNode
+  addChild|(Lorg/apache/jasper/xmlparser/TreeNode;)V
+  findChildren|()Ljava/util/Iterator;
 org.apache.juli.logging|DirectJDKLog|debug|(Ljava/lang/Object;)V
 org.apache.log4j
  Category
@@ -339,11 +402,22 @@ org.apache.logging.slf4j
  SLF4JLoggerContext
   getLogger|(Ljava/lang/String;)Lorg/apache/logging/log4j/spi/ExtendedLogger;
 org.apache.naming
+ NamingContextBindingsEnumeration
+  nextElement
+   ()Ljava/lang/Object;
+   ()Ljavax/naming/Binding;
  StringManager
   getString
    (Ljava/lang/String;)Ljava/lang/String;
    (Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
-org.apache.naming.resources|BaseDirContext|lookup|(Ljava/lang/String;)Ljava/lang/Object;
+org.apache.naming.resources
+ BaseDirContext
+  getRealPath|(Ljava/lang/String;)Ljava/lang/String;
+  lookup|(Ljava/lang/String;)Ljava/lang/Object;
+ ProxyDirContext
+  lookup|(Ljava/lang/String;)Ljava/lang/Object;
+ ResourceCache
+  lookup|(Ljava/lang/String;)Lorg/apache/naming/resources/CacheEntry;
 org.apache.openjpa.kernel
  BrokerImpl
   assertOpen|()V
@@ -367,6 +441,23 @@ org.apache.solr.schema
  SchemaField
   indexed|()Z
 org.apache.solr.search|DocSetCollector|collect|(I)V
+org.apache.taglibs.standard.tlv
+ JstlCoreTLV$Handler
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+ JstlFmtTLV$Handler
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+ JstlSqlTLV$Handler
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+ JstlXmlTLV$Handler
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
 org.apache.tika.io|ProxyInputStream|read|([BII)I
 org.apache.tika.parser.pdf|PDF2XHTML$1|write|([CII)V
 org.apache.tika.sax
@@ -558,202 +649,39 @@ org.apache.tomcat.util.threads
  ThreadPoolExecutor
   execute|(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)V
 org.apache.tomcat.websocket.server|WsFilter|doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V
-org.apache.xerces.dom
- AttrImpl
-  cloneNode|(Z)Lorg/w3c/dom/Node;
- ChildNode
-  cloneNode|(Z)Lorg/w3c/dom/Node;
- DeferredDocumentImpl
-  appendChild|(II)V
-  createDeferredAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
-  createDeferredElement|(Ljava/lang/String;Ljava/lang/String;)I
-  createDeferredTextNode|(Ljava/lang/String;Z)I
-  getLastChild
-   (I)I
-   (IZ)I
-  getNodeExtra
-   (I)I
-   (IZ)I
-  getNodeName
-   (I)Ljava/lang/String;
-   (IZ)Ljava/lang/String;
-  getNodeObject|(I)Lorg/apache/xerces/dom/DeferredNode;
-  getNodeType|(IZ)S
-  getNodeValueString|(IZ)Ljava/lang/String;
-  getParentNode|(IZ)I
-  getPrevSibling
-   (I)I
-   (IZ)I
-  getRealPrevSibling|(IZ)I
-  getTypeInfo|(I)Ljava/lang/Object;
- ElementImpl
-  getAttribute|(Ljava/lang/String;)Ljava/lang/String;
-  getAttributeNode|(Ljava/lang/String;)Lorg/w3c/dom/Attr;
- NamedNodeMapImpl
-  getNamedItem|(Ljava/lang/String;)Lorg/w3c/dom/Node;
-  item|(I)Lorg/w3c/dom/Node;
- NodeImpl
-  appendChild|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
-  cloneNode|(Z)Lorg/w3c/dom/Node;
-  needsSyncChildren|(Z)V
- ParentNode
-  insertBefore|(Lorg/w3c/dom/Node;Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
-  item|(I)Lorg/w3c/dom/Node;
-org.apache.xerces.impl
- XMLDocumentFragmentScannerImpl
-  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
-  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
- XMLDocumentFragmentScannerImpl$ElementStack
-  popElement|(Lorg/apache/xerces/xni/QName;)V
-  pushElement|(Lorg/apache/xerces/xni/QName;)Lorg/apache/xerces/xni/QName;
- XMLEntityManager
-  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
-  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
- XMLEntityManager$RewindableInputStream
-  readAndBuffer|()I
- XMLEntityScanner
-  peekChar|()I
-  scanChar|()I
-  scanContent|(Lorg/apache/xerces/xni/XMLString;)I
-  scanLiteral|(ILorg/apache/xerces/xni/XMLString;)I
-  skipChar|(I)Z
-  skipSpaces|()Z
-  skipString|(Ljava/lang/String;)Z
-org.apache.xerces.impl.dtd
- DTDGrammar
-  comment|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
-  element|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
-  endAttlist|(Lorg/apache/xerces/xni/Augmentations;)V
-  endContentModel|(Lorg/apache/xerces/xni/Augmentations;)V
-  endGroup|(Lorg/apache/xerces/xni/Augmentations;)V
-  getAttributeDecl|(ILorg/apache/xerces/impl/dtd/XMLAttributeDecl;)Z
-  getAttributeDeclIndex|(ILjava/lang/String;)I
-  getContentSpec|(ILorg/apache/xerces/impl/dtd/XMLContentSpec;)Z
-  getContentSpecType|(I)S
-  getElementDecl|(ILorg/apache/xerces/impl/dtd/XMLElementDecl;)Z
-  getElementDeclIndex|(Ljava/lang/String;)I
-  getFirstAttributeDeclIndex|(I)I
-  getNextAttributeDeclIndex|(I)I
-  occurrence|(SLorg/apache/xerces/xni/Augmentations;)V
-  separator|(SLorg/apache/xerces/xni/Augmentations;)V
-  startAttlist|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
-  startContentModel|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
-  startGroup|(Lorg/apache/xerces/xni/Augmentations;)V
- DTDGrammar$QNameHashtable
-  get|(Ljava/lang/String;)I
-  put|(Ljava/lang/String;I)V
- XMLDTDProcessor
-  element|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
-  endAttlist|(Lorg/apache/xerces/xni/Augmentations;)V
-  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
-  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
-  separator|(SLorg/apache/xerces/xni/Augmentations;)V
-  startAttlist|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
- XMLDTDValidator
-  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
-  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
- XMLSimpleType
-  clear|()V
-org.apache.xerces.impl.dtd.models
- CMNode
-  firstPos|()Lorg/apache/xerces/impl/dtd/models/CMStateSet;
-  lastPos|()Lorg/apache/xerces/impl/dtd/models/CMStateSet;
-  type|()I
- CMStateSet
-  getBit|(I)Z
-  union|(Lorg/apache/xerces/impl/dtd/models/CMStateSet;)V
-  zeroBits|()V
- DFAContentModel
-  validate|([Lorg/apache/xerces/xni/QName;II)I
-org.apache.xerces.impl.xs|XSGrammarBucket|getGrammar|(Ljava/lang/String;)Lorg/apache/xerces/impl/xs/SchemaGrammar;
-org.apache.xerces.impl.xs.opti|SchemaDOMParser|characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
-org.apache.xerces.impl.xs.util|XSObjectListImpl|item|(I)Lorg/apache/xerces/xs/XSObject;
-org.apache.xerces.parsers
- AbstractDOMParser
-  attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
-  characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
-  ignorableWhitespace|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
- AbstractSAXParser
-  attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
- AbstractXMLDocumentParser
-  element|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
-  endAttlist|(Lorg/apache/xerces/xni/Augmentations;)V
-  endContentModel|(Lorg/apache/xerces/xni/Augmentations;)V
-  endGroup|(Lorg/apache/xerces/xni/Augmentations;)V
-  occurrence|(SLorg/apache/xerces/xni/Augmentations;)V
-  separator|(SLorg/apache/xerces/xni/Augmentations;)V
-  startAttlist|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
-  startContentModel|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
-  startGroup|(Lorg/apache/xerces/xni/Augmentations;)V
- SecuritySupport$3
-  run|()Ljava/lang/Object;
-org.apache.xerces.util
- AugmentationsImpl
-  getItem|(Ljava/lang/String;)Ljava/lang/Object;
-  putItem|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
-  removeAllItems|()V
- AugmentationsImpl$SmallContainer
-  clear|()V
-  getItem|(Ljava/lang/Object;)Ljava/lang/Object;
-  putItem|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
- DOMUtil
-  getLocalName|(Lorg/w3c/dom/Node;)Ljava/lang/String;
-  getNamespaceURI|(Lorg/w3c/dom/Node;)Ljava/lang/String;
- IntStack
-  pop|()I
-  push|(I)V
- NamespaceSupport
-  getURI|(Ljava/lang/String;)Ljava/lang/String;
-  popContext|()V
-  pushContext|()V
- ParserConfigurationSettings
-  addRecognizedFeatures|([Ljava/lang/String;)V
-  addRecognizedProperties|([Ljava/lang/String;)V
-  getFeature|(Ljava/lang/String;)Z
-  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
- SymbolHash
-  get|(Ljava/lang/Object;)Ljava/lang/Object;
- SymbolTable
-  addSymbol|([CII)Ljava/lang/String;
-  hash
-   (Ljava/lang/String;)I
-   ([CII)I
- XMLAttributesImpl
-  getAugmentations|(I)Lorg/apache/xerces/xni/Augmentations;
-  getIndex|(Ljava/lang/String;Ljava/lang/String;)I
-  getIndexFast|(Ljava/lang/String;)I
-  getLocalName|(I)Ljava/lang/String;
-  getName|(ILorg/apache/xerces/xni/QName;)V
-  getPrefix|(I)Ljava/lang/String;
-  getQName|(I)Ljava/lang/String;
-  getType|(I)Ljava/lang/String;
-  getURI|(I)Ljava/lang/String;
-  getValue|(I)Ljava/lang/String;
-  isSpecified|(I)Z
-  removeAllAttributes|()V
- XMLChar
-  isContent|(I)Z
-  isHighSurrogate|(I)Z
-  isInvalid|(I)Z
-  isNCName|(I)Z
-  isNCNameStart|(I)Z
-  isName|(I)Z
-  isNameStart|(I)Z
-  isPubid|(I)Z
-  isSpace|(I)Z
-  isValid|(I)Z
-  isValidNmtoken|(Ljava/lang/String;)Z
- XMLStringBuffer
-  append
-   (C)V
-   (Ljava/lang/String;)V
-   ([CII)V
-  clear|()V
-org.apache.xerces.xni
- QName
-  clear|()V
- XMLString
-  clear|()V
+org.apache.velocity.runtime|RuntimeInstance|getBoolean|(Ljava/lang/String;Z)Z
+org.apache.velocity.runtime.parser
+ JJTParserState
+  closeNodeScope|(Lorg/apache/velocity/runtime/parser/node/Node;Z)V
+  nodeArity|()I
+  openNodeScope|(Lorg/apache/velocity/runtime/parser/node/Node;)V
+  popNode|()Lorg/apache/velocity/runtime/parser/node/Node;
+  pushNode|(Lorg/apache/velocity/runtime/parser/node/Node;)V
+ Parser
+  getToken|(I)Lorg/apache/velocity/runtime/parser/Token;
+ ParserTokenManager
+  SwitchTo|(I)V
+  stateStackPop|()Z
+  stateStackPush|()Z
+ Token
+  newToken|(I)Lorg/apache/velocity/runtime/parser/Token;
+ VelocityCharStream
+  BeginToken|()C
+  GetImage|()Ljava/lang/String;
+  GetSuffix|(I)[C
+  backup|(I)V
+  readChar|()C
+org.apache.velocity.runtime.parser.node
+ NodeUtils
+  tokenLiteral|(Lorg/apache/velocity/runtime/parser/Token;)Ljava/lang/String;
+ SimpleNode
+  init|(Lorg/apache/velocity/context/InternalContextAdapter;Ljava/lang/Object;)Ljava/lang/Object;
+  jjtAddChild|(Lorg/apache/velocity/runtime/parser/node/Node;I)V
+  jjtClose|()V
+  jjtGetChild|(I)Lorg/apache/velocity/runtime/parser/node/Node;
+  jjtGetNumChildren|()I
+  jjtOpen|()V
+  jjtSetParent|(Lorg/apache/velocity/runtime/parser/node/Node;)V
 org.apache.xml.dtm.ref
  DTMDefaultBase
   getNodeType|(I)S

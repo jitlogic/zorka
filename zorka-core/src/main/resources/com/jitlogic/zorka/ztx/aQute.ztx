@@ -1,0 +1,45 @@
+aQute.bnd.header
+ Attrs
+  containsKey|(Ljava/lang/String;)Z
+  entrySet|()Ljava/util/Set;
+  get|(Ljava/lang/String;)Ljava/lang/String;
+ Parameters
+  containsKey|(Ljava/lang/String;)Z
+  put|(Ljava/lang/String;LaQute/bnd/header/Attrs;)LaQute/bnd/header/Attrs;
+aQute.bnd.osgi
+ Analyzer
+  findClass|(LaQute/bnd/osgi/Descriptors$TypeRef;)LaQute/bnd/osgi/Clazz;
+ Clazz
+  parseDescriptor|(Ljava/lang/String;I)V
+  reset|()V
+ Clazz$JAVA
+  values|()[LaQute/bnd/osgi/Clazz$JAVA;
+ Descriptors
+  binaryToFQN|(Ljava/lang/String;)Ljava/lang/String;
+  fqnToBinary|(Ljava/lang/String;)Ljava/lang/String;
+  getPackageRef|(Ljava/lang/String;)LaQute/bnd/osgi/Descriptors$PackageRef;
+  getTypeRef|(Ljava/lang/String;)LaQute/bnd/osgi/Descriptors$TypeRef;
+ Descriptors$PackageRef
+  compareTo|(LaQute/bnd/osgi/Descriptors$PackageRef;)I
+ Instruction
+  matches|(Ljava/lang/String;)Z
+ Jar
+  getResource|(Ljava/lang/String;)LaQute/bnd/osgi/Resource;
+  updateModified|(JLjava/lang/String;)V
+ Packages
+  containsKey|(LaQute/bnd/osgi/Descriptors$PackageRef;)Z
+  get|(LaQute/bnd/osgi/Descriptors$PackageRef;)LaQute/bnd/header/Attrs;
+  keySet|()Ljava/util/Set;
+  put|(LaQute/bnd/osgi/Descriptors$PackageRef;LaQute/bnd/header/Attrs;)LaQute/bnd/header/Attrs;
+ Processor
+  removeDuplicateMarker|(Ljava/lang/String;)Ljava/lang/String;
+  unsetProperty|(Ljava/lang/String;)V
+ ZipResource
+  lastModified|()J
+  openInputStream|()Ljava/io/InputStream;
+aQute.lib.collections|MultiMap|addAll|(Ljava/lang/Object;Ljava/util/Collection;)Z
+aQute.libg.generics
+ Create
+  list|()Ljava/util/List;
+  set|()Ljava/util/Set;
+aQute.libg.qtokens|QuotedTokenizer|nextToken|(Ljava/lang/String;)Ljava/lang/String;

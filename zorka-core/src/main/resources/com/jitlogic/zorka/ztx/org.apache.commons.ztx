@@ -1,0 +1,104 @@
+org.apache.commons.beanutils
+ MethodUtils
+  getAccessibleMethod|(Ljava/lang/Class;Ljava/lang/reflect/Method;)Ljava/lang/reflect/Method;
+ PropertyUtilsBean
+  getPropertyDescriptor|(Ljava/lang/Object;Ljava/lang/String;)Ljava/beans/PropertyDescriptor;
+  getPropertyDescriptors
+   (Ljava/lang/Class;)[Ljava/beans/PropertyDescriptor;
+   (Ljava/lang/Object;)[Ljava/beans/PropertyDescriptor;
+ WeakFastHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+org.apache.commons.beanutils.expression
+ DefaultResolver
+  getProperty|(Ljava/lang/String;)Ljava/lang/String;
+  isIndexed|(Ljava/lang/String;)Z
+  isMapped|(Ljava/lang/String;)Z
+  next|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.commons.collections
+ ArrayStack
+  pop|()Ljava/lang/Object;
+  push|(Ljava/lang/Object;)Ljava/lang/Object;
+ ExtendedProperties
+  getBoolean
+   (Ljava/lang/String;Ljava/lang/Boolean;)Ljava/lang/Boolean;
+   (Ljava/lang/String;Z)Z
+ FastHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+org.apache.commons.collections.map
+ AbstractHashedMap
+  containsKey|(Ljava/lang/Object;)Z
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  remove|(Ljava/lang/Object;)Ljava/lang/Object;
+ AbstractLinkedMap$KeySetIterator
+  next|()Ljava/lang/Object;
+ LRUMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+org.apache.commons.configuration
+ AbstractConfiguration
+  getList|(Ljava/lang/String;)Ljava/util/List;
+  getString
+   (Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ AbstractFileConfiguration
+  containsKey|(Ljava/lang/String;)Z
+  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
+  reload|()V
+ BaseConfiguration
+  containsKey|(Ljava/lang/String;)Z
+  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
+ CompositeConfiguration
+  getList|(Ljava/lang/String;Ljava/util/List;)Ljava/util/List;
+  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
+ MapConfiguration
+  containsKey|(Ljava/lang/String;)Z
+ PropertyConverter
+  interpolate|(Ljava/lang/Object;Lorg/apache/commons/configuration/AbstractConfiguration;)Ljava/lang/Object;
+org.apache.commons.configuration.reloading|InvariantReloadingStrategy|reloadingRequired|()Z
+org.apache.commons.dbcp
+ DelegatingResultSet
+  getLong|(Ljava/lang/String;)J
+  getString|(Ljava/lang/String;)Ljava/lang/String;
+  next|()Z
+  wasNull|()Z
+org.apache.commons.fileupload
+ MultipartStream
+  readByte|()B
+ MultipartStream$ItemInputStream
+  available|()I
+  read|([BII)I
+org.apache.commons.httpclient.params|DefaultHttpParams|getParameter|(Ljava/lang/String;)Ljava/lang/Object;
+org.apache.commons.io.output|ThresholdingOutputStream|write|([BII)V
+org.apache.commons.lang
+ ArrayUtils
+  contains|([CC)Z
+  indexOf
+   ([CC)I
+   ([CCI)I
+ StringUtils
+  join|(Ljava/util/Iterator;C)Ljava/lang/String;
+org.apache.commons.lang.text
+ StrBuilder
+  append
+   (C)Lorg/apache/commons/lang/text/StrBuilder;
+   (Ljava/lang/Object;)Lorg/apache/commons/lang/text/StrBuilder;
+   (Ljava/lang/String;)Lorg/apache/commons/lang/text/StrBuilder;
+  ensureCapacity|(I)Lorg/apache/commons/lang/text/StrBuilder;
+  length|()I
+ StrMatcher$StringMatcher
+  isMatch|([CIII)I
+ StrSubstitutor
+  replace|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.commons.logging
+ LogFactory
+  getLog
+   (Ljava/lang/Class;)Lorg/apache/commons/logging/Log;
+   (Ljava/lang/String;)Lorg/apache/commons/logging/Log;
+ LogFactory$Log4jDelegate
+  createLog|(Ljava/lang/String;)Lorg/apache/commons/logging/Log;
+org.apache.commons.logging.impl
+ Log4JLogger
+  debug|(Ljava/lang/Object;)V
+  trace|(Ljava/lang/Object;)V
+ SLF4JLocationAwareLog
+  trace|(Ljava/lang/Object;)V

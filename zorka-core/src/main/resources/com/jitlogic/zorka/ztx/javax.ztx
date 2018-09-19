@@ -1,3 +1,9 @@
+javax.crypto
+ Mac
+  doFinal
+   ()[B
+   ([BI)V
+  update|([B)V
 javax.el
  ArrayELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -16,6 +22,24 @@ javax.el
  ResourceBundleELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 javax.management.modelmbean|DescriptorSupport|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
+javax.management.openmbean
+ ArrayType
+  isValue|(Ljava/lang/Object;)Z
+ CompositeType
+  getType|(Ljava/lang/String;)Ljavax/management/openmbean/OpenType;
+  keySet|()Ljava/util/Set;
+ SimpleType
+  isValue|(Ljava/lang/Object;)Z
+javax.media.jai
+ ImageLayout
+  isValid|(I)Z
+  setValid|(I)Ljavax/media/jai/ImageLayout;
+ PlanarImage
+  XToTileX|(III)I
+  YToTileY|(III)I
+  getSourceImage|(I)Ljavax/media/jai/PlanarImage;
+  tileXToX|(III)I
+  tileYToY|(III)I
 javax.naming
  NameImpl
   get|(I)Ljava/lang/String;

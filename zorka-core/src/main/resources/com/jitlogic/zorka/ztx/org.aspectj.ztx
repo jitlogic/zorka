@@ -1,0 +1,20 @@
+org.aspectj.lang.reflect|AjTypeSystem|getAjType|(Ljava/lang/Class;)Lorg/aspectj/lang/reflect/AjType;
+org.aspectj.util
+ FuzzyBoolean
+  fromBoolean|(Z)Lorg/aspectj/util/FuzzyBoolean;
+ FuzzyBoolean$NoFuzzyBoolean
+  maybeTrue|()Z
+org.aspectj.weaver
+ TypeFactory
+  createTypeFromSignature|(Ljava/lang/String;)Lorg/aspectj/weaver/UnresolvedType;
+ UnresolvedType
+  needsModifiableDelegate|()Z
+ World$TypeMap
+  checkq|()V
+  put|(Ljava/lang/String;Lorg/aspectj/weaver/ResolvedType;)Lorg/aspectj/weaver/ResolvedType;
+org.aspectj.weaver.patterns|NamePattern|matches|([C)Z
+org.aspectj.weaver.reflect
+ ReflectionBasedReferenceTypeDelegate
+  ensureConsistent|()V
+  initialize|(Lorg/aspectj/weaver/ReferenceType;Ljava/lang/Class;Ljava/lang/ClassLoader;Lorg/aspectj/weaver/World;)V
+org.aspectj.weaver.tools|FuzzyBoolean|fromBoolean|(Z)Lorg/aspectj/weaver/tools/FuzzyBoolean;

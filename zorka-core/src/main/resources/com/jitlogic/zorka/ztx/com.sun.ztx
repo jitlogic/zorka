@@ -25,7 +25,18 @@ com.sun.el.parser
   getValue|(Lcom/sun/el/lang/EvaluationContext;)Ljava/lang/Object;
  SimpleNode
   accept|(Lcom/sun/el/parser/NodeVisitor;)V
-com.sun.jmx.mbeanserver|Repository$ObjectNamePattern|matchKeys|(Ljavax/management/ObjectName;)Z
+com.sun.imageio.plugins.png
+ IDATOutputStream
+  deflate|()V
+ RowFilter
+  filterRow|(I[B[B[[BII)I
+com.sun.jmx.mbeanserver
+ DefaultMXBeanMappingFactory$NonNullMXBeanMapping
+  toOpenValue|(Ljava/lang/Object;)Ljava/lang/Object;
+ Repository$ObjectNamePattern
+  matchKeys|(Ljavax/management/ObjectName;)Z
+com.sun.media.jai.codecimpl|PNGChunk|getByte|(I)B
+com.sun.media.jai.util|CaselessStringArrayTable|indexOf|(Ljavax/media/jai/util/CaselessStringKey;)I
 com.sun.org.apache.regexp.internal
  StringCharacterIterator
   charAt|(I)C
@@ -77,6 +88,10 @@ com.sun.org.apache.xerces.internal.impl
   next|()I
  XMLDocumentScannerImpl$XMLDeclDriver
   next|()I
+ XMLEntityManager$RewindableInputStream
+  read
+   ()I
+   ([BII)I
  XMLEntityScanner
   arrangeCapacity|(IZ)Z
   peekChar|()I
@@ -126,8 +141,11 @@ com.sun.org.apache.xerces.internal.impl.dtd
   reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
   startDocument|(Lcom/sun/org/apache/xerces/internal/xni/XMLLocator;Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/xni/NamespaceContext;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
   validate|()Z
+ XMLSimpleType
+  clear|()V
 com.sun.org.apache.xerces.internal.impl.dtd.models|CMNode|type|()I
 com.sun.org.apache.xerces.internal.impl.dv|DTDDVFactory|getInstance|(Ljava/lang/String;)Lcom/sun/org/apache/xerces/internal/impl/dv/DTDDVFactory;
+com.sun.org.apache.xerces.internal.impl.io|UTF8Reader|read|([CII)I
 com.sun.org.apache.xerces.internal.impl.validation
  ValidationManager
   addValidationState|(Lcom/sun/org/apache/xerces/internal/impl/validation/ValidationState;)V
@@ -255,13 +273,23 @@ com.sun.org.apache.xerces.internal.utils
  XMLSecurityPropertyManager$Property
   equalsName|(Ljava/lang/String;)Z
   values|()[Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityPropertyManager$Property;
-com.sun.org.apache.xerces.internal.xni|QName|clear|()V
+com.sun.org.apache.xerces.internal.xni
+ QName
+  clear|()V
+ XMLString
+  clear|()V
 com.sun.org.apache.xml.internal.dtm.ref.sax2dtm|SAX2DTM2|_exptype2|(I)I
 com.sun.org.apache.xml.internal.serializer|WriterToUTF8Buffered|write|(I)V
 com.sun.org.apache.xpath.internal.compiler|OpMapVector|elementAt|(I)I
 com.sun.proxy
  $Proxy1
   annotationType|()Ljava/lang/Class;
+ $Proxy10
+  value|()Ljava/lang/String;
+ $Proxy12
+  annotationType|()Ljava/lang/Class;
+  name|()Ljava/lang/String;
+  type|()Ljava/lang/Class;
  $Proxy16
   getQName
    (Ljava/lang/Long;)Lorg/alfresco/util/Pair;
@@ -272,6 +300,8 @@ com.sun.proxy
   getProperty|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Ljava/io/Serializable;
   getType|(Lorg/alfresco/service/cmr/repository/NodeRef;)Lorg/alfresco/service/namespace/QName;
   hasAspect|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Z
+ $Proxy23
+  getClassNameId|(Ljava/lang/Class;)J
  $Proxy26
   annotationType|()Ljava/lang/Class;
  $Proxy29
@@ -282,6 +312,11 @@ com.sun.proxy
   annotationType|()Ljava/lang/Class;
  $Proxy31
   annotationType|()Ljava/lang/Class;
+ $Proxy311
+  annotationType|()Ljava/lang/Class;
+  scope|()Lcom/liferay/portal/kernel/cache/Lifecycle;
+ $Proxy34
+  getGroup|(J)Lcom/liferay/portal/model/Group;
  $Proxy4
   annotationType|()Ljava/lang/Class;
  $Proxy41

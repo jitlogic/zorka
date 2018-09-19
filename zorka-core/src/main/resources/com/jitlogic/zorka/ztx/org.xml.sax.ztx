@@ -1,4 +1,12 @@
 org.xml.sax.helpers
+ AttributesImpl
+  addAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  getLocalName|(I)Ljava/lang/String;
+  getQName|(I)Ljava/lang/String;
+  getValue
+   (I)Ljava/lang/String;
+   (Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  DefaultHandler
   endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V

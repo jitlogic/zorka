@@ -1,0 +1,11 @@
+jodd.asm4
+ ClassReader
+  readInt|(I)I
+  readUTF8|(I[C)Ljava/lang/String;
+  readUnsignedShort|(I)I
+ MethodVisitor
+  visitLabel|(Ljodd/asm4/Label;)V
+  visitLineNumber|(ILjodd/asm4/Label;)V
+  visitVarInsn|(II)V
+jodd.paramo|MethodFinder|visitMethod|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Ljodd/asm4/MethodVisitor;
+jodd.util|ReflectUtil|compareSignatures|(Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)Z

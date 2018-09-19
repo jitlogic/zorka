@@ -1,0 +1,14 @@
+net.sf.ehcache
+ Cache$CacheStatus
+  checkAlive|(Lnet/sf/ehcache/config/CacheConfiguration;)V
+ CacheManager
+  getCache|(Ljava/lang/String;)Lnet/sf/ehcache/Cache;
+net.sf.ehcache.event|RegisteredEventListeners|notifyElementRemoved|(Lnet/sf/ehcache/Element;Z)V
+net.sf.ehcache.store
+ MemoryStore
+  get|(Ljava/lang/Object;)Lnet/sf/ehcache/Element;
+  remove|(Ljava/lang/Object;)Lnet/sf/ehcache/Element;
+net.sf.ehcache.util
+ TimeUtil
+  convertTimeToInt|(J)I
+  toMillis|(I)J

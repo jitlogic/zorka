@@ -1,3 +1,4 @@
+sun.java2d|StateTrackableDelegate|markDirty|()V
 sun.misc
  FDBigInteger
   cmp|(Lsun/misc/FDBigInteger;)I
