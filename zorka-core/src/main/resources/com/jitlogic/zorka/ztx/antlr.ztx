@@ -2,6 +2,8 @@ antlr
  ANTLRStringBuffer
   append|(C)V
   length|()I
+ ASTPair
+  advanceChildToEnd|()V
  CharBuffer
   fill|(I)V
  CharQueue
@@ -9,7 +11,9 @@ antlr
   elementAt|(I)C
   removeFirst|()V
  CharScanner
+  LA|(I)C
   append|(C)V
+  consume|()V
   toLower|(C)C
  InputBuffer
   LA|(I)C

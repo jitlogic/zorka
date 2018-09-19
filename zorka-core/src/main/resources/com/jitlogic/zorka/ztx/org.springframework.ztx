@@ -1,18 +1,83 @@
+org.springframework.aop.framework
+ AdvisedSupport
+  getInterceptorsAndDynamicInterceptionAdvice|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Ljava/util/List;
+ JdkDynamicAopProxy
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+ ReflectiveMethodInvocation
+  proceed|()Ljava/lang/Object;
+org.springframework.aop.support
+ AopUtils
+  getTargetClass|(Ljava/lang/Object;)Ljava/lang/Class;
+  invokeJoinpointUsingReflection|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+  isEqualsMethod|(Ljava/lang/reflect/Method;)Z
+  isHashCodeMethod|(Ljava/lang/reflect/Method;)Z
+org.springframework.aop.target|AbstractBeanFactoryBasedTargetSource|releaseTarget|(Ljava/lang/Object;)V
+org.springframework.asm
+ ClassReader
+  readUTF8|(I[C)Ljava/lang/String;
+  readUnsignedShort|(I)I
 org.springframework.beans
  BeanUtils
   instantiateClass
    (Ljava/lang/Class;)Ljava/lang/Object;
    (Ljava/lang/reflect/Constructor;[Ljava/lang/Object;)Ljava/lang/Object;
+ BeanWrapperImpl
+  isWritableProperty|(Ljava/lang/String;)Z
+ ExtendedBeanInfo
+  isCandidateWriteMethod|(Ljava/lang/reflect/Method;)Z
+ MutablePropertyValues
+  addPropertyValue|(Lorg/springframework/beans/PropertyValue;)Lorg/springframework/beans/MutablePropertyValues;
+  addPropertyValues|(Lorg/springframework/beans/PropertyValues;)Lorg/springframework/beans/MutablePropertyValues;
+ PropertyAccessorUtils
+  getFirstNestedPropertySeparatorIndex|(Ljava/lang/String;)I
+  isNestedOrIndexedProperty|(Ljava/lang/String;)Z
  PropertyEditorRegistrySupport
   findCustomEditor|(Ljava/lang/Class;Ljava/lang/String;)Ljava/beans/PropertyEditor;
+  overrideDefaultEditor|(Ljava/lang/Class;Ljava/beans/PropertyEditor;)V
  TypeConverterSupport
   convertIfNecessary|(Ljava/lang/Object;Ljava/lang/Class;Lorg/springframework/core/MethodParameter;)Ljava/lang/Object;
+org.springframework.beans.factory
+ BeanFactoryUtils
+  isFactoryDereference|(Ljava/lang/String;)Z
+  transformedBeanName|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.beans.factory.config|ConstructorArgumentValues|addArgumentValues|(Lorg/springframework/beans/factory/config/ConstructorArgumentValues;)V
+org.springframework.beans.factory.parsing
+ NullSourceExtractor
+  extractSource|(Ljava/lang/Object;Lorg/springframework/core/io/Resource;)Ljava/lang/Object;
+ ParseState
+  pop|()V
+  push|(Lorg/springframework/beans/factory/parsing/ParseState$Entry;)V
+org.springframework.beans.factory.support
+ AbstractBeanDefinition
+  copyQualifiersFrom|(Lorg/springframework/beans/factory/support/AbstractBeanDefinition;)V
+ AbstractBeanFactory
+  getBean|(Ljava/lang/String;)Ljava/lang/Object;
+  getRegisteredScope|(Ljava/lang/String;)Lorg/springframework/beans/factory/config/Scope;
+ DefaultListableBeanFactory
+  containsBeanDefinition|(Ljava/lang/String;)Z
+  getBeanDefinition|(Ljava/lang/String;)Lorg/springframework/beans/factory/config/BeanDefinition;
+ DefaultSingletonBeanRegistry
+  containsSingleton|(Ljava/lang/String;)Z
+  getSingleton|(Ljava/lang/String;)Ljava/lang/Object;
+  isSingletonCurrentlyInCreation|(Ljava/lang/String;)Z
+ MethodOverrides
+  addOverrides|(Lorg/springframework/beans/factory/support/MethodOverrides;)V
+org.springframework.beans.factory.xml
+ BeanDefinitionParserDelegate
+  getLocalName|(Lorg/w3c/dom/Node;)Ljava/lang/String;
+  getNamespaceURI|(Lorg/w3c/dom/Node;)Ljava/lang/String;
+  nodeNameEquals|(Lorg/w3c/dom/Node;Ljava/lang/String;)Z
 org.springframework.context.expression|StandardBeanExpressionResolver|evaluate|(Ljava/lang/String;Lorg/springframework/beans/factory/config/BeanExpressionContext;)Ljava/lang/Object;
 org.springframework.context.i18n|LocaleContextHolder|resetLocaleContext|()V
 org.springframework.context.support|AbstractApplicationContext|publishEvent|(Lorg/springframework/context/ApplicationEvent;)V
 org.springframework.core
+ AttributeAccessorSupport
+  attributeNames|()[Ljava/lang/String;
  BridgeMethodResolver
   findBridgedMethod|(Ljava/lang/reflect/Method;)Ljava/lang/reflect/Method;
+ GenericTypeResolver
+  getTargetType|(Lorg/springframework/core/MethodParameter;)Ljava/lang/reflect/Type;
+  getTypeVariableMap|(Ljava/lang/Class;)Ljava/util/Map;
  KotlinDetector
   isKotlinType|(Ljava/lang/Class;)Z
  MethodParameter
@@ -34,6 +99,9 @@ org.springframework.core
   resolve
    ()Ljava/lang/Class;
    (Ljava/lang/Class;)Ljava/lang/Class;
+ SimpleAliasRegistry
+  canonicalName|(Ljava/lang/String;)Ljava/lang/String;
+  isAlias|(Ljava/lang/String;)Z
 org.springframework.core.annotation
  AnnotatedElementUtils
   hasAnnotation|(Ljava/lang/reflect/AnnotatedElement;Ljava/lang/Class;)Z
@@ -46,6 +114,8 @@ org.springframework.core.annotation
   alwaysProcesses|()Z
  AnnotationAwareOrderComparator
   sort|(Ljava/util/List;)V
+ AnnotationUtils
+  findAnnotation|(Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
  SynthesizedAnnotationInvocationHandler
   invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 org.springframework.core.convert|TypeDescriptor|forObject|(Ljava/lang/Object;)Lorg/springframework/core/convert/TypeDescriptor;
@@ -69,6 +139,51 @@ org.springframework.expression.common
   getValue
    (Lorg/springframework/expression/EvaluationContext;)Ljava/lang/Object;
    (Lorg/springframework/expression/EvaluationContext;)Ljava/lang/String;
+org.springframework.extensions.config|DefaultLookupAlgorithm|process|(Lorg/springframework/extensions/config/ConfigSection;Lorg/springframework/extensions/config/evaluator/Evaluator;Ljava/lang/Object;Lorg/springframework/extensions/config/Config;)V
+org.springframework.extensions.config.element|ConfigElementAdapter|getAttribute|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.extensions.config.evaluator|StringEvaluator|applies|(Ljava/lang/Object;Ljava/lang/String;)Z
+org.springframework.extensions.surf.extensibility.impl
+ DefaultExtensibilityContent
+  write|([CII)V
+ ModelWriter
+  write|([CII)V
+org.springframework.extensions.surf.util
+ Base64$OutputStream
+  write|(I)V
+ ParameterCheck
+  mandatory|(Ljava/lang/String;Ljava/lang/Object;)V
+ StringBuilderWriter
+  write
+   (I)V
+   (Ljava/lang/String;)V
+   ([CII)V
+ XMLUtil
+  parse|(Ljava/lang/String;)Lorg/dom4j/Document;
+org.springframework.extensions.webscripts
+ ClassPathStore
+  exists|()Z
+ JaxRSUriIndex$1
+  compare|(Lorg/springframework/extensions/webscripts/JaxRSUriIndex$IndexEntry;Lorg/springframework/extensions/webscripts/JaxRSUriIndex$IndexEntry;)I
+ NativeMap
+  get|(Ljava/lang/String;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;
+  unwrap|()Ljava/lang/Object;
+ UriTemplate
+  match|(Ljava/lang/String;)Ljava/util/Map;
+ WebScriptPropertyResourceBundle
+  handleGetObject|(Ljava/lang/String;)Ljava/lang/Object;
+org.springframework.extensions.webscripts.json
+ JSONUtils
+  encodeJSONString|(Ljava/lang/Object;)Ljava/lang/Object;
+ JSONWriter
+  encodeJSONString|(Ljava/lang/String;)Ljava/lang/String;
+  endObject|()Lorg/springframework/extensions/webscripts/json/JSONWriter;
+  startObject|()Lorg/springframework/extensions/webscripts/json/JSONWriter;
+  startValue|(Ljava/lang/String;)Lorg/springframework/extensions/webscripts/json/JSONWriter;
+  writeValue
+   (Ljava/lang/String;)Lorg/springframework/extensions/webscripts/json/JSONWriter;
+   (Ljava/lang/String;Ljava/lang/String;)Lorg/springframework/extensions/webscripts/json/JSONWriter;
+   (Z)Lorg/springframework/extensions/webscripts/json/JSONWriter;
+org.springframework.extensions.webscripts.processor|JSScriptProcessor$PresentationWrapFactory|wrapAsJavaObject|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;Ljava/lang/Class;)Lorg/mozilla/javascript/Scriptable;
 org.springframework.http
  CacheControl
   empty|()Lorg/springframework/http/CacheControl;
@@ -104,6 +219,23 @@ org.springframework.http.converter.xml
  SourceHttpMessageConverter
   supports|(Ljava/lang/Class;)Z
 org.springframework.http.server|ServletServerHttpResponse$ServletResponseHttpHeaders|getFirst|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.transaction.interceptor
+ NameMatchTransactionAttributeSource
+  getTransactionAttribute|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
+ TransactionAspectSupport$TransactionInfo
+  newTransactionStatus|(Lorg/springframework/transaction/TransactionStatus;)V
+ TransactionInterceptor
+  invoke|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
+ TransactionInterceptor$1
+  proceedWithInvocation|()Ljava/lang/Object;
+org.springframework.transaction.support
+ AbstractPlatformTransactionManager
+  commit|(Lorg/springframework/transaction/TransactionStatus;)V
+  getTransaction|(Lorg/springframework/transaction/TransactionDefinition;)Lorg/springframework/transaction/TransactionStatus;
+ TransactionSynchronizationManager
+  getResource|(Ljava/lang/Object;)Ljava/lang/Object;
+ TransactionSynchronizationUtils$ScopedProxyUnwrapper
+  unwrapIfNecessary|(Ljava/lang/Object;)Ljava/lang/Object;
 org.springframework.ui
  ExtendedModelMap
   addAllAttributes
@@ -119,12 +251,23 @@ org.springframework.util
   match|(Ljava/lang/String;Ljava/lang/String;)Z
  AntPathMatcher$AntPathStringMatcher
   matchStrings|(Ljava/lang/String;Ljava/util/Map;)Z
+ Assert
+  notNull|(Ljava/lang/Object;Ljava/lang/String;)V
+  state|(ZLjava/lang/String;)V
+ ClassUtils
+  isAssignable|(Ljava/lang/Class;Ljava/lang/Class;)Z
+  resolvePrimitiveClassName|(Ljava/lang/String;)Ljava/lang/Class;
+ CollectionUtils
+  isEmpty|(Ljava/util/Collection;)Z
  ConcurrentReferenceHashMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  ConcurrentReferenceHashMap$ReferenceManager
+  createReference|(Lorg/springframework/util/ConcurrentReferenceHashMap$Entry;ILorg/springframework/util/ConcurrentReferenceHashMap$Reference;)Lorg/springframework/util/ConcurrentReferenceHashMap$Reference;
   pollForPurge|()Lorg/springframework/util/ConcurrentReferenceHashMap$Reference;
  ConcurrentReferenceHashMap$Segment
   getReference|(Ljava/lang/Object;ILorg/springframework/util/ConcurrentReferenceHashMap$Restructure;)Lorg/springframework/util/ConcurrentReferenceHashMap$Reference;
+ ConcurrentReferenceHashMap$Task
+  hasOption|(Lorg/springframework/util/ConcurrentReferenceHashMap$TaskOption;)Z
  MimeType
   getParameter|(Ljava/lang/String;)Ljava/lang/String;
   isCompatibleWith|(Lorg/springframework/util/MimeType;)Z
@@ -139,9 +282,28 @@ org.springframework.util
  ObjectUtils
   isEmpty|([Ljava/lang/Object;)Z
   nullSafeEquals|(Ljava/lang/Object;Ljava/lang/Object;)Z
+  nullSafeHashCode|(Ljava/lang/Object;)I
+ PatternMatchUtils
+  simpleMatch|(Ljava/lang/String;Ljava/lang/String;)Z
+ PropertyPlaceholderHelper
+  replacePlaceholders|(Ljava/lang/String;Lorg/springframework/util/PropertyPlaceholderHelper$PlaceholderResolver;)Ljava/lang/String;
+ ReflectionUtils
+  isCglibRenamedMethod|(Ljava/lang/reflect/Method;)Z
+  isEqualsMethod|(Ljava/lang/reflect/Method;)Z
+  isHashCodeMethod|(Ljava/lang/reflect/Method;)Z
+  makeAccessible|(Ljava/lang/reflect/Method;)V
  StreamUtils
   copy|(Ljava/lang/String;Ljava/nio/charset/Charset;Ljava/io/OutputStream;)V
   copyToString|(Ljava/io/InputStream;Ljava/nio/charset/Charset;)Ljava/lang/String;
+ StringUtils
+  deleteAny|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  hasLength
+   (Ljava/lang/CharSequence;)Z
+   (Ljava/lang/String;)Z
+  hasText|(Ljava/lang/CharSequence;)Z
+  substringMatch|(Ljava/lang/CharSequence;ILjava/lang/CharSequence;)Z
+  toStringArray|(Ljava/util/Collection;)[Ljava/lang/String;
+  tokenizeToStringArray|(Ljava/lang/String;Ljava/lang/String;ZZ)[Ljava/lang/String;
  TypeUtils
   isAssignable|(Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)Z
 org.springframework.validation|DataBinder|convertIfNecessary|(Ljava/lang/Object;Ljava/lang/Class;Lorg/springframework/core/MethodParameter;)Ljava/lang/Object;

@@ -1,0 +1,23 @@
+org.objectweb.asm
+ ByteVector
+  putByte|(I)Lorg/objectweb/asm/ByteVector;
+  putShort|(I)Lorg/objectweb/asm/ByteVector;
+  putUTF8|(Ljava/lang/String;)Lorg/objectweb/asm/ByteVector;
+ ClassReader
+  readUnsignedShort|(I)I
+ ClassWriter
+  newClass|(Ljava/lang/String;)I
+  newUTF8|(Ljava/lang/String;)I
+ MethodWriter
+  visitFieldInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitInsn|(I)V
+  visitLabel|(Lorg/objectweb/asm/Label;)V
+  visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitTypeInsn|(ILjava/lang/String;)V
+  visitVarInsn|(II)V
+ Type
+  getArgumentTypes|(Ljava/lang/String;)[Lorg/objectweb/asm/Type;
+  getDescriptor|(Ljava/lang/Class;)Ljava/lang/String;
+  getOpcode|(I)I
+  getReturnType|(Ljava/lang/String;)Lorg/objectweb/asm/Type;
+  getType|(Ljava/lang/String;)Lorg/objectweb/asm/Type;

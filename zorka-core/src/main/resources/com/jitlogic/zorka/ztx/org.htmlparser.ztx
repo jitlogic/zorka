@@ -1,0 +1,64 @@
+org.htmlparser
+ PrototypicalNodeFactory
+  createStringNode|(Lorg/htmlparser/lexer/Page;II)Lorg/htmlparser/Text;
+  createTagNode|(Lorg/htmlparser/lexer/Page;IILjava/util/Vector;)Lorg/htmlparser/Tag;
+org.htmlparser.beans
+ StringBean
+  visitEndTag|(Lorg/htmlparser/Tag;)V
+  visitStringNode|(Lorg/htmlparser/Text;)V
+  visitTag|(Lorg/htmlparser/Tag;)V
+org.htmlparser.lexer
+ Cursor
+  advance|()V
+  retreat|()V
+ InputStreamSource
+  getCharacter|(I)C
+  getString|(II)Ljava/lang/String;
+  offset|()I
+  read|()I
+ Lexer
+  nextNode|(Z)Lorg/htmlparser/Node;
+ Page
+  getCharacter|(Lorg/htmlparser/lexer/Cursor;)C
+  getText|(II)Ljava/lang/String;
+  ungetCharacter|(Lorg/htmlparser/lexer/Cursor;)V
+ PageIndex
+  add|(Lorg/htmlparser/lexer/Cursor;)I
+  capacity|()I
+  size|()I
+ Stream
+  read|()I
+org.htmlparser.nodes
+ AbstractNode
+  clone|()Ljava/lang/Object;
+  doSemanticAction|()V
+  toHtml|()Ljava/lang/String;
+ TagNode
+  accept|(Lorg/htmlparser/visitors/NodeVisitor;)V
+  breaksFlow|()Z
+ TextNode
+  accept|(Lorg/htmlparser/visitors/NodeVisitor;)V
+  toHtml|(Z)Ljava/lang/String;
+org.htmlparser.scanners|CompositeTagScanner|isTagToBeEndedFor|(Lorg/htmlparser/Tag;Lorg/htmlparser/Tag;)Z
+org.htmlparser.tags
+ CompositeTag
+  accept|(Lorg/htmlparser/visitors/NodeVisitor;)V
+  children|()Lorg/htmlparser/util/SimpleNodeIterator;
+org.htmlparser.util
+ NodeList
+  add|(Lorg/htmlparser/Node;)V
+  elementAt|(I)Lorg/htmlparser/Node;
+  elements|()Lorg/htmlparser/util/SimpleNodeIterator;
+  remove|(I)Lorg/htmlparser/Node;
+  removeAll|()V
+  size|()I
+ NodeList$1
+  nextNode|()Lorg/htmlparser/Node;
+ Translate
+  decode
+   (Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/util/List;)Ljava/lang/String;
+org.htmlparser.visitors
+ NodeVisitor
+  shouldRecurseChildren|()Z
+  shouldRecurseSelf|()Z

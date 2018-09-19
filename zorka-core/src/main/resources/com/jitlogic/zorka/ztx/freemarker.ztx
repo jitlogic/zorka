@@ -1,0 +1,42 @@
+freemarker.core
+ Environment
+  getGlobalVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+  getLocalVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+  getVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+ IteratorBlock$Context
+  getLocalVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+ Macro$Context
+  getLocalVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+ SimpleCharStream
+  BeginToken|()C
+  GetImage|()Ljava/lang/String;
+  backup|(I)V
+  readChar|()C
+ TextBlock
+  accept|(Lfreemarker/core/Environment;)V
+ Token
+  newToken|(I)Lfreemarker/core/Token;
+freemarker.ext.beans
+ BeanModel
+  get|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+ BeansWrapper
+  coerceBigDecimals|([Ljava/lang/Class;[Ljava/lang/Object;)V
+  wrap|(Ljava/lang/Object;)Lfreemarker/template/TemplateModel;
+ OverloadedMethodsModel
+  exec|(Ljava/util/List;)Ljava/lang/Object;
+ SimpleMethodModel
+  exec|(Ljava/util/List;)Ljava/lang/Object;
+ StringModel$1
+  create|(Ljava/lang/Object;Lfreemarker/template/ObjectWrapper;)Lfreemarker/template/TemplateModel;
+freemarker.ext.util|ModelCache|getInstance|(Ljava/lang/Object;)Lfreemarker/template/TemplateModel;
+freemarker.template
+ DefaultObjectWrapper
+  wrap|(Ljava/lang/Object;)Lfreemarker/template/TemplateModel;
+ SimpleHash
+  get|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+freemarker.template.utility
+ Collections12
+  singletonList|(Ljava/lang/Object;)Ljava/util/List;
+ Collections12$SingletonList
+  get|(I)Ljava/lang/Object;
+  size|()I

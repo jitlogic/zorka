@@ -16,6 +16,12 @@ javax.el
  ResourceBundleELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 javax.management.modelmbean|DescriptorSupport|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
+javax.naming
+ NameImpl
+  get|(I)Ljava/lang/String;
+  size|()I
+ NameImplEnumerator
+  nextElement|()Ljava/lang/String;
 javax.security.auth|Subject$SecureSet|iterator|()Ljava/util/Iterator;
 javax.servlet
  ServletRequestWrapper
@@ -34,6 +40,15 @@ javax.servlet.jsp.el
  ScopedAttributeELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 javax.servlet.jsp.tagext|TagSupport|release|()V
+javax.xml.parsers
+ FactoryFinder$1
+  run|()Ljava/lang/Object;
+ SAXParserFactory
+  newInstance|()Ljavax/xml/parsers/SAXParserFactory;
+ SecuritySupport$1
+  run|()Ljava/lang/Object;
+ SecuritySupport$2
+  run|()Ljava/lang/Object;
 javax.xml.transform
  FactoryFinder$1
   run|()Ljava/lang/Object;

@@ -1,0 +1,13 @@
+com.google.common.base
+ Equivalence
+  equivalent|(Ljava/lang/Object;Ljava/lang/Object;)Z
+  hash|(Ljava/lang/Object;)I
+ Equivalences$Equals
+  doHash|(Ljava/lang/Object;)I
+ Preconditions
+  checkNotNull|(Ljava/lang/Object;)Ljava/lang/Object;
+com.google.common.cache
+ LocalCache
+  getIfPresent|(Ljava/lang/Object;)Ljava/lang/Object;
+ LocalCache$LocalManualCache
+  getIfPresent|(Ljava/lang/Object;)Ljava/lang/Object;

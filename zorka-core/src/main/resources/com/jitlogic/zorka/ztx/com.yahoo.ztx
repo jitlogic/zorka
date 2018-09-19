@@ -1,0 +1,18 @@
+com.yahoo.platform.yui.javascript
+ Node
+  addChildToBack|(Lcom/yahoo/platform/yui/javascript/Node;)V
+  newString
+   (ILjava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node;
+   (Ljava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node;
+ Node$Scope
+  getDefiningScope|(Ljava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node$Scope;
+  putSymbol|(Ljava/lang/String;Lcom/yahoo/platform/yui/javascript/Node$Symbol;)V
+ ObjArray
+  add|(Ljava/lang/Object;)V
+  get|(I)Ljava/lang/Object;
+  size|()I
+ ObjToIntMap
+  intern|(Ljava/lang/Object;)Ljava/lang/Object;
+ ScriptOrFnNode
+  getDefiningScope|(Ljava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node$Scope;
+  putSymbol|(Ljava/lang/String;Lcom/yahoo/platform/yui/javascript/Node$Symbol;)V

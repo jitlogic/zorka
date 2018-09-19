@@ -1,0 +1,9 @@
+net.arnx.jsonic
+ IntegerConverter
+  convert|(Lnet/arnx/jsonic/JSON;Lnet/arnx/jsonic/JSON$Context;Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/reflect/Type;)Ljava/lang/Object;
+ PlainConverter
+  convert|(Lnet/arnx/jsonic/JSON;Lnet/arnx/jsonic/JSON$Context;Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/reflect/Type;)Ljava/lang/Object;
+net.arnx.jsonic.io
+ CharSequenceInputSource
+  back|()V
+  next|()I

@@ -1,0 +1,41 @@
+com.ibm.icu.impl
+ CharTrie
+  getCodePointValue|(I)C
+ CharacterIteration
+  next32|(Ljava/text/CharacterIterator;)I
+  nextTrail32|(Ljava/text/CharacterIterator;I)I
+ Norm2AllModes$ComposeNormalizer2
+  quickCheck|(Ljava/lang/CharSequence;)Lcom/ibm/icu/text/Normalizer$QuickCheckResult;
+ Normalizer2Impl
+  composeQuickCheck|(Ljava/lang/CharSequence;IIZZ)I
+  decomposeShort|(Ljava/lang/CharSequence;IILcom/ibm/icu/impl/Normalizer2Impl$ReorderingBuffer;)V
+  getCCFromYesOrMaybe|(I)I
+  getNorm16|(I)I
+  isDecompYes|(I)Z
+ Normalizer2Impl$ReorderingBuffer
+  append
+   (II)V
+   (Ljava/lang/CharSequence;II)Lcom/ibm/icu/impl/Normalizer2Impl$ReorderingBuffer;
+   (Ljava/lang/CharSequence;IIII)V
+  flush|()V
+  flushAndAppendZeroCC|(Ljava/lang/CharSequence;II)Lcom/ibm/icu/impl/Normalizer2Impl$ReorderingBuffer;
+  length|()I
+ Trie2$1
+  map|(I)I
+ Trie2_16
+  get|(I)I
+  getFromU16SingleLead|(C)I
+ UCharacterProperty
+  getAdditional|(II)I
+  getProperty|(I)I
+  getType|(I)I
+com.ibm.icu.lang|UScript|getScript|(I)I
+com.ibm.icu.text
+ RuleBasedBreakIterator
+  current|()I
+  first|()I
+  next|()I
+ UTF16
+  charAt|([CIII)I
+  getCharCount|(I)I
+  isSurrogate|(C)Z

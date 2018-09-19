@@ -1,0 +1,22 @@
+org.alfresco.repo.content
+ AbstractContentAccessor$CallbackFileChannel
+  read|(Ljava/nio/ByteBuffer;)I
+  write|(Ljava/nio/ByteBuffer;)I
+org.alfresco.repo.content.metadata
+ TikaPoweredMetadataExtracter$NullContentHandler
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  ignorableWhitespace|([CII)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+org.alfresco.repo.dictionary|DictionaryComponent|isSubClass|(Lorg/alfresco/service/namespace/QName;Lorg/alfresco/service/namespace/QName;)Z
+org.alfresco.repo.management.subsystems
+ DefaultChildApplicationContextManager
+  getApplicationContext|(Ljava/lang/String;)Lorg/springframework/context/ApplicationContext;
+ DefaultChildApplicationContextManager$ApplicationContextManagerState
+  getApplicationContext|(Ljava/lang/String;)Lorg/springframework/context/ApplicationContext;
+ SubsystemProxyFactory$1
+  invoke|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
+org.alfresco.repo.policy|JavaBehaviour$JavaMethodInvocationHandler|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+org.alfresco.repo.search.impl.lucene.analysis|MLTokenDuplicator|buildIterator|(Lorg/apache/lucene/analysis/Token;)Ljava/util/Iterator;
+org.alfresco.repo.security.permissions|ACLType|getACLTypeFromId|(I)Lorg/alfresco/repo/security/permissions/ACLType;
+org.alfresco.repo.template|FreeMarkerProcessor|convertValue|(Ljava/lang/Object;Lorg/alfresco/service/cmr/repository/TemplateImageResolver;)Ljava/lang/Object;

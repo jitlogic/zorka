@@ -1,0 +1,12 @@
+net.sf.acegisecurity.vote
+ RoleVoter
+  supports|(Lnet/sf/acegisecurity/ConfigAttribute;)Z
+  vote|(Lnet/sf/acegisecurity/Authentication;Ljava/lang/Object;Lnet/sf/acegisecurity/ConfigAttributeDefinition;)I
+net.sf.cglib.core
+ CodeEmitter
+  make_label|()Lorg/objectweb/asm/Label;
+ TypeUtils
+  ICONST|(I)I
+  isArray|(Lorg/objectweb/asm/Type;)Z
+  isPrimitive|(Lorg/objectweb/asm/Type;)Z
+  isStatic|(I)Z

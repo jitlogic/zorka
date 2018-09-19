@@ -45,7 +45,24 @@ com.sun.org.apache.xalan.internal.utils
   values|()[Lcom/sun/org/apache/xalan/internal/utils/XMLSecurityManager$NameMap;
  XMLSecurityPropertyManager$Property
   values|()[Lcom/sun/org/apache/xalan/internal/utils/XMLSecurityPropertyManager$Property;
+com.sun.org.apache.xerces.internal.dom
+ NamedNodeMapImpl
+  getNamedItem|(Ljava/lang/String;)Lorg/w3c/dom/Node;
+ ParentNode
+  item|(I)Lorg/w3c/dom/Node;
 com.sun.org.apache.xerces.internal.impl
+ XMLDTDScannerImpl
+  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
+  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
+  reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
+ XMLDocumentFragmentScannerImpl
+  endEntity|(Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
+  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
+  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
+  refresh|(I)V
+  reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
+  scanDocument|(Z)Z
+  startEntity|(Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/xni/XMLResourceIdentifier;Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
  XMLDocumentFragmentScannerImpl$ElementStack
   nextElement|()Lcom/sun/org/apache/xerces/internal/xni/QName;
   popElement|()Lcom/sun/org/apache/xerces/internal/xni/QName;
@@ -53,6 +70,12 @@ com.sun.org.apache.xerces.internal.impl
   next|()I
  XMLDocumentScannerImpl
   getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
+  next|()I
+ XMLDocumentScannerImpl$PrologDriver
+  next|()I
+ XMLDocumentScannerImpl$TrailingMiscDriver
+  next|()I
+ XMLDocumentScannerImpl$XMLDeclDriver
   next|()I
  XMLEntityScanner
   arrangeCapacity|(IZ)Z
@@ -64,16 +87,61 @@ com.sun.org.apache.xerces.internal.impl
   skipChar|(I)Z
   skipSpaces|()Z
   skipString|(Ljava/lang/String;)Z
+ XMLErrorReporter
+  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
+  getMessageFormatter|(Ljava/lang/String;)Lcom/sun/org/apache/xerces/internal/util/MessageFormatter;
+  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
+  putMessageFormatter|(Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/util/MessageFormatter;)V
+  reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
  XMLNSDocumentScannerImpl
   next|()I
+ XMLScanner
+  endEntity|(Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
+  reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
+  scanPseudoAttribute|(ZLcom/sun/org/apache/xerces/internal/xni/XMLString;)Ljava/lang/String;
+  startEntity|(Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/xni/XMLResourceIdentifier;Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
+ XMLVersionDetector
+  determineDocVersion|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLInputSource;)S
+  reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
+  startDocumentParsing|(Lcom/sun/org/apache/xerces/internal/impl/XMLEntityHandler;S)V
 com.sun.org.apache.xerces.internal.impl.dtd
  DTDGrammar
   getAttributeDecl|(ILcom/sun/org/apache/xerces/internal/impl/dtd/XMLAttributeDecl;)Z
+  getContentSpecType|(I)S
   getFirstAttributeDeclIndex|(I)I
   getNextAttributeDeclIndex|(I)I
+ DTDGrammar$QNameHashtable
+  get|(Ljava/lang/String;)I
+ DTDGrammarBucket
+  clear|()V
+ XMLDTDProcessor
+  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
+  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
+  reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
+ XMLDTDValidator
+  characters|(Lcom/sun/org/apache/xerces/internal/xni/XMLString;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
+  endElement|(Lcom/sun/org/apache/xerces/internal/xni/QName;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
+  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
+  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
+  reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
+  startDocument|(Lcom/sun/org/apache/xerces/internal/xni/XMLLocator;Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/xni/NamespaceContext;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
+  validate|()Z
 com.sun.org.apache.xerces.internal.impl.dtd.models|CMNode|type|()I
+com.sun.org.apache.xerces.internal.impl.dv|DTDDVFactory|getInstance|(Ljava/lang/String;)Lcom/sun/org/apache/xerces/internal/impl/dv/DTDDVFactory;
+com.sun.org.apache.xerces.internal.impl.validation
+ ValidationManager
+  addValidationState|(Lcom/sun/org/apache/xerces/internal/impl/validation/ValidationState;)V
+  reset|()V
+ ValidationState
+  resetIDTables|()V
 com.sun.org.apache.xerces.internal.impl.xs.opti|SchemaDOMParser|characters|(Lcom/sun/org/apache/xerces/internal/xni/XMLString;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
 com.sun.org.apache.xerces.internal.impl.xs.traversers|XSAttributeChecker|returnAttrArray|([Ljava/lang/Object;Lcom/sun/org/apache/xerces/internal/impl/xs/traversers/XSDocumentInfo;)V
+com.sun.org.apache.xerces.internal.impl.xs.util|XSObjectListImpl|item|(I)Lcom/sun/org/apache/xerces/internal/xs/XSObject;
+com.sun.org.apache.xerces.internal.jaxp
+ SAXParserFactoryImpl
+  newSAXParser|()Ljavax/xml/parsers/SAXParser;
+ SAXParserImpl$JAXPSAXParser
+  parse|(Lorg/xml/sax/InputSource;)V
 com.sun.org.apache.xerces.internal.parsers
  AbstractSAXParser
   characters|(Lcom/sun/org/apache/xerces/internal/xni/XMLString;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
@@ -88,6 +156,14 @@ com.sun.org.apache.xerces.internal.parsers
   emptyElement|(Lcom/sun/org/apache/xerces/internal/xni/QName;Lcom/sun/org/apache/xerces/internal/xni/XMLAttributes;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
  XIncludeAwareParserConfiguration
   getFeature|(Ljava/lang/String;)Z
+ XML11Configuration
+  cleanup|()V
+  getPropertyState|(Ljava/lang/String;)Lcom/sun/org/apache/xerces/internal/util/PropertyState;
+  parse
+   (Lcom/sun/org/apache/xerces/internal/xni/parser/XMLInputSource;)V
+   (Z)Z
+ XMLParser
+  parse|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLInputSource;)V
 com.sun.org.apache.xerces.internal.util
  AugmentationsImpl
   removeAllItems|()V
@@ -97,6 +173,8 @@ com.sun.org.apache.xerces.internal.util
   getLocalName|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getNamespaceURI|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getNextSiblingElement|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Element;
+ FeatureState
+  is|(Z)Lcom/sun/org/apache/xerces/internal/util/FeatureState;
  NamespaceSupport
   getURI|(Ljava/lang/String;)Ljava/lang/String;
   popContext|()V
@@ -106,6 +184,10 @@ com.sun.org.apache.xerces.internal.util
   addRecognizedProperties|([Ljava/lang/String;)V
   getFeature|(Ljava/lang/String;)Z
   getProperty|(Ljava/lang/String;)Ljava/lang/Object;
+ PropertyState
+  is|(Ljava/lang/Object;)Lcom/sun/org/apache/xerces/internal/util/PropertyState;
+ SAXMessageFormatter
+  formatMessage|(Ljava/util/Locale;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;
  SymbolTable
   addSymbol|([CII)Ljava/lang/String;
   hash
@@ -132,15 +214,64 @@ com.sun.org.apache.xerces.internal.util
   isNameStart|(I)Z
   isSpace|(I)Z
   isValid|(I)Z
+ XMLResourceIdentifierImpl
+  clear|()V
  XMLStringBuffer
   append|([CII)V
   clear|()V
+com.sun.org.apache.xerces.internal.utils
+ ObjectFactory
+  findClassLoader|()Ljava/lang/ClassLoader;
+  findProviderClass|(Ljava/lang/String;Ljava/lang/ClassLoader;Z)Ljava/lang/Class;
+  newInstance
+   (Ljava/lang/String;Ljava/lang/ClassLoader;Z)Ljava/lang/Object;
+   (Ljava/lang/String;Z)Ljava/lang/Object;
+ SecuritySupport
+  getResourceBundle|(Ljava/lang/String;Ljava/util/Locale;)Ljava/util/ResourceBundle;
+  getSystemProperty|(Ljava/lang/String;)Ljava/lang/String;
+ SecuritySupport$1
+  run|()Ljava/lang/Object;
+ SecuritySupport$2
+  run|()Ljava/lang/Object;
+ SecuritySupport$3
+  run|()Ljava/lang/Object;
+ SecuritySupport$4
+  run|()Ljava/lang/Object;
+ SecuritySupport$7
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/util/ResourceBundle;
+ XMLSecurityManager
+  isOverLimit|(ILcom/sun/org/apache/xerces/internal/utils/XMLLimitAnalyzer;)Z
+ XMLSecurityManager$Limit
+  equalsAPIPropertyName|(Ljava/lang/String;)Z
+  values|()[Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityManager$Limit;
+ XMLSecurityManager$NameMap
+  values|()[Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityManager$NameMap;
+ XMLSecurityPropertyManager
+  getIndex|(Ljava/lang/String;)I
+  getValue|(Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityPropertyManager$Property;)Ljava/lang/String;
+  setValue|(Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityPropertyManager$State;Ljava/lang/Object;)Z
+ XMLSecurityPropertyManager$Property
+  equalsName|(Ljava/lang/String;)Z
+  values|()[Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityPropertyManager$Property;
 com.sun.org.apache.xerces.internal.xni|QName|clear|()V
 com.sun.org.apache.xml.internal.dtm.ref.sax2dtm|SAX2DTM2|_exptype2|(I)I
 com.sun.org.apache.xml.internal.serializer|WriterToUTF8Buffered|write|(I)V
+com.sun.org.apache.xpath.internal.compiler|OpMapVector|elementAt|(I)I
 com.sun.proxy
  $Proxy1
   annotationType|()Ljava/lang/Class;
+ $Proxy16
+  getQName
+   (Ljava/lang/Long;)Lorg/alfresco/util/Pair;
+   (Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/util/Pair;
+ $Proxy20
+  exists|(Lorg/alfresco/service/cmr/repository/NodeRef;)Z
+  getAspects|(Lorg/alfresco/service/cmr/repository/NodeRef;)Ljava/util/Set;
+  getProperty|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Ljava/io/Serializable;
+  getType|(Lorg/alfresco/service/cmr/repository/NodeRef;)Lorg/alfresco/service/namespace/QName;
+  hasAspect|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Z
  $Proxy26
   annotationType|()Ljava/lang/Class;
  $Proxy29
@@ -153,6 +284,8 @@ com.sun.proxy
   annotationType|()Ljava/lang/Class;
  $Proxy4
   annotationType|()Ljava/lang/Class;
+ $Proxy41
+  hasAspect|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Z
  $Proxy56
   annotationType|()Ljava/lang/Class;
  $Proxy57
@@ -164,3 +297,15 @@ com.sun.proxy
   value|()Ljava/lang/String;
  $Proxy65
   annotationType|()Ljava/lang/Class;
+com.sun.xml.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+com.sun.xml.internal.stream
+ Entity
+  clear|()V
+ Entity$ScannedEntity
+  close|()V
+ XMLEntityStorage
+  reset|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLComponentManager;)V
+com.sun.xml.internal.stream.util
+ BufferAllocator
+  getCharBuffer|(I)[C
+  returnCharBuffer|([C)V

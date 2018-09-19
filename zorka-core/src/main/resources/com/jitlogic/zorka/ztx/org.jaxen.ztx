@@ -1,0 +1,18 @@
+org.jaxen.dom4j
+ DocumentNavigator
+  getParentNode|(Ljava/lang/Object;)Ljava/lang/Object;
+  isAttribute|(Ljava/lang/Object;)Z
+  isNamespace|(Ljava/lang/Object;)Z
+org.jaxen.expr
+ DefaultLocationPath
+  addStep|(Lorg/jaxen/expr/Step;)V
+ DefaultXPathFactory
+  createPredicateSet|()Lorg/jaxen/expr/PredicateSet;
+ PredicateSet
+  simplify|()V
+org.jaxen.expr.iter|IterableAxis|value|()I
+org.jaxen.util
+ FollowingSiblingAxisIterator
+  next|()Ljava/lang/Object;
+ SingletonList
+  size|()I

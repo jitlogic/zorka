@@ -1,3 +1,13 @@
+sun.misc
+ FDBigInteger
+  cmp|(Lsun/misc/FDBigInteger;)I
+  cmpPow52|(II)I
+  leftInplaceSub|(Lsun/misc/FDBigInteger;)Lsun/misc/FDBigInteger;
+  leftShift|(I)Lsun/misc/FDBigInteger;
+  makeImmutable|()V
+  multByPow52|(II)Lsun/misc/FDBigInteger;
+  rightInplaceSub|(Lsun/misc/FDBigInteger;)Lsun/misc/FDBigInteger;
+  valueOfMulPow52|(JII)Lsun/misc/FDBigInteger;
 sun.net|DefaultProgressMeteringPolicy|shouldMeterInput|(Ljava/net/URL;Ljava/lang/String;)Z
 sun.net.www|MeteredStream|read|([BII)I
 sun.net.www.http
@@ -27,14 +37,23 @@ sun.net.www.protocol.http
   close|()V
   read|()I
 sun.nio.ch
+ ChannelInputStream
+  read
+   (Ljava/nio/channels/ReadableByteChannel;Ljava/nio/ByteBuffer;Z)I
+   ([BII)I
  EPollArrayWrapper
   interrupt|()V
   interruptedIndex|()I
  EPollSelectorImpl
   putEventOps|(Lsun/nio/ch/SelectionKeyImpl;I)V
   wakeup|()Ljava/nio/channels/Selector;
+ FileChannelImpl
+  read|(Ljava/nio/ByteBuffer;)I
+  write|(Ljava/nio/ByteBuffer;)I
  IOStatus
-  normalize|(I)I
+  normalize
+   (I)I
+   (J)J
  SelectionKeyImpl
   readyOps|()I
   selector|()Ljava/nio/channels/Selector;
@@ -46,12 +65,36 @@ sun.nio.ch
  Util$3
   iterator|()Ljava/util/Iterator;
 sun.nio.cs
+ ISO_8859_1$Decoder
+  decode|([BII[C)I
+ ISO_8859_1$Encoder
+  encode|([CII[B)I
  ThreadLocalCoders
   decoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetDecoder;
   encoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetEncoder;
  US_ASCII$Decoder
   decode|([BII[C)I
-sun.security.util|DerInputStream|available|()I
+sun.security.util
+ DerInputStream
+  available|()I
+ SignatureFileVerifier
+  isBlockOrSF|(Ljava/lang/String;)Z
+sun.text
+ ComposedCharIter
+  decomposition|()Ljava/lang/String;
+  next|()I
+ UCompactIntArray
+  elementAt|(I)I
+sun.text.normalizer
+ IntTrie
+  getCodePointValue|(I)I
+ ReplaceableString
+  charAt|(I)C
+  length|()I
+ ReplaceableUCharacterIterator
+  current|()I
+  next|()I
+sun.util|ResourceBundleEnumeration|nextElement|()Ljava/lang/String;
 sun.util.logging
  LoggingSupport
   isLoggable|(Ljava/lang/Object;Ljava/lang/Object;)Z

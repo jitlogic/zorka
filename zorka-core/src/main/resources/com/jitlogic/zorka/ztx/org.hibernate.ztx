@@ -1,0 +1,15 @@
+org.hibernate.engine.query|ParamLocationRecognizer|other|(C)V
+org.hibernate.hql.classic|ParserHelper|isWhitespace|(Ljava/lang/String;)Z
+org.hibernate.impl|SessionFactoryImpl|getEntityPersister|(Ljava/lang/String;)Lorg/hibernate/persister/entity/EntityPersister;
+org.hibernate.persister.entity|AbstractEntityPersister|getSubclassPropertyType|(I)Lorg/hibernate/type/Type;
+org.hibernate.sql|Alias|toAliasString|(Ljava/lang/String;)Ljava/lang/String;
+org.hibernate.type
+ ManyToOneType
+  useLHSPrimaryKey|()Z
+ NullableType
+  getColumnSpan|(Lorg/hibernate/engine/Mapping;)I
+org.hibernate.util
+ JoinedIterator
+  next|()Ljava/lang/Object;
+ StringHelper
+  qualify|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
