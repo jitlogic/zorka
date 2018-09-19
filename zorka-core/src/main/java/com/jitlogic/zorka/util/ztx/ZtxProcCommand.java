@@ -63,10 +63,7 @@ public class ZtxProcCommand {
     }
 
     public static Pattern pattern(String s) {
-        return Pattern.compile(s
-                .replace(".", "\\.")
-                .replace("**", ".+")
-                .replace("*","[^\\.]+"));
+        return Pattern.compile(s.replace(".", "\\.").replace("*", ".*"));
     }
 
     public static boolean matches(List<Pattern> patterns, String s) {
@@ -108,16 +105,14 @@ public class ZtxProcCommand {
         if (incls.isEmpty())
             incls.add(Pattern.compile(".*"));
 
-        NavigableMap<String,NavigableMap<String,NavigableMap<String,NavigableSet<String>>>> idata =
-                new TreeMap<String, NavigableMap<String, NavigableMap<String, NavigableSet<String>>>>();
+        NavigableMap<String,NavigableMap<String,NavigableMap<String,NavigableSet<String>>>> idata = new TreeMap<String, NavigableMap<String, NavigableMap<String, NavigableSet<String>>>>();
 
         ZtxProcReader rdr = new ZtxProcReader(idata);
 
         for (File f : inpf)
             rdr.read(f);
 
-        NavigableMap<String,NavigableMap<String,NavigableMap<String,NavigableSet<String>>>> odata =
-                new TreeMap<String, NavigableMap<String, NavigableMap<String, NavigableSet<String>>>>();
+        NavigableMap<String,NavigableMap<String,NavigableMap<String,NavigableSet<String>>>> odata = new TreeMap<String, NavigableMap<String, NavigableMap<String, NavigableSet<String>>>>();
 
         for (Map.Entry<String,NavigableMap<String,NavigableMap<String,NavigableSet<String>>>> e : idata.entrySet()) {
             if (matches(incls, e.getKey()) && !matches(excls, e.getKey()))

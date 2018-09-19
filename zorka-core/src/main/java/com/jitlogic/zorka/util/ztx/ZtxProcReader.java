@@ -39,7 +39,7 @@ public class ZtxProcReader extends AbstractZtxReader {
         NavigableMap<String,NavigableSet<String>> mc = mp.get(c);
         if (mc == null) {
             mc = new TreeMap<String,NavigableSet<String>>();
-            mp.put(m, mc);
+            mp.put(c, mc);
         }
 
         NavigableSet<String> ms = mc.get(m);
