@@ -172,8 +172,8 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
      */
     public boolean submit(T obj) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Submitting: " + obj);
+        if (log.isTraceEnabled()) {
+            log.trace("Submitting: " + obj);
         }
 
         try {
