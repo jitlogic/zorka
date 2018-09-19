@@ -1,1 +1,5 @@
-jdk.internal.org.objectweb.asm|ByteVector|putShort|(I)Ljdk/internal/org/objectweb/asm/ByteVector;
+jdk.internal.org.objectweb.asm
+ ByteVector
+  putByte|(I)Ljdk/internal/org/objectweb/asm/ByteVector;
+  putShort|(I)Ljdk/internal/org/objectweb/asm/ByteVector;
+  putUTF8|(Ljava/lang/String;)Ljdk/internal/org/objectweb/asm/ByteVector;

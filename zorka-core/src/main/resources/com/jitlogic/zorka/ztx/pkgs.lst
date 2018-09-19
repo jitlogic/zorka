@@ -1,9 +1,9 @@
 antlr
 aQute
 ch.qos
-com.atlassian
 com.bea
 com.certicom
+com.ctc
 com.fasterxml
 com.germinus
 com.google
@@ -46,8 +46,10 @@ org.eclipse.osgi
 org.hibernate
 org.hsqldb
 org.htmlparser
+org.infinispan
 org.jabsorb
 org.jaxen
+org.jboss
 org.jdom
 org.jibx
 org.joda
@@ -62,8 +64,10 @@ org.saxpath
 org.slf4j
 org.springframework
 org.terracotta
+org.wildfly.common
 org.xmlpull
 org.xml.sax
+org.xnio
 scala
 serp
 sun

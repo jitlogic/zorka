@@ -338,6 +338,8 @@ com.sun.proxy
   annotationType|()Ljava/lang/Class;
  $Proxy34
   getGroup|(J)Lcom/liferay/portal/model/Group;
+ $Proxy39
+  annotationType|()Ljava/lang/Class;
  $Proxy4
   annotationType|()Ljava/lang/Class;
  $Proxy41

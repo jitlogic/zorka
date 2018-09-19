@@ -1,0 +1,134 @@
+org.jboss.as.controller
+ PathAddress
+  append
+   (Ljava/util/List;)Lorg/jboss/as/controller/PathAddress;
+   (Lorg/jboss/as/controller/PathAddress;)Lorg/jboss/as/controller/PathAddress;
+  iterator|()Ljava/util/ListIterator;
+  pathAddress|(Ljava/util/List;)Lorg/jboss/as/controller/PathAddress;
+  size|()I
+ PathElement
+  pathElement|(Ljava/lang/String;Ljava/lang/String;)Lorg/jboss/as/controller/PathElement;
+org.jboss.as.controller.registry
+ AbstractModelResource
+  registerChild|(Lorg/jboss/as/controller/PathElement;Lorg/jboss/as/controller/registry/Resource;)V
+ AbstractModelResource$DefaultResourceProvider
+  get|(Ljava/lang/String;)Lorg/jboss/as/controller/registry/Resource;
+  register|(Ljava/lang/String;Lorg/jboss/as/controller/registry/Resource;)V
+ AtomicMapFieldUpdater
+  get|(Ljava/lang/Object;)Ljava/util/Map;
+ FastCopyHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+org.jboss.as.ee.component.interceptors|OrderedItemContainer|add|(Ljava/lang/Object;I)V
+org.jboss.as.server.deployment|SimpleAttachmentKey|cast|(Ljava/lang/Object;)Ljava/lang/Object;
+org.jboss.as.server.deployment.module|VFSResourceLoader$4|accepts|(Lorg/jboss/vfs/VirtualFile;)Z
+org.jboss.classfilewriter.code|StackEntry|write|(Ljava/io/DataOutputStream;)V
+org.jboss.dmr
+ ModelNode
+  asString|()Ljava/lang/String;
+  clone|()Lorg/jboss/dmr/ModelNode;
+  get|(Ljava/lang/String;)Lorg/jboss/dmr/ModelNode;
+  has|(Ljava/lang/String;)Z
+  hasDefined|(Ljava/lang/String;)Z
+  set
+   (Ljava/lang/String;)Lorg/jboss/dmr/ModelNode;
+   (Lorg/jboss/dmr/ModelNode;)Lorg/jboss/dmr/ModelNode;
+   (Z)Lorg/jboss/dmr/ModelNode;
+org.jboss.invocation.proxy|MethodIdentifier|getIdentifierForMethod|(Ljava/lang/reflect/Method;)Lorg/jboss/invocation/proxy/MethodIdentifier;
+org.jboss.jandex
+ ClassInfo
+  name|()Lorg/jboss/jandex/DotName;
+ DotName
+  prefix|()Lorg/jboss/jandex/DotName;
+ FieldInternal$NameComparator
+  compare|(Lorg/jboss/jandex/FieldInternal;Lorg/jboss/jandex/FieldInternal;)I
+ GenericSignatureParser$MethodSignature
+  methodParameters|()[Lorg/jboss/jandex/Type;
+  returnType|()Lorg/jboss/jandex/Type;
+  throwables|()[Lorg/jboss/jandex/Type;
+  typeParameters|()[Lorg/jboss/jandex/Type;
+ Index
+  getClassByName|(Lorg/jboss/jandex/DotName;)Lorg/jboss/jandex/ClassInfo;
+ MethodInfo
+  exceptions|()Ljava/util/List;
+ MethodInternal$NameAndParameterComponentComparator
+  compare|(Lorg/jboss/jandex/MethodInternal;Lorg/jboss/jandex/MethodInternal;)I
+ StrongInternPool
+  intern|(Ljava/lang/Object;)Ljava/lang/Object;
+ Type
+  name|()Lorg/jboss/jandex/DotName;
+org.jboss.metadata.javaee.support
+ MappedAnnotationMetaData
+  add|(Lorg/jboss/metadata/javaee/support/MappableMetaData;)Z
+ NonNullLinkedHashMap
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+org.jboss.metadata.parser.ee
+ DescriptionGroupMetaDataParser
+  parse
+   (Ljavax/xml/stream/XMLStreamReader;Lorg/jboss/metadata/javaee/spec/DescriptionGroupMetaData;Lorg/jboss/metadata/property/PropertyReplacer;)Z
+   (Ljavax/xml/stream/XMLStreamReader;Lorg/jboss/metadata/parser/ee/Accessor;Lorg/jboss/metadata/property/PropertyReplacer;)Z
+ DescriptionsMetaDataParser
+  parse|(Ljavax/xml/stream/XMLStreamReader;Lorg/jboss/metadata/javaee/spec/DescriptionsImpl;Lorg/jboss/metadata/property/PropertyReplacer;)Z
+ Element
+  forName|(Ljava/lang/String;)Lorg/jboss/metadata/parser/ee/Element;
+org.jboss.metadata.parser.jsp|Element|forName|(Ljava/lang/String;)Lorg/jboss/metadata/parser/jsp/Element;
+org.jboss.metadata.property
+ PropertyReplacers
+  noop|()Lorg/jboss/metadata/property/PropertyReplacer;
+ PropertyReplacers$1
+  replaceProperties|(Ljava/lang/String;)Ljava/lang/String;
+org.jboss.msc.service
+ IdentityHashSet
+  add|(Ljava/lang/Object;)Z
+  iterator|()Ljava/util/Iterator;
+ IdentityHashSet$IdentityHashSetIterator
+  next|()Ljava/lang/Object;
+org.jboss.weld.annotated.enhanced.jlr|AbstractEnhancedAnnotated|isAnnotationPresent|(Ljava/lang/Class;)Z
+org.jboss.weld.bootstrap.api.helpers|SimpleServiceRegistry|get|(Ljava/lang/Class;)Lorg/jboss/weld/bootstrap/api/Service;
+org.jboss.weld.executor|IterativeWorkerTaskFactory$1|call|()Ljava/lang/Void;
+org.jboss.weld.interceptor.util|InterceptionTypeRegistry|getAnnotationClass|(Lorg/jboss/weld/interceptor/spi/model/InterceptionType;)Ljava/lang/Class;
+org.jboss.weld.util
+ InterceptorBindingSet
+  iterator|()Ljava/util/Iterator;
+ LazyValueHolder$1
+  apply|(Ljava/lang/Object;)Lorg/jboss/weld/util/ValueHolder;
+ Preconditions
+  checkArgumentNotNull|(Ljava/lang/Object;Ljava/lang/String;)V
+  checkNotNull|(Ljava/lang/Object;)V
+ Types
+  boxedClass|(Ljava/lang/Class;)Ljava/lang/Class;
+  boxedType|(Ljava/lang/reflect/Type;)Ljava/lang/reflect/Type;
+  isArray|(Ljava/lang/reflect/Type;)Z
+org.jboss.weld.util.cache|ReentrantMapBackedComputingCache|getValue|(Ljava/lang/Object;)Ljava/lang/Object;
+org.jboss.weld.util.collections
+ AbstractMultimap
+  containsKey|(Ljava/lang/Object;)Z
+  get|(Ljava/lang/Object;)Ljava/util/Collection;
+ ImmutableHashSet
+  iterator|()Ljava/util/Iterator;
+ ImmutableHashSet$IteratorImpl
+  next|()Ljava/lang/Object;
+ ImmutableSet
+  builder|()Lorg/jboss/weld/util/collections/ImmutableSet$Builder;
+ ImmutableSet$BuilderImpl
+  add|(Ljava/lang/Object;)Lorg/jboss/weld/util/collections/ImmutableSet$Builder;
+ ImmutableTinySet$Doubleton
+  size|()I
+ ImmutableTinySet$Singleton
+  size|()I
+ Iterators$CombinedIterator
+  next|()Ljava/lang/Object;
+ Iterators$IndexIterator
+  next|()Ljava/lang/Object;
+ Multimaps
+  unmodifiableMultimap|(Lorg/jboss/weld/util/collections/Multimap;)Lorg/jboss/weld/util/collections/Multimap;
+ WeldCollections
+  immutableListView|(Ljava/util/List;)Ljava/util/List;
+org.jboss.weld.util.reflection
+ DeclaredMemberIndexer$MethodComparator
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;)I
+ Reflections
+  cast|(Ljava/lang/Object;)Ljava/lang/Object;
+  getRawType|(Ljava/lang/reflect/Type;)Ljava/lang/Class;
+  isPackagePrivate|(I)Z
