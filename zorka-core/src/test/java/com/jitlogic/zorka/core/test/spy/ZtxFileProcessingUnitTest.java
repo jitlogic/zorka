@@ -52,9 +52,9 @@ public class ZtxFileProcessingUnitTest {
                 new File("src/test/resources/tuner"),
                 ztxLog, registry, true);
 
-        List<String> pkgs = CoreTestUtil.getField(zms, "ztxPkgs");
+        Map<String,String> pkgs = CoreTestUtil.getField(zms, "ztxs");
         assertTrue(pkgs.size() > 2);
-        assertTrue(pkgs.contains("test"));
+        assertTrue(pkgs.containsKey("test"));
     }
 
     @Test

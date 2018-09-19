@@ -25,10 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ZtxMatcherSet implements SpyMatcherSet {
 
@@ -43,8 +41,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
 
     private CidsMidsZtxReader reader;
 
-    private List<String> ztxPkgs  = new ArrayList<String>();
-    private List<String> ztxPaths = new ArrayList<String>();
+    private Map<String,String> ztxs = new ConcurrentHashMap<String, String>();
 
     private File ztxDir;
     private File ztxLog;
@@ -83,6 +80,8 @@ public class ZtxMatcherSet implements SpyMatcherSet {
         scanZtxDir();
         scanZtxClasspath();
 
+        log.info("Tracer exclusion packages found: " + ztxs.keySet());
+
         if (!ztxDir.getPath().equals(ztxLog.getParent()) && ztxLog.isFile()) {
             loadZtx(ztxLog);
         }
@@ -95,20 +94,16 @@ public class ZtxMatcherSet implements SpyMatcherSet {
         if (!patternMatcherSet.classMatch(className)) return false;
 
         synchronized (this) {
-            return !(cids.get(classId) || (probe(className) && cids.get(classId)));
+            if (cids.get(classId)) return false;
+            probe(className);
+            return !cids.get(classId);
         }
     }
 
     @Override
     public boolean classMatch(Class<?> clazz, boolean matchMethods) {
         String className = clazz.getName();
-        int classId = registry.symbolId(className);
-
-        if (!patternMatcherSet.classMatch(className)) return false;
-
-        synchronized (this) {
-            return !(cids.get(classId) || (probe(className) && cids.get(classId)));
-        }
+        return classMatch(className);
     }
 
     @Override
@@ -144,8 +139,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
                     if (fname.startsWith("_")) {
                         loadZtx("file:"+f.getPath());
                     } else {
-                        ztxPkgs.add(fname.substring(0, fname.length()-4));
-                        ztxPaths.add("file:"+f.getPath());
+                        ztxs.put(fname.substring(0, fname.length()-4), "file:"+f.getPath());
                     }
                 }
             }
@@ -161,8 +155,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
                 BufferedReader rdr = new BufferedReader(new InputStreamReader(is));
                 for (String pkg = rdr.readLine(); pkg != null; pkg = rdr.readLine()) {
                     if (pkg.trim().length() > 0) {
-                        ztxPkgs.add(pkg);
-                        ztxPaths.add("classpath:/com/jitlogic/zorka/ztx/" + pkg.trim() + ".ztx");
+                        ztxs.put(pkg, "classpath:/com/jitlogic/zorka/ztx/" + pkg.trim() + ".ztx");
                     }
                 }
             } catch (IOException e) {
@@ -185,6 +178,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
     }
 
     private synchronized void loadZtx(String path) {
+        log.info("Loading tracer exclusions: " + path);
         InputStream is = null;
         try {
             if (path.startsWith("file:")) {
@@ -216,21 +210,23 @@ public class ZtxMatcherSet implements SpyMatcherSet {
 
     private synchronized boolean probe(String className) {
 
-        List<Integer> found = new ArrayList<Integer>();
+        Set<String> found = null;
 
-        for (int i = 0; i < ztxPkgs.size(); i++) {
-            if (className.startsWith(ztxPkgs.get(i))) {
-                found.add(i);
-                loadZtx(ztxPaths.get(i));
+        for (Map.Entry<String,String> e : ztxs.entrySet()) {
+            if (className.startsWith(e.getKey())) {
+                loadZtx(e.getValue());
+                if (found == null) found = new HashSet<String>();
+                found.add(e.getKey());
             }
         }
 
-        for (int i = found.size()-1; i >= 0; i--) {
-            ztxPkgs.remove(i);
-            ztxPaths.remove(i);
+        if (found != null) {
+            for (String s : found) {
+                ztxs.remove(s);
+            }
         }
 
-        return found.size() > 0;
+        return found != null;
     }
 
 
