@@ -1,3 +1,15 @@
+org.apache.beehive.netui.pageflow.scoping
+ ScopedServletUtils
+  getOuterRequest|(Ljavax/servlet/http/HttpServletRequest;)Ljavax/servlet/http/HttpServletRequest;
+  unwrapRequest|(Ljavax/servlet/ServletRequest;)Lorg/apache/beehive/netui/pageflow/scoping/ScopedRequest;
+org.apache.beehive.netui.pageflow.scoping.internal
+ AttributeContainer
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+ ScopedRequestImpl
+  getAttribute
+   (Ljava/lang/String;)Ljava/lang/Object;
+   (Ljava/lang/String;Z)Ljava/lang/Object;
+org.apache.beehive.netui.util.internal|InternalStringBuilder|length|()I
 org.apache.catalina.authenticator|AuthenticatorBase|invoke|(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V
 org.apache.catalina.connector
  CoyoteOutputStream
@@ -64,6 +76,13 @@ org.apache.catalina.util
   isTLSRequestAttribute|(Ljava/lang/String;)Z
 org.apache.catalina.valves|ErrorReportValve|invoke|(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V
 org.apache.catalina.webresources|StandardRoot|getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
+org.apache.commons.beanutils
+ PropertyUtilsBean
+  getPropertyDescriptor|(Ljava/lang/Object;Ljava/lang/String;)Ljava/beans/PropertyDescriptor;
+  getPropertyDescriptors
+   (Ljava/lang/Class;)[Ljava/beans/PropertyDescriptor;
+   (Ljava/lang/Object;)[Ljava/beans/PropertyDescriptor;
+org.apache.commons.collections|FastHashMap|get|(Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.commons.logging
  LogFactory
   getLog
@@ -114,7 +133,17 @@ org.apache.coyote.http11.filters
  VoidInputFilter
   end|()J
   recycle|()V
+org.apache.derby.client.am
+ Agent
+  loggingEnabled|()Z
+ SignedBinary
+  getShort|([BI)S
 org.apache.juli.logging|DirectJDKLog|debug|(Ljava/lang/Object;)V
+org.apache.log4j
+ Hierarchy
+  isDisabled|(I)Z
+ Priority
+  isGreaterOrEqual|(Lorg/apache/log4j/Priority;)Z
 org.apache.logging.log4j.spi
  AbstractLogger
   isEnabled|(Lorg/apache/logging/log4j/Level;)Z
@@ -126,6 +155,22 @@ org.apache.logging.slf4j
   isEnabled|(Lorg/apache/logging/log4j/Level;Lorg/apache/logging/log4j/Marker;Ljava/lang/Object;Ljava/lang/Throwable;)Z
  SLF4JLoggerContext
   getLogger|(Ljava/lang/String;)Lorg/apache/logging/log4j/spi/ExtendedLogger;
+org.apache.openjpa.kernel
+ BrokerImpl
+  assertOpen|()V
+  lock|()V
+  unlock|()V
+org.apache.openjpa.lib.meta|ClassAnnotationMetaDataFilter|matches|(Lorg/apache/openjpa/lib/meta/MetaDataFilter$Resource;)Z
+org.apache.openjpa.meta
+ ClassMetaData
+  getField|(I)Lorg/apache/openjpa/meta/FieldMetaData;
+ Extensions
+  getObjectExtension|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+  getStringExtension|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ FieldMetaData
+  getFullName|(Z)Ljava/lang/String;
+org.apache.openjpa.persistence|AnnotationPersistenceMetaDataParser$MethodComparator|compare|(Ljava/lang/Object;Ljava/lang/Object;)I
+org.apache.oro.util|CacheLRU|getElement|(Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.tomcat.util.buf
  AbstractChunk
   indexOf|(Ljava/lang/String;III)I

@@ -1,6 +1,13 @@
+antlr
+ch.qos
+com.bea
+com.certicom
 com.fasterxml
+com.octetstring
 com.sun
 javax
 org.apache
 org.springframework
+serp
 sun
+weblogic

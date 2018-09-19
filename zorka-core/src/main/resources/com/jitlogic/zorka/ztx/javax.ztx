@@ -1,4 +1,39 @@
-javax.servlet.http|HttpServlet|service|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
+javax.el
+ ArrayELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ BeanELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ BeanELResolver$BeanProperties
+  getBeanProperty|(Ljava/lang/String;)Ljavax/el/BeanELResolver$BeanProperty;
+ CompositeELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ELContext
+  getContext|(Ljava/lang/Class;)Ljava/lang/Object;
+ ListELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ MapELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ResourceBundleELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+javax.management.modelmbean|DescriptorSupport|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
+javax.security.auth|Subject$SecureSet|iterator|()Ljava/util/Iterator;
+javax.servlet
+ ServletRequestWrapper
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  getParameter|(Ljava/lang/String;)Ljava/lang/String;
+javax.servlet.http
+ HttpServlet
+  service|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
+ HttpServletRequestWrapper
+  getSession|(Z)Ljavax/servlet/http/HttpSession;
+javax.servlet.jsp.el
+ ImplicitObjectELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ImplicitObjectELResolver$ImplicitObjects
+  getImplicitObjects|(Ljavax/servlet/jsp/PageContext;)Ljavax/servlet/jsp/el/ImplicitObjectELResolver$ImplicitObjects;
+ ScopedAttributeELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+javax.servlet.jsp.tagext|TagSupport|release|()V
 javax.xml.transform
  FactoryFinder$1
   run|()Ljava/lang/Object;

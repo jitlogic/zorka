@@ -81,10 +81,6 @@ public class ZtxProcCommand {
         for (int i = 1; i < args.length-1; i++) {
             if ("-o".equals(args[i])) {
                 outf = new File(args[i+1]);
-                if (!outf.getParentFile().isDirectory()) {
-                    err.println("No such directory: " + outf.getParent());
-                    return;
-                }
             }
             if ("-f".equals(args[i])) {
                 File f = new File(args[i+1]);

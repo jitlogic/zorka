@@ -1,0 +1,205 @@
+weblogic.application.descriptor|ReaderEventInfo$Namespaces|getNamespaceURI|(Ljava/lang/String;)Ljava/lang/String;
+weblogic.application.io
+ DescriptorFinder
+  getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ ManifestFinder
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+weblogic.deploy.internal|DeploymentType|isInstance|(Ljava/lang/Object;)Z
+weblogic.j2ee
+ ApplicationManager
+  loadClass
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;Z)Ljava/lang/Class;
+   (Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/Class;
+weblogic.jdbc.common.internal|JdbcDebug|isEnabled|(Lweblogic/jdbc/jta/DataSource;I)Z
+weblogic.jsp.internal.jsp.utils|JspRuntimeUtils|convertType|(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Object;
+weblogic.kernel
+ FinalThreadLocal$FinalThreadStorage
+  get|(I)Ljava/lang/Object;
+ ResettableThreadLocal$ThreadStorage
+  get|(I)Ljava/lang/Object;
+weblogic.management.jmx.mbeanserver|WLSMBeanServerInterceptorBase|getAttribute|(Ljavax/management/ObjectName;Ljava/lang/String;)Ljava/lang/Object;
+weblogic.management.mbeanservers.internal|WLSObjectNameManager|isClassMapped|(Ljava/lang/Class;)Z
+weblogic.rmi.extensions.server
+ CBVInputStream
+  readObjectSpecial|()Ljava/lang/Object;
+ CBVOutputStream
+  writeObjectSpecial|(Ljava/lang/Object;)V
+weblogic.rmi.internal.wls
+ WLSCBVInput
+  readUTF|()Ljava/lang/String;
+ WLSCBVOutput
+  writeUTF|(Ljava/lang/String;)V
+weblogic.rmi.utils.io
+ RemoteObjectReplacer
+  replaceObject|(Ljava/lang/Object;)Ljava/lang/Object;
+  resolveObject|(Ljava/lang/Object;)Ljava/lang/Object;
+weblogic.security.service
+ SubjectManagerImpl
+  checkKernelIdentity|(Lweblogic/security/subject/AbstractSubject;)V
+  isKernelIdentity|(Lweblogic/security/subject/AbstractSubject;)Z
+weblogic.servlet.internal
+ CharChunkOutput
+  print|(Ljava/lang/String;)V
+ ChunkOutput$2
+  checkForFlush|()V
+  checkOverflow|(I)V
+ ChunkOutputWrapper
+  print|(Ljava/lang/String;)V
+  write|([BII)V
+ ServletRequestImpl
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  getParameter|(Ljava/lang/String;)Ljava/lang/String;
+  getSession|(Z)Ljavax/servlet/http/HttpSession;
+  removeAttribute|(Ljava/lang/String;)V
+ ServletRequestImpl$SessionHelper
+  getSession|(Z)Ljavax/servlet/http/HttpSession;
+ WebComponentContributor
+  inject|(Ljava/lang/Object;)V
+  notifyPostConstruct|(Ljava/lang/Object;)V
+  notifyPreDestroy|(Ljava/lang/Object;)V
+weblogic.servlet.internal.session|SessionData|getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+weblogic.servlet.jsp
+ BodyContentImpl
+  print|(Ljava/lang/String;)V
+ DependencyInjectionHelper
+  inject|(Ljavax/servlet/jsp/PageContext;Ljava/lang/Object;)V
+  preDestroy|(Ljavax/servlet/jsp/PageContext;Ljava/lang/Object;)V
+ ELHelper
+  createValueExpression|(Ljava/lang/String;Ljava/lang/Class;Ljavax/servlet/jsp/PageContext;Ljavax/el/FunctionMapper;)Ljavax/el/ValueExpression;
+  evaluate|(Ljava/lang/String;Ljava/lang/Class;Ljavax/servlet/jsp/PageContext;Ljavax/el/FunctionMapper;)Ljava/lang/Object;
+ JspFactoryImpl
+  getJspApplicationContext|(Ljavax/servlet/ServletContext;)Ljavax/servlet/jsp/JspApplicationContext;
+ PageContextImpl
+  findAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  getAttribute
+   (Ljava/lang/String;)Ljava/lang/Object;
+   (Ljava/lang/String;I)Ljava/lang/Object;
+weblogic.store
+ StoreWritePolicy
+  unforced|()Z
+  usesCacheFile|()Z
+weblogic.store.io.file|StoreDir|get|(I)Lweblogic/store/io/file/StoreFile;
+weblogic.store.io.file.direct|DirectIOManager|nativeCodeAvailable|()Z
+weblogic.utils
+ Debug
+  assertion|(ZLjava/lang/String;)V
+ StringUtils
+  getString|([CII)Ljava/lang/String;
+  splitCompletely|(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;
+  startsWith|(Ljava/lang/String;C)Z
+ StringUtils$ReflectedStringMaker
+  getString|([CII)Ljava/lang/String;
+ StringUtils$StringMaker
+  getString|([CII)Ljava/lang/String;
+ UnsyncCircularQueue
+  put|(Ljava/lang/Object;)V
+  size|()I
+ UnsyncStringBuffer
+  append|(Ljava/lang/String;)Lweblogic/utils/UnsyncStringBuffer;
+  ensureCapacity|(I)V
+weblogic.utils.classfile
+ Bytecodes
+  add|(Lweblogic/utils/classfile/Op;)V
+  pcForOp|(Lweblogic/utils/classfile/Op;)I
+ DataBuffer
+  writeByte|(I)V
+  writeShort|(I)V
+ Label
+  length|()I
+ Op
+  length|()I
+  write|(Ljava/io/DataOutput;)V
+weblogic.utils.classfile.cp
+ ConstantPool
+  getClass|(Lweblogic/utils/classfile/cp/CPUtf8;)Lweblogic/utils/classfile/cp/CPClass;
+  getUtf8|(Ljava/lang/String;)Lweblogic/utils/classfile/cp/CPUtf8;
+weblogic.utils.classfile.expr
+ CompoundStatement
+  add|(Lweblogic/utils/classfile/expr/Statement;)V
+ Utilities
+  getReturnType|(Ljava/lang/String;)Lweblogic/utils/classfile/Type;
+weblogic.utils.classfile.ops|ConstPoolOp|write|(Ljava/io/DataOutput;)V
+weblogic.utils.classloaders
+ AbstractClassFinder
+  getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ ClasspathClassFinder
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ DirectoryClassFinder
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ GenericClassLoader
+  loadClass|(Ljava/lang/String;)Ljava/lang/Class;
+ JarClassFinder
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ MultiClassFinder
+  getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ NullClassFinder
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ ZipClassFinder
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+weblogic.utils.collections
+ ArrayMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ConcurrentHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ CopyOnWriteArrayList
+  iterator|()Ljava/util/Iterator;
+ CopyOnWriteArrayList$COWIterator
+  next|()Ljava/lang/Object;
+ Stack
+  peek|()Ljava/lang/Object;
+  pop|()Ljava/lang/Object;
+  push|(Ljava/lang/Object;)V
+  size|()I
+weblogic.utils.http
+ BytesToString
+  is8BitUnicodeSubset|(Ljava/lang/String;)Z
+ QueryParams
+  getValue|(Ljava/lang/Object;)Ljava/lang/String;
+  getValues|(Ljava/lang/Object;)[Ljava/lang/String;
+weblogic.utils.io
+ ByteBufferInputStream
+  read|([BII)I
+ ByteBufferOutputStream
+  write|([BII)V
+ ChunkedInputStream
+  read
+   ()I
+   ([BII)I
+ ChunkedOutputStream
+  write|([BII)V
+ DelegatingOutputStream
+  flush|()V
+  write|([BII)V
+ FilenameEncoder
+  getSafeFile|(Ljava/lang/String;Ljava/lang/String;)Ljava/io/File;
+  resolveRelativeURIPath|(Ljava/lang/String;Z)Ljava/lang/String;
+ UnsyncByteArrayInputStream
+  read|()I
+ UnsyncByteArrayOutputStream
+  write
+   (I)V
+   ([BII)V
+weblogic.xml.babel.baseparser
+ BaseParser
+  compare|(I)Z
+ SymbolTable
+  withinElement|()Z
+weblogic.xml.babel.reader
+ XmlChars
+  isChar|(I)Z
+  isHighSurrogate|(I)Z
+  isLetter|(C)Z
+  isLowSurrogate|(I)Z
+  isNameChar|(C)Z
+  isSpace|(C)Z
+weblogic.xml.babel.scanner
+ Scanner
+  scan|()Lweblogic/xml/babel/scanner/Token;
+ ScannerState
+  checkSize|(I)Z
+  checkedRead|()V
+ TokenFactory
+  createStoredToken|(I[CII)Lweblogic/xml/babel/scanner/Token;
+  createToken|(I)Lweblogic/xml/babel/scanner/Token;
+weblogic.xml.util|TernarySearchTree|get|([CII)Ljava/lang/Object;

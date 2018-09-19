@@ -1,0 +1,19 @@
+antlr
+ ANTLRStringBuffer
+  append|(C)V
+  length|()I
+ CharBuffer
+  fill|(I)V
+ CharQueue
+  append|(C)V
+  elementAt|(I)C
+  removeFirst|()V
+ CharScanner
+  append|(C)V
+  toLower|(C)C
+ InputBuffer
+  LA|(I)C
+  consume|()V
+ TokenQueue
+  elementAt|(I)Lantlr/Token;
+antlr.collections.impl|BitSet|member|(I)Z

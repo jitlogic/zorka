@@ -51,6 +51,7 @@ sun.nio.cs
   encoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetEncoder;
  US_ASCII$Decoder
   decode|([BII[C)I
+sun.security.util|DerInputStream|available|()I
 sun.util.logging
  LoggingSupport
   isLoggable|(Ljava/lang/Object;Ljava/lang/Object;)Z
