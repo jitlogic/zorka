@@ -164,10 +164,14 @@ public class FileTrapper extends ZorkaAsyncThread<String> implements ZorkaTrappe
             }
         }
 
-        // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
-
-        if (!submit(sb.toString())) {
-            // TODO AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_DROPPED);
+        try {
+            if (!submit(sb.toString())) {
+                AgentDiagnostics.inc(AgentDiagnostics.TRAPS_DROPPED);
+            } else {
+                AgentDiagnostics.inc(countTraps, AgentDiagnostics.TRAPS_SUBMITTED);
+            }
+        } catch (Exception e1) {
+            AgentDiagnostics.inc(AgentDiagnostics.TRAPS_DROPPED);
         }
 
     }
