@@ -1,0 +1,11 @@
+org.osgi.framework
+ FrameworkUtil$FilterImpl
+  match|(Lorg/osgi/framework/ServiceReference;)Z
+  matches|(Ljava/util/Map;)Z
+ FrameworkUtil$ServiceReferenceMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ Version
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/osgi/framework/Version;)I
+org.osgi.util.tracker|ServiceTracker$Tracked|serviceChanged|(Lorg/osgi/framework/ServiceEvent;)V

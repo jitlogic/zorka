@@ -1,0 +1,17 @@
+org.bouncycastle.crypto.digests
+ GeneralDigest
+  finish|()V
+  reset|()V
+  update
+   (B)V
+   ([BII)V
+ SHA1Digest
+  doFinal|([BI)I
+  reset
+   ()V
+   (Lorg/bouncycastle/util/Memoable;)V
+org.bouncycastle.crypto.macs
+ HMac
+  doFinal|([BI)I
+  update|([BII)V
+org.bouncycastle.crypto.util|Pack|intToBigEndian|(I[BI)V

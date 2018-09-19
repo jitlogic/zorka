@@ -1,0 +1,23 @@
+com.querydsl.core.support|SerializerBase|append|(Ljava/lang/String;)Lcom/querydsl/core/support/SerializerBase;
+com.querydsl.core.types
+ QTuple
+  newInstance
+   ([Ljava/lang/Object;)Lcom/querydsl/core/Tuple;
+   ([Ljava/lang/Object;)Ljava/lang/Object;
+ QTuple$TupleImpl
+  get|(Lcom/querydsl/core/types/Expression;)Ljava/lang/Object;
+com.querydsl.sql
+ Configuration
+  get|(Ljava/sql/ResultSet;Lcom/querydsl/core/types/Path;ILjava/lang/Class;)Ljava/lang/Object;
+ JavaTypeMapping
+  getType|(Ljava/lang/Class;)Lcom/querydsl/sql/types/Type;
+  register|(Lcom/querydsl/sql/types/Type;)V
+com.querydsl.sql.types
+ IntegerType
+  getValue
+   (Ljava/sql/ResultSet;I)Ljava/lang/Integer;
+   (Ljava/sql/ResultSet;I)Ljava/lang/Object;
+ StringType
+  getValue
+   (Ljava/sql/ResultSet;I)Ljava/lang/Object;
+   (Ljava/sql/ResultSet;I)Ljava/lang/String;

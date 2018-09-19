@@ -1,0 +1,11 @@
+electric.util.io
+ FastBufferedReader
+  read|()I
+ FastStringReader
+  mark|(I)V
+  read|()I
+  reset|()V
+electric.util.lex
+ Lex
+  peek|()I
+  read|()I

@@ -1,1 +1,5 @@
 org.slf4j.helpers|MessageFormatter|arrayFormat|(Ljava/lang/String;[Ljava/lang/Object;)Lorg/slf4j/helpers/FormattingTuple;
+org.slf4j.impl
+ Log4jLoggerAdapter
+  debug|(Ljava/lang/String;)V
+  log|(Lorg/slf4j/Marker;Ljava/lang/String;ILjava/lang/String;[Ljava/lang/Object;Ljava/lang/Throwable;)V

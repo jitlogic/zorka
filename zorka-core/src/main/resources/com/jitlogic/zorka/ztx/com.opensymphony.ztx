@@ -1,0 +1,3 @@
+com.opensymphony.module.propertyset|AbstractPropertySet|getString|(Ljava/lang/String;)Ljava/lang/String;
+com.opensymphony.module.propertyset.ofbiz|StringPropertyHandler|processGet|(ILjava/lang/Object;)Ljava/lang/Object;
+com.opensymphony.workflow.loader|XMLUtil|printIndent|(Ljava/io/PrintWriter;I)V

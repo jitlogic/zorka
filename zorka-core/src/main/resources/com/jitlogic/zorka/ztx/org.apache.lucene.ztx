@@ -1,6 +1,9 @@
 org.apache.lucene.analysis
  Analyzer
   getOffsetGap|(Lorg/apache/lucene/document/Fieldable;)I
+ CharArrayMap
+  containsKey|(Ljava/lang/CharSequence;)Z
+  put|([CLjava/lang/Object;)Ljava/lang/Object;
  ReusableStringReader
   read|()I
 org.apache.lucene.analysis.en
@@ -62,6 +65,7 @@ org.apache.lucene.analysis.tokenattributes
   clear|()V
  TypeAttributeImpl
   clear|()V
+  type|()Ljava/lang/String;
 org.apache.lucene.analysis.util
  CharArrayMap
   containsKey|([CII)Z
@@ -255,7 +259,9 @@ org.apache.lucene.util
    ([II)[I
   oversize|(II)I
  AttributeImpl
-  clone|()Lorg/apache/lucene/util/AttributeImpl;
+  clone
+   ()Ljava/lang/Object;
+   ()Lorg/apache/lucene/util/AttributeImpl;
  AttributeSource
   addAttribute|(Ljava/lang/Class;)Lorg/apache/lucene/util/Attribute;
   clearAttributes|()V
@@ -279,6 +285,8 @@ org.apache.lucene.util
  BytesRefHash
   add|(Lorg/apache/lucene/util/BytesRef;)I
   byteStart|(I)I
+ CharacterUtils$Java4CharacterUtils
+  codePointAt|([CI)I
  CharacterUtils$Java5CharacterUtils
   codePointAt|([CI)I
  Counter$SerialCounter

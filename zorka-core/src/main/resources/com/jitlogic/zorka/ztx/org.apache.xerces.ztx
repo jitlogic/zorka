@@ -5,6 +5,8 @@ org.apache.xerces.dom
   setNamedItem|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
  ChildNode
   cloneNode|(Z)Lorg/w3c/dom/Node;
+ DeepNodeListImpl
+  item|(I)Lorg/w3c/dom/Node;
  DeferredDocumentImpl
   appendChild|(II)V
   createDeferredAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
@@ -21,7 +23,9 @@ org.apache.xerces.dom
    (IZ)Ljava/lang/String;
   getNodeObject|(I)Lorg/apache/xerces/dom/DeferredNode;
   getNodeType|(IZ)S
-  getNodeURI|(IZ)Ljava/lang/String;
+  getNodeURI
+   (I)Ljava/lang/String;
+   (IZ)Ljava/lang/String;
   getNodeValueString
    (I)Ljava/lang/String;
    (IZ)Ljava/lang/String;
@@ -29,12 +33,15 @@ org.apache.xerces.dom
   getPrevSibling
    (I)I
    (IZ)I
-  getRealPrevSibling|(IZ)I
+  getRealPrevSibling
+   (I)I
+   (IZ)I
   getTypeInfo|(I)Ljava/lang/Object;
   setDeferredAttribute|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;ZZLjava/lang/Object;)I
  ElementImpl
   getAttribute|(Ljava/lang/String;)Ljava/lang/String;
   getAttributeNode|(Ljava/lang/String;)Lorg/w3c/dom/Attr;
+  getElementsByTagName|(Ljava/lang/String;)Lorg/w3c/dom/NodeList;
   hasAttribute|(Ljava/lang/String;)Z
  NamedNodeMapImpl
   getNamedItem|(Ljava/lang/String;)Lorg/w3c/dom/Node;
@@ -103,8 +110,11 @@ org.apache.xerces.impl.dtd
   separator|(SLorg/apache/xerces/xni/Augmentations;)V
   startAttlist|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
  XMLDTDValidator
+  characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
+  endElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/Augmentations;)V
   getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
   getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
+  startElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;Lorg/apache/xerces/xni/Augmentations;)V
  XMLSimpleType
   clear|()V
 org.apache.xerces.impl.dtd.models
@@ -190,7 +200,9 @@ org.apache.xerces.parsers
  AbstractDOMParser
   attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
+  endElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/Augmentations;)V
   ignorableWhitespace|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
+  startElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;Lorg/apache/xerces/xni/Augmentations;)V
  AbstractSAXParser
   attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
@@ -200,6 +212,7 @@ org.apache.xerces.parsers
   startCDATA|(Lorg/apache/xerces/xni/Augmentations;)V
   startElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;Lorg/apache/xerces/xni/Augmentations;)V
  AbstractSAXParser$AttributesProxy
+  getIndex|(Ljava/lang/String;Ljava/lang/String;)I
   getLocalName|(I)Ljava/lang/String;
   getQName|(I)Ljava/lang/String;
   getURI|(I)Ljava/lang/String;

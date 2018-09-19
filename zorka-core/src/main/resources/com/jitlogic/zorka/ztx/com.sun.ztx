@@ -30,6 +30,21 @@ com.sun.imageio.plugins.png
   deflate|()V
  RowFilter
   filterRow|(I[B[B[[BII)I
+com.sun.jersey.api.uri|UriPattern|match|(Ljava/lang/CharSequence;)Ljava/util/regex/MatchResult;
+com.sun.jersey.core.header|GrammarUtil|isToken|(C)Z
+com.sun.jersey.core.reflection
+ AnnotatedMethod
+  getAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+ MethodList
+  filter|(Lcom/sun/jersey/core/reflection/MethodList$Filter;)Lcom/sun/jersey/core/reflection/MethodList;
+ MethodList$5
+  keep|(Lcom/sun/jersey/core/reflection/AnnotatedMethod;)Z
+ ReflectionHelper
+  findMethodOnClassPA|(Ljava/lang/Class;Ljava/lang/reflect/Method;)Ljava/security/PrivilegedAction;
+ ReflectionHelper$9
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/lang/reflect/Method;
 com.sun.jmx.mbeanserver
  DefaultMXBeanMappingFactory$NonNullMXBeanMapping
   toOpenValue|(Ljava/lang/Object;)Ljava/lang/Object;
@@ -286,6 +301,8 @@ com.sun.proxy
   annotationType|()Ljava/lang/Class;
  $Proxy10
   value|()Ljava/lang/String;
+ $Proxy108
+  annotationType|()Ljava/lang/Class;
  $Proxy12
   annotationType|()Ljava/lang/Class;
   name|()Ljava/lang/String;
@@ -315,6 +332,10 @@ com.sun.proxy
  $Proxy311
   annotationType|()Ljava/lang/Class;
   scope|()Lcom/liferay/portal/kernel/cache/Lifecycle;
+ $Proxy3269
+  annotationType|()Ljava/lang/Class;
+ $Proxy3271
+  annotationType|()Ljava/lang/Class;
  $Proxy34
   getGroup|(J)Lcom/liferay/portal/model/Group;
  $Proxy4
@@ -325,6 +346,8 @@ com.sun.proxy
   annotationType|()Ljava/lang/Class;
  $Proxy57
   annotationType|()Ljava/lang/Class;
+ $Proxy5700
+  annotationType|()Ljava/lang/Class;
  $Proxy64
   defaultValue|()Ljava/lang/String;
   name|()Ljava/lang/String;
@@ -332,7 +355,39 @@ com.sun.proxy
   value|()Ljava/lang/String;
  $Proxy65
   annotationType|()Ljava/lang/Class;
+ $Proxy9
+  annotationType|()Ljava/lang/Class;
 com.sun.xml.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+com.sun.xml.internal.bind|WhiteSpaceProcessor|isWhiteSpace|(Ljava/lang/CharSequence;)Z
+com.sun.xml.internal.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/internal/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+com.sun.xml.internal.bind.v2.model.impl
+ RuntimeBuiltinLeafInfoImpl$StringImplImpl
+  parse
+   (Ljava/lang/CharSequence;)Ljava/lang/Object;
+   (Ljava/lang/CharSequence;)Ljava/lang/String;
+com.sun.xml.internal.bind.v2.model.nav
+ ReflectionNavigator
+  erasure|(Ljava/lang/reflect/Type;)Ljava/lang/Class;
+ ReflectionNavigator$3
+  onClass
+   (Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/Class;Ljava/lang/Void;)Ljava/lang/Class;
+ TypeVisitor
+  visit|(Ljava/lang/reflect/Type;Ljava/lang/Object;)Ljava/lang/Object;
+com.sun.xml.internal.bind.v2.runtime|JaxBeanInfo|lookForLifecycleMethods|()Z
+com.sun.xml.internal.bind.v2.runtime.reflect|TransducedAccessor$CompositeTransducedAccessorImpl|parse|(Ljava/lang/Object;Ljava/lang/CharSequence;)V
+com.sun.xml.internal.bind.v2.runtime.unmarshaller
+ LeafPropertyLoader
+  text|(Lcom/sun/xml/internal/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Ljava/lang/CharSequence;)V
+ LeafPropertyXsiLoader
+  startElement|(Lcom/sun/xml/internal/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Lcom/sun/xml/internal/bind/v2/runtime/unmarshaller/TagName;)V
+ Loader
+  leaveElement|(Lcom/sun/xml/internal/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Lcom/sun/xml/internal/bind/v2/runtime/unmarshaller/TagName;)V
+  startElement|(Lcom/sun/xml/internal/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Lcom/sun/xml/internal/bind/v2/runtime/unmarshaller/TagName;)V
+ SAXConnector
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
 com.sun.xml.internal.stream
  Entity
   clear|()V

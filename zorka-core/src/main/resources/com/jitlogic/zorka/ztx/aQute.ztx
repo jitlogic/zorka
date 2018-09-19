@@ -7,8 +7,24 @@ aQute.bnd.header
   containsKey|(Ljava/lang/String;)Z
   put|(Ljava/lang/String;LaQute/bnd/header/Attrs;)LaQute/bnd/header/Attrs;
 aQute.bnd.osgi
+ AbstractResource
+  openInputStream|()Ljava/io/InputStream;
  Analyzer
   findClass|(LaQute/bnd/osgi/Descriptors$TypeRef;)LaQute/bnd/osgi/Clazz;
+ ClassDataCollector
+  classBegin|(ILaQute/bnd/osgi/Descriptors$TypeRef;)V
+  classEnd|()V
+  classStart|(LaQute/bnd/osgi/Clazz;)Z
+  field|(LaQute/bnd/osgi/Clazz$FieldDef;)V
+  innerClass|(LaQute/bnd/osgi/Descriptors$TypeRef;LaQute/bnd/osgi/Descriptors$TypeRef;Ljava/lang/String;I)V
+  memberEnd|()V
+  method|(LaQute/bnd/osgi/Clazz$MethodDef;)V
+  referTo|(LaQute/bnd/osgi/Descriptors$TypeRef;I)V
+  referenceMethod|(ILaQute/bnd/osgi/Descriptors$TypeRef;Ljava/lang/String;Ljava/lang/String;)V
+  signature|(Ljava/lang/String;)V
+  version|(II)V
+ ClassDataCollectors
+  referTo|(LaQute/bnd/osgi/Descriptors$TypeRef;I)V
  Clazz
   parseDescriptor|(Ljava/lang/String;I)V
   reset|()V
@@ -38,6 +54,7 @@ aQute.bnd.osgi
   lastModified|()J
   openInputStream|()Ljava/io/InputStream;
 aQute.lib.collections|MultiMap|addAll|(Ljava/lang/Object;Ljava/util/Collection;)Z
+aQute.lib.zip|ZipUtil|getModifiedTime|(Ljava/util/zip/ZipEntry;)J
 aQute.libg.generics
  Create
   list|()Ljava/util/List;

@@ -1,18 +1,69 @@
+org.jaxen
+ BaseXPath
+  selectNodes|(Ljava/lang/Object;)Ljava/util/List;
+ JaxenHandler
+  endAdditiveExpr|(I)V
+  endAndExpr|(Z)V
+  endEqualityExpr|(I)V
+  endMultiplicativeExpr|(I)V
+  endNameStep|()V
+  endOrExpr|(Z)V
+  endPathExpr|()V
+  endRelationalExpr|(I)V
+  endRelativeLocationPath|()V
+  endUnaryExpr|(I)V
+  endUnionExpr|(Z)V
+  endXPath|()V
+  getXPathExpr|(Z)Lorg/jaxen/expr/XPathExpr;
+  startAdditiveExpr|()V
+  startAndExpr|()V
+  startEqualityExpr|()V
+  startMultiplicativeExpr|()V
+  startNameStep|(ILjava/lang/String;Ljava/lang/String;)V
+  startOrExpr|()V
+  startPathExpr|()V
+  startRelationalExpr|()V
+  startRelativeLocationPath|()V
+  startUnaryExpr|()V
+  startUnionExpr|()V
+  startXPath|()V
 org.jaxen.dom4j
  DocumentNavigator
   getParentNode|(Ljava/lang/Object;)Ljava/lang/Object;
   isAttribute|(Ljava/lang/Object;)Z
   isNamespace|(Ljava/lang/Object;)Z
 org.jaxen.expr
+ DefaultAllNodeStep
+  matches|(Ljava/lang/Object;Lorg/jaxen/ContextSupport;)Z
+ DefaultExpr
+  convertToList|(Ljava/lang/Object;)Ljava/util/List;
  DefaultLocationPath
   addStep|(Lorg/jaxen/expr/Step;)V
+ DefaultNameStep
+  matches|(Ljava/lang/Object;Lorg/jaxen/ContextSupport;)Z
+ DefaultPathExpr
+  simplify|()Lorg/jaxen/expr/Expr;
+ DefaultStep
+  axisIterator|(Ljava/lang/Object;Lorg/jaxen/ContextSupport;)Ljava/util/Iterator;
+  simplify|()V
+ DefaultXPathExpr
+  asList|(Lorg/jaxen/Context;)Ljava/util/List;
+  simplify|()V
  DefaultXPathFactory
   createPredicateSet|()Lorg/jaxen/expr/PredicateSet;
  PredicateSet
   simplify|()V
-org.jaxen.expr.iter|IterableAxis|value|()I
+org.jaxen.expr.iter
+ IterableAttributeAxis
+  iterator|(Ljava/lang/Object;Lorg/jaxen/ContextSupport;)Ljava/util/Iterator;
+ IterableAxis
+  value|()I
 org.jaxen.util
  FollowingSiblingAxisIterator
   next|()Ljava/lang/Object;
+ IdentityHashMap
+  clear|()V
+  containsKey|(Ljava/lang/Object;)Z
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  SingletonList
   size|()I

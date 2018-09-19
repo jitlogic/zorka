@@ -1,0 +1,16 @@
+org.codehaus.jackson.map|DeserializationConfig|isEnabled|(Lorg/codehaus/jackson/map/DeserializationConfig$Feature;)Z
+org.codehaus.jackson.map.introspect
+ Annotated
+  hasAnnotation|(Ljava/lang/Class;)Z
+ AnnotatedField
+  getAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+ AnnotatedMethodMap
+  add|(Lorg/codehaus/jackson/map/introspect/AnnotatedMethod;)V
+  find|(Ljava/lang/reflect/Method;)Lorg/codehaus/jackson/map/introspect/AnnotatedMethod;
+  remove|(Ljava/lang/reflect/Method;)Lorg/codehaus/jackson/map/introspect/AnnotatedMethod;
+ AnnotatedWithParams
+  getAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+ AnnotationMap
+  get|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+ BasicClassIntrospector$MinimalMethodFilter
+  includeMethod|(Ljava/lang/reflect/Method;)Z

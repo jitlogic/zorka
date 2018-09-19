@@ -1,3 +1,13 @@
+org.apache.abdera.i18n.text
+ CharUtils
+  inRange|(III)Z
+  invset_contains|([II)Z
+  isAlphaDigit|(I)Z
+  isDigit|(I)Z
+  isHighSurrogate|(C)Z
+ CodepointIterator
+  position|()I
+  remaining|()I
 org.apache.beehive.netui.pageflow.scoping
  ScopedServletUtils
   getOuterRequest|(Ljavax/servlet/http/HttpServletRequest;)Ljavax/servlet/http/HttpServletRequest;
@@ -93,6 +103,8 @@ org.apache.catalina.loader
   loadClass
    (Ljava/lang/String;)Ljava/lang/Class;
    (Ljava/lang/String;Z)Ljava/lang/Class;
+ WebappClassLoaderBase
+  loadClass|(Ljava/lang/String;Z)Ljava/lang/Class;
 org.apache.catalina.mapper
  Mapper
   map|(Lorg/apache/tomcat/util/buf/MessageBytes;Lorg/apache/tomcat/util/buf/MessageBytes;Ljava/lang/String;Lorg/apache/catalina/mapper/MappingData;)V
@@ -108,7 +120,19 @@ org.apache.catalina.util
  TLSUtil
   isTLSRequestAttribute|(Ljava/lang/String;)Z
 org.apache.catalina.valves|ErrorReportValve|invoke|(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V
-org.apache.catalina.webresources|StandardRoot|getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
+org.apache.catalina.webresources
+ AbstractArchiveResourceSet
+  getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
+ Cache$EvictionOrder
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Lorg/apache/catalina/webresources/CachedResource;Lorg/apache/catalina/webresources/CachedResource;)I
+ DirResourceSet
+  getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
+ EmptyResource
+  exists|()Z
+ StandardRoot
+  getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
 org.apache.chemistry.opencmis.commons.enums|BaseTypeId|value|()Ljava/lang/String;
 org.apache.chemistry.opencmis.commons.impl.dataobjects|AbstractTypeDefinition|addPropertyDefinition|(Lorg/apache/chemistry/opencmis/commons/definitions/PropertyDefinition;)V
 org.apache.coyote
@@ -226,6 +250,8 @@ org.apache.http.impl.io
   write|([BII)V
  HttpTransportMetricsImpl
   incrementBytesTransferred|(J)V
+ SessionInputBufferImpl
+  read|([BII)I
  SessionOutputBufferImpl
   write|([BII)V
 org.apache.http.util
@@ -390,6 +416,11 @@ org.apache.log4j
   isDisabled|(I)Z
  Priority
   isGreaterOrEqual|(Lorg/apache/log4j/Priority;)Z
+org.apache.log4j.helpers
+ PatternConverter
+  format|(Ljava/lang/StringBuffer;Lorg/apache/log4j/spi/LoggingEvent;)V
+ PatternParser$LiteralPatternConverter
+  format|(Ljava/lang/StringBuffer;Lorg/apache/log4j/spi/LoggingEvent;)V
 org.apache.logging.log4j.spi
  AbstractLogger
   isEnabled|(Lorg/apache/logging/log4j/Level;)Z
@@ -672,9 +703,16 @@ org.apache.velocity.runtime.parser
   backup|(I)V
   readChar|()C
 org.apache.velocity.runtime.parser.node
+ ASTIdentifier
+  jjtAccept|(Lorg/apache/velocity/runtime/parser/node/ParserVisitor;Ljava/lang/Object;)Ljava/lang/Object;
+ ASTReference
+  jjtAccept|(Lorg/apache/velocity/runtime/parser/node/ParserVisitor;Ljava/lang/Object;)Ljava/lang/Object;
+ ASTText
+  jjtAccept|(Lorg/apache/velocity/runtime/parser/node/ParserVisitor;Ljava/lang/Object;)Ljava/lang/Object;
  NodeUtils
   tokenLiteral|(Lorg/apache/velocity/runtime/parser/Token;)Ljava/lang/String;
  SimpleNode
+  childrenAccept|(Lorg/apache/velocity/runtime/parser/node/ParserVisitor;Ljava/lang/Object;)Ljava/lang/Object;
   init|(Lorg/apache/velocity/context/InternalContextAdapter;Ljava/lang/Object;)Ljava/lang/Object;
   jjtAddChild|(Lorg/apache/velocity/runtime/parser/node/Node;I)V
   jjtClose|()V
@@ -682,6 +720,12 @@ org.apache.velocity.runtime.parser.node
   jjtGetNumChildren|()I
   jjtOpen|()V
   jjtSetParent|(Lorg/apache/velocity/runtime/parser/node/Node;)V
+org.apache.velocity.runtime.visitor
+ BaseVisitor
+  visit
+   (Lorg/apache/velocity/runtime/parser/node/ASTIdentifier;Ljava/lang/Object;)Ljava/lang/Object;
+   (Lorg/apache/velocity/runtime/parser/node/ASTReference;Ljava/lang/Object;)Ljava/lang/Object;
+   (Lorg/apache/velocity/runtime/parser/node/ASTText;Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.xml.dtm.ref
  DTMDefaultBase
   getNodeType|(I)S

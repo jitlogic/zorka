@@ -5,6 +5,7 @@ org.joda.time
   getChronology|(Lorg/joda/time/Chronology;)Lorg/joda/time/Chronology;
  DurationFieldType$StandardDurationFieldType
   getField|(Lorg/joda/time/Chronology;)Lorg/joda/time/DurationField;
+org.joda.time.base|AbstractInstant|isBefore|(J)Z
 org.joda.time.chrono
  AssembledChronology
   months|()Lorg/joda/time/DurationField;

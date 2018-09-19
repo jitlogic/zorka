@@ -1,0 +1,34 @@
+com.thoughtworks.xstream.converters.basic|StringConverter|fromString|(Ljava/lang/String;)Ljava/lang/Object;
+com.thoughtworks.xstream.converters.reflection
+ AbstractReflectionConverter$SeenFields
+  add|(Ljava/lang/Class;Ljava/lang/String;)V
+ FieldDictionary
+  field|(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/reflect/Field;
+com.thoughtworks.xstream.core|DefaultConverterLookup|lookupConverterForType|(Ljava/lang/Class;)Lcom/thoughtworks/xstream/converters/Converter;
+com.thoughtworks.xstream.core.util
+ FastStack
+  peek|()Ljava/lang/Object;
+  pop|()Ljava/lang/Object;
+  popSilently|()V
+  push|(Ljava/lang/Object;)Ljava/lang/Object;
+  size|()I
+com.thoughtworks.xstream.io.path
+ PathTracker
+  popElement|()V
+  pushElement|(Ljava/lang/String;)V
+com.thoughtworks.xstream.io.xml
+ AbstractPullReader
+  mark|()V
+ XmlFriendlyReplacer
+  escapeName|(Ljava/lang/String;)Ljava/lang/String;
+  unescapeName|(Ljava/lang/String;)Ljava/lang/String;
+com.thoughtworks.xstream.mapper
+ DefaultMapper
+  aliasForAttribute|(Ljava/lang/String;)Ljava/lang/String;
+  aliasForSystemAttribute|(Ljava/lang/String;)Ljava/lang/String;
+  defaultImplementationOf|(Ljava/lang/Class;)Ljava/lang/Class;
+  realMember|(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/String;
+ ImplicitCollectionMapper
+  getImplicitCollectionDefForFieldName|(Ljava/lang/Class;Ljava/lang/String;)Lcom/thoughtworks/xstream/mapper/Mapper$ImplicitCollectionMapping;
+ LocalConversionMapper
+  getLocalConverter|(Ljava/lang/Class;Ljava/lang/String;)Lcom/thoughtworks/xstream/converters/Converter;

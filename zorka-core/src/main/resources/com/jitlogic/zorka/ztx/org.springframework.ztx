@@ -1,6 +1,9 @@
 org.springframework.aop.framework
  AdvisedSupport
   getInterceptorsAndDynamicInterceptionAdvice|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Ljava/util/List;
+ AopProxyUtils
+  equalsAdvisors|(Lorg/springframework/aop/framework/AdvisedSupport;Lorg/springframework/aop/framework/AdvisedSupport;)Z
+  equalsProxiedInterfaces|(Lorg/springframework/aop/framework/AdvisedSupport;Lorg/springframework/aop/framework/AdvisedSupport;)Z
  JdkDynamicAopProxy
   invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
  ReflectiveMethodInvocation
@@ -12,6 +15,8 @@ org.springframework.aop.support
   invokeJoinpointUsingReflection|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
   isEqualsMethod|(Ljava/lang/reflect/Method;)Z
   isHashCodeMethod|(Ljava/lang/reflect/Method;)Z
+ DelegatingIntroductionInterceptor
+  invoke|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
 org.springframework.aop.target|AbstractBeanFactoryBasedTargetSource|releaseTarget|(Ljava/lang/Object;)V
 org.springframework.asm
  ClassReader
@@ -41,6 +46,7 @@ org.springframework.beans.factory
  BeanFactoryUtils
   isFactoryDereference|(Ljava/lang/String;)Z
   transformedBeanName|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.beans.factory.annotation|AutowiredAnnotationBeanPostProcessor$1|doWith|(Ljava/lang/reflect/Method;)V
 org.springframework.beans.factory.config
  ConstructorArgumentValues
   addArgumentValues|(Lorg/springframework/beans/factory/config/ConstructorArgumentValues;)V
@@ -75,6 +81,7 @@ org.springframework.beans.factory.xml
   getLocalName|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getNamespaceURI|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   nodeNameEquals|(Lorg/w3c/dom/Node;Ljava/lang/String;)Z
+org.springframework.context.event|EventListenerMethodProcessor$1|inspect|(Ljava/lang/reflect/Method;)Lorg/springframework/context/event/EventListener;
 org.springframework.context.expression|StandardBeanExpressionResolver|evaluate|(Ljava/lang/String;Lorg/springframework/beans/factory/config/BeanExpressionContext;)Ljava/lang/Object;
 org.springframework.context.i18n|LocaleContextHolder|resetLocaleContext|()V
 org.springframework.context.support|AbstractApplicationContext|publishEvent|(Lorg/springframework/context/ApplicationEvent;)V
@@ -107,6 +114,8 @@ org.springframework.core
   resolve
    ()Ljava/lang/Class;
    (Ljava/lang/Class;)Ljava/lang/Class;
+ ResolvableType$1
+  isAssignableFrom|(Ljava/lang/Class;)Z
  SimpleAliasRegistry
   canonicalName|(Ljava/lang/String;)Ljava/lang/String;
   isAlias|(Ljava/lang/String;)Z
@@ -316,8 +325,12 @@ org.springframework.util
   isEqualsMethod|(Ljava/lang/reflect/Method;)Z
   isHashCodeMethod|(Ljava/lang/reflect/Method;)Z
   makeAccessible|(Ljava/lang/reflect/Method;)V
+ ReflectionUtils$1
+  doWith|(Ljava/lang/reflect/Method;)V
  ReflectionUtils$4
   doWith|(Ljava/lang/reflect/Method;)V
+ ReflectionUtils$6
+  matches|(Ljava/lang/reflect/Method;)Z
  StreamUtils
   copy|(Ljava/lang/String;Ljava/nio/charset/Charset;Ljava/io/OutputStream;)V
   copyToString|(Ljava/io/InputStream;Ljava/nio/charset/Charset;)Ljava/lang/String;

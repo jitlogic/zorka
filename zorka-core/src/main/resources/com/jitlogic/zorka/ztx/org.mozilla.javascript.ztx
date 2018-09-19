@@ -49,6 +49,10 @@ org.mozilla.javascript
   get|(Ljava/lang/String;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;
   getDefaultValue|(Ljava/lang/Class;)Ljava/lang/Object;
   unwrap|()Ljava/lang/Object;
+ NativeMath
+  execIdCall|(Lorg/mozilla/javascript/IdFunctionObject;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
+ NativeObject
+  execIdCall|(Lorg/mozilla/javascript/IdFunctionObject;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
  NativeString
   execIdCall|(Lorg/mozilla/javascript/IdFunctionObject;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
   toCharSequence|()Ljava/lang/CharSequence;
@@ -173,6 +177,12 @@ org.mozilla.javascript
   wrapAsJavaObject|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;Ljava/lang/Class;)Lorg/mozilla/javascript/Scriptable;
 org.mozilla.javascript.ast|Scope|getDefiningScope|(Ljava/lang/String;)Lorg/mozilla/javascript/ast/Scope;
 org.mozilla.javascript.gen
+ _js_less_less_patches_js_2
+  call|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
+ _js_less_less_rhino_js_1
+  call|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
+  getParamOrVarConst|(I)Z
+  getParamOrVarName|(I)Ljava/lang/String;
  file__v_zorka_ztest_alfresco_alfr50d_1_tomcat_webapps_share_WEB_INF_classes_alfresco_site_webscripts_org_alfresco_components_documentlibrary_data_surf_doclist_get_js_24
   call|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
   getParamOrVarConst|(I)Z
@@ -191,3 +201,9 @@ org.mozilla.javascript.regexp
   execIdCall|(Lorg/mozilla/javascript/IdFunctionObject;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
  RegExpImpl
   wrapRegExp|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;)Lorg/mozilla/javascript/Scriptable;
+org.mozilla.javascript.v8dtoa
+ FastDtoa
+  dtoa|(DLorg/mozilla/javascript/v8dtoa/FastDtoaBuilder;)Z
+ FastDtoaBuilder
+  format|()Ljava/lang/String;
+  reset|()V

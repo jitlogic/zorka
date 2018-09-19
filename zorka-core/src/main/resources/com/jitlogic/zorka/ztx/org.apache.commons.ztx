@@ -18,6 +18,9 @@ org.apache.commons.collections
  ArrayStack
   pop|()Ljava/lang/Object;
   push|(Ljava/lang/Object;)Ljava/lang/Object;
+ CollectionUtils
+  isEmpty|(Ljava/util/Collection;)Z
+  isNotEmpty|(Ljava/util/Collection;)Z
  ExtendedProperties
   getBoolean
    (Ljava/lang/String;Ljava/lang/Boolean;)Ljava/lang/Boolean;
@@ -61,6 +64,14 @@ org.apache.commons.dbcp
   getString|(Ljava/lang/String;)Ljava/lang/String;
   next|()Z
   wasNull|()Z
+org.apache.commons.dbcp2
+ DelegatingResultSet
+  getInt|(I)I
+  getString
+   (I)Ljava/lang/String;
+   (Ljava/lang/String;)Ljava/lang/String;
+  next|()Z
+  wasNull|()Z
 org.apache.commons.fileupload
  MultipartStream
   readByte|()B
@@ -68,15 +79,41 @@ org.apache.commons.fileupload
   available|()I
   read|([BII)I
 org.apache.commons.httpclient.params|DefaultHttpParams|getParameter|(Ljava/lang/String;)Ljava/lang/Object;
-org.apache.commons.io.output|ThresholdingOutputStream|write|([BII)V
+org.apache.commons.io
+ IOUtils
+  copy|(Ljava/io/InputStream;Ljava/io/OutputStream;)I
+  copyLarge|(Ljava/io/InputStream;Ljava/io/OutputStream;)J
+  toByteArray|(Ljava/io/InputStream;)[B
+org.apache.commons.io.input|CharSequenceReader|read|()I
+org.apache.commons.io.output
+ ByteArrayOutputStream
+  toByteArray|()[B
+  write|([BII)V
+ ThresholdingOutputStream
+  write|([BII)V
 org.apache.commons.lang
  ArrayUtils
   contains|([CC)Z
   indexOf
    ([CC)I
    ([CCI)I
+ Entities
+  entityName|(I)Ljava/lang/String;
+ Entities$LookupEntityMap
+  name|(I)Ljava/lang/String;
  StringUtils
+  defaultString|(Ljava/lang/String;)Ljava/lang/String;
+  isBlank|(Ljava/lang/String;)Z
+  isEmpty|(Ljava/lang/String;)Z
+  isNotBlank|(Ljava/lang/String;)Z
   join|(Ljava/util/Iterator;C)Ljava/lang/String;
+  trim|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.commons.lang.builder
+ EqualsBuilder
+  append|(Ljava/lang/Object;Ljava/lang/Object;)Lorg/apache/commons/lang/builder/EqualsBuilder;
+ HashCodeBuilder
+  append|(Ljava/lang/Object;)Lorg/apache/commons/lang/builder/HashCodeBuilder;
+  toHashCode|()I
 org.apache.commons.lang.text
  StrBuilder
   append
@@ -85,10 +122,21 @@ org.apache.commons.lang.text
    (Ljava/lang/String;)Lorg/apache/commons/lang/text/StrBuilder;
   ensureCapacity|(I)Lorg/apache/commons/lang/text/StrBuilder;
   length|()I
+  setLength|(I)Lorg/apache/commons/lang/text/StrBuilder;
  StrMatcher$StringMatcher
   isMatch|([CIII)I
  StrSubstitutor
   replace|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.commons.lang3|StringUtils|stripToNull|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.commons.lang3.text.translate
+ AggregateTranslator
+  translate|(Ljava/lang/CharSequence;ILjava/io/Writer;)I
+ CodePointTranslator
+  translate|(Ljava/lang/CharSequence;ILjava/io/Writer;)I
+ LookupTranslator
+  translate|(Ljava/lang/CharSequence;ILjava/io/Writer;)I
+ UnicodeEscaper
+  translate|(ILjava/io/Writer;)Z
 org.apache.commons.logging
  LogFactory
   getLog
@@ -101,4 +149,5 @@ org.apache.commons.logging.impl
   debug|(Ljava/lang/Object;)V
   trace|(Ljava/lang/Object;)V
  SLF4JLocationAwareLog
+  debug|(Ljava/lang/Object;)V
   trace|(Ljava/lang/Object;)V

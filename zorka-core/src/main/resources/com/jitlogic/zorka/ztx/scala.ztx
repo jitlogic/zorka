@@ -1,0 +1,30 @@
+scala.collection.mutable
+ ArrayOps$ofByte
+  apply|(I)Ljava/lang/Object;
+  repr|()[B
+scala.reflect.internal
+ Names$Name
+  index|()I
+ Phase
+  flagMask|()J
+  fmask|()J
+ SymbolTable
+  NoSymbol|()Lscala/reflect/internal/Symbols$NoSymbol;
+  chrs|()[C
+  phase|()Lscala/reflect/internal/Phase;
+scala.reflect.internal.pickling
+ PickleBuffer
+  bytes|()[B
+  readByte|()I
+  readIndex|()I
+  readLongNat|()J
+  readNat|()I
+scala.reflect.runtime
+ JavaMirrors$JavaMirror$unpickler$
+  global
+   ()Lscala/reflect/internal/SymbolTable;
+   ()Lscala/reflect/runtime/SymbolTable;
+scala.runtime
+ BoxesRunTime
+  boxToByte|(B)Ljava/lang/Byte;
+  unboxToByte|(Ljava/lang/Object;)B
