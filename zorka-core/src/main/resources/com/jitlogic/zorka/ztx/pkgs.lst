@@ -1,2 +1,6 @@
-org.apache.catalina
+com.fasterxml
+com.sun
+javax
+org.apache
 org.springframework
+sun

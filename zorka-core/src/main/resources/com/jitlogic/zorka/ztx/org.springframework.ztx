@@ -1,3 +1,312 @@
-
-# TODO add something
-
+org.springframework.beans
+ BeanUtils
+  instantiateClass
+   (Ljava/lang/Class;)Ljava/lang/Object;
+   (Ljava/lang/reflect/Constructor;[Ljava/lang/Object;)Ljava/lang/Object;
+ PropertyEditorRegistrySupport
+  findCustomEditor|(Ljava/lang/Class;Ljava/lang/String;)Ljava/beans/PropertyEditor;
+ TypeConverterSupport
+  convertIfNecessary|(Ljava/lang/Object;Ljava/lang/Class;Lorg/springframework/core/MethodParameter;)Ljava/lang/Object;
+org.springframework.context.expression|StandardBeanExpressionResolver|evaluate|(Ljava/lang/String;Lorg/springframework/beans/factory/config/BeanExpressionContext;)Ljava/lang/Object;
+org.springframework.context.i18n|LocaleContextHolder|resetLocaleContext|()V
+org.springframework.context.support|AbstractApplicationContext|publishEvent|(Lorg/springframework/context/ApplicationEvent;)V
+org.springframework.core
+ BridgeMethodResolver
+  findBridgedMethod|(Ljava/lang/reflect/Method;)Ljava/lang/reflect/Method;
+ KotlinDetector
+  isKotlinType|(Ljava/lang/Class;)Z
+ MethodParameter
+  getParameterAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+  hasParameterAnnotation|(Ljava/lang/Class;)Z
+  initParameterNameDiscovery|(Lorg/springframework/core/ParameterNameDiscoverer;)V
+  nestedIfOptional|()Lorg/springframework/core/MethodParameter;
+ PrioritizedParameterNameDiscoverer
+  addDiscoverer|(Lorg/springframework/core/ParameterNameDiscoverer;)V
+ ResolvableType
+  as|(Ljava/lang/Class;)Lorg/springframework/core/ResolvableType;
+  forClass|(Ljava/lang/Class;)Lorg/springframework/core/ResolvableType;
+  forInstance|(Ljava/lang/Object;)Lorg/springframework/core/ResolvableType;
+  forMethodParameter
+   (Lorg/springframework/core/MethodParameter;)Lorg/springframework/core/ResolvableType;
+   (Lorg/springframework/core/MethodParameter;Ljava/lang/reflect/Type;)Lorg/springframework/core/ResolvableType;
+  forType|(Ljava/lang/reflect/Type;)Lorg/springframework/core/ResolvableType;
+  getNested|(ILjava/util/Map;)Lorg/springframework/core/ResolvableType;
+  resolve
+   ()Ljava/lang/Class;
+   (Ljava/lang/Class;)Ljava/lang/Class;
+org.springframework.core.annotation
+ AnnotatedElementUtils
+  hasAnnotation|(Ljava/lang/reflect/AnnotatedElement;Ljava/lang/Class;)Z
+ AnnotatedElementUtils$AlwaysTrueBooleanAnnotationProcessor
+  process
+   (Ljava/lang/reflect/AnnotatedElement;Ljava/lang/annotation/Annotation;I)Ljava/lang/Boolean;
+   (Ljava/lang/reflect/AnnotatedElement;Ljava/lang/annotation/Annotation;I)Ljava/lang/Object;
+ AnnotatedElementUtils$SimpleAnnotationProcessor
+  aggregates|()Z
+  alwaysProcesses|()Z
+ AnnotationAwareOrderComparator
+  sort|(Ljava/util/List;)V
+ SynthesizedAnnotationInvocationHandler
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+org.springframework.core.convert|TypeDescriptor|forObject|(Ljava/lang/Object;)Lorg/springframework/core/convert/TypeDescriptor;
+org.springframework.core.convert.support
+ GenericConversionService
+  canConvert|(Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Z
+  convert|(Ljava/lang/Object;Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
+ GenericConversionService$ConverterFactoryAdapter
+  convert|(Ljava/lang/Object;Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
+ GenericConversionService$NoOpConverter
+  convert|(Ljava/lang/Object;Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
+ StringToNumberConverterFactory
+  getConverter|(Ljava/lang/Class;)Lorg/springframework/core/convert/converter/Converter;
+ StringToNumberConverterFactory$StringToNumber
+  convert
+   (Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/String;)Ljava/lang/Number;
+org.springframework.core.env|AbstractPropertyResolver|resolveRequiredPlaceholders|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.expression.common
+ LiteralExpression
+  getValue
+   (Lorg/springframework/expression/EvaluationContext;)Ljava/lang/Object;
+   (Lorg/springframework/expression/EvaluationContext;)Ljava/lang/String;
+org.springframework.http
+ CacheControl
+  empty|()Lorg/springframework/http/CacheControl;
+ HttpMethod
+  resolve|(Ljava/lang/String;)Lorg/springframework/http/HttpMethod;
+ HttpStatus
+  resolve|(I)Lorg/springframework/http/HttpStatus;
+  series|()Lorg/springframework/http/HttpStatus$Series;
+  values|()[Lorg/springframework/http/HttpStatus;
+ HttpStatus$Series
+  values|()[Lorg/springframework/http/HttpStatus$Series;
+org.springframework.http.client
+ AbstractClientHttpRequest
+  execute|()Lorg/springframework/http/client/ClientHttpResponse;
+ SimpleClientHttpRequestFactory
+  createRequest|(Ljava/net/URI;Lorg/springframework/http/HttpMethod;)Lorg/springframework/http/client/ClientHttpRequest;
+ SimpleClientHttpResponse
+  close|()V
+org.springframework.http.converter
+ ByteArrayHttpMessageConverter
+  supports|(Ljava/lang/Class;)Z
+ FormHttpMessageConverter
+  addPartConverter|(Lorg/springframework/http/converter/HttpMessageConverter;)V
+ ResourceRegionHttpMessageConverter
+  canWrite|(Ljava/lang/reflect/Type;Ljava/lang/Class;Lorg/springframework/http/MediaType;)Z
+ StringHttpMessageConverter
+  supports|(Ljava/lang/Class;)Z
+org.springframework.http.converter.json|AbstractJackson2HttpMessageConverter|canWrite|(Ljava/lang/Class;Lorg/springframework/http/MediaType;)Z
+org.springframework.http.converter.xml
+ Jaxb2RootElementHttpMessageConverter
+  canRead|(Ljava/lang/Class;Lorg/springframework/http/MediaType;)Z
+  canWrite|(Ljava/lang/Class;Lorg/springframework/http/MediaType;)Z
+ SourceHttpMessageConverter
+  supports|(Ljava/lang/Class;)Z
+org.springframework.http.server|ServletServerHttpResponse$ServletResponseHttpHeaders|getFirst|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.ui
+ ExtendedModelMap
+  addAllAttributes
+   (Ljava/util/Map;)Lorg/springframework/ui/ExtendedModelMap;
+   (Ljava/util/Map;)Lorg/springframework/ui/ModelMap;
+  mergeAttributes
+   (Ljava/util/Map;)Lorg/springframework/ui/ExtendedModelMap;
+   (Ljava/util/Map;)Lorg/springframework/ui/ModelMap;
+org.springframework.util
+ AntPathMatcher
+  extractUriTemplateVariables|(Ljava/lang/String;Ljava/lang/String;)Ljava/util/Map;
+  getPatternComparator|(Ljava/lang/String;)Ljava/util/Comparator;
+  match|(Ljava/lang/String;Ljava/lang/String;)Z
+ AntPathMatcher$AntPathStringMatcher
+  matchStrings|(Ljava/lang/String;Ljava/util/Map;)Z
+ ConcurrentReferenceHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ConcurrentReferenceHashMap$ReferenceManager
+  pollForPurge|()Lorg/springframework/util/ConcurrentReferenceHashMap$Reference;
+ ConcurrentReferenceHashMap$Segment
+  getReference|(Ljava/lang/Object;ILorg/springframework/util/ConcurrentReferenceHashMap$Restructure;)Lorg/springframework/util/ConcurrentReferenceHashMap$Reference;
+ MimeType
+  getParameter|(Ljava/lang/String;)Ljava/lang/String;
+  isCompatibleWith|(Lorg/springframework/util/MimeType;)Z
+ MimeType$SpecificityComparator
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Lorg/springframework/util/MimeType;Lorg/springframework/util/MimeType;)I
+ MimeTypeUtils
+  parseMimeType|(Ljava/lang/String;)Lorg/springframework/util/MimeType;
+ NumberUtils
+  parseNumber|(Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Number;
+ ObjectUtils
+  isEmpty|([Ljava/lang/Object;)Z
+  nullSafeEquals|(Ljava/lang/Object;Ljava/lang/Object;)Z
+ StreamUtils
+  copy|(Ljava/lang/String;Ljava/nio/charset/Charset;Ljava/io/OutputStream;)V
+  copyToString|(Ljava/io/InputStream;Ljava/nio/charset/Charset;)Ljava/lang/String;
+ TypeUtils
+  isAssignable|(Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)Z
+org.springframework.validation|DataBinder|convertIfNecessary|(Ljava/lang/Object;Ljava/lang/Class;Lorg/springframework/core/MethodParameter;)Ljava/lang/Object;
+org.springframework.web.accept
+ ContentNegotiationManager
+  resolveMediaTypes|(Lorg/springframework/web/context/request/NativeWebRequest;)Ljava/util/List;
+ HeaderContentNegotiationStrategy
+  resolveMediaTypes|(Lorg/springframework/web/context/request/NativeWebRequest;)Ljava/util/List;
+org.springframework.web.bind.support
+ ConfigurableWebBindingInitializer
+  initBinder|(Lorg/springframework/web/bind/WebDataBinder;)V
+ DefaultDataBinderFactory
+  createBinder|(Lorg/springframework/web/context/request/NativeWebRequest;Ljava/lang/Object;Ljava/lang/String;)Lorg/springframework/web/bind/WebDataBinder;
+ WebBindingInitializer
+  initBinder|(Lorg/springframework/web/bind/WebDataBinder;Lorg/springframework/web/context/request/WebRequest;)V
+org.springframework.web.client
+ DefaultResponseErrorHandler
+  hasError|(Lorg/springframework/http/client/ClientHttpResponse;)Z
+ HttpMessageConverterExtractor
+  extractData|(Lorg/springframework/http/client/ClientHttpResponse;)Ljava/lang/Object;
+ RestTemplate
+  execute|(Ljava/lang/String;Lorg/springframework/http/HttpMethod;Lorg/springframework/web/client/RequestCallback;Lorg/springframework/web/client/ResponseExtractor;[Ljava/lang/Object;)Ljava/lang/Object;
+  getForObject|(Ljava/lang/String;Ljava/lang/Class;[Ljava/lang/Object;)Ljava/lang/Object;
+ RestTemplate$AcceptHeaderRequestCallback
+  doWithRequest|(Lorg/springframework/http/client/ClientHttpRequest;)V
+org.springframework.web.context.request
+ AbstractRequestAttributes
+  requestCompleted|()V
+ RequestContextHolder
+  resetRequestAttributes|()V
+ ServletWebRequest
+  getNativeRequest|(Ljava/lang/Class;)Ljava/lang/Object;
+org.springframework.web.context.request.async|WebAsyncUtils|getAsyncManager|(Ljavax/servlet/ServletRequest;)Lorg/springframework/web/context/request/async/WebAsyncManager;
+org.springframework.web.cors
+ CorsUtils
+  isCorsRequest|(Ljavax/servlet/http/HttpServletRequest;)Z
+  isPreFlightRequest|(Ljavax/servlet/http/HttpServletRequest;)Z
+org.springframework.web.filter|OncePerRequestFilter|doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V
+org.springframework.web.method
+ HandlerMethod
+  createWithResolvedBean|()Lorg/springframework/web/method/HandlerMethod;
+  getReturnValueType|(Ljava/lang/Object;)Lorg/springframework/core/MethodParameter;
+  hasMethodAnnotation|(Ljava/lang/Class;)Z
+ HandlerMethod$HandlerMethodParameter
+  hasMethodAnnotation|(Ljava/lang/Class;)Z
+org.springframework.web.method.annotation
+ AbstractNamedValueMethodArgumentResolver
+  resolveArgument|(Lorg/springframework/core/MethodParameter;Lorg/springframework/web/method/support/ModelAndViewContainer;Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/bind/support/WebDataBinderFactory;)Ljava/lang/Object;
+ InitBinderDataBinderFactory
+  initBinder|(Lorg/springframework/web/bind/WebDataBinder;Lorg/springframework/web/context/request/NativeWebRequest;)V
+ ModelFactory
+  initModel|(Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/method/support/ModelAndViewContainer;Lorg/springframework/web/method/HandlerMethod;)V
+  updateModel|(Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/method/support/ModelAndViewContainer;)V
+ ModelMethodProcessor
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+org.springframework.web.method.support
+ HandlerMethodArgumentResolverComposite
+  resolveArgument|(Lorg/springframework/core/MethodParameter;Lorg/springframework/web/method/support/ModelAndViewContainer;Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/bind/support/WebDataBinderFactory;)Ljava/lang/Object;
+  supportsParameter|(Lorg/springframework/core/MethodParameter;)Z
+ HandlerMethodReturnValueHandlerComposite
+  handleReturnValue|(Ljava/lang/Object;Lorg/springframework/core/MethodParameter;Lorg/springframework/web/method/support/ModelAndViewContainer;Lorg/springframework/web/context/request/NativeWebRequest;)V
+ InvocableHandlerMethod
+  doInvoke|([Ljava/lang/Object;)Ljava/lang/Object;
+  invokeForRequest|(Lorg/springframework/web/context/request/NativeWebRequest;Lorg/springframework/web/method/support/ModelAndViewContainer;[Ljava/lang/Object;)Ljava/lang/Object;
+ ModelAndViewContainer
+  addAllAttributes|(Ljava/util/Map;)Lorg/springframework/web/method/support/ModelAndViewContainer;
+  mergeAttributes|(Ljava/util/Map;)Lorg/springframework/web/method/support/ModelAndViewContainer;
+org.springframework.web.multipart.support|MultipartResolutionDelegate|resolveMultipartArgument|(Ljava/lang/String;Lorg/springframework/core/MethodParameter;Ljavax/servlet/http/HttpServletRequest;)Ljava/lang/Object;
+org.springframework.web.servlet|HandlerExecutionChain|addInterceptor|(Lorg/springframework/web/servlet/HandlerInterceptor;)V
+org.springframework.web.servlet.handler
+ AbstractHandlerMapping
+  getHandler|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/HandlerExecutionChain;
+ AbstractHandlerMethodMapping$MappingRegistry
+  acquireReadLock|()V
+  getMappingsByUrl|(Ljava/lang/String;)Ljava/util/List;
+  releaseReadLock|()V
+ AbstractUrlHandlerMapping
+  useTrailingSlashMatch|()Z
+ ConversionServiceExposingInterceptor
+  preHandle|(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/Object;)Z
+ HandlerInterceptorAdapter
+  afterCompletion|(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/Object;Ljava/lang/Exception;)V
+  postHandle|(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/Object;Lorg/springframework/web/servlet/ModelAndView;)V
+org.springframework.web.servlet.mvc.condition
+ HeadersRequestCondition
+  getMatchingCondition|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/mvc/condition/HeadersRequestCondition;
+ ParamsRequestCondition
+  getMatchingCondition|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/mvc/condition/ParamsRequestCondition;
+ PatternsRequestCondition
+  getMatchingCondition|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/mvc/condition/PatternsRequestCondition;
+  getMatchingPatterns|(Ljava/lang/String;)Ljava/util/List;
+ RequestConditionHolder
+  getMatchingCondition|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/mvc/condition/RequestConditionHolder;
+ RequestMethodsRequestCondition
+  getMatchingCondition|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/mvc/condition/RequestMethodsRequestCondition;
+org.springframework.web.servlet.mvc.method
+ AbstractHandlerMethodAdapter
+  getLastModified|(Ljavax/servlet/http/HttpServletRequest;Ljava/lang/Object;)J
+  supports|(Ljava/lang/Object;)Z
+ RequestMappingInfo
+  getMatchingCondition|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/mvc/method/RequestMappingInfo;
+org.springframework.web.servlet.mvc.method.annotation
+ AbstractMappingJacksonResponseBodyAdvice
+  supports|(Lorg/springframework/core/MethodParameter;Ljava/lang/Class;)Z
+ AsyncTaskMethodReturnValueHandler
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+ CallableMethodReturnValueHandler
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+ DeferredResultMethodReturnValueHandler
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+ HttpHeadersReturnValueHandler
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+ JsonViewResponseBodyAdvice
+  supports|(Lorg/springframework/core/MethodParameter;Ljava/lang/Class;)Z
+ RequestResponseBodyAdviceChain
+  beforeBodyWrite|(Ljava/lang/Object;Lorg/springframework/core/MethodParameter;Lorg/springframework/http/MediaType;Ljava/lang/Class;Lorg/springframework/http/server/ServerHttpRequest;Lorg/springframework/http/server/ServerHttpResponse;)Ljava/lang/Object;
+ RequestResponseBodyMethodProcessor
+  handleReturnValue|(Ljava/lang/Object;Lorg/springframework/core/MethodParameter;Lorg/springframework/web/method/support/ModelAndViewContainer;Lorg/springframework/web/context/request/NativeWebRequest;)V
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+ ResponseBodyEmitterReturnValueHandler
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+ ServletInvocableHandlerMethod
+  invokeAndHandle|(Lorg/springframework/web/context/request/ServletWebRequest;Lorg/springframework/web/method/support/ModelAndViewContainer;[Ljava/lang/Object;)V
+ StreamingResponseBodyReturnValueHandler
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+ ViewMethodReturnValueHandler
+  supportsReturnType|(Lorg/springframework/core/MethodParameter;)Z
+org.springframework.web.servlet.resource|ResourceUrlProviderExposingInterceptor|preHandle|(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/Object;)Z
+org.springframework.web.servlet.support|RequestContextUtils|getInputFlashMap|(Ljavax/servlet/http/HttpServletRequest;)Ljava/util/Map;
+org.springframework.web.util
+ DefaultUriBuilderFactory
+  expand|(Ljava/lang/String;[Ljava/lang/Object;)Ljava/net/URI;
+  shouldParsePath|()Z
+  uriString|(Ljava/lang/String;)Lorg/springframework/web/util/UriBuilder;
+ HierarchicalUriComponents
+  encode
+   (Ljava/nio/charset/Charset;)Lorg/springframework/web/util/HierarchicalUriComponents;
+   (Ljava/nio/charset/Charset;)Lorg/springframework/web/util/UriComponents;
+  toUriString|()Ljava/lang/String;
+ HierarchicalUriComponents$PathSegmentComponent
+  encode|(Ljava/nio/charset/Charset;)Lorg/springframework/web/util/HierarchicalUriComponents$PathComponent;
+  expand|(Lorg/springframework/web/util/UriComponents$UriTemplateVariables;)Lorg/springframework/web/util/HierarchicalUriComponents$PathComponent;
+ HierarchicalUriComponents$Type$1
+  isAllowed|(I)Z
+ HierarchicalUriComponents$Type$10
+  isAllowed|(I)Z
+ HierarchicalUriComponents$Type$4
+  isAllowed|(I)Z
+ HierarchicalUriComponents$Type$8
+  isAllowed|(I)Z
+ UriComponents
+  encode|()Lorg/springframework/web/util/UriComponents;
+  expand|([Ljava/lang/Object;)Lorg/springframework/web/util/UriComponents;
+ UriComponents$VarArgsTemplateVariables
+  getValue|(Ljava/lang/String;)Ljava/lang/Object;
+ UriComponentsBuilder
+  build
+   ()Lorg/springframework/web/util/UriComponents;
+   (Z)Lorg/springframework/web/util/UriComponents;
+ UriComponentsBuilder$CompositePathComponentBuilder
+  build|()Lorg/springframework/web/util/HierarchicalUriComponents$PathComponent;
+ UriComponentsBuilder$FullPathComponentBuilder
+  build|()Lorg/springframework/web/util/HierarchicalUriComponents$PathComponent;
+ UriComponentsBuilder$PathSegmentComponentBuilder
+  append|([Ljava/lang/String;)V
+  build|()Lorg/springframework/web/util/HierarchicalUriComponents$PathComponent;
+ WebUtils
+  getNativeRequest|(Ljavax/servlet/ServletRequest;Ljava/lang/Class;)Ljava/lang/Object;

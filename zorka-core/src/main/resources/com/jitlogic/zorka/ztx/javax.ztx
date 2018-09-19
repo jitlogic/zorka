@@ -1,0 +1,10 @@
+javax.servlet.http|HttpServlet|service|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
+javax.xml.transform
+ FactoryFinder$1
+  run|()Ljava/lang/Object;
+ SecuritySupport$1
+  run|()Ljava/lang/Object;
+ SecuritySupport$2
+  run|()Ljava/lang/Object;
+ TransformerFactory
+  newInstance|()Ljavax/xml/transform/TransformerFactory;

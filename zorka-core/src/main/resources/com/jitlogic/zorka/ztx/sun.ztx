@@ -1,0 +1,58 @@
+sun.net|DefaultProgressMeteringPolicy|shouldMeterInput|(Ljava/net/URL;Ljava/lang/String;)Z
+sun.net.www|MeteredStream|read|([BII)I
+sun.net.www.http
+ ChunkedInputStream
+  read|([BII)I
+ KeepAliveCache
+  get|(Ljava/net/URL;Ljava/lang/Object;)Lsun/net/www/http/HttpClient;
+  put|(Ljava/net/URL;Ljava/lang/Object;Lsun/net/www/http/HttpClient;)V
+ KeepAliveStream
+  close|()V
+sun.net.www.protocol.http
+ AuthCacheImpl
+  get|(Ljava/lang/String;Ljava/lang/String;)Lsun/net/www/protocol/http/AuthCacheValue;
+ HttpURLConnection$2
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/net/CookieHandler;
+ HttpURLConnection$3
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/net/ResponseCache;
+ HttpURLConnection$7
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/net/ProxySelector;
+ HttpURLConnection$HttpInputStream
+  close|()V
+  read|()I
+sun.nio.ch
+ EPollArrayWrapper
+  interrupt|()V
+  interruptedIndex|()I
+ EPollSelectorImpl
+  putEventOps|(Lsun/nio/ch/SelectionKeyImpl;I)V
+  wakeup|()Ljava/nio/channels/Selector;
+ IOStatus
+  normalize|(I)I
+ SelectionKeyImpl
+  readyOps|()I
+  selector|()Ljava/nio/channels/Selector;
+ SelectorImpl
+  select|(J)I
+  selectedKeys|()Ljava/util/Set;
+ Util
+  getTemporaryDirectBuffer|(I)Ljava/nio/ByteBuffer;
+ Util$3
+  iterator|()Ljava/util/Iterator;
+sun.nio.cs
+ ThreadLocalCoders
+  decoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetDecoder;
+  encoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetEncoder;
+ US_ASCII$Decoder
+  decode|([BII[C)I
+sun.util.logging
+ LoggingSupport
+  isLoggable|(Ljava/lang/Object;Ljava/lang/Object;)Z
+ PlatformLogger
+  isLoggable|(Lsun/util/logging/PlatformLogger$Level;)Z

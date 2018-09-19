@@ -1,0 +1,4 @@
+ch.qos.logback.classic
+ Logger
+  isDebugEnabled|(Lorg/slf4j/Marker;)Z
+  isTraceEnabled|(Lorg/slf4j/Marker;)Z
