@@ -63,7 +63,7 @@ public class ZtxProcCommand {
     }
 
     public static Pattern pattern(String s) {
-        return Pattern.compile(s.replace(".", "\\.").replace("*", ".*"));
+        return Pattern.compile(s.replace(".", "\\.") + "(\\..*)?");
     }
 
     public static boolean matches(List<Pattern> patterns, String s) {
