@@ -1,6 +1,12 @@
 Zorka 1.90.4 (2018-09-30)
 -------------------------
 
+* new high performance tracer implementation (experimental, not fully stable);
+* automated tracer tuning;
+* flex messaging library support; 
+* fixes: agent config reload;
+* reinstrument classes in background;
+* distributed tracing: quarts;
 
 
 Zorka 1.90.3 (2018-08-16)
