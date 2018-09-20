@@ -61,12 +61,12 @@ public class AgentConfigProps {
     public static final int TRACER_TUNER_MAX_RATIO_DEFV = 80;
 
     /** Minimum number of calls that will qualify method for exclusion. */
-    public static final String TRACER_TUNER_MIN_METHOD_CALLS_PROP = "tracer.tuner.min.method.calls";
-    public static final long TRACER_TUNER_MIN_METHOD_CALLS_DEFV = 20000L;
+    public static final String TRACER_TUNER_MIN_CALLS_PROP = "tracer.tuner.min.calls";
+    public static final long TRACER_TUNER_MIN_CALLS_DEFV = 20000L;
 
     /** Minimum number of calls registered by tracer (globally) that will trigger reinstrumentation. */
-    public static final String TRACER_TUNER_MIN_TOTAL_CALLS_PROP = "tracer.tuner.min.total.calls";
-    public static final long TRACER_TUNER_MIN_TOTAL_CALLS_DEFV = 4000000L;
+    public static final String TRACER_TUNER_MIN_RANK_PROP = "tracer.tuner.min.rank";
+    public static final long TRACER_TUNER_MIN_RANK_DEFV = 4000000L;
 
     /** Tracer tuner queue length. */
     public static final String TRACER_TUNER_QLEN_PROP = "tracer.tuner.qlen";

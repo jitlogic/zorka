@@ -84,7 +84,7 @@ public class ZorkaFixture extends CommonFixture {
                 "zorka.home.dir", "/tmp",
                 "zabbix.enabled", "no",
                 "zorka.hostname", "test",
-                "zorka.filelog", "no",
+                "zorka.log.file", "no",
                 "zorka.mbs.autoregister", "yes",
                 "scripts", "",
                 "spy", "yes",
@@ -155,10 +155,10 @@ public class ZorkaFixture extends CommonFixture {
         MainSubmitter.setTracer(null);
         MainSubmitter.setSubmitter(null);
 
-        Tracer.setMinMethodTime(Tracer.DEFAULT_MIN_METHOD_TIME);
-        Tracer.setTuningMode(Tracer.TUNING_OFF);
-        Tracer.setTuningLongThreshold(Tracer.TUNING_DEFAULT_LCALL_THRESHOLD);
-        Tracer.setTuningDefaultExchInterval(Tracer.TUNING_DEFAULT_EXCH_INTERVAL);
+        TraceHandler.setMinMethodTime(TraceHandler.DEFAULT_MIN_METHOD_TIME);
+        TraceHandler.setTuningMode(TraceHandler.TUNING_OFF);
+        TraceHandler.setTuningLongThreshold(TraceHandler.TUNING_DEFAULT_LCALL_THRESHOLD);
+        TraceHandler.setTuningDefaultExchInterval(TraceHandler.TUNING_DEFAULT_EXCH_INTERVAL);
 
         TraceHandler.setTuningExchangeMinCalls(TraceHandler.TUNING_EXCHANGE_CALLS_DEFV);
     }

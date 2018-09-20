@@ -20,6 +20,7 @@ import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import org.junit.Before;
@@ -78,7 +79,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                 spy.instance("1").onEnter(tracer.begin("TEST", 0))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
-        agentInstance.getTracer().setMinMethodTime(0); // Catch everything
+        TraceHandler.setMinMethodTime(0); // Catch everything
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
@@ -101,7 +102,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
             .onEnter(spy.fetchArg("TAG", 1), tracer.begin("${TAG}", 0))
             .include(spy.byMethod(TCLASS1, "trivialStrMethod")));
 
-        agentInstance.getTracer().setMinMethodTime(0); // Catch everything
+        TraceHandler.setMinMethodTime(0); // Catch everything
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
@@ -124,7 +125,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                 tracer.attr("URL", "URL")
         ).include(spy.byMethod(TCLASS1, "trivialMethod")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
@@ -143,7 +144,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
         spy.add(spy.instance("2").onEnter(tracer.begin("TEST2", 0)).include(spy.byMethod(TCLASS4, "recursive2")));
         spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr("TEST1", "X", "XXX")).include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -165,7 +166,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
         spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr(null, "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -186,7 +187,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
         spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr("TEST3", "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -205,7 +206,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                 tracer.formatTraceAttr("TEST1", "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -225,7 +226,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                         tracer.formatTraceAttr(null, "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -250,7 +251,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                 .onEnter(tracer.traceFlags("TEST1", TraceMarker.ERROR_MARK))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -277,7 +278,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                         tracer.formatTraceAttr("TEST1", "IN", "YES")))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -299,7 +300,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                         tracer.formatTraceAttr("TEST1", "IN", "YES")))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(output);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -320,7 +321,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                 .onEnter(spy.put("AA", "OJA"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
 
         agentInstance.getTracer().setTraceSpyMethods(true);
 
@@ -342,7 +343,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                 .onEnter(spy.put("AA", "OJA"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
 
         agentInstance.getTracer().setTraceSpyMethods(false);
 
@@ -365,7 +366,7 @@ public class LTracerFullUnitTest extends ZorkaFixture {
                 .onEnter(spy.put("AA", "OJA"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
 
         agentInstance.getTracer().setTraceSpyMethods(false);
 

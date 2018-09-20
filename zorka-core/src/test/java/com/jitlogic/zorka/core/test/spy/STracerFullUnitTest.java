@@ -2,6 +2,7 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.Tracer;
+import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STBeg;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STErr;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STRec;
@@ -61,7 +62,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
         spy.add(spy.instance("1").onEnter(tracer.begin("TEST", 0))
                         .include(spy.byMethod(TCLASS1, "trivialMethod")));
 
-        Tracer.setMinMethodTime(0); // Catch everything
+        TraceHandler.setMinMethodTime(0); // Catch everything
 
         tracer.output(o);
 
@@ -93,7 +94,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
                         .onEnter(spy.fetchArg("TAG", 1), tracer.begin("${TAG}", 0))
                         .include(spy.byMethod(TCLASS1, "trivialStrMethod")));
 
-        agentInstance.getTracer().setMinMethodTime(0); // Catch everything
+        TraceHandler.setMinMethodTime(0); // Catch everything
         tracer.output(o);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
@@ -120,7 +121,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
                 tracer.attr("URL", "URL")
         ).include(spy.byMethod(TCLASS1, "trivialMethod")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(o);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
@@ -142,7 +143,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
         spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr("TEST1", "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(o);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -164,7 +165,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
         spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr(null, "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(o);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -187,7 +188,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
         spy.add(spy.instance("3").onEnter(tracer.formatTraceAttr("TEST3", "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive1")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(o);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -207,7 +208,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
                 tracer.formatTraceAttr("TEST1", "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(o);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -226,7 +227,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
                         tracer.formatTraceAttr(null, "X", "XXX"))
                 .include(spy.byMethod(TCLASS4, "recursive3")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(o);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
@@ -264,7 +265,7 @@ public class STracerFullUnitTest extends ZorkaFixture {
         spy.add(spy.instance("1").onEnter(tracer.begin("TEST", 0))
                 .include(spy.byMethod(TCLASS1, "errorMethod")));
 
-        agentInstance.getTracer().setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
         tracer.output(o);
 
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);

@@ -159,11 +159,13 @@ public class STraceHandler extends TraceHandler {
     /** Used to generate UUIDs of traces. */
     private Random random = new Random();
 
-    public STraceHandler(boolean streamingEnabled, long minMethodTime, STraceBufManager bufManager,
+    public STraceHandler(boolean streamingEnabled, STraceBufManager bufManager,
                          SymbolRegistry symbols, TracerTuner tracerTuner, ZorkaSubmitter<SymbolicRecord> output) {
 
+        long mmt = TraceHandler.minMethodTime >>> 16;
+
         this.streamingEnabled = streamingEnabled;
-        this.minMethodTime = minMethodTime;
+        this.minMethodTime = mmt;
 
         this.bufManager = bufManager;
         this.tuner = tracerTuner;
@@ -228,7 +230,7 @@ public class STraceHandler extends TraceHandler {
 
         boolean fsm = 0 != (w0 & TF_SUBMIT_METHOD);
 
-        if (Tracer.getTuningMode() != Tracer.TUNING_OFF) {
+        if (TraceHandler.getTuningMode() != TraceHandler.TUNING_OFF) {
             tuningProbe((int)(w2 & MID_MASK), tstamp, dur << 16);
         }
 
@@ -371,9 +373,8 @@ public class STraceHandler extends TraceHandler {
 
         traceReturn(tstamp);
 
-        if (Tracer.getTuningMode() != Tracer.TUNING_OFF) {
-            tunErrors++;
-            if (Tracer.getTuningMode() == Tracer.TUNING_DET) {
+        if (TraceHandler.getTuningMode() != TraceHandler.TUNING_OFF) {
+            if (TraceHandler.getTuningMode() == TraceHandler.TUNING_DET) {
                 tunStats.getDetails().markRank(mid, ERROR_PENALTY);
             }
         }

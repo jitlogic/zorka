@@ -54,7 +54,7 @@ public class TracerTuningUnitTest extends ZorkaFixture {
         m[0] = symbols.methodId(symbols.symbolId("some.Class"), symbols.symbolId("someMethod"), symbols.symbolId("()V"));
         m[1] = symbols.methodId(symbols.symbolId("other.Class"), symbols.symbolId("someMethod"), symbols.symbolId("()V"));
 
-        Tracer.setTuningMode(Tracer.TUNING_DET);
+        TraceHandler.setTuningMode(TraceHandler.TUNING_DET);
         TraceHandler.setTuningExchangeMinCalls(0);
     }
 
@@ -69,16 +69,13 @@ public class TracerTuningUnitTest extends ZorkaFixture {
     @Test
     public void detReturnCheckStateUnitTest() throws Exception {
 
-        Tracer.setMinMethodTime(1000);
+        TraceHandler.setMinMethodTime(1000);
 
         h.traceEnter(m[0], 10);
         h.traceReturn(20);
 
         assertEquals(20L, getField(h, "tunLastExchange"));
         assertEquals(1L, getField(h, "tunCalls"));
-        assertEquals(1L, getField(h, "tunDrops"));
-        assertEquals(0L, getField(h, "tunLCalls"));
-        assertEquals(0L, getField(h ,"tunErrors"));
 
         TraceSummaryStats ts = getField(h, "tunStats");
         assertNotNull(ts);
@@ -89,35 +86,29 @@ public class TracerTuningUnitTest extends ZorkaFixture {
 
     @Test
     public void detReturnDropCheckStateUnitTest() throws Exception {
-        Tracer.setMinMethodTime(0);
+        TraceHandler.setMinMethodTime(0);
 
         h.traceEnter(m[0], 10);
         h.traceReturn(20);
 
         assertEquals(20L, getField(h, "tunLastExchange"));
         assertEquals(1L, getField(h, "tunCalls"));
-        assertEquals(0L, getField(h, "tunDrops"));
-        assertEquals(0L, getField(h, "tunLCalls"));
-        assertEquals(0L, getField(h ,"tunErrors"));
     }
 
     @Test
     public void detErrorCheckStateUnitTest() throws Exception {
-        Tracer.setMinMethodTime(1000);
+        TraceHandler.setMinMethodTime(1000);
 
         h.traceEnter(m[0], 10);
         h.traceError(new NullPointerException(), 20);
 
         assertEquals(20L, getField(h, "tunLastExchange"));
         assertEquals(1L, getField(h, "tunCalls"));
-        assertEquals(1L, getField(h, "tunDrops"));
-        assertEquals(0L, getField(h, "tunLCalls"));
-        assertEquals(1L, getField(h ,"tunErrors"));
     }
 
     @Test
     public void detExchangeStateUnitTest() throws Exception {
-        Tracer.setTuningDefaultExchInterval(100);
+        TraceHandler.setTuningDefaultExchInterval(100);
 
         h.traceEnter(m[0], 5);
         h.traceReturn(10);
@@ -129,7 +120,7 @@ public class TracerTuningUnitTest extends ZorkaFixture {
 
     @Test
     public void detExchangeCycleUnitTest() throws Exception {
-        Tracer.setTuningDefaultExchInterval(100);
+        TraceHandler.setTuningDefaultExchInterval(100);
         setField(tuner, "interval", 100L);
 
         h.traceEnter(m[0], 5);
@@ -144,7 +135,7 @@ public class TracerTuningUnitTest extends ZorkaFixture {
 
     @Test
     public void detExchangeCycleRetransformUnitTest() throws Exception {
-        Tracer.setTuningDefaultExchInterval(100);
+        TraceHandler.setTuningDefaultExchInterval(100);
         setField(tuner, "interval", 100L);
         setField(tuner, "minTotalCalls", 5L);
         setField(tuner, "minMethodCalls", 0L);

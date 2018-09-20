@@ -46,7 +46,7 @@ public class STracer extends Tracer {
     private ThreadLocal<STraceHandler> handlers =
         new ThreadLocal<STraceHandler>() {
             public STraceHandler initialValue() {
-                return new STraceHandler(streamingEnabled, minMethodTime >> 16,
+                return new STraceHandler(streamingEnabled,
                         bufManager, symbolRegistry, tracerTuner, outputs.get().get(0));
             }
         };

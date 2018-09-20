@@ -381,7 +381,7 @@ public abstract class TracerLib {
     }
 
     public long getTracerMinMethodTime() {
-        return Tracer.getMinMethodTime();
+        return TraceHandler.getMinMethodTime();
     }
 
     /**
@@ -391,7 +391,7 @@ public abstract class TracerLib {
      * @param methodTime minimum execution time (in nanoseconds, 250 microseconds by default)
      */
     public void setTracerMinMethodTime(int methodTime) {
-        Tracer.setMinMethodTime(methodTime);
+        TraceHandler.setMinMethodTime(methodTime);
     }
 
     /**
@@ -401,7 +401,7 @@ public abstract class TracerLib {
      * @param methodTime minimum execution time (in nanoseconds, 250 microseconds by default)
      */
     public void setTracerMinMethodTime(long methodTime) {
-        Tracer.setMinMethodTime(methodTime);
+        TraceHandler.setMinMethodTime(methodTime);
     }
 
     public long getTracerMinTraceTime() {
@@ -440,27 +440,27 @@ public abstract class TracerLib {
      * @param maxRecords maximum numbner of trace records
      */
     public void setTracerMaxTraceRecords(int maxRecords) {
-        LTracer.setMaxTraceRecords(maxRecords);
+        TraceHandler.setMaxTraceRecords(maxRecords);
     }
 
     public void setTracerMaxTraceRecords(long maxRecords) {
-        LTracer.setMaxTraceRecords((int) maxRecords);
+        TraceHandler.setMaxTraceRecords((int) maxRecords);
     }
 
     public int getTracerMaxTraceRecords() {
-        return LTracer.getMaxTraceRecords();
+        return TraceHandler.getMaxTraceRecords();
     }
 
     public void setTracerMinTraceCalls(int minCalls) {
-        LTracer.setMinTraceCalls(minCalls);
+        TraceHandler.setMinTraceCalls(minCalls);
     }
 
     public void setTracerMinTraceCalls(long minCalls) {
-        LTracer.setMinTraceCalls((int)minCalls);
+        TraceHandler.setMinTraceCalls((int)minCalls);
     }
 
     public int getTracerMinTraceCalls() {
-        return LTracer.getMinTraceCalls();
+        return TraceHandler.getMinTraceCalls();
     }
 
     public void setTraceSpyMethods(boolean tsm) {
@@ -509,6 +509,6 @@ public abstract class TracerLib {
     }
 
     public void setTuningMode(int mode) {
-        Tracer.setTuningMode(mode);
+        TraceHandler.setTuningMode(mode);
     }
 }

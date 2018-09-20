@@ -23,27 +23,19 @@ import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyRetransformer;
-import com.jitlogic.zorka.core.spy.Tracer;
 
 import java.util.*;
 
 import static com.jitlogic.zorka.core.AgentConfigProps.*;
 import static com.jitlogic.zorka.common.stats.AgentDiagnostics.*;
-import static com.jitlogic.zorka.core.spy.tuner.TraceDetailStats.*;
 
 public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
     private boolean trace;
 
     private long calls;
-    private long drops;
-    private long errors;
-    private long lcalls;
 
     private volatile long lastCalls;
-    private volatile long lastDrops;
-    private volatile long lastECalls;
-    private volatile long lastLCalls;
 
     private int[] ranks;
 
@@ -91,8 +83,8 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         this.rankSize = config.intCfg(TRACER_TUNER_RANKS_PROP, TRACER_TUNER_RANKS_DEFV);
         this.interval = config.intCfg(TRACER_TUNER_INTERVAL_PROP, TRACER_TUNER_INTERVAL_DEFV) * 1000000L;
         this.auto = config.boolCfg(TRACER_TUNER_AUTO_PROP, TRACER_TUNER_AUTO_DEFV);
-        this.minTotalCalls = config.longCfg(TRACER_TUNER_MIN_TOTAL_CALLS_PROP, TRACER_TUNER_MIN_TOTAL_CALLS_DEFV);
-        this.minMethodCalls = config.longCfg(TRACER_TUNER_MIN_METHOD_CALLS_PROP, TRACER_TUNER_MIN_METHOD_CALLS_DEFV);
+        this.minTotalCalls = config.longCfg(TRACER_TUNER_MIN_RANK_PROP, TRACER_TUNER_MIN_RANK_DEFV);
+        this.minMethodCalls = config.longCfg(TRACER_TUNER_MIN_CALLS_PROP, TRACER_TUNER_MIN_CALLS_DEFV);
 
         this.autoRatio = config.intCfg(TRACER_TUNER_MAX_RATIO_PROP, TRACER_TUNER_MAX_RATIO_DEFV);
         this.autoMpc = config.intCfg(TRACER_TUNER_MAX_ITEMS_PROP, TRACER_TUNER_MAX_ITEMS_DEFV);
@@ -110,22 +102,16 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         log.info("Starting tuning cycle (dsize=" + ranks.length + ")");
 
         lastCalls = calls;
-        lastDrops = drops;
-        lastECalls = errors;
-        lastLCalls = lcalls;
 
         AgentDiagnostics.inc(TUNER_CYCLES);
         AgentDiagnostics.inc(TUNER_CALLS, calls);
-        AgentDiagnostics.inc(TUNER_DROPS, drops);
-        AgentDiagnostics.inc(TUNER_ECALLS, errors);
-        AgentDiagnostics.inc(TUNER_LCALLS, lcalls);
 
         calcRanks();
         clearStats();
 
 
-        if (log.isDebugEnabled()) {
-            log.debug("Tuner status (before exclusion): " + getStatus());
+        if (log.isTraceEnabled()) {
+            log.trace("Tuner status (before exclusion): " + getStatus());
         }
 
         log.debug("auto=" + auto + ", lastCalls=" + lastCalls + ", minTotalCalls=" + minTotalCalls);
@@ -179,7 +165,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     }
 
     private synchronized void clearStats() {
-        calls = drops = errors = lcalls = 0;
+        calls = 0;
         for (int i = 0; i < ranks.length; i++) {
             ranks[i] = 0;
         }
@@ -238,9 +224,6 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             log.debug("Processing stats: " + stats);
 
         calls += stats.getCalls();
-        drops += stats.getDrops();
-        errors += stats.getErrors();
-        lcalls += stats.getLcalls();
 
         if (stats.getDetails() != null) {
             processDetails(stats.getDetails());
@@ -257,21 +240,8 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
         // Return stats struct to reuse
         stats.clear();
-        switch (Tracer.getTuningMode()) {
-            case Tracer.TUNING_SUM:
-                stats.setDetails(null);
-                if (statCache.size() < statCacheMax)
-                    statCache.addFirst(stats);
-                break;
-            case Tracer.TUNING_DET:
-                if (statCache.size() < statCacheMax &&
-                        stats.getDetails() != null &&
-                        stats.getDetails().getSize() == ranks.length)
-                    statCache.addFirst(stats);
-                break;
-            default:
-                break;
-        }
+        if (statCache.size() < statCacheMax)
+            statCache.addFirst(stats);
     }
 
     @Override
@@ -292,8 +262,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     public String getStatus() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format("Status: interval=%dms%n", interval/1000000));
-        sb.append(String.format("calls=%d, drops=%d, errs=%d, lcalls=%d%n", lastCalls, lastDrops, lastECalls, lastLCalls));
+        sb.append(String.format("Status: interval=%dms calls=%d%n", interval/1000000, lastCalls));
         sb.append("--------------------------------------------------\n");
 
         List<RankItem> lst = rankList;
@@ -314,37 +283,15 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
         if (stats != null) submit(stats);
 
-        for (TraceSummaryStats s  = statCache.pollLast(); s != null; s = statCache.pollLast()) {
-            if (Tracer.getTuningMode() == Tracer.TUNING_SUM) {
-                s.setDetails(null);
-                return s;
-            }
-            if (Tracer.getTuningMode() == Tracer.TUNING_DET && s.getDetails() != null &&
-                    s.getDetails().getSize() == ranks.length) {
-                return s;
-            }
-        }
+        TraceSummaryStats s  = statCache.pollLast();
 
-        TraceSummaryStats s = new TraceSummaryStats();
-        if (Tracer.getTuningMode() == Tracer.TUNING_DET) {
-            s.setDetails(new TraceDetailStats());
-        }
+        if (s != null) return s;
+
+        s = new TraceSummaryStats();
         return s;
     }
 
     public long getLastCalls() {
         return lastCalls;
-    }
-
-    public long getLastDrops() {
-        return lastDrops;
-    }
-
-    public long getLastECalls() {
-        return lastECalls;
-    }
-
-    public long getLastLCalls() {
-        return lastLCalls;
     }
 }

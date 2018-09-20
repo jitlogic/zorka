@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.core.spy.lt;
 
-import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.tuner.TraceDetailStats;
 import com.jitlogic.zorka.core.spy.tuner.TraceSummaryStats;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
@@ -27,12 +26,54 @@ public abstract class TraceHandler {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
+
+    /** Tracer tuning disabled. */
+    public static final int TUNING_OFF = 0x00;
+
+    /** Summary statistics are collected. */
+    public static final int TUNING_SUM = 0x01;
+
+    /** Detail statistics are collected. */
+    public static final int TUNING_DET = 0x02;
+
+    /** Default long call threshold for automated tracer tuning: 10ms */
+    public static final long TUNING_DEFAULT_LCALL_THRESHOLD = 10000000L;
+
+    /** Default handler-tuner exchange interval. */
+    public static final long TUNING_DEFAULT_EXCH_INTERVAL = 30 * 1000000000L;
+
+    /** */
+    public static final long TUNING_EXCHANGE_CALLS_DEFV = 1048576;
+
+    /** Automated tracer tuning mode is disabled by default. */
+    protected static int tuningMode = TUNING_OFF;
+
+    /** Threshold above which method call will be considered long-duration. */
+    protected static long tuningLongThreshold = TUNING_DEFAULT_LCALL_THRESHOLD;
+
+    /** Interval between handler-tuner exchanges. */
+    protected static long tuningExchInterval = TUNING_DEFAULT_EXCH_INTERVAL;
+
+
+    /** Minimum number of calls required to initiate tuning stats exchange */
+    private static long tuningExchangeMinCalls = TUNING_EXCHANGE_CALLS_DEFV;
+
+    /** Default: ~0.25ms */
+    public final static long DEFAULT_MIN_METHOD_TIME = 262144;
+
+    /** Minimum default method execution time required to attach method to trace. */
+    protected static long minMethodTime = DEFAULT_MIN_METHOD_TIME;
+
+    /** Maximum number of records inside trace */
+    protected static int maxTraceRecords = 4096;
+
+    /** Number of registered trace calls that will force trace submission regardless of execution time. */
+    protected static int minTraceCalls = 262144;
+
+
     protected boolean disabled;
 
     protected long tunCalls = 0;
-    protected long tunDrops = 0;
-    protected long tunErrors = 0;
-    protected long tunLCalls = 0;
 
     protected TracerTuner tuner;
     protected TraceSummaryStats tunStats = null;
@@ -41,11 +82,6 @@ public abstract class TraceHandler {
 
     public static final int LONG_PENALTY = -1024;
     public static final int ERROR_PENALTY = -256;
-
-    public static final long TUNING_EXCHANGE_CALLS_DEFV = 1048576;
-
-    /** Minimum number of calls required to initiate tuning stats exchange */
-    private static long tuningExchangeMinCalls = TUNING_EXCHANGE_CALLS_DEFV;
 
     public abstract void traceBegin(int traceId, long clock, int flags);
 
@@ -71,16 +107,14 @@ public abstract class TraceHandler {
     protected void tuningProbe(int mid, long tstamp, long ttime) {
 
         if (tunStats == null ||
-                (tstamp > tunLastExchange + Tracer.getTuningDefaultExchInterval() && tunCalls > tuningExchangeMinCalls)) {
+                (tstamp > tunLastExchange + tuningExchInterval && tunCalls > tuningExchangeMinCalls)) {
             tuningExchange(tstamp);
         }
 
         tunCalls++;
-        if (ttime < LTracer.getMinMethodTime()) tunDrops++;
 
-        if (Tracer.getTuningMode() == Tracer.TUNING_DET) {
+        if (tuningMode == TUNING_DET) {
 
-            if (ttime > Tracer.getTuningLongThreshold()) tunLCalls++;
 
             if (tunStats.getDetails() == null) {
                 tuningExchange(tstamp);
@@ -88,12 +122,12 @@ public abstract class TraceHandler {
 
             TraceDetailStats details = tunStats.getDetails();
 
-            if (ttime < LTracer.getMinMethodTime()) {
+            if (ttime < minMethodTime) {
                 if (!details.markRank(mid, 1)) {
                     tuningExchange(tstamp);
                 }
-            } else if (ttime > Tracer.getTuningLongThreshold()) {
-                details.markRank(mid, LONG_PENALTY);
+            } else if (ttime > tuningLongThreshold) {
+                details.markRank(mid, (int)(ttime >>> 18));
             }
 
         }
@@ -104,14 +138,8 @@ public abstract class TraceHandler {
         if (tunStats != null) {
             tunStats.setThreadId(Thread.currentThread().getId());
             tunStats.setCalls(tunCalls);
-            tunStats.setDrops(tunDrops);
-            tunStats.setErrors(tunErrors);
-            tunStats.setLcalls(tunLCalls);
             tunStats.setTstamp(tstamp);
             tunCalls = 0;
-            tunDrops = 0;
-            tunErrors = 0;
-            tunLCalls = 0;
         }
 
         tunStats = tuner.exchange(tunStats);
@@ -147,4 +175,58 @@ public abstract class TraceHandler {
     public static void setTuningExchangeMinCalls(long tuningExchangeMinCalls) {
         TraceHandler.tuningExchangeMinCalls = tuningExchangeMinCalls;
     }
+
+    public static int getTuningMode() {
+        return tuningMode;
+    }
+
+    public static void setTuningMode(int tuningMode) {
+        TraceHandler.tuningMode = tuningMode;
+    }
+
+    public static long getTuningLongThreshold() {
+        return tuningLongThreshold;
+    }
+
+    public static void setTuningLongThreshold(long tuningLongThreshold) {
+        TraceHandler.tuningLongThreshold = tuningLongThreshold;
+    }
+
+    public static long getTuningDefaultExchInterval() {
+        return tuningExchInterval;
+    }
+
+    public static void setTuningDefaultExchInterval(long tuningDefaultExchInterval) {
+        TraceHandler.tuningExchInterval = tuningDefaultExchInterval;
+    }
+
+    public static long getMinMethodTime() {
+        return minMethodTime;
+    }
+
+
+    public static void setMinMethodTime(long methodTime) {
+        minMethodTime = methodTime;
+    }
+
+
+    public static int getMaxTraceRecords() {
+        return maxTraceRecords;
+    }
+
+
+    public static void setMaxTraceRecords(int traceSize) {
+        maxTraceRecords = traceSize;
+    }
+
+
+    public static int getMinTraceCalls() {
+        return minTraceCalls;
+    }
+
+    public static void setMinTraceCalls(int traceCalls) {
+        minTraceCalls = traceCalls;
+    }
+
+
 }

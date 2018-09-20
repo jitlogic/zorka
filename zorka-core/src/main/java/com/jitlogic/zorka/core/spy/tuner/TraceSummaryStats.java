@@ -24,11 +24,8 @@ public class TraceSummaryStats {
     private long threadId;
     private long tstamp;
     private long calls;
-    private long drops;
-    private long errors;
-    private long lcalls;
 
-    private TraceDetailStats details;
+    private TraceDetailStats details = new TraceDetailStats();
 
     public long getThreadId() {
         return threadId;
@@ -54,30 +51,6 @@ public class TraceSummaryStats {
         this.calls = calls;
     }
 
-    public long getDrops() {
-        return drops;
-    }
-
-    public void setDrops(long drops) {
-        this.drops = drops;
-    }
-
-    public long getErrors() {
-        return errors;
-    }
-
-    public void setErrors(long errors) {
-        this.errors = errors;
-    }
-
-    public long getLcalls() {
-        return lcalls;
-    }
-
-    public void setLcalls(long lcalls) {
-        this.lcalls = lcalls;
-    }
-
     public TraceDetailStats getDetails() {
         return details;
     }
@@ -87,7 +60,7 @@ public class TraceSummaryStats {
     }
 
     public void clear() {
-        tstamp = calls = drops = errors = lcalls = 0;
+        tstamp = calls = 0;
         if (details != null) details.clear();
     }
 
