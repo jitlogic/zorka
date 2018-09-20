@@ -112,6 +112,21 @@ public class SymbolRegistry {
         return cms != null ? symbolName(cms[0]) + "." + symbolName(cms[1]) + "()" : "<?>";
     }
 
+    public String methodXDesc(int mid) {
+        int[] cms = methodDef(mid);
+        if (cms != null) {
+            String pkgName = "";
+            String className = symbolName(cms[0]);
+            int ix = className.lastIndexOf('.');
+            if (ix > 0) {
+                pkgName = className.substring(0, ix-1);
+                className = className.substring(ix);
+            }
+            return pkgName + "|" + className + "|" +  symbolName(cms[1]) + "|" + symbolName(cms[2]);
+        }
+        return "?";
+    }
+
     /**
      * Adds new symbol to registry (with predefined ID).
      *

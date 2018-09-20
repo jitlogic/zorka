@@ -20,124 +20,47 @@ import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 public class TraceDetailStats {
 
-    public static final long CALL_MASK = 0x0000000000FFFFFFL;
-    private static final long CALL_INV = 0xFFFFFFFFFF000000L;
-    private static final long CALL_MAX = 0xFFFFFFL;
-
-    public static final long DROP_BITS = 24;
-    public static final long DROP_MASK = 0x0000FFFFFF000000L;
-    private static final long DROP_INV  = 0xFFFF000000FFFFFFL;
-    private static final long DROP_MAX  = 0xFFFFFFL;
-
-    public static final long ERR_BITS = 48;
-    public static final long ERR_MASK = 0x00FF000000000000L;
-    private static final long ERR_INV  = 0xFF00FFFFFFFFFFFFL;
-    private static final long ERR_MAX  = 0xFFL;
-
-    public static final long LONG_BITS = 56;
-    public static final long LONG_MASK = 0xFF00000000000000L;
-    private static final long LONG_INV  = 0x00FFFFFFFFFFFFFFL;
-    private static final long LONG_MAX  = 0xFFL;
-
     private int size;
-    private long[] stats;
+    private int[] stats;
 
     public TraceDetailStats(int size) {
         this.size = size;
-        this.stats = new long[size];
+        this.stats = new int[size];
     }
 
     public void clear() {
-        for (int i = 0; i < stats.length; i++) stats[i] = 0L;
+        for (int i = 0; i < stats.length; i++) stats[i] = 0;
     }
 
     public int getSize() {
         return size;
     }
 
-    public long[] getStats() {
+    public int[] getStats() {
         return stats;
     }
 
-    public boolean markCall(int mid) {
+    public boolean markRank(int mid, int delta) {
         if (mid >= size) {
             stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
             size = stats.length;
         }
-        long l = stats[mid];
-        long c = (l & CALL_MASK) + 1;
-        if (c <= CALL_MAX) {
-            stats[mid] = (l & CALL_INV) | c;
-            return true;
-        } else {
-            return false;
-        }
+
+        stats[mid] = Math.max(stats[mid]+delta, 0);
+
+        return true;
     }
 
-    public long getCalls(int mid) {
-        if (mid > size) return 0;
-        long rslt = stats[mid] & CALL_MASK;
-        return rslt;
+    public long getRank(int mid) {
+        return mid < size ? stats[mid] : 0;
     }
 
-    public boolean markDrop(int mid) {
-        if (mid >= size) {
-            stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
-            size = stats.length;
-        }
-        long l = stats[mid];
-        long c = ((l & DROP_MASK) >>> DROP_BITS) + 1;
-        if (c <= DROP_MAX) {
-            stats[mid] = (l & DROP_INV) | (c << DROP_BITS);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public long getDrops(int mid) {
-        if (mid > size) return 0;
-        long l = (stats[mid] & DROP_MASK) >>> DROP_BITS;
-        return l;
-    }
-
-    public boolean markError(int mid) {
-        if (mid >= size) {
-            stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
-            size = stats.length;
-        }
-        long l = stats[mid];
-        long c = ((l & ERR_MASK) >>> ERR_BITS) + 1;
-        if (c <= ERR_MAX) {
-            stats[mid] = (l & ERR_INV) | (c << ERR_BITS);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public long getErrors(int mid) {
-        if (mid > size) return 0;
-        return (stats[mid] & ERR_MASK) >>> ERR_BITS;
-    }
-
-    public boolean markLCall(int mid) {
-        if (mid >= size) {
-            stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
-            size = stats.length;
-        }
-        long l = stats[mid];
-        long c = ((l & LONG_MASK) >>> LONG_BITS) + 1;
-        if (c <= LONG_MAX) {
-            stats[mid] = (l & LONG_INV) | (c << LONG_BITS);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public long getLCalls(int mid) {
-        if (mid > size) return 0;
-        return (stats[mid] & LONG_MASK) >>> LONG_BITS;
+    @Override
+    public String toString() {
+        int used = 0;
+        for (int i = 0; i < size; i++)
+            if (stats[i] != 0)
+                used++;
+        return "TD(sz=" + size + ", used=" + used + ")";
     }
 }

@@ -374,7 +374,7 @@ public class STraceHandler extends TraceHandler {
         if (Tracer.getTuningMode() != Tracer.TUNING_OFF) {
             tunErrors++;
             if (Tracer.getTuningMode() == Tracer.TUNING_DET) {
-                tunStats.getDetails().markError(mid);
+                tunStats.getDetails().markRank(mid, ERROR_PENALTY);
             }
         }
     }

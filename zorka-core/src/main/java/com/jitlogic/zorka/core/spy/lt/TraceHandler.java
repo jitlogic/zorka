@@ -39,6 +39,9 @@ public abstract class TraceHandler {
 
     protected long tunLastExchange = 0;
 
+    public static final int LONG_PENALTY = -1024;
+    public static final int ERROR_PENALTY = -256;
+
     public abstract void traceBegin(int traceId, long clock, int flags);
 
     /**
@@ -79,11 +82,12 @@ public abstract class TraceHandler {
 
             TraceDetailStats details = tunStats.getDetails();
 
-            if (!details.markCall(mid)) {
-                tuningExchange(tstamp);
+            if (ttime < LTracer.getMinMethodTime()) {
+                details.markRank(mid, 1);
+            } else if (ttime > Tracer.getTuningLongThreshold()) {
+                details.markRank(mid, LONG_PENALTY);
             }
-            if (ttime < LTracer.getMinMethodTime()) details.markDrop(mid);
-            if (ttime > Tracer.getTuningLongThreshold()) details.markLCall(mid);
+
         }
     }
 

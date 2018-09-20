@@ -20,14 +20,10 @@ public class RankItem {
 
     private int mid;
     private int rank;
-    private long calls;
-    private long drops;
 
-    public RankItem(int mid, int rank, long calls, long drops) {
+    public RankItem(int mid, int rank) {
         this.mid = mid;
         this.rank = rank;
-        this.calls = calls;
-        this.drops = drops;
     }
 
     public int getMid() {
@@ -38,16 +34,9 @@ public class RankItem {
         return rank;
     }
 
-    public long getCalls() {
-        return calls;
-    }
-
-    public long getDrops() {
-        return drops;
-    }
 
     @Override
     public String toString() {
-        return "(m=" + mid + ",r=" + rank + ",c=" + calls + ",d=" + drops + ")";
+        return "(m=" + mid + ",r=" + rank + ")";
     }
 }

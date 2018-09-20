@@ -93,6 +93,7 @@ public class TraceSummaryStats {
 
     @Override
     public String toString() {
-        return "TSS(id=" + threadId + ",t=" + tstamp + ",calls=" + calls+")";
+
+        return "TSS(id=" + threadId + ",t=" + tstamp + ",calls=" + calls+ ", det=" + details +")";
     }
 }

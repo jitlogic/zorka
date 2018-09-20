@@ -182,7 +182,7 @@ public class LTraceHandler extends TraceHandler {
             tuningProbe(ttop.getMid(), tstamp, ttime);
 
             if (Tracer.getTuningMode() == Tracer.TUNING_DET)
-                tunStats.getDetails().markError(ttop.getMid());
+                tunStats.getDetails().markRank(ttop.getMid(), ERROR_PENALTY);
         }
 
         pop();

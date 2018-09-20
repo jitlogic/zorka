@@ -83,8 +83,7 @@ public class TracerTuningUnitTest extends ZorkaFixture {
         assertNotNull(ts);
 
         TraceDetailStats td = ts.getDetails();
-        assertEquals("Should register method call.", 1, td.getCalls(m[0]));
-        assertEquals("Should register method drop.", 1, td.getDrops(m[0]));
+        assertEquals("Should register method call.", 1, td.getRank(m[0]));
     }
 
     @Test

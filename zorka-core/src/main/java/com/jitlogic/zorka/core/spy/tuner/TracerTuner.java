@@ -45,10 +45,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     private volatile long lastECalls;
     private volatile long lastLCalls;
 
-    private long[] callsv;
-    private long[] dropsv;
-    private int[] errorsv;
-    private int[] lcallsv;
+    private int[] ranks;
 
     /** Interval between tuning cycles. */
     private long interval;
@@ -100,10 +97,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         this.autoRatio = config.intCfg(TRACER_TUNER_MAX_RATIO_PROP, TRACER_TUNER_MAX_RATIO_DEFV);
         this.autoMpc = config.intCfg(TRACER_TUNER_MAX_ITEMS_PROP, TRACER_TUNER_MAX_ITEMS_DEFV);
 
-        callsv = new long[1024];
-        dropsv = new long[1024];
-        errorsv = new int[1024];
-        lcallsv = new int[1024];
+        ranks = new int[1024];
 
         trace = log.isTraceEnabled();
 
@@ -113,7 +107,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
     private synchronized void tuningCycle() {
 
-        log.info("Starting tuning cycle (dsize=" + callsv.length + ")");
+        log.info("Starting tuning cycle (dsize=" + ranks.length + ")");
 
         lastCalls = calls;
         lastDrops = drops;
@@ -155,7 +149,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             RankItem ri = rankList.get(rc);
             int mid = ri.getMid();
             int[] cms = registry.methodDef(mid);
-            if (cms != null && ri.getCalls() > minMethodCalls && !tracerMatcherSet.isExcluded(mid)) {
+            if (cms != null && ri.getRank() > minMethodCalls && !tracerMatcherSet.isExcluded(mid)) {
                 String className = registry.symbolName(cms[0]);
                 String methodName = registry.symbolName(cms[1]);
                 String methodSignature = registry.symbolName(cms[2]);
@@ -164,7 +158,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
                 tracerMatcherSet.add(className, methodName, methodSignature);
             }
 
-            lcur += ri.getCalls();
+            lcur += ri.getRank();
             if (lcur > lmax) break;
         }
 
@@ -186,30 +180,27 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
     private synchronized void clearStats() {
         calls = drops = errors = lcalls = 0;
-        for (int i = 0; i < callsv.length; i++) {
-            callsv[i] = 0;
-            dropsv[i] = 0;
-            errorsv[i] = 0;
-            lcallsv[i] = 0;
+        for (int i = 0; i < ranks.length; i++) {
+            ranks[i] = 0;
         }
     }
 
     private void calcRanks() {
         KVSortingHeap heap = new KVSortingHeap(rankSize, true);
 
-        for (int i = 0; i < callsv.length; i++) {
-            int r = rank(i);
+        for (int i = 0; i < ranks.length; i++) {
+            int r = ranks[i];
             if (r > 0) heap.add(i, r);
             if (trace) {
-                log.trace(i + "| RANK: r=" + r + "c=" + callsv[i] + ", d=" + dropsv[i] + " " + registry.methodDesc(i));
+                log.trace(i + "| RANK: r=" + r + ": " + registry.methodXDesc(i));
             }
         }
 
         List<RankItem> rl = new ArrayList<RankItem>();
         for (int i = heap.next(); i > 0; i = heap.next()) {
-            int r = rank(i);
+            int r = ranks[i];
             if (!tracerMatcherSet.isExcluded(i)) {
-                rl.add(new RankItem(i, r, callsv[i], dropsv[i]));
+                rl.add(new RankItem(i, r));
             }
         }
 
@@ -218,36 +209,22 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         this.rankList = rl;
     }
 
-    private int rank(int mid) {
-        if (callsv[mid] == 0) return -1;
-        long c = callsv[mid];
-        long d = dropsv[mid];
-        return (int) Math.min(c-((c-d)>>>2)-(errorsv[mid]<<4)-(lcallsv[mid]<<8), Integer.MAX_VALUE);
-    }
-
     private synchronized void processDetails(TraceDetailStats detail) {
-        if (detail.getSize() > callsv.length) {
+        if (detail.getSize() > ranks.length) {
             resize(detail.getSize());
         }
 
-        long[] sws = detail.getStats();
+        int[] sws = detail.getStats();
 
         for (int i = 0; i < detail.getSize(); i++) {
-            long l = sws[i];
-            callsv[i] += l & CALL_MASK;
-            dropsv[i] += (l & DROP_MASK) >>> DROP_BITS;
-            errorsv[i] += (l & ERR_MASK) >>> ERR_BITS;
-            lcallsv[i] += (l & LONG_MASK) >>> LONG_BITS;
+            ranks[i] += sws[i];
         }
     }
 
     private synchronized void resize(int size) {
         int sz = ((size+1023) >>> 10) << 10;
 
-        callsv = ZorkaUtil.clipArray(callsv, sz);
-        dropsv = ZorkaUtil.clipArray(dropsv, sz);
-        errorsv = ZorkaUtil.clipArray(errorsv, sz);
-        lcallsv = ZorkaUtil.clipArray(lcallsv, sz);
+        ranks = ZorkaUtil.clipArray(ranks, sz);
     }
 
     private synchronized void processStats(TraceSummaryStats stats) {
@@ -284,7 +261,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             case Tracer.TUNING_DET:
                 if (statCache.size() < statCacheMax &&
                         stats.getDetails() != null &&
-                        stats.getDetails().getSize() == callsv.length)
+                        stats.getDetails().getSize() == ranks.length)
                     statCache.addFirst(stats);
                 break;
             default:
@@ -315,9 +292,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         if (lst != null && !lst.isEmpty()) {
             for (int i = 0; i < lst.size(); i++) {
                 RankItem itm = lst.get(i);
-                sb.append(String.format("%d: R=%d c=%d d=%d  %s%n",
-                        i, itm.getRank(), itm.getCalls(), itm.getDrops(),
-                        registry.getMethod(itm.getMid())));
+                sb.append(String.format("%d: R=%d %s%n", i, itm.getRank(), registry.getMethod(itm.getMid())));
             }
         } else {
             sb.append("N/A");
@@ -335,14 +310,15 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
                 s.setDetails(null);
                 return s;
             }
-            if (Tracer.getTuningMode() == Tracer.TUNING_DET && s.getDetails() != null && s.getDetails().getSize() == callsv.length) {
+            if (Tracer.getTuningMode() == Tracer.TUNING_DET && s.getDetails() != null &&
+                    s.getDetails().getSize() == ranks.length) {
                 return s;
             }
         }
 
         TraceSummaryStats s = new TraceSummaryStats();
         if (Tracer.getTuningMode() == Tracer.TUNING_DET) {
-            s.setDetails(new TraceDetailStats(callsv.length));
+            s.setDetails(new TraceDetailStats(ranks.length));
         }
         return s;
     }
