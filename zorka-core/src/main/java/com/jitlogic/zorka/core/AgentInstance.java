@@ -48,6 +48,8 @@ import java.io.File;
 import java.util.Set;
 import java.util.concurrent.*;
 
+import static com.jitlogic.zorka.core.AgentConfigProps.*;
+
 /**
  * This method binds together all components to create fuunctional Zorka agent. It is responsible for
  * initializing all subsystems (according to property values in zorka configuration file) and starting
@@ -205,7 +207,7 @@ public class AgentInstance implements ZorkaService {
 
         bsh.put("util", getUtilLib());
 
-        if (config.boolCfg("spy", true)) {
+        if (config.boolCfg(SPY_PROP, SPY_DEFV)) {
             log.info("Enabling Zorka SPY");
             bsh.put("spy", getSpyLib());
             bsh.put("tracer", getTracerLib());
@@ -213,12 +215,12 @@ public class AgentInstance implements ZorkaService {
 
         bsh.put("perfmon", getPerfMonLib());
         
-        if (config.boolCfg("syslog", true)) {
+        if (config.boolCfg(SYSLOG_PROP, SYSLOG_DEFV)) {
             log.info("Enabling Syslog subsystem ....");
             this.zorkaAgent.put("syslog", getSyslogLib());
         }
 
-        if (config.boolCfg("snmp", true)) {
+        if (config.boolCfg(SNMP_PROP, SNMP_DEFV)) {
             log.info("Enabling SNMP subsystem ...");
             this.zorkaAgent.put("snmp", getSnmpLib());
         }
@@ -229,7 +231,7 @@ public class AgentInstance implements ZorkaService {
 
 
     public void createZorkaDiagMBean() {
-        String mbeanName = config.get("zorka.diagnostics.mbean").trim();
+        String mbeanName = config.get(ZORKA_DIAGNOSTICS_MBEAN).trim();
 
         MBeanServerRegistry registry = getMBeanServerRegistry();
 
@@ -272,13 +274,13 @@ public class AgentInstance implements ZorkaService {
     public synchronized ZtxMatcherSet getTracerMatcherSet() {
         if (tracerMatcherSet == null) {
 
-            File ztxDir = config.hasCfg("tracer.tuner.dir")
-                    ? new File(config.stringCfg("tracer.tuner.dir", null))
-                    : new File(config.getHomeDir(), "tuner");
+            File ztxDir = config.hasCfg(TRACER_TUNER_DIR_PROP)
+                    ? new File(config.stringCfg(TRACER_TUNER_DIR_PROP, null))
+                    : new File(config.getHomeDir(), TRACER_TUNER_DIR_DEFV);
 
-            File ztxLog = config.hasCfg("tracer.tuner.xlog")
-                    ? new File(config.stringCfg("tracer.tuner.xlog", null))
-                    : new File(ztxDir, "_log.ztx");
+            File ztxLog = config.hasCfg(TRACER_TUNER_XLOG_PROP)
+                    ? new File(config.stringCfg(TRACER_TUNER_XLOG_PROP, null))
+                    : new File(ztxDir, TRACER_TUNER_XLOG_DEFV);
 
             tracerMatcherSet = new ZtxMatcherSet(ztxDir, ztxLog, getSymbolRegistry(), false);
         }
@@ -304,9 +306,9 @@ public class AgentInstance implements ZorkaService {
 
     private synchronized Executor getConnExecutor() {
         if (connExecutor == null) {
-            int rt = config.intCfg("zorka.req.threads", 16);
+            int rt = config.intCfg(ZORKA_REQ_THREADS_PROP, ZORKA_REQ_THREADS_DEFV);
             connExecutor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
-                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 256)),
+                    new ArrayBlockingQueue<Runnable>(config.intCfg(ZORKA_REQ_QUEUE_PROP, ZORKA_REQ_QUEUE_DEFV)),
                     new DaemonThreadFactory("ZORKA-conn-pool"));
         }
         return connExecutor;
@@ -315,9 +317,9 @@ public class AgentInstance implements ZorkaService {
 
     private synchronized ExecutorService getMainExecutor() {
         if (mainExecutor == null) {
-            int rt = config.intCfg("zorka.req.threads", 16);
+            int rt = config.intCfg(ZORKA_REQ_THREADS_PROP, ZORKA_REQ_THREADS_DEFV);
             mainExecutor = new ThreadPoolExecutor(rt, rt, 1000, TimeUnit.MILLISECONDS,
-                    new ArrayBlockingQueue<Runnable>(config.intCfg("zorka.req.queue", 256)),
+                    new ArrayBlockingQueue<Runnable>(config.intCfg(ZORKA_REQ_QUEUE_PROP, ZORKA_REQ_QUEUE_DEFV)),
                     new DaemonThreadFactory("ZORKA-main-pool"));
         }
         return mainExecutor;
@@ -325,7 +327,7 @@ public class AgentInstance implements ZorkaService {
 
     private synchronized ScheduledExecutorService getScheduledExecutor() {
         if (scheduledExecutor == null) {
-            int rt = config.intCfg("zorka.req.threads", 8);
+            int rt = config.intCfg(ZORKA_REQ_THREADS_PROP, ZORKA_REQ_THREADS_DEFV);
             scheduledExecutor = Executors.newScheduledThreadPool(rt, new DaemonThreadFactory("ZORKA-thread-pool"));
         }
         return scheduledExecutor;
@@ -335,15 +337,15 @@ public class AgentInstance implements ZorkaService {
     public synchronized STraceBufManager getBufManager() {
         if (bufManager == null) {
             bufManager = new STraceBufManager(
-                    getConfig().intCfg("tracer.chunk.size", 65536),
-                    getConfig().intCfg("tracer.chunk.max", 16));
+                    getConfig().intCfg(TRACER_CHUNK_SIZE_PROP, TRACER_CHUNK_SIZE_DEFV),
+                    getConfig().intCfg(TRACER_CHUNK_MAX_PROP, TRACER_CHUNK_MAX_DEFV));
         }
         return bufManager;
     }
 
     public synchronized TracerTuner getTracerTuner() {
         if (tracerTuner == null) {
-            if (config.boolCfg("tracer.tuner", false)) {
+            if (config.boolCfg(TRACER_TUNER_PROP, TRACER_TUNER_DEFV)) {
                 log.info("Enabling automatic tracer tuner.");
                 tracerTuner = new TracerTuner(getConfig(), getSymbolRegistry(), getRetransformer(), getTracerMatcherSet());
                 tracerTuner.start();
@@ -354,7 +356,7 @@ public class AgentInstance implements ZorkaService {
 
     public synchronized Tracer getTracer() {
         if (tracer == null) {
-            if ("streaming".equals(config.stringCfg("tracer.type", "local"))) {
+            if (TRACER_TYPE_STREAMING.equals(config.stringCfg(TRACER_TYPE_PROP, TRACER_TYPE_LOCAL))) {
                 log.info("STREAMING tracer selected.");
                 tracer = new STracer(config, getTracerMatcherSet(), getSymbolRegistry(), getTracerTuner(), getBufManager());
                 MainSubmitter.setTracer(tracer);
@@ -399,7 +401,7 @@ public class AgentInstance implements ZorkaService {
      */
     public synchronized ZorkaBshAgent getZorkaAgent() {
         if (zorkaAgent == null) {
-            long timeout = config.longCfg("zorka.req.timeout", 5000L);
+            long timeout = config.longCfg(ZORKA_REQ_TIMEOUT_PROP, ZORKA_REQ_TIMEOUT_DEFV);
             zorkaAgent = new ZorkaBshAgent(getConnExecutor(), getMainExecutor(), timeout, config);
         }
         return zorkaAgent;
@@ -611,15 +613,15 @@ public class AgentInstance implements ZorkaService {
         config.initLoggers();
         log.info("Agent configuration reloaded ...");
 
-        if (config.boolCfg("zabbix", true)) {
+        if (config.boolCfg(ZABBIX_PROP, ZABBIX_DEFV)) {
             getZabbixAgent().restart();
         }
 
-        if (config.boolCfg("zabbix.active", false)) {
+        if (config.boolCfg(ZABBIX_ACTIVE_PROP, ZABBIX_ACTIVE_DEFV)) {
             getZabbixActiveAgent().restart();
         }
         
-        if (config.boolCfg("nagios", true)) {
+        if (config.boolCfg(NAGIOS_PROP, NAGIOS_DVAL)) {
             getNagiosAgent().restart();
         }
 

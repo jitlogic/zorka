@@ -54,7 +54,6 @@ public class ZorkaConfig {
 	private Map<String,String> sysenv = System.getenv();
 	private Properties sysprops = System.getProperties();
 
-    public static final String PROP_HOME_DIR = "zorka.home.dir";
 
     public ZorkaConfig() {
         this(new Properties());
@@ -368,7 +367,7 @@ public class ZorkaConfig {
         String propPath = ZorkaUtil.path(homeDir, fname);
         loadCfg(properties, propPath, true);
 
-        properties.put(PROP_HOME_DIR, homeDir);
+        properties.put("zorka.home.dir", homeDir);
 
     }
 

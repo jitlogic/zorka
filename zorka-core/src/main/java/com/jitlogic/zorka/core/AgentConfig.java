@@ -32,14 +32,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
+import static com.jitlogic.zorka.core.AgentConfigProps.*;
+
 public class AgentConfig extends ZorkaConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AgentConfig.class);
 
     public final static String DEFAULT_CONF_PATH = "/com/jitlogic/zorka/core/zorka.properties";
-    public static final String PROP_SCRIPTS_DIR = "zorka.scripts.dir";
 
-    public static final String PROP_PROFILE_DIR = "zorka.profile.dir";
 
     public static boolean persistent = true;
 
@@ -60,25 +60,21 @@ public class AgentConfig extends ZorkaConfig {
 
     public AgentConfig(Properties props) {
         properties = props;
-        homeDir = get(PROP_HOME_DIR);
+        homeDir = get(ZORKA_HOME_DIR_PROP);
         setBaseProps();
     }
 
 
     private void setBaseProps() {
-        if (!properties.containsKey(PROP_SCRIPTS_DIR)) {
-            properties.put(PROP_SCRIPTS_DIR, ZorkaUtil.path(homeDir, "scripts"));
+        if (!properties.containsKey(SCRIPTS_DIR_PROP)) {
+            properties.put(SCRIPTS_DIR_PROP, ZorkaUtil.path(homeDir, SCRIPTS_DIR_DVAL));
         }
 
-        if (!properties.containsKey(PROP_PROFILE_DIR)) {
-            properties.put(PROP_PROFILE_DIR, ZorkaUtil.path(homeDir, "profiles"));
+        if (!properties.containsKey(ZORKA_LOG_DIR_PROP)) {
+            properties.put(ZORKA_LOG_DIR_PROP, ZorkaUtil.path(homeDir, ZORKA_LOG_DIR_DVAL));
         }
 
-        if (!properties.containsKey("zorka.log.dir")) {
-            properties.put("zorka.log.dir", ZorkaUtil.path(homeDir, "log"));
-        }
-
-        agentAttrs = mapCfg("zorka.agent", "host", stringCfg("zorka.hostname", System.getenv("HOSTNAME")));
+        agentAttrs = mapCfg(ZORKA_AGENT_PROP, "host", stringCfg(ZORKA_HOSTNAME_PROP, System.getenv("HOSTNAME")));
     }
 
     public Map<String,String> getAgentAttrs() {
@@ -90,13 +86,13 @@ public class AgentConfig extends ZorkaConfig {
      */
     public void initLoggers() {
 
-        FileTrapper.ENABLE_FSYNC = boolCfg("zorka.log.fsync", false);
+        FileTrapper.ENABLE_FSYNC = boolCfg(ZORKA_LOG_FSYNC_PROP, ZORKA_LOG_FSYNC_DVAL);
 
-        if (boolCfg("zorka.filelog", true)) {
+        if (boolCfg(ZORKA_LOG_FILE_PROP, ZORKA_LOG_FILE_DVAL)) {
             initFileTrapper();
         }
 
-        if (boolCfg("zorka.syslog", false)) {
+        if (boolCfg(ZORKA_LOG_SYSLOG_PROP, ZORKA_LOG_SYSLOG_DVAL)) {
             initSyslogTrapper();
         }
 
@@ -112,9 +108,9 @@ public class AgentConfig extends ZorkaConfig {
      */
     private void initSyslogTrapper() {
         try {
-            String server = stringCfg("zorka.syslog.server", "127.0.0.1");
-            String hostname = stringCfg("zorka.hostname", "zorka");
-            int syslogFacility = SyslogLib.getFacility(stringCfg("zorka.syslog.facility", "F_LOCAL0"));
+            String server = stringCfg(ZORKA_LOG_SYSLOG_ADDR_PROP, ZORKA_LOG_SYSLOG_ADDR_DVAL);
+            String hostname = stringCfg(ZORKA_HOSTNAME_PROP, ZORKA_HOSTNAME_DVAL);
+            int syslogFacility = SyslogLib.getFacility(stringCfg(ZORKA_LOG_SYSLOG_FACILITY_PROP, ZORKA_LOG_SYSLOG_FACILITY_DVAL));
 
             SyslogTrapper trapper = new SyslogTrapper(server, hostname, syslogFacility, true);
             trapper.disableTrapCounter();
@@ -139,15 +135,15 @@ public class AgentConfig extends ZorkaConfig {
     private void initFileTrapper() {
         String logDir = getLogDir();
         boolean logExceptions = boolCfg("zorka.log.exceptions", true);
-        String logFileName = stringCfg("zorka.log.fname", "zorka.log");
+        String logFileName = stringCfg(ZORKA_LOG_FILE_NAME_PROP, ZORKA_LOG_FILE_NAME_DVAL);
         ZorkaLogLevel logThreshold = ZorkaLogLevel.DEBUG;
 
         int maxSize = 4 * 1024 * 1024, maxLogs = 4; // TODO int -> long
 
         try {
-            logThreshold = ZorkaLogLevel.valueOf(stringCfg("zorka.log.level", "INFO"));
-            maxSize = (int) (long) kiloCfg("zorka.log.size", 4L * 1024 * 1024);
-            maxLogs = intCfg("zorka.log.num", 8);
+            logThreshold = ZorkaLogLevel.valueOf(stringCfg(ZORKA_LOG_LEVEL_PROP, ZORKA_LOG_LEVEL_DVAL));
+            maxSize = (int) (long) kiloCfg(ZORKA_LOG_FILE_SIZE_PROP, ZORKA_LOG_FILE_SIZE_DVAL);
+            maxLogs = intCfg(ZORKA_LOG_FILE_NUM_PROP, ZORKA_LOG_FILE_NUM_DVAL);
         } catch (Exception e) {
             log.error("Error parsing logger arguments", e);
             log.info("File trapper will be disabled.");

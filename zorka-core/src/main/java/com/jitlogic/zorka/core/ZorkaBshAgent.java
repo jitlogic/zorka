@@ -38,6 +38,9 @@ import bsh.Interpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.jitlogic.zorka.core.AgentConfigProps.SCRIPTS_DIR_PROP;
+import static com.jitlogic.zorka.core.AgentConfigProps.SCRIPTS_PROP;
+
 /**
  * This is central part of Zorka agent - it processes actual queries and executes BSH scripts.
  *
@@ -163,7 +166,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
      * @param script path to script
      */
     public synchronized String loadScript(String script) {
-        String path = ZorkaUtil.path(config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null), script);
+        String path = ZorkaUtil.path(config.stringCfg(SCRIPTS_DIR_PROP, null), script);
         Reader rdr = null;
         try {
             if (new File(path).canRead()) {
@@ -255,14 +258,14 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
      * Loads and executes all script in script directory.
      */
     public void loadScripts() {
-        String scriptsDir = config.stringCfg(AgentConfig.PROP_SCRIPTS_DIR, null);
+        String scriptsDir = config.stringCfg(SCRIPTS_DIR_PROP, null);
 
         if (scriptsDir == null) {
             log.error("Scripts directory not set. Internal error ?!?");
             return;
         }
 
-        List<String> scripts = config.listCfg("scripts");
+        List<String> scripts = config.listCfg(SCRIPTS_PROP);
 
         if (scripts != null) {
             for (String script : scripts) {
@@ -291,6 +294,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
 
     public void restart() {
         interpreter = new Interpreter();
+        put("PROP", AgentConfigProps.PROPS);
     }
 
     @Override

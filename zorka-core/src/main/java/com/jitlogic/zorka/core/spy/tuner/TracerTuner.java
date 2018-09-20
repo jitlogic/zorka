@@ -27,6 +27,7 @@ import com.jitlogic.zorka.core.spy.Tracer;
 
 import java.util.*;
 
+import static com.jitlogic.zorka.core.AgentConfigProps.*;
 import static com.jitlogic.zorka.common.stats.AgentDiagnostics.*;
 import static com.jitlogic.zorka.core.spy.tuner.TraceDetailStats.*;
 
@@ -84,20 +85,20 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     private Deque<TraceSummaryStats> statCache = new LinkedList<TraceSummaryStats>();
 
     public TracerTuner(ZorkaConfig config, SymbolRegistry registry, SpyRetransformer retransformer, ZtxMatcherSet tracerMatcherSet) {
-        super("TRACER-TUNER", config.intCfg("tracer.tuner.qlen", 1024), 2);
+        super("TRACER-TUNER", config.intCfg(TRACER_TUNER_QLEN_PROP, TRACER_TUNER_QLEN_DEFV), 2);
 
         this.registry = registry;
         this.retransformer = retransformer;
         this.tracerMatcherSet = tracerMatcherSet;
 
-        this.rankSize = config.intCfg("tracer.tuner.ranks", 255);
-        this.interval = config.intCfg("tracer.tuner.interval", 30000) * 1000000L;
-        this.auto = config.boolCfg("tracer.tuner.auto", true);
-        this.minTotalCalls = config.longCfg("tracer.tuner.min.total.calls", 4000000L);
-        this.minMethodCalls = config.longCfg("tracer.tuner.min.method.calls", 20000L);
+        this.rankSize = config.intCfg(TRACER_TUNER_RANKS_PROP, TRACER_TUNER_RANKS_DEFV);
+        this.interval = config.intCfg(TRACER_TUNER_INTERVAL_PROP, TRACER_TUNER_INTERVAL_DEFV) * 1000000L;
+        this.auto = config.boolCfg(TRACER_TUNER_AUTO_PROP, TRACER_TUNER_AUTO_DEFV);
+        this.minTotalCalls = config.longCfg(TRACER_TUNER_MIN_TOTAL_CALLS_PROP, TRACER_TUNER_MIN_TOTAL_CALLS_DEFV);
+        this.minMethodCalls = config.longCfg(TRACER_TUNER_MIN_METHOD_CALLS_PROP, TRACER_TUNER_MIN_METHOD_CALLS_DEFV);
 
-        this.autoRatio = config.intCfg("tracer.tuner.max.ratio", 80);
-        this.autoMpc = config.intCfg("tracer.tuner.max.items", 120);
+        this.autoRatio = config.intCfg(TRACER_TUNER_MAX_RATIO_PROP, TRACER_TUNER_MAX_RATIO_DEFV);
+        this.autoMpc = config.intCfg(TRACER_TUNER_MAX_ITEMS_PROP, TRACER_TUNER_MAX_ITEMS_DEFV);
 
         callsv = new long[1024];
         dropsv = new long[1024];
