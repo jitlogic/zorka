@@ -1,4 +1,31 @@
-org.codehaus.jackson.map|DeserializationConfig|isEnabled|(Lorg/codehaus/jackson/map/DeserializationConfig$Feature;)Z
+org.codehaus.jackson|JsonStreamContext|inObject|()Z
+org.codehaus.jackson.impl
+ JsonGeneratorBase
+  isEnabled|(Lorg/codehaus/jackson/JsonGenerator$Feature;)Z
+ JsonWriteContext
+  createChildObjectContext|()Lorg/codehaus/jackson/impl/JsonWriteContext;
+  writeFieldName|(Ljava/lang/String;)I
+  writeValue|()I
+ Utf8Generator
+  writeEndObject|()V
+  writeFieldName|(Lorg/codehaus/jackson/io/SerializedString;)V
+  writeNull|()V
+  writeNumber
+   (I)V
+   (J)V
+  writeStartObject|()V
+  writeString|(Ljava/lang/String;)V
+org.codehaus.jackson.io
+ NumberOutput
+  outputInt|(I[BI)I
+  outputLong|(J[BI)I
+ SerializedString
+  asQuotedUTF8|()[B
+org.codehaus.jackson.map
+ DeserializationConfig
+  isEnabled|(Lorg/codehaus/jackson/map/DeserializationConfig$Feature;)Z
+ SerializerProvider
+  defaultSerializeNull|(Lorg/codehaus/jackson/JsonGenerator;)V
 org.codehaus.jackson.map.introspect
  Annotated
   hasAnnotation|(Ljava/lang/Class;)Z
@@ -14,3 +41,25 @@ org.codehaus.jackson.map.introspect
   get|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
  BasicClassIntrospector$MinimalMethodFilter
   includeMethod|(Ljava/lang/reflect/Method;)Z
+org.codehaus.jackson.map.ser
+ BeanPropertyWriter
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  serializeAsField|(Ljava/lang/Object;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+ BeanSerializer
+  serialize|(Ljava/lang/Object;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+ StdSerializers$IntegerSerializer
+  serialize
+   (Ljava/lang/Integer;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+   (Ljava/lang/Object;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+ StdSerializers$LongSerializer
+  serialize
+   (Ljava/lang/Long;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+   (Ljava/lang/Object;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+org.codehaus.jackson.map.ser.impl|PropertySerializerMap$Single|serializerFor|(Ljava/lang/Class;)Lorg/codehaus/jackson/map/JsonSerializer;
+org.codehaus.jackson.map.ser.std
+ NullSerializer
+  serialize|(Ljava/lang/Object;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+ StringSerializer
+  serialize
+   (Ljava/lang/Object;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+   (Ljava/lang/String;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V

@@ -1,0 +1,18 @@
+org.fressian
+ FressianReader
+  readInt|()J
+  readObject|()Ljava/lang/Object;
+ FressianReader$1
+  convertList|([Ljava/lang/Object;)Ljava/util/List;
+org.fressian.impl
+ Fns
+  intCast|(J)I
+  lookup|(Lorg/fressian/handlers/ILookup;Ljava/lang/Object;)Ljava/lang/Object;
+  readUTF8Chars|(Ljava/lang/StringBuffer;[BII)V
+ MapLookup
+  valAt|(Ljava/lang/Object;)Ljava/lang/Object;
+ RawInput
+  readFully|([BII)V
+  readRawByte|()I
+  readRawInt16|()J
+  readRawInt8|()J
