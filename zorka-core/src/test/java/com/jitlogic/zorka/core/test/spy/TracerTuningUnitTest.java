@@ -135,8 +135,8 @@ public class TracerTuningUnitTest extends ZorkaFixture {
         TraceHandler.setTuningDefaultExchInterval(100);
         setField(tuner, "interval", 100L);
         setField(tuner, "minTotalCalls", 5L);
-        setField(tuner, "minMethodCalls", 0L);
-        setField(tuner, "autoMpc", 1);
+        setField(tuner, "minMethodRank", 0L);
+        setField(tuner, "maxItems", 1);
         setField(tuner, "auto", true);
 
         h.traceEnter(m[0], 5);

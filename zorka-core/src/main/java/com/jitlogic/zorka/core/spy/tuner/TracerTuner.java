@@ -48,15 +48,15 @@ public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
     private boolean auto;
 
     /** Maximum number of methods to exclude in one cycle. */
-    private int autoMpc;
+    private int maxItems;
 
     /** Approximate percentage of all counted method calls to be excluded in one cycle (when exceeded, exclusions will stop). */
-    private int autoRatio;
+    private int maxRatio;
 
     /** Minimum number of calls in last cycle that will trigger automatic exclusion of top offender methods. */
     private long minTotalCalls;
 
-    private long minMethodCalls;
+    private long minMethodRank;
 
     /** Last tuning cycle timestamp. */
     private long tstlast = 0L;
@@ -83,18 +83,18 @@ public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
         this.rankSize = config.intCfg(TRACER_TUNER_RANKS_PROP, TRACER_TUNER_RANKS_DEFV);
         this.interval = config.intCfg(TRACER_TUNER_INTERVAL_PROP, TRACER_TUNER_INTERVAL_DEFV) * 1000000L;
         this.auto = config.boolCfg(TRACER_TUNER_AUTO_PROP, TRACER_TUNER_AUTO_DEFV);
-        this.minTotalCalls = config.longCfg(TRACER_TUNER_MIN_RANK_PROP, TRACER_TUNER_MIN_RANK_DEFV);
-        this.minMethodCalls = config.longCfg(TRACER_TUNER_MIN_CALLS_PROP, TRACER_TUNER_MIN_CALLS_DEFV);
+        this.minTotalCalls = config.longCfg(TRACER_TUNER_MIN_CALLS_PROP, TRACER_TUNER_MIN_CALLS_DEFV);
+        this.minMethodRank = config.longCfg(TRACER_TUNER_MIN_RANK_PROP, TRACER_TUNER_MIN_RANK_DEFV);
 
-        this.autoRatio = config.intCfg(TRACER_TUNER_MAX_RATIO_PROP, TRACER_TUNER_MAX_RATIO_DEFV);
-        this.autoMpc = config.intCfg(TRACER_TUNER_MAX_ITEMS_PROP, TRACER_TUNER_MAX_ITEMS_DEFV);
+        this.maxRatio = config.intCfg(TRACER_TUNER_MAX_RATIO_PROP, TRACER_TUNER_MAX_RATIO_DEFV);
+        this.maxItems = config.intCfg(TRACER_TUNER_MAX_ITEMS_PROP, TRACER_TUNER_MAX_ITEMS_DEFV);
 
         ranks = new int[1024];
 
         trace = log.isTraceEnabled();
 
         log.info("Tracer tuner: auto=" + auto + ", interval=" + interval + "ns, rankSize=" + rankSize +
-                ", threshold=" + minTotalCalls + "methods/cycle" + ", ratio=" + autoRatio + "pct, mpc=" + autoMpc);
+                ", threshold=" + minTotalCalls + "methods/cycle" + ", ratio=" + maxRatio + "pct, mpc=" + maxItems);
     }
 
     private synchronized void tuningCycle() {
@@ -117,14 +117,14 @@ public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
         log.debug("auto=" + auto + ", lastCalls=" + lastCalls + ", minTotalCalls=" + minTotalCalls);
 
         if (auto && lastCalls >= minTotalCalls) {
-            exclude(autoMpc, false);
+            exclude(maxItems, false);
         }
     }
 
     public synchronized int exclude(int nitems, boolean force) {
 
         long lcur = 0;
-        long lmax = force ? Long.MAX_VALUE : (lastCalls * 100L / autoRatio);
+        long lmax = force ? Long.MAX_VALUE : (lastCalls * 100L / maxRatio);
 
         log.debug("Looking for classes to exclude: lastCalls=" + lastCalls + ", lmax=" + lmax);
 
@@ -135,7 +135,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
             RankItem ri = rankList.get(rc);
             int mid = ri.getMid();
             int[] cms = registry.methodDef(mid);
-            if (cms != null && ri.getRank() > minMethodCalls && !tracerMatcherSet.isExcluded(mid)) {
+            if (cms != null && ri.getRank() > minMethodRank && !tracerMatcherSet.isExcluded(mid)) {
                 String className = registry.symbolName(cms[0]);
                 String methodName = registry.symbolName(cms[1]);
                 String methodSignature = registry.symbolName(cms[2]);

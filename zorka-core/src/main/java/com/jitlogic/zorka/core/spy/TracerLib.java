@@ -508,7 +508,7 @@ public abstract class TracerLib {
         return "Excluded: " +  tt.exclude(nitems, true) + " (items left: " + tt.getRankList().size() + ")";
     }
 
-    public void setTuning(boolean tuningEnabled) {
+    public void setTuningEnabled(boolean tuningEnabled) {
         TraceHandler.setTuningEnabled(tuningEnabled);
     }
 }
