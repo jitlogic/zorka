@@ -29,7 +29,7 @@ import java.util.*;
 import static com.jitlogic.zorka.core.AgentConfigProps.*;
 import static com.jitlogic.zorka.common.stats.AgentDiagnostics.*;
 
-public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
+public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
 
     private boolean trace;
 
@@ -71,7 +71,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
     private int statCacheMax = 16;
 
-    private Deque<TraceSummaryStats> statCache = new LinkedList<TraceSummaryStats>();
+    private Deque<TraceTuningStats> statCache = new LinkedList<TraceTuningStats>();
 
     public TracerTuner(ZorkaConfig config, SymbolRegistry registry, SpyRetransformer retransformer, ZtxMatcherSet tracerMatcherSet) {
         super("TRACER-TUNER", config.intCfg(TRACER_TUNER_QLEN_PROP, TRACER_TUNER_QLEN_DEFV), 2);
@@ -195,7 +195,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         this.rankList = rl;
     }
 
-    private synchronized void processDetails(TraceDetailStats detail) {
+    private synchronized void processDetails(TraceTuningStats detail) {
         if (detail.getSize() > ranks.length) {
             resize(detail.getSize());
         }
@@ -205,7 +205,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         for (int i = 0; i < stats.length; i++) {
             long l = stats[i];
             if (l != 0) {
-                int mid = (int) (l & TraceDetailStats.MID_MASK);
+                int mid = (int) (l & TraceTuningStats.MID_MASK);
                 if (mid >= ranks.length) resize(mid);
                 ranks[mid] += (l >>> 32);
             }
@@ -218,16 +218,14 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         ranks = ZorkaUtil.clipArray(ranks, sz);
     }
 
-    private synchronized void processStats(TraceSummaryStats stats) {
+    private synchronized void processStats(TraceTuningStats stats) {
 
         if (log.isDebugEnabled())
             log.debug("Processing stats: " + stats);
 
         calls += stats.getCalls();
 
-        if (stats.getDetails() != null) {
-            processDetails(stats.getDetails());
-        }
+        processDetails(stats);
 
         long tstamp = stats.getTstamp();
 
@@ -245,8 +243,8 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     }
 
     @Override
-    protected void process(List<TraceSummaryStats> obj) {
-        for (TraceSummaryStats stats : obj) {
+    protected void process(List<TraceTuningStats> obj) {
+        for (TraceTuningStats stats : obj) {
             try {
                 processStats(stats);
             } catch (Exception e) {
@@ -279,16 +277,13 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
         return sb.toString();
     }
 
-    public TraceSummaryStats exchange(TraceSummaryStats stats) {
+    public TraceTuningStats exchange(TraceTuningStats stats) {
 
         if (stats != null) submit(stats);
 
-        TraceSummaryStats s  = statCache.pollLast();
+        TraceTuningStats s  = statCache.pollLast();
 
-        if (s != null) return s;
-
-        s = new TraceSummaryStats();
-        return s;
+        return s != null ? s : new TraceTuningStats();
     }
 
     public long getLastCalls() {

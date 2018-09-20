@@ -16,8 +16,7 @@
 
 package com.jitlogic.zorka.core.spy.lt;
 
-import com.jitlogic.zorka.core.spy.tuner.TraceDetailStats;
-import com.jitlogic.zorka.core.spy.tuner.TraceSummaryStats;
+import com.jitlogic.zorka.core.spy.tuner.TraceTuningStats;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,16 +24,6 @@ import org.slf4j.LoggerFactory;
 public abstract class TraceHandler {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-
-
-    /** Tracer tuning disabled. */
-    public static final int TUNING_OFF = 0x00;
-
-    /** Summary statistics are collected. */
-    public static final int TUNING_SUM = 0x01;
-
-    /** Detail statistics are collected. */
-    public static final int TUNING_DET = 0x02;
 
     /** Default long call threshold for automated tracer tuning: 10ms */
     public static final long TUNING_DEFAULT_LCALL_THRESHOLD = 10000000L;
@@ -45,8 +34,7 @@ public abstract class TraceHandler {
     /** */
     public static final long TUNING_EXCHANGE_CALLS_DEFV = 1048576;
 
-    /** Automated tracer tuning mode is disabled by default. */
-    protected static int tuningMode = TUNING_OFF;
+    protected static boolean tuningEnabled = false;
 
     /** Threshold above which method call will be considered long-duration. */
     protected static long tuningLongThreshold = TUNING_DEFAULT_LCALL_THRESHOLD;
@@ -76,7 +64,7 @@ public abstract class TraceHandler {
     protected long tunCalls = 0;
 
     protected TracerTuner tuner;
-    protected TraceSummaryStats tunStats = null;
+    protected TraceTuningStats tunStats = null;
 
     protected long tunLastExchange = 0;
 
@@ -113,21 +101,15 @@ public abstract class TraceHandler {
 
         tunCalls++;
 
-        if (tuningMode == TUNING_DET) {
+        if (tuningEnabled) {
 
-
-            if (tunStats.getDetails() == null) {
-                tuningExchange(tstamp);
-            }
-
-            TraceDetailStats details = tunStats.getDetails();
 
             if (ttime < minMethodTime) {
-                if (!details.markRank(mid, 1)) {
+                if (!tunStats.markRank(mid, 1)) {
                     tuningExchange(tstamp);
                 }
             } else if (ttime > tuningLongThreshold) {
-                details.markRank(mid, (int)(ttime >>> 18));
+                tunStats.markRank(mid, (int)(ttime >>> 18));
             }
 
         }
@@ -176,12 +158,12 @@ public abstract class TraceHandler {
         TraceHandler.tuningExchangeMinCalls = tuningExchangeMinCalls;
     }
 
-    public static int getTuningMode() {
-        return tuningMode;
+    public static boolean isTuningEnabled() {
+        return tuningEnabled;
     }
 
-    public static void setTuningMode(int tuningMode) {
-        TraceHandler.tuningMode = tuningMode;
+    public static void setTuningEnabled(boolean tuningEnabled) {
+        TraceHandler.tuningEnabled = tuningEnabled;
     }
 
     public static long getTuningLongThreshold() {

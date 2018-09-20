@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.spy.tuner;
 
 
-public class TraceDetailStats {
+public class TraceTuningStats {
 
     public static final int STATS_SIZE = 2048;
     public static final int STATS_MASK = STATS_SIZE-1;
@@ -31,17 +31,22 @@ public class TraceDetailStats {
 
     public static final long MMAX = 16;
 
+    private long threadId;
+    private long tstamp;
+    private long calls;
+
     private int misses0 = 0;
     private int misses1 = 0;
     private int misses2 = 0;
 
     private long[] stats;
 
-    public TraceDetailStats() {
+    public TraceTuningStats() {
         this.stats = new long[STATS_SIZE];
     }
 
     public void clear() {
+        tstamp = calls = 0;
         for (int i = 0; i < STATS_SIZE; i++) stats[i] = 0;
     }
 
@@ -110,6 +115,32 @@ public class TraceDetailStats {
         for (int i = 0; i < STATS_SIZE; i++)
             if (stats[i] != 0) used++;
 
-        return "TD(sz=" + STATS_SIZE + ",used=" + used + ",misses0=" + misses0 + ",misses1=" + misses1 + ",misses2=" + misses2 + ")";
+        return "TS: " + "tid=" + threadId + " calls=" + calls + "size=" + STATS_SIZE + " used=" + used +
+                " misses0=" + misses0 + " misses1=" + misses1 + " misses2=" + misses2 + ")";
     }
+
+    public long getThreadId() {
+        return threadId;
+    }
+
+    public void setThreadId(long threadId) {
+        this.threadId = threadId;
+    }
+
+    public long getTstamp() {
+        return tstamp;
+    }
+
+    public void setTstamp(long tstamp) {
+        this.tstamp = tstamp;
+    }
+
+    public long getCalls() {
+        return calls;
+    }
+
+    public void setCalls(long calls) {
+        this.calls = calls;
+    }
+
 }

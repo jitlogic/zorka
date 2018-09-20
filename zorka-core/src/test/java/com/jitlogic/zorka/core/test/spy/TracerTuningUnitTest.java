@@ -2,10 +2,8 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.lt.TraceHandler;
-import com.jitlogic.zorka.core.spy.tuner.TraceDetailStats;
-import com.jitlogic.zorka.core.spy.tuner.TraceSummaryStats;
+import com.jitlogic.zorka.core.spy.tuner.TraceTuningStats;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Before;
@@ -54,7 +52,7 @@ public class TracerTuningUnitTest extends ZorkaFixture {
         m[0] = symbols.methodId(symbols.symbolId("some.Class"), symbols.symbolId("someMethod"), symbols.symbolId("()V"));
         m[1] = symbols.methodId(symbols.symbolId("other.Class"), symbols.symbolId("someMethod"), symbols.symbolId("()V"));
 
-        TraceHandler.setTuningMode(TraceHandler.TUNING_DET);
+        TraceHandler.setTuningEnabled(true);
         TraceHandler.setTuningExchangeMinCalls(0);
     }
 
@@ -77,11 +75,10 @@ public class TracerTuningUnitTest extends ZorkaFixture {
         assertEquals(20L, getField(h, "tunLastExchange"));
         assertEquals(1L, getField(h, "tunCalls"));
 
-        TraceSummaryStats ts = getField(h, "tunStats");
+        TraceTuningStats ts = getField(h, "tunStats");
         assertNotNull(ts);
 
-        TraceDetailStats td = ts.getDetails();
-        assertEquals("Should register method call.", 1, td.getRank(m[0]));
+        assertEquals("Should register method call.", 1, ts.getRank(m[0]));
     }
 
     @Test

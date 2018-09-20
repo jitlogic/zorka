@@ -23,7 +23,6 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 
 /**
@@ -144,7 +143,7 @@ public class LTraceHandler extends TraceHandler {
         long ttime = tstamp - ttop.getTime();
         ttop.setTime(ttime);
 
-        if (tuningMode != TUNING_OFF)
+        if (tuningEnabled)
             tuningProbe(ttop.getMid(), tstamp, ttime);
 
         pop();
@@ -176,12 +175,9 @@ public class LTraceHandler extends TraceHandler {
         ttop.setTime(ttime);
         ttop.setErrors(ttop.getErrors() + 1);
 
-        if (tuningMode != TUNING_OFF) {
-
+        if (tuningEnabled) {
             tuningProbe(ttop.getMid(), tstamp, ttime);
-
-            if (tuningMode == TUNING_DET)
-                tunStats.getDetails().markRank(ttop.getMid(), ERROR_PENALTY);
+            tunStats.markRank(ttop.getMid(), ERROR_PENALTY);
         }
 
         pop();

@@ -156,7 +156,7 @@ public class ZorkaFixture extends CommonFixture {
         MainSubmitter.setSubmitter(null);
 
         TraceHandler.setMinMethodTime(TraceHandler.DEFAULT_MIN_METHOD_TIME);
-        TraceHandler.setTuningMode(TraceHandler.TUNING_OFF);
+        TraceHandler.setTuningEnabled(false);
         TraceHandler.setTuningLongThreshold(TraceHandler.TUNING_DEFAULT_LCALL_THRESHOLD);
         TraceHandler.setTuningDefaultExchInterval(TraceHandler.TUNING_DEFAULT_EXCH_INTERVAL);
 
