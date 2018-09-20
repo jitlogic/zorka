@@ -80,6 +80,10 @@ public class AgentConfigProps {
     public static final String TRACER_TUNER_XLOG_PROP = "tracer.tuner.xlog";
     public static final String TRACER_TUNER_XLOG_DEFV = "_log.ztx";
 
+    public static final String TRACER_TUNER_ZTX_SCAN_PROP = "tracer.tuner.ztx.scan";
+    public static final boolean TRACER_TUNER_ZTX_SCAN_DEFV = true;
+
+
     /** Selects tracer type. */
     public static final String TRACER_TYPE_PROP = "tracer.type";
     public static final String TRACER_TYPE_LOCAL = "local";

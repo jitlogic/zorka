@@ -50,7 +50,7 @@ public class ZtxFileProcessingUnitTest {
     public void ztxMatcherSetInitUnitTest() throws Exception {
         ZtxMatcherSet zms = new ZtxMatcherSet(
                 new File("src/test/resources/tuner"),
-                ztxLog, registry, true);
+                ztxLog, registry, true, true);
 
         Map<String,String> pkgs = CoreTestUtil.getField(zms, "ztxs");
         assertTrue(pkgs.size() > 2);
@@ -61,7 +61,7 @@ public class ZtxFileProcessingUnitTest {
     public void ztxMatcherSetLoadUnitTest() throws Exception {
         ZtxMatcherSet zms = new ZtxMatcherSet(
                 new File("src/test/resources/tuner"),
-                ztxLog, registry, true);
+                ztxLog, registry, true, true);
 
         assertFalse("Class is present in exclusions", zms.classMatch("test.myapp.SomeClass"));
         assertTrue("Class is absent in exclusions", zms.classMatch("test.myapp.SomeClass1"));
@@ -71,7 +71,7 @@ public class ZtxFileProcessingUnitTest {
     public void ztxMatcherSetAddDefUnitTest() {
         ZtxMatcherSet zms = new ZtxMatcherSet(
                 new File("src/test/resources/tuner"),
-                ztxLog, registry, true);
+                ztxLog, registry, true, true);
         assertTrue(zms.methodMatch("test.myapp.SomeClass1", null, null, null, 1, "someMethod", "()V", null));
         zms.add("test.myapp.SomeClass1", "someMethod", "()V");
         assertFalse(zms.methodMatch("test.myapp.SomeClass1", null, null, null, 1, "someMethod", "()V", null));

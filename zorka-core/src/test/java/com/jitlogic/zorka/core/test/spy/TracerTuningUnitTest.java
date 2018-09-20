@@ -55,6 +55,7 @@ public class TracerTuningUnitTest extends ZorkaFixture {
         m[1] = symbols.methodId(symbols.symbolId("other.Class"), symbols.symbolId("someMethod"), symbols.symbolId("()V"));
 
         Tracer.setTuningMode(Tracer.TUNING_DET);
+        TraceHandler.setTuningExchangeMinCalls(0);
     }
 
 

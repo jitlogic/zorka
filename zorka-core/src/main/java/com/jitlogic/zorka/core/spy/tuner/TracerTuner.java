@@ -214,16 +214,21 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
             resize(detail.getSize());
         }
 
-        int[] sws = detail.getStats();
+        long[] stats = detail.getStats();
 
-        for (int i = 0; i < detail.getSize(); i++) {
-            ranks[i] += sws[i];
+        for (int i = 0; i < stats.length; i++) {
+            long l = stats[i];
+            if (l != 0) {
+                int mid = (int) (l & TraceDetailStats.MID_MASK);
+                if (mid >= ranks.length) resize(mid);
+                ranks[mid] += (l >>> 32);
+            }
         }
     }
 
     private synchronized void resize(int size) {
-        int sz = ((size+1023) >>> 10) << 10;
-
+        int sz = ((size+16384) >>> 14) << 14;
+        log.debug("Resizing rank table to " + sz + " items.");
         ranks = ZorkaUtil.clipArray(ranks, sz);
     }
 
@@ -272,7 +277,11 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
     @Override
     protected void process(List<TraceSummaryStats> obj) {
         for (TraceSummaryStats stats : obj) {
-            processStats(stats);
+            try {
+                processStats(stats);
+            } catch (Exception e) {
+                log.error("Error processing stats: " + stats, e);
+            }
         }
     }
 
@@ -318,7 +327,7 @@ public class TracerTuner extends ZorkaAsyncThread<TraceSummaryStats> {
 
         TraceSummaryStats s = new TraceSummaryStats();
         if (Tracer.getTuningMode() == Tracer.TUNING_DET) {
-            s.setDetails(new TraceDetailStats(ranks.length));
+            s.setDetails(new TraceDetailStats());
         }
         return s;
     }

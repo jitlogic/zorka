@@ -16,51 +16,100 @@
 
 package com.jitlogic.zorka.core.spy.tuner;
 
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 public class TraceDetailStats {
 
-    private int size;
-    private int[] stats;
+    public static final int STATS_SIZE = 2048;
+    public static final int STATS_MASK = STATS_SIZE-1;
 
-    public TraceDetailStats(int size) {
-        this.size = size;
-        this.stats = new int[size];
+    public static final long MID_MASK = 0x00000000FFFFFFFFL;
+
+    public static final long XCL_MIN1 = 8;
+    public static final long XCL_MIN2 = 32;
+
+    public static final int IMAX = 24;
+
+    public static final long MMAX = 16;
+
+    private int misses0 = 0;
+    private int misses1 = 0;
+    private int misses2 = 0;
+
+    private long[] stats;
+
+    public TraceDetailStats() {
+        this.stats = new long[STATS_SIZE];
     }
 
     public void clear() {
-        for (int i = 0; i < stats.length; i++) stats[i] = 0;
+        for (int i = 0; i < STATS_SIZE; i++) stats[i] = 0;
     }
 
     public int getSize() {
-        return size;
+        return STATS_SIZE;
     }
 
-    public int[] getStats() {
+    public long[] getStats() {
         return stats;
     }
 
     public boolean markRank(int mid, int delta) {
-        if (mid >= size) {
-            stats = ZorkaUtil.clipArray(stats, ((mid + 1023) >>> 10) << 10);
-            size = stats.length;
+
+        int x0 = mid & STATS_MASK;
+
+        for (int i = 0; i < IMAX; i++) {
+            int x1 = (x0+i) & STATS_MASK;
+            long s1 = stats[x1];
+            long m1 = s1 & MID_MASK;
+            if (m1 == 0 || m1 == mid) {
+                long v1 = (s1 >>> 32) + delta;
+                stats[x1] = v1 > 0 ? ((v1 << 32) | mid) : 0;
+                return true;
+
+            }
         }
 
-        stats[mid] = Math.max(stats[mid]+delta, 0);
+        misses0++;
+        if (delta <= 0) return true;
 
-        return true;
+        for (int i = 0; i < IMAX; i++) {
+            int x1 = (x0+i) & STATS_MASK;
+            long s1 = stats[x1];
+            long v1 = s1 >>> 32;
+            if (v1 < XCL_MIN1) {
+                stats[x1] = mid & ((v1+delta) << 32);
+                return true;
+            }
+        }
+
+        misses1++;
+
+        for (int i = 0; i < IMAX; i++) {
+            int x1 = (x0+i) & STATS_MASK;
+            long s1 = stats[x1];
+            long v1 = s1 >>> 32;
+            if (v1 < XCL_MIN2) {
+                stats[x1] = mid & ((v1+delta) << 32);
+                return true;
+            }
+        }
+
+        misses2++;
+
+        return misses2 < MMAX;
     }
 
     public long getRank(int mid) {
-        return mid < size ? stats[mid] : 0;
+        return mid < STATS_SIZE ? (stats[mid] & MID_MASK) : 0;
     }
 
     @Override
     public String toString() {
         int used = 0;
-        for (int i = 0; i < size; i++)
-            if (stats[i] != 0)
-                used++;
-        return "TD(sz=" + size + ", used=" + used + ")";
+
+        for (int i = 0; i < STATS_SIZE; i++)
+            if (stats[i] != 0) used++;
+
+        return "TD(sz=" + STATS_SIZE + ",used=" + used + ",misses0=" + misses0 + ",misses1=" + misses1 + ",misses2=" + misses2 + ")";
     }
 }

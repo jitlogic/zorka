@@ -42,6 +42,11 @@ public abstract class TraceHandler {
     public static final int LONG_PENALTY = -1024;
     public static final int ERROR_PENALTY = -256;
 
+    public static final long TUNING_EXCHANGE_CALLS_DEFV = 1048576;
+
+    /** Minimum number of calls required to initiate tuning stats exchange */
+    private static long tuningExchangeMinCalls = TUNING_EXCHANGE_CALLS_DEFV;
+
     public abstract void traceBegin(int traceId, long clock, int flags);
 
     /**
@@ -65,7 +70,8 @@ public abstract class TraceHandler {
 
     protected void tuningProbe(int mid, long tstamp, long ttime) {
 
-        if (tunStats == null || tstamp > tunLastExchange + Tracer.getTuningDefaultExchInterval()) {
+        if (tunStats == null ||
+                (tstamp > tunLastExchange + Tracer.getTuningDefaultExchInterval() && tunCalls > tuningExchangeMinCalls)) {
             tuningExchange(tstamp);
         }
 
@@ -83,7 +89,9 @@ public abstract class TraceHandler {
             TraceDetailStats details = tunStats.getDetails();
 
             if (ttime < LTracer.getMinMethodTime()) {
-                details.markRank(mid, 1);
+                if (!details.markRank(mid, 1)) {
+                    tuningExchange(tstamp);
+                }
             } else if (ttime > Tracer.getTuningLongThreshold()) {
                 details.markRank(mid, LONG_PENALTY);
             }
@@ -131,4 +139,12 @@ public abstract class TraceHandler {
     public abstract void traceEnter(int mid, long tstamp);
 
     public abstract void traceError(Object e, long tstamp);
+
+    public static long getTuningExchangeMinCalls() {
+        return tuningExchangeMinCalls;
+    }
+
+    public static void setTuningExchangeMinCalls(long tuningExchangeMinCalls) {
+        TraceHandler.tuningExchangeMinCalls = tuningExchangeMinCalls;
+    }
 }

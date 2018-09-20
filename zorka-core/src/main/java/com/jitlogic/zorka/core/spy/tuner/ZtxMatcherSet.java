@@ -56,7 +56,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
             "**$$Lambda$**"
     ));
 
-    public ZtxMatcherSet(File ztxDir, File ztxLog, SymbolRegistry registry, boolean initExcl) {
+    public ZtxMatcherSet(File ztxDir, File ztxLog, SymbolRegistry registry, boolean initExcl, boolean scanZtx) {
         cids = new BitVector();
         mids = new BitVector();
 
@@ -77,8 +77,10 @@ public class ZtxMatcherSet implements SpyMatcherSet {
             patternMatcherSet = patternMatcherSet.include(SpyMatcher.fromString("**").forTrace().priority(1000));
         }
 
-        scanZtxDir();
-        scanZtxClasspath();
+        if (scanZtx) {
+            scanZtxDir();
+            scanZtxClasspath();
+        }
 
         log.info("Tracer exclusion packages found: " + ztxs.keySet());
 

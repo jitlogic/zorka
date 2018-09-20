@@ -282,7 +282,8 @@ public class AgentInstance implements ZorkaService {
                     ? new File(config.stringCfg(TRACER_TUNER_XLOG_PROP, null))
                     : new File(ztxDir, TRACER_TUNER_XLOG_DEFV);
 
-            tracerMatcherSet = new ZtxMatcherSet(ztxDir, ztxLog, getSymbolRegistry(), false);
+            tracerMatcherSet = new ZtxMatcherSet(ztxDir, ztxLog, getSymbolRegistry(),
+                    false, config.boolCfg(TRACER_TUNER_ZTX_SCAN_PROP, TRACER_TUNER_ZTX_SCAN_DEFV));
         }
         return tracerMatcherSet;
     }

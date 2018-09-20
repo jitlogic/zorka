@@ -35,6 +35,7 @@ import com.jitlogic.zorka.common.test.support.CommonTestUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.SpyClassLookup;
 import com.jitlogic.zorka.core.spy.lt.LTracer;
+import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.TestSpyRetransformer;
 import org.junit.After;
 import org.junit.Before;
@@ -158,6 +159,8 @@ public class ZorkaFixture extends CommonFixture {
         Tracer.setTuningMode(Tracer.TUNING_OFF);
         Tracer.setTuningLongThreshold(Tracer.TUNING_DEFAULT_LCALL_THRESHOLD);
         Tracer.setTuningDefaultExchInterval(Tracer.TUNING_DEFAULT_EXCH_INTERVAL);
+
+        TraceHandler.setTuningExchangeMinCalls(TraceHandler.TUNING_EXCHANGE_CALLS_DEFV);
     }
 
 
