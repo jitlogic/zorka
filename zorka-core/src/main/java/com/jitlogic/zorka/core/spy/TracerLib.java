@@ -84,7 +84,7 @@ public abstract class TracerLib {
     public void include(String... matchers) {
         for (String matcher : matchers) {
             if (matcher != null) {
-                log.debug("Tracer include: " + matcher);
+                log.info("Tracer include: " + matcher);
                 tracer.include(SpyMatcher.fromString(matcher));
             }
         }
@@ -93,7 +93,7 @@ public abstract class TracerLib {
     public void include(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
             if (matcher != null) {
-                log.debug("Tracer include: " + matcher);
+                log.info("Tracer include: " + matcher);
                 tracer.include(matcher);
             }
         }
@@ -107,7 +107,7 @@ public abstract class TracerLib {
     public void exclude(String... matchers) {
         for (String matcher : matchers) {
             if (matcher != null) {
-                log.debug("Tracer exclude: " + matcher);
+                log.info("Tracer exclude: " + matcher);
                 tracer.include(SpyMatcher.fromString(matcher).exclude());
             }
         }
@@ -116,7 +116,7 @@ public abstract class TracerLib {
     public void exclude(SpyMatcher... matchers) {
         for (SpyMatcher matcher : matchers) {
             if (matcher != null) {
-                log.debug("Tracer exclude: " + matcher);
+                log.info("Tracer exclude: " + matcher);
                 tracer.include((matcher).exclude());
             }
         }
