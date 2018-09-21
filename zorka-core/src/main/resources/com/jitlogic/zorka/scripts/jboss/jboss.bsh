@@ -18,16 +18,11 @@
 // Common JBoss 4/5/6 support functions
 
 zorka.require(
-  "javax.bsh",
   "jsf.bsh",
-  "libs.bsh",
   "audit.bsh",
-  "apache/apache.bsh",
   "apache/catalina.bsh",
-  "jboss/hibernate.bsh",
   "jboss/jbossejb.bsh",
-  "javax/jms.bsh",
-  "jboss/seam.bsh"
+  "javax/jms.bsh"
 );
 
 __jboss() {
@@ -153,104 +148,6 @@ __jboss() {
     .onReturn(spy.fetchArg("THIS", 0), (com.jitlogic.zorka.core.spy.SpyProcessor)__mbsRegister())
     .include(spy.byMethod(0, "org.jboss.naming.NamingService", "startService", null)));
 
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-      tracer.exclude(
-          "250:org.jboss.jms.client.delegate.**",
-
-          // Most of exclusions below are on class basis. This is to avoid blind spots in application server tracing.
-
-          "com.arjuna.ats.**",
-
-          "org.jboss.aop.**",
-
-          "org.jboss.classloader.**",
-          "org.jboss.classloading.spi.vfs.policy.VFSClassLoaderPolic**",
-
-          "org.jboss.ejb3.interceptors.lang.SecurityAct**",
-          "org.jboss.ejb3.interceptors.metadata.**",
-          "org.jboss.ejb3.metadata.plugins.**",
-          "org.jboss.ejb3.security.bridge.**",
-
-          "org.jboss.el.**",      // TODO is this some kind of library ?
-
-          "org.jboss.jmx.adaptor.model.DomainData",
-          "org.jboss.jmx.adaptor.model.MBeanData",
-
-          "org.jboss.logbridge.**",
-          "org.jboss.logging.**",
-          "org.jboss.logmanager.**",
-
-          "org.jboss.metadata.plugins.**",
-          "org.jboss.metadata.spi.**",
-
-          "org.jboss.mx.interceptor.AbstractInterceptor",
-          "org.jboss.mx.interceptor.ModelMBeanInfoInterceptor",
-          "org.jboss.mx.interceptor.StandardMBeanInfoInterceptor",
-          "org.jboss.mx.server.*",
-          "org.jboss.mx.server.registry.BasicMBeanRegistry",
-          "org.jboss.mx.server.registry.MBeanEntry",
-
-          "org.jboss.net.protocol.file.Handler",
-          "org.jboss.net.protocol.file.FileURLConnection",
-
-          "org.jboss.on.embedded.**",
-
-          "org.jboss.resource.adapter.jdbc.*Set",
-          "org.jboss.resource.adapter.jdbc.*Statement",
-          "org.jboss.reflect.**",
-          "org.jboss.resource.connectionmanager.**/checkTransactionActive",
-
-          "org.jboss.serial.**",
-          "org.jboss.slf4j.**",
-
-          "org.jboss.security.**/run",
-
-          "org.jboss.stdio.**",
-
-          "org.jboss.tm.**",
-
-          "org.jboss.vfs.VirtualFile",
-          "org.jboss.vfs.VFSUtils",
-          "org.jboss.vfs.spi.JavaZipFileSystem",
-          "org.jboss.vfs.util.PathTokenizer",
-
-          "org.jboss.virtual.Visitor**",
-          "org.jboss.virtual.plugins.cache.**",
-          "org.jboss.virtual.plugins.context.Abstract**",
-          "org.jboss.virtual.plugins.context.DelegatingHandler",
-          "org.jboss.virtual.plugins.context.DefaultOptions",
-          "org.jboss.virtual.plugins.context.file.FileHandler",
-          "org.jboss.virtual.plugins.context.file.FileSystemContext",
-          "org.jboss.virtual.plugins.context.memory.MemoryContextHandler",
-          "org.jboss.virtual.plugins.context.temp.BasicTempInfo",
-          "org.jboss.virtual.plugins.context.zip.**",
-          "org.jboss.virtual.plugins.registry.VFSRegistry",
-          "org.jboss.virtual.plugins.registry.DefaultVFSRegistry",
-          "org.jboss.virtual.plugins.vfs.VirtualFileURLConnection",
-          "org.jboss.virtual.plugins.vfs.helpers.**",
-          "org.jboss.virtual.spi.cache.VFSCacheFactory",
-          "org.jboss.virtual.spi.registry.VFSRegistry",
-          "org.jboss.virtual.VirtualFile",
-          "org.jboss.virtual.VFSUtils",
-
-          "org.jboss.web.tomcat.service.TomcatInjectionContainer",
-          "org.jboss.web.tomcat.service.injection.WebResourceHandler",
-
-          "org.jboss.util.LRU*",
-          "org.jboss.util.collection.**",
-          "org.jboss.util.WeakObject",
-          "org.jboss.util.TimedCache**",
-
-          "org.jnp.interfaces.FastNamingProperties",
-          "org.jnp.interfaces.NamingParser",
-          "org.jnp.interfaces.NamingContext",
-
-          "org.rhq.core.**",
-
-          "com.arjuna.common.internal.util.logging.**"
-      );
-  }
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

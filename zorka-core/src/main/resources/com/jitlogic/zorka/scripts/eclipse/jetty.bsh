@@ -17,9 +17,7 @@
 
 zorka.require(
   "jvm.bsh",
-  "http.bsh",
-  "javax.bsh",
-  "eclipse/eclipse.bsh"
+  "http.bsh"
 );
 
 __jetty() {
@@ -64,16 +62,6 @@ __jetty() {
       http._tags_chain)
     .include(
       spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "org.eclipse.jetty.util.**",
-      "org.eclipse.jetty.http.Http*",
-      "org.eclipse.jetty.server.Response",
-      "org.eclipse.jetty.server.HttpOutput",
-      "org.eclipse.jetty.webapp.WebAppClassLoader/loadClass"
-    );
-  }
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

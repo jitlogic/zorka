@@ -17,16 +17,9 @@
 
 zorka.require(
   "jvm.bsh",
-  "javax.bsh",
-  "libs.bsh",
   "jsf.bsh",
   "ejb.bsh",
-  "apache/apache.bsh",
-  "eclipse/eclipse.bsh",
   "oracle/grizzly.bsh",
-  "jboss/hibernate.bsh",
-  "jboss/weld.bsh",
-  "google/libs.bsh",
   "oracle/jersey.bsh"
 );
 
@@ -63,22 +56,6 @@ __glassfish() {
           spy.byMethod("com.sun.ejb.containers.EJBHomeInvocationHandler", "invoke")
       ));
 
-  }
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "com.sun.appserv.connectors.internal.**",
-      "com.sun.enterprise.container.**",
-      "com.sun.enterprise.deployment.**",
-      "com.sun.enterprise.loader.ASURLClassL**",
-      "com.sun.enterprise.module.ModuleMetadata",
-      "org.glassfish.hk2.utilities.**",
-      "org.glassfish.jersey.message.internal.**",
-      "org.glassfish.jersey.uri.internal.**",
-      "org.glassfish.jersey.internal.util.**",
-      "org.glassfish.web.deployment.descriptor.**",
-      "org.jvnet.hk2.**"
-    );
   }
 
   if (zorka.boolCfg("zabbix.active")) {

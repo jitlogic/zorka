@@ -17,8 +17,7 @@
 
 zorka.require(
   "http.bsh",
-  "audit.bsh",
-  "apache/apache.bsh"
+  "audit.bsh"
 );
 
 __catalina() {
@@ -199,28 +198,6 @@ __catalina() {
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");
     zabbix.tagMetadata("CATALINA");
-  }
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-        "org.apache.tomcat.util.**",
-        "org.apache.catalina.security.**",
-        "org.apache.catalina.core.ApplicationCont**",
-        "org.apache.catalina.core.ContainerBase/fireContainerEvent",
-        "org.apache.catalina.core.StandardWrap**",
-        "org.apache.catalina.core.StandardContext",
-        "org.apache.catalina.connector.**", // TODO but this is sometimes useful for resolving connectivity problems
-        "org.apache.catalina.deploy.Security**",
-        "org.apache.catalina.loader.WebappClassLoaderBase/*",
-        "org.apache.catalina.session.StandardSession",
-        "org.apache.catalina.session.StandardSessionFacade",
-        "org.apache.catalina.util.**",
-        "org.apache.catalina.webresources.StandardRoot/getClassLoaderResource",
-        "org.apache.coyote.Request",
-        "org.apache.coyote.Response",
-        "org.apache.catalina.core.ApplicationHttpRequest",
-        "org.apache.catalina.loader.WebappClassLoader"
-    );
   }
 
   return this;

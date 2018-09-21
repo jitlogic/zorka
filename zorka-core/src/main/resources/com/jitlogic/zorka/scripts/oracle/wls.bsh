@@ -20,15 +20,8 @@ zorka.require(
   "jvm.bsh",
   "jsf.bsh",
   "http.bsh",
-  "javax.bsh",
-  "libs.bsh",
   "javax/jms.bsh",
-  "apache/apache.bsh",
-  "apache/cxf.bsh",
-  "eclipse/eclipse.bsh",
-  "google/libs.bsh",
-  "jboss/hibernate.bsh",
-  "jboss/weld.bsh"
+  "apache/cxf.bsh"
 );
 
 __wls() {
@@ -105,58 +98,6 @@ __wls() {
           spy.byMethod(0, "weblogic.ejb.container.internal.SessionLocalMethodInvoker", "invoke", null),
           spy.byMethod(0, "weblogic.ejb.container.internal.SessionRemoteMethodInvoker", "invoke", null)
       ));
-
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "com.bea.console.handles.**",
-      "com.bea.jsptools.**",
-      "com.bea.netuix.**",
-      "com.bea.p13n.util.**",
-      "com.bea.portlet.adapter.NetuiActionHandler",
-      "com.bea.portlet.GenericURL",
-      "com.bea.staxb.**",
-      "com.bea.xbean.**",
-      "com.bea.xml.**",
-
-      "com.octetstring.**",
-
-      "com.oracle.injection.**",
-
-      "oracle.net.ns.NetInputStream",
-
-      "weblogic.application.ApplicationAcc**",
-      "weblogic.application.descriptor.ReaderEvent2",
-      "weblogic.application.io.DescriptorFinder",
-      "weblogic.application.io.ManifestFinder",
-      "weblogic.application.utils.**",
-      "weblogic.common.internal.PackageInfo",
-      "weblogic.diagnostics.debug.**",
-      "weblogic.diagnostics.instrumentation.**",
-      "weblogic.j2ee.ApplicationManager/loadClass",
-      "weblogic.i18ntools.**",
-      "weblogic.jdbc.wrapper.**",
-      "weblogic.jsp.**",
-      "weblogic.kernel.FinalThread**",
-      "weblogic.kernel.ResettableThread**",
-      "weblogic.kernel.ThreadLocalStack",
-      "weblogic.management.**",
-      "weblogic.rmi.extensions.server.CBV**",
-      "weblogic.rmi.internal.**",
-      "weblogic.rmi.utils.io.RemoteObjectReplacer",
-      "weblogic.security.**",
-      "weblogic.servlet.internal.**",
-      "weblogic.servlet.jsp.**",
-      "weblogic.servlet.spi.WebServerRegistry/isProductionMode",
-      "weblogic.servlet.utils.**",
-      "weblogic.transaction.internal.TransactionManagerImpl/getTransactionManager",
-      "weblogic.transaction.TransactionHelp**/get*",
-      "weblogic.utils.**",
-      "weblogic.validation.**",
-      "weblogic.work.ExecuteThread",
-      "weblogic.xml.**"
-    );
-  }
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

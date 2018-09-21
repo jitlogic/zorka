@@ -18,18 +18,12 @@
 
 zorka.require(
   "ejb.bsh",
-  "javax.bsh",
   "jsf.bsh",
-  "libs.bsh",
   "audit.bsh",
   "javax/jms.bsh",
   "apache/catalina.bsh",
-  "apache/apache.bsh",
   "apache/cxf.bsh",
-  "google/libs.bsh",
-  "jboss/hibernate.bsh",
   "jboss/undertow.bsh",
-  "jboss/weld.bsh",
   "jdbc/h2.bsh"
 );
 
@@ -301,14 +295,7 @@ __jboss7() {
 
 
   if (zorka.boolCfg("tracer")) {
-      tracer.exclude(
-          "100:org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate",
-          "org.jboss.modules.**",
-          "org.jboss.logging.**",
-          "org.jboss.logmanager.**",
-          "org.jboss.as.weld.webtier.jsf.**",
-          "org.jboss.vfs.**",
-          "org.jboss.modules.ConcurrentClassLoader");
+      tracer.exclude("100:org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate");
   }
 
 

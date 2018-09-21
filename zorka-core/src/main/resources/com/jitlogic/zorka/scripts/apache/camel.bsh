@@ -17,10 +17,7 @@
 
 // This file contains agent configurations for various unqualified libraries
 
-zorka.require(
-  "tracer.bsh",
-  "apache/apache.bsh"
-);
+zorka.require("tracer.bsh");
 
 
 __apache_camel() {

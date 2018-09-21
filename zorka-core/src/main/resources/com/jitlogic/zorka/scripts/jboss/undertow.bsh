@@ -16,8 +16,7 @@
  */
 
 zorka.require(
-  "http.bsh",
-  "jboss/jbosslibs.bsh"
+  "http.bsh"
 );
 
 __undertow() {
@@ -210,11 +209,6 @@ __undertow() {
         http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
         http._tags_chain)
       .include(spy.byMethod(0, "io.undertow.server.Connectors", "executeRootHandler", null)));
-
-
-  tracer.exclude(
-    "io.undertow.util.**"
-  );
 
 
   return this;

@@ -16,10 +16,8 @@
  */
 
 zorka.require(
-  "libs.bsh",
   "tracer.bsh",
-  "audit.bsh",
-  "apache/apache.bsh"
+  "audit.bsh"
 );
 
 __spring() {
@@ -151,50 +149,6 @@ __spring() {
   }
 
   http_client = __http_client();
-
-  // Tracer tuning
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "net.sf.acegisecurity.vote.RoleVoter",
-      "org.springframework.aop.**",
-      "org.springframework.asm.**",
-      "org.springframework.beans.**",
-      "org.springframework.binding.**",
-      "org.springframework.core.**",
-      "org.springframework.context.**",
-      "org.springframework.expression.**",
-      "org.springframework.extensions.config.DefaultLookupAlgorithm/process",
-      "org.springframework.extensions.config.element.ConfigElementAdapter/getAttribute",
-      "org.springframework.extensions.config.evaluator.StringEvaluator/applies",
-      "org.springframework.extensions.surf.DependencyHandle/loadInputStream",
-      "org.springframework.extensions.surf.DojoDependencyHandler",
-      "org.springframework.extensions.surf.ModelHelper/isModelProperty",
-      "org.springframework.extensions.surf.support.AbstractRequestContext/getValue",
-      "org.springframework.extensions.surf.types.AbstractModelObject/removeModelProperty",
-      "org.springframework.extensions.surf.util.Base6**",
-      "org.springframework.extensions.surf.util.I18NUtil/getMessage",
-      "org.springframework.extensions.surf.util.ParameterCheck",
-      "org.springframework.extensions.surf.util.StringBuilderWriter",
-      "org.springframework.extensions.surf.util.XMLUtil",
-      "org.springframework.extensions.webscripts.processor.JSScriptProcess**",
-      "org.springframework.extensions.webscripts.NativeMap",
-      "org.springframework.extensions.webscripts.UriTemplate/match",
-      "org.springframework.extensions.webscripts.json.JSONWriter",
-      "org.springframework.extensions.webscripts.json.JSONUtils",
-      "org.springframework.jdbc.core.ColumnMapRowMapper/mapRow",
-      "org.springframework.jdbc.support.JdbcUtils",
-      "org.springframework.orm.**",
-      "org.springframework.transaction.support.TransactionS**",
-      "org.springframework.transaction.support.TransactionSynchronizationUtil**",
-      "org.springframework.util.**",
-      "org.springframework.web.context.**",
-      "org.springframework.web.servlet.**",
-      "org.springframework.web.util.**",
-      "org.springframework.webflow.core.**",
-      "org.springframework.webflow.engine.**"
-    );
-  }
-
 
   return this;
 }

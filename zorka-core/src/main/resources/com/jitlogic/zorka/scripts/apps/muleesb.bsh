@@ -17,10 +17,7 @@
 
 zorka.require(
   "jvm.bsh",
-  "javax.bsh",
-  "libs.bsh",
   "tracer.bsh",
-  "apache/apache.bsh",
   "apache/cxf.bsh",
   "spring.bsh"
 );
@@ -179,19 +176,6 @@ __muleesb() {
 
     // org.mule.execution.EndProcessPhase
     // org.mule.execution.ValidationPhase
-
-    if (zorka.boolCfg("tracer.exclude.compat")) {
-        tracer.exclude(
-            "org.mule.DefaultMuleMessage",
-            "org.mule.api.transport.PropertyScope$ScopeComparator",
-            "org.mule.MessagePropertiesContext",
-            "org.mule.el.**",
-            "org.mule.launcher.FineGrainedControlClassLoader",
-            "org.mule.context.notification.ServerNotificationManager/isNotificationEnabled",
-            "org.mule.module.logging.**",
-            "org.mule.util.annotation.**"
-        );
-    }
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

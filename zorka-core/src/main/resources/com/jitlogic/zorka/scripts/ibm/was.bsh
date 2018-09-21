@@ -20,13 +20,8 @@ zorka.require(
   "jsf.bsh",
   "ejb.bsh",
   "http.bsh",
-  "javax.bsh",
-  "libs.bsh",
-  "ibm/ibm.bsh"
   "javax/jms.bsh",
-  "apache/apache.bsh",
-  "apache/cxf.bsh",
-  "eclipse/eclipse.bsh"
+  "apache/cxf.bsh"
 );
 
 __was() {
@@ -248,14 +243,6 @@ __was() {
   }
 
   // Tracer tuning
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "com.ibm.websphere.models.config.**",
-      "com.ibm.websphere.pmi.**",
-      "com.ibm.websphere.resource.**"
-    );
-  }
 
   return this;
 }

@@ -16,7 +16,7 @@
  */
 
 
-zorka.require("soap.bsh", "rest.bsh", "apache/apache.bsh");
+zorka.require("soap.bsh", "rest.bsh");
 
 __cxf() {
 
@@ -301,18 +301,6 @@ __cxf() {
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");
     zabbix.tagMetadata("CXF");
-  }
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "org.apache.cxf.bus.extension.Extension",
-      "org.apache.cxf.common.logging.**",
-      "org.apache.cxf.message.MessageImpl",
-      "org.apache.cxf.message.StringMapImpl",
-      "org.apache.cxf.helpers.HttpHeaderHelper",
-      "org.apache.cxf.phase.Phase",
-      "org.apache.cxf.common.util.**"
-    );
   }
 
   return this;

@@ -16,7 +16,6 @@
  */
 
 zorka.require(
-  "libs.bsh",
   "tracer.bsh",
   "audit.bsh"
 );

@@ -17,20 +17,7 @@
 
 // This file contains instrumentation definitions for Apache httpclient library.
 
-zorka.require(
-  "tracer.bsh",
-  "apache/apache.bsh"
-);
-
-// Tracer tuning
-if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-        "org.apache.commons.httpclient.**",
-        "org.apache.http.impl.client.**",
-        "org.apache.http.message.TokenParser",
-        "org.apache.http.util.Args"
-    );
-}
+zorka.require("tracer.bsh");
 
 
 __apache_httpclient() {

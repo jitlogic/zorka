@@ -21,14 +21,6 @@ zorka.require(
   "tracer.bsh"
 );
 
-// Tracer tuning
-if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-        "org.codehaus.groovy.**",
-        "groovy**"
-    );
-}
-
 if (zorka.boolCfg("zabbix.active")) {
   zorka.require("zabbix.bsh");
   zabbix.tagMetadata("GROOVY");

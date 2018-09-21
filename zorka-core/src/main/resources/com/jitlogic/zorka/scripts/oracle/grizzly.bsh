@@ -61,21 +61,6 @@ __grizzly() {
         http._tags_chain)
       .include(spy.byMethod(0, "org.glassfish.grizzly.http.server.HttpHandler", "doHandle", "boolean")));
 
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "org.apache.catalina.connector.Request",
-      "org.apache.catalina.connector.RequestFacade",
-      "org.apache.catalina.connector.Response",
-      "org.apache.catalina.connector.ResponseFacade",
-      "org.apache.catalina.core.ApplicationCont**",
-      "org.apache.catalina.session.StandardSession",
-      "org.apache.catalina.session.StandardSessionFacade",
-      "org.apache.catalina.util.**",
-      "org.glassfish.grizzly.http.HttpRequestPacket",
-      "org.glassfish.grizzly.http.util.**"
-    );
-  }
-
   return this;
 }
 

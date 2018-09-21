@@ -17,15 +17,10 @@
 
 zorka.require(
   "jvm.bsh",
-  "javax.bsh",
-  "libs.bsh",
   "tracer.bsh",
   "apache/axis2.bsh",
   "apache/tomcat.bsh",
-  "apache/apache.bsh",
-  "apache/cxf.bsh",
-  "eclipse/eclipse.bsh",
-  "wso2/carbon.bsh"
+  "apache/cxf.bsh"
 );
 
 if (zorka.boolCfg("zabbix.active")) {

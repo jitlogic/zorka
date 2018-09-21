@@ -23,29 +23,6 @@ zorka.require(
 
 __axis2() {
 
-    // Tracer tuning
-    if (zorka.boolCfg("tracer.exclude.compat")) {
-        tracer.exclude(
-            "org.apache.axis2.client.Options",
-            "org.apache.axis2.context.AbstractContext",
-            "org.apache.axis2.context.ConfigurationContext",
-            "org.apache.axis2.context.MessageContext",
-            "org.apache.axis2.databinding.utils.reader.**",
-            "org.apache.axis2.engine.AxisConfiguration",
-            "org.apache.axis2.engine.Handler$InvocationResponse",
-            "org.apache.axis2.engine.Phase",
-            "org.apache.axis2.description.**",
-            "org.apache.axis2.deployment.util.**",
-            "org.apache.axis2.handlers.AbstractHandler",
-            "org.apache.axis2.phaseresolver.PhaseHolder",
-            "org.apache.axis2.phaseresolver.PhaseResolver",
-            "org.apache.axis2.databinding.typemapping.**",
-            "org.apache.axis2.wsdl.**",
-            "org.apache.axis2.util.**"
-        );
-    }
-
-
     spy.add(spy.instrument("AXIS2_SERVER_INVOKE")
       .onEnter(spy.fetchArg("CTX", 0),
         soap._trace ? tracer.begin("SOAP", soap._time) : null)

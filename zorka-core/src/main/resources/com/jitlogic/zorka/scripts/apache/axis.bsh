@@ -16,8 +16,7 @@
  */
 
 zorka.require(
-  "soap.bsh",
-  "apache/apache.bsh"
+  "soap.bsh"
 );
 
 __axis() {
@@ -158,14 +157,6 @@ __axis() {
       .include(spy.byMethod(0, "org.apache.axis.transport.jms.JMSSender", "invoke", "void",
         "org.apache.axis.MessageContext")));
 
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "org.apache.axis.utils.**",
-      "org.apache.axis.encoding.**",
-      "org.apache.axis.message.**"
-    );
-  }
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

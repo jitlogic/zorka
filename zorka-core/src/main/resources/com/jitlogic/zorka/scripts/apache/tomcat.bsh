@@ -17,11 +17,7 @@
 
 zorka.require(
   "jvm.bsh",
-  "javax.bsh",
-  "libs.bsh",
-  "apache/apache.bsh",
-  "apache/catalina.bsh",
-  "eclipse/eclipse.bsh"
+  "apache/catalina.bsh"
 );
 
 __tomcat() {
@@ -96,12 +92,6 @@ __tomcat() {
   }
 
   jsp = __jsp();
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "org.apache.tomcat.jdbc.pool.**"
-    );
-  }
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");

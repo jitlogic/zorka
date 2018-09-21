@@ -17,7 +17,10 @@
 
 // This file contains agent configurations for a variety of Apache libraries
 
-zorka.require("jvm.bsh", "tracer.bsh", "apache/apache.bsh", "eclipse/jetty.bsh");
+zorka.require(
+  "jvm.bsh",
+  "tracer.bsh",
+  "eclipse/jetty.bsh");
 
 
 __activemq() {

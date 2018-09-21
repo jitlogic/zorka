@@ -66,40 +66,6 @@ __jvm() {
     perfmon.cpuHiccup("java", mbean, "CPU", 10, 30000).start();
   } // hiccup = yes
 
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-      tracer.exclude(
-          "com.sun.crypto.provider.SunJ**",
-          "com.sun.java_cup.**",
-          "com.sun.jndi.ldap.Ber*",
-          "com.sun.jmx.**",
-          "com.sun.org.apache.**",
-          "com.sun.proxy.**",
-          "com.sun.tools.javac.**",
-          "com.sun.xml.**",
-          "javax.management.**",
-          "jdk.internal.org.objectweb.asm.**",
-          "sun.dc.pr.**",
-          "sun.font.**",
-          "sun.java2d.**",
-          "com.sun.media.imageioimpl.**",
-          "sun.invoke.util.**",
-          "sun.misc.CharacterDecoder",
-          "sun.misc.FDBigInteger",
-          "sun.misc.FpUtils",
-          "sun.misc.IOUtils",
-          "sun.misc.URLClassPat*",
-          "sun.net.www.http.ChunkedInputStream",
-          "sun.net.www.MeteredStream",
-          "sun.net.www.protocol.http.HttpURLConnection$HttpInputStream",
-          "sun.nio.cs.**",
-          "sun.security.provider.**",
-          "sun.util.ResourceBundleEnumeration",
-          "sun.util.logging.**",
-          "sun.security.**",
-          "sun.text.**"
-      );
-  }
-
   if (zorka.boolCfg("nagios", false)) {
 
     // Monitor memory pools

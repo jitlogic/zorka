@@ -20,11 +20,8 @@
  */
 
 zorka.require(
-  "javax.bsh",
   "ldap.bsh",
   "tracer.bsh",
-  "libs.bsh",
-  "jboss/hibernate.bsh",
   "spring.bsh"
 );
 
@@ -261,13 +258,6 @@ __cas() {
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");
     zabbix.tagMetadata("JASIG_CAS");
-  }
-
-  if (zorka.boolCfg("tracer.exclude.compat")) {
-    tracer.exclude(
-      "org.jasig.cas.aspect.LogAspect",
-      "com.github.inspektr.**"
-    );
   }
 
   return this;
