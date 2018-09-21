@@ -36,9 +36,14 @@ public class AgentConfigProps {
     public static final String TRACER_PROP = "tracer";
     public static final boolean TRACER_DEFV = false;
 
+    /** When set to true, chunks can be sent even if trace is incomplete.
+        When false, chunks will always be grouped together. */
+    public static final String TRACER_STREAMING_CHUNKED_PROP = "tracer.streaming.chunked";
+    public static final boolean TRACER_STREAMING_CHUNKED_DEFV = false;
+
     /** Enables or disables tracer tuner. */
     public static final String TRACER_TUNER_PROP = "tracer.tuner";
-    public static final boolean TRACER_TUNER_DEFV = false;
+    public static final boolean TRACER_TUNER_DEFV = true;
 
     /** Enables or disables automatic reinstrumentation of tracer classes. */
     public static final String TRACER_TUNER_AUTO_PROP = "tracer.tuner.auto";
@@ -62,11 +67,11 @@ public class AgentConfigProps {
 
     /** Minimum number of calls that will qualify method for exclusion. */
     public static final String TRACER_TUNER_MIN_RANK_PROP = "tracer.tuner.min.rank";
-    public static final long TRACER_TUNER_MIN_RANK_DEFV = 20000L;
+    public static final long TRACER_TUNER_MIN_RANK_DEFV = 10000L;
 
     /** Minimum number of calls registered by tracer (globally) that will trigger reinstrumentation. */
     public static final String TRACER_TUNER_MIN_CALLS_PROP = "tracer.tuner.min.calls";
-    public static final long TRACER_TUNER_MIN_CALLS_DEFV = 4000000L;
+    public static final long TRACER_TUNER_MIN_CALLS_DEFV = 1000000L;
 
     /** Tracer tuner queue length. */
     public static final String TRACER_TUNER_QLEN_PROP = "tracer.tuner.qlen";

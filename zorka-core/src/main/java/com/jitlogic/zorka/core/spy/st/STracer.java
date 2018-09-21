@@ -25,6 +25,9 @@ import com.jitlogic.zorka.core.spy.lt.TraceHandler;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import com.jitlogic.zorka.core.spy.tuner.ZtxMatcherSet;
 
+import static com.jitlogic.zorka.core.AgentConfigProps.TRACER_STREAMING_CHUNKED_DEFV;
+import static com.jitlogic.zorka.core.AgentConfigProps.TRACER_STREAMING_CHUNKED_PROP;
+
 /**
  * Groups all tracer engine components and global settings.
  *
@@ -53,7 +56,7 @@ public class STracer extends Tracer {
 
     public STracer(ZorkaConfig config, ZtxMatcherSet matcherSet, SymbolRegistry symbolRegistry, TracerTuner tuner, STraceBufManager bufManager) {
         super(matcherSet, symbolRegistry, tuner);
-        this.streamingEnabled = config.boolCfg("tracer.streaming.enabled", false);
+        this.streamingEnabled = config.boolCfg(TRACER_STREAMING_CHUNKED_PROP, TRACER_STREAMING_CHUNKED_DEFV);
         this.symbolRegistry = symbolRegistry;
         this.bufManager = bufManager;
     }
