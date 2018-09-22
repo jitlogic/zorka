@@ -82,29 +82,6 @@ org.jboss.msc.service
   iterator|()Ljava/util/Iterator;
  IdentityHashSet$IdentityHashSetIterator
   next|()Ljava/lang/Object;
-org.jboss.resteasy.core
- MethodInjectorImpl
-  invoke|(Lorg/jboss/resteasy/spi/HttpRequest;Lorg/jboss/resteasy/spi/HttpResponse;Ljava/lang/Object;)Ljava/lang/Object;
- ResourceMethodInvoker
-  invoke
-   (Lorg/jboss/resteasy/spi/HttpRequest;Lorg/jboss/resteasy/spi/HttpResponse;)Lorg/jboss/resteasy/specimpl/BuiltResponse;
-   (Lorg/jboss/resteasy/spi/HttpRequest;Lorg/jboss/resteasy/spi/HttpResponse;Ljava/lang/Object;)Lorg/jboss/resteasy/specimpl/BuiltResponse;
- SynchronousDispatcher
-  invoke
-   (Lorg/jboss/resteasy/spi/HttpRequest;Lorg/jboss/resteasy/spi/HttpResponse;)V
-   (Lorg/jboss/resteasy/spi/HttpRequest;Lorg/jboss/resteasy/spi/HttpResponse;Lorg/jboss/resteasy/core/ResourceInvoker;)V
-org.jboss.resteasy.core.interception|AbstractWriterInterceptorContext|proceed|()V
-org.jboss.resteasy.plugins.server.servlet
- HttpServletDispatcher
-  service|(Ljava/lang/String;Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V
- HttpServletResponseWrapper$DeferredOutputStream
-  write|([BII)V
- ServletContainerDispatcher
-  service|(Ljava/lang/String;Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Z)V
-org.jboss.resteasy.util
- CommitHeaderOutputStream
-  commit|()V
-  write|([BII)V
 org.jboss.weld.annotated.enhanced.jlr|AbstractEnhancedAnnotated|isAnnotationPresent|(Ljava/lang/Class;)Z
 org.jboss.weld.bootstrap.api.helpers|SimpleServiceRegistry|get|(Ljava/lang/Class;)Lorg/jboss/weld/bootstrap/api/Service;
 org.jboss.weld.executor|IterativeWorkerTaskFactory$1|call|()Ljava/lang/Void;

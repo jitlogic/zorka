@@ -109,7 +109,7 @@ public abstract class TraceHandler {
                     tuningExchange(tstamp);
                 }
             } else if (ttime > tuningLongThreshold) {
-                tunStats.markRank(mid, (int)(ttime >>> 18));
+                tunStats.markRank(mid, -1 * (int)(ttime >>> 18));
             }
 
         }

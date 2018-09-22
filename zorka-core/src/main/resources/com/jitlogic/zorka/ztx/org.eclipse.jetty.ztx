@@ -4,15 +4,7 @@ org.eclipse.jetty.server
  Response
   isAllContentWritten|(J)Z
 org.eclipse.jetty.servlet
- ServletHandler
-  doHandle|(Ljava/lang/String;Lorg/eclipse/jetty/server/Request;Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;)V
- ServletHandler$CachedChain
-  doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
- ServletHolder
-  handle|(Lorg/eclipse/jetty/server/Request;Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
 org.eclipse.jetty.util
- BlockingArrayQueue
-  poll|(JLjava/util/concurrent/TimeUnit;)Ljava/lang/Object;
  BufferUtil
   fill|(Ljava/nio/ByteBuffer;[BII)I
   flipToFill|(Ljava/nio/ByteBuffer;)I
@@ -21,8 +13,3 @@ org.eclipse.jetty.util
   isEmpty|(Ljava/nio/ByteBuffer;)Z
   isFull|(Ljava/nio/ByteBuffer;)Z
   length|(Ljava/nio/ByteBuffer;)I
-org.eclipse.jetty.util.thread
- SpinLock
-  lock|()Lorg/eclipse/jetty/util/thread/SpinLock$Lock;
- SpinLock$Lock
-  close|()V
