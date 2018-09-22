@@ -119,8 +119,8 @@ public class SymbolRegistry {
             String className = symbolName(cms[0]);
             int ix = className.lastIndexOf('.');
             if (ix > 0) {
-                pkgName = className.substring(0, ix-1);
-                className = className.substring(ix);
+                pkgName = className.substring(0, ix);
+                className = className.substring(ix+1);
             }
             return pkgName + "|" + className + "|" +  symbolName(cms[1]) + "|" + symbolName(cms[2]);
         }

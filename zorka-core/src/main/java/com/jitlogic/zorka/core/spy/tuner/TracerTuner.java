@@ -261,14 +261,14 @@ public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
         StringBuilder sb = new StringBuilder();
 
         sb.append(String.format("Status: interval=%dms summary_calls=%d%n", interval/1000000, lastCalls));
-        sb.append("Method call ranks (first 100 entries).\n");
+        sb.append("Method call ranks (first 32 entries).\n");
 
         List<RankItem> lst = rankList;
 
         if (lst != null && !lst.isEmpty()) {
-            for (int i = 0; i < Math.min(lst.size(), 100); i++) {
+            for (int i = 0; i < Math.min(lst.size(), 32); i++) {
                 RankItem itm = lst.get(i);
-                sb.append(registry.methodXDesc(itm.getMid()));
+                sb.append(String.format("%d: R=%d %s%n", i, itm.getRank(), registry.methodXDesc(itm.getMid())));
             }
         } else {
             sb.append("N/A");
