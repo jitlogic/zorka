@@ -47,6 +47,7 @@ if (zorka.boolCfg("tracer")) {
 
   tracer.exclude("100:com.jitlogic.zorka.**");
   tracer.exclude("java.**", "sun.reflect.**", "sun.awt.**", "com.sun.beans.**", "$Proxy*", "**$$Lambda$**");
+  tracer.exclude("com.sun.proxy.$Proxy*");
   tracer.include(spy.byClass("**").forTrace().priority(1000));
 
 
@@ -142,7 +143,7 @@ if (zorka.boolCfg("tracer")) {
     tracer.setDefaultTraceFlags(zfl);
   }
 
-  if (zorka.boolCfg("tracer.tuner", false)) {
+  if (zorka.boolCfg("tracer.tuner", true)) {
     zorka.logInfo("Enabling tracer tuner ...");
     tracer.setTuningEnabled(true);
   }

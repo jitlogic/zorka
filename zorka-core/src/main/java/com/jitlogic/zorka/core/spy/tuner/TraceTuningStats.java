@@ -24,8 +24,8 @@ public class TraceTuningStats {
 
     public static final long MID_MASK = 0x00000000FFFFFFFFL;
 
-    public static final long XCL_MIN1 = 8;
-    public static final long XCL_MIN2 = 32;
+    public static final long XCL_MIN1 = 6;
+    public static final long XCL_MIN2 = 24;
 
     public static final int IMAX = 24;
 
@@ -115,8 +115,8 @@ public class TraceTuningStats {
         for (int i = 0; i < STATS_SIZE; i++)
             if (stats[i] != 0) used++;
 
-        return "TS: " + "tid=" + threadId + " calls=" + calls + "size=" + STATS_SIZE + " used=" + used +
-                " misses0=" + misses0 + " misses1=" + misses1 + " misses2=" + misses2 + ")";
+        return "TS: " + "tid=" + threadId + " calls=" + calls + " size=" + STATS_SIZE + " used=" + used +
+                " misses.0=" + misses0 + " misses.1=" + misses1 + " misses.2=" + misses2 + ")";
     }
 
     public long getThreadId() {

@@ -180,7 +180,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
     }
 
     private synchronized void loadZtx(String path) {
-        log.info("Loading tracer exclusions: " + path);
+        log.info("Loading: " + path);
         InputStream is = null;
         try {
             if (path.startsWith("file:")) {

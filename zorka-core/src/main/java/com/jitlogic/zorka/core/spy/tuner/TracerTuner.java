@@ -110,8 +110,8 @@ public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
         clearStats();
 
 
-        if (log.isTraceEnabled()) {
-            log.trace("Tuner status (before exclusion): " + getStatus());
+        if (log.isDebugEnabled()) {
+            log.debug("Tuner status (before exclusion): " + getStatus());
         }
 
         log.debug("auto=" + auto + ", lastCalls=" + lastCalls + ", minTotalCalls=" + minTotalCalls);
@@ -260,15 +260,15 @@ public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
     public String getStatus() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format("Status: interval=%dms calls=%d%n", interval/1000000, lastCalls));
-        sb.append("--------------------------------------------------\n");
+        sb.append(String.format("Status: interval=%dms summary_calls=%d%n", interval/1000000, lastCalls));
+        sb.append("Method call ranks (first 100 entries).\n");
 
         List<RankItem> lst = rankList;
 
         if (lst != null && !lst.isEmpty()) {
-            for (int i = 0; i < lst.size(); i++) {
+            for (int i = 0; i < Math.min(lst.size(), 100); i++) {
                 RankItem itm = lst.get(i);
-                sb.append(String.format("%d: R=%d %s%n", i, itm.getRank(), registry.getMethod(itm.getMid())));
+                sb.append(registry.methodXDesc(itm.getMid()));
             }
         } else {
             sb.append("N/A");

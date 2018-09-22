@@ -23,7 +23,7 @@ zorka.require(
   "apache/camel.bsh",
   "lang/groovy.bsh",
   "libs/quartz.bsh",
-  "apache/httpclient.bsh",
+  "apache/httpclient.bsh"
 );
 
 

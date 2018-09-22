@@ -296,69 +296,6 @@ com.sun.org.apache.xerces.internal.xni
 com.sun.org.apache.xml.internal.dtm.ref.sax2dtm|SAX2DTM2|_exptype2|(I)I
 com.sun.org.apache.xml.internal.serializer|WriterToUTF8Buffered|write|(I)V
 com.sun.org.apache.xpath.internal.compiler|OpMapVector|elementAt|(I)I
-com.sun.proxy
- $Proxy1
-  annotationType|()Ljava/lang/Class;
- $Proxy10
-  value|()Ljava/lang/String;
- $Proxy108
-  annotationType|()Ljava/lang/Class;
- $Proxy12
-  annotationType|()Ljava/lang/Class;
-  name|()Ljava/lang/String;
-  type|()Ljava/lang/Class;
- $Proxy16
-  getQName
-   (Ljava/lang/Long;)Lorg/alfresco/util/Pair;
-   (Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/util/Pair;
- $Proxy20
-  exists|(Lorg/alfresco/service/cmr/repository/NodeRef;)Z
-  getAspects|(Lorg/alfresco/service/cmr/repository/NodeRef;)Ljava/util/Set;
-  getProperty|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Ljava/io/Serializable;
-  getType|(Lorg/alfresco/service/cmr/repository/NodeRef;)Lorg/alfresco/service/namespace/QName;
-  hasAspect|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Z
- $Proxy23
-  getClassNameId|(Ljava/lang/Class;)J
- $Proxy26
-  annotationType|()Ljava/lang/Class;
- $Proxy29
-  annotationType|()Ljava/lang/Class;
- $Proxy3
-  annotationType|()Ljava/lang/Class;
- $Proxy30
-  annotationType|()Ljava/lang/Class;
- $Proxy31
-  annotationType|()Ljava/lang/Class;
- $Proxy311
-  annotationType|()Ljava/lang/Class;
-  scope|()Lcom/liferay/portal/kernel/cache/Lifecycle;
- $Proxy3269
-  annotationType|()Ljava/lang/Class;
- $Proxy3271
-  annotationType|()Ljava/lang/Class;
- $Proxy34
-  getGroup|(J)Lcom/liferay/portal/model/Group;
- $Proxy39
-  annotationType|()Ljava/lang/Class;
- $Proxy4
-  annotationType|()Ljava/lang/Class;
- $Proxy41
-  hasAspect|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Z
- $Proxy56
-  annotationType|()Ljava/lang/Class;
- $Proxy57
-  annotationType|()Ljava/lang/Class;
- $Proxy5700
-  annotationType|()Ljava/lang/Class;
- $Proxy64
-  defaultValue|()Ljava/lang/String;
-  name|()Ljava/lang/String;
-  required|()Z
-  value|()Ljava/lang/String;
- $Proxy65
-  annotationType|()Ljava/lang/Class;
- $Proxy9
-  annotationType|()Ljava/lang/Class;
 com.sun.xml.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
 com.sun.xml.internal.bind|WhiteSpaceProcessor|isWhiteSpace|(Ljava/lang/CharSequence;)Z
 com.sun.xml.internal.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/internal/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
