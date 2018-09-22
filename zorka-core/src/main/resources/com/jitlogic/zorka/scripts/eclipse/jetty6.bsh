@@ -17,7 +17,7 @@
 
 zorka.require(
   "jvm.bsh",
-  "http.bsh",
+  "http.bsh"
 );
 
 __jetty6() {
