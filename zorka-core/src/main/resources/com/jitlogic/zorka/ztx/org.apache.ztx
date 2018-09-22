@@ -261,6 +261,10 @@ org.apache.fontbox.cmap
   parse|(Ljava/lang/String;Ljava/io/InputStream;)Lorg/apache/fontbox/cmap/CMap;
  CodespaceRange
   isInRange|([BII)Z
+org.apache.geronimo.connector.outbound|AbstractConnectionManager|doStart|()V
+org.apache.geronimo.console.filter|ResponseOutputStream|write|(I)V
+org.apache.geronimo.gbean|AbstractNameQuery|matches|(Lorg/apache/geronimo/gbean/AbstractName;Ljava/util/Set;)Z
+org.apache.geronimo.kernel.repository|Artifact|compareTo|(Ljava/lang/Object;)I
 org.apache.http.impl.io
  ContentLengthOutputStream
   write|([BII)V
@@ -433,6 +437,7 @@ org.apache.jasper.runtime
   print|(Ljava/lang/String;)V
   write
    (I)V
+   (Ljava/lang/String;)V
    (Ljava/lang/String;II)V
  PageContextImpl
   findAttribute|(Ljava/lang/String;)Ljava/lang/Object;
@@ -502,6 +507,7 @@ org.apache.openjpa.meta
   getFullName|(Z)Ljava/lang/String;
 org.apache.openjpa.persistence|AnnotationPersistenceMetaDataParser$MethodComparator|compare|(Ljava/lang/Object;Ljava/lang/Object;)I
 org.apache.oro.util|CacheLRU|getElement|(Ljava/lang/Object;)Ljava/lang/Object;
+org.apache.pluto.util|StringUtils|replace|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
 org.apache.solr.common.util
  FastInputStream
   readByte|()B

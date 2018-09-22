@@ -1,3 +1,4 @@
+com.ibm.crypto.provider|SHA|init|()V
 com.ibm.icu.impl
  CharTrie
   getCodePointValue|(I)C

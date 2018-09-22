@@ -6,15 +6,57 @@ net.sf.cglib.asm
  ByteVector
   putByte|(I)Lnet/sf/cglib/asm/ByteVector;
   putShort|(I)Lnet/sf/cglib/asm/ByteVector;
+ ClassReader
+  readUnsignedShort|(I)I
+ ClassWriter
+  newClass|(Ljava/lang/String;)I
+  newField|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+  newNameType|(Ljava/lang/String;Ljava/lang/String;)I
+  newUTF8|(Ljava/lang/String;)I
+ CodeWriter
+  visitFieldInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitInsn|(I)V
+  visitJumpInsn|(ILnet/sf/cglib/asm/Label;)V
+  visitLabel|(Lnet/sf/cglib/asm/Label;)V
+  visitLdcInsn|(Ljava/lang/Object;)V
+  visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitVarInsn|(II)V
+ Type
+  getArgumentTypes
+   (Ljava/lang/String;)[Lnet/sf/cglib/asm/Type;
+   (Ljava/lang/reflect/Method;)[Lnet/sf/cglib/asm/Type;
+  getDescriptor|(Ljava/lang/Class;)Ljava/lang/String;
+  getMethodDescriptor
+   (Ljava/lang/reflect/Method;)Ljava/lang/String;
+   (Lnet/sf/cglib/asm/Type;[Lnet/sf/cglib/asm/Type;)Ljava/lang/String;
+  getOpcode|(I)I
+  getReturnType
+   (Ljava/lang/String;)Lnet/sf/cglib/asm/Type;
+   (Ljava/lang/reflect/Method;)Lnet/sf/cglib/asm/Type;
+  getType
+   (Ljava/lang/Class;)Lnet/sf/cglib/asm/Type;
+   (Ljava/lang/String;)Lnet/sf/cglib/asm/Type;
 net.sf.cglib.core
  CodeEmitter
   load_this|()V
   make_label|()Lorg/objectweb/asm/Label;
+ EmitUtils$5
+  transform|(Ljava/lang/Object;)Ljava/lang/Object;
+ EmitUtils$6
+  processCase|(ILnet/sf/cglib/asm/Label;)V
+ MethodWrapper
+  create|(Ljava/lang/reflect/Method;)Ljava/lang/Object;
+ MethodWrapper$MethodWrapperKey$$KeyFactoryByCGLIB$$d45e49f7
+  newInstance|(Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+ ReflectUtils
+  getNames|([Ljava/lang/Class;)[Ljava/lang/String;
+  getSignature|(Ljava/lang/reflect/Member;)Lnet/sf/cglib/core/Signature;
  TypeUtils
   ICONST|(I)I
   isArray|(Lorg/objectweb/asm/Type;)Z
   isPrimitive|(Lorg/objectweb/asm/Type;)Z
   isStatic|(I)Z
+net.sf.cglib.proxy|MethodProxy|find|(Ljava/lang/Class;Lnet/sf/cglib/core/Signature;)Lnet/sf/cglib/proxy/MethodProxy;
 net.sf.jasperreports.data.cache
  BlockColumnStore
   addValue|(Ljava/lang/Object;)V
