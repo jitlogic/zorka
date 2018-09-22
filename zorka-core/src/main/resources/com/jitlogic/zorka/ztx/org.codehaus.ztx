@@ -1,3 +1,9 @@
+org.codehaus.groovy.antlr
+ SourceBuffer
+  write|(I)V
+ UnicodeEscapingReader
+  read|()I
+org.codehaus.groovy.ast|ClassNode|redirect|()Lorg/codehaus/groovy/ast/ClassNode;
 org.codehaus.jackson|JsonStreamContext|inObject|()Z
 org.codehaus.jackson.impl
  JsonGeneratorBase

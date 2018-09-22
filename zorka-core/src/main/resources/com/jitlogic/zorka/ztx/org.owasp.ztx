@@ -1,0 +1,5 @@
+org.owasp.esapi.codecs
+ PushbackString
+  mark|()V
+  next|()Ljava/lang/Character;
+  reset|()V

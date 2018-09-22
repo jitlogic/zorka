@@ -62,8 +62,10 @@ org.apache.catalina.connector
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
 org.apache.catalina.core
  ApplicationContext
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
   getRealPath|(Ljava/lang/String;)Ljava/lang/String;
  ApplicationContextFacade
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
   getRealPath|(Ljava/lang/String;)Ljava/lang/String;
  ApplicationFilterChain
   doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
@@ -110,6 +112,7 @@ org.apache.catalina.mapper
   map|(Lorg/apache/tomcat/util/buf/MessageBytes;Lorg/apache/tomcat/util/buf/MessageBytes;Ljava/lang/String;Lorg/apache/catalina/mapper/MappingData;)V
  MappingData
   recycle|()V
+org.apache.catalina.session|StandardSessionFacade|getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
 org.apache.catalina.util
  ParameterMap
   clear|()V
@@ -190,6 +193,8 @@ org.apache.derby.client.am
   loggingEnabled|()Z
  SignedBinary
   getShort|([BI)S
+org.apache.el.lang|ExpressionBuilder|visit|(Lorg/apache/el/parser/Node;)V
+org.apache.el.parser|SimpleNode|accept|(Lorg/apache/el/parser/NodeVisitor;)V
 org.apache.fontbox.afm
  FontMetric
   addKernPair|(Lorg/apache/fontbox/afm/KernPair;)V
@@ -565,7 +570,20 @@ org.apache.tika.sax.xpath
   descend|(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/tika/sax/xpath/Matcher;
   matchesElement|()Z
   matchesText|()Z
+org.apache.tiles.context|ChainedTilesRequestContextFactory|createRequestContext|(Lorg/apache/tiles/TilesApplicationContext;[Ljava/lang/Object;)Lorg/apache/tiles/context/TilesRequestContext;
+org.apache.tiles.servlet.context|ServletTilesRequestContextFactory|createRequestContext|(Lorg/apache/tiles/TilesApplicationContext;[Ljava/lang/Object;)Lorg/apache/tiles/context/TilesRequestContext;
+org.apache.tomcat.dbcp.dbcp
+ DelegatingResultSet
+  getDate|(I)Ljava/sql/Date;
+  getInt|(I)I
+  getString|(I)Ljava/lang/String;
+  next|()Z
+  wasNull|()Z
 org.apache.tomcat.util.bcel.classfile
+ AnnotationEntry
+  read|(Ljava/io/DataInputStream;Lorg/apache/tomcat/util/bcel/classfile/ConstantPool;)Lorg/apache/tomcat/util/bcel/classfile/AnnotationEntry;
+ Attribute
+  readAttribute|(Ljava/io/DataInputStream;Lorg/apache/tomcat/util/bcel/classfile/ConstantPool;)Lorg/apache/tomcat/util/bcel/classfile/Attribute;
  ClassParser
   parse|()Lorg/apache/tomcat/util/bcel/classfile/JavaClass;
  ConstantPool
@@ -574,6 +592,8 @@ org.apache.tomcat.util.bcel.classfile
    (IB)Lorg/apache/tomcat/util/bcel/classfile/Constant;
  ElementValue
   readElementValue|(Ljava/io/DataInput;Lorg/apache/tomcat/util/bcel/classfile/ConstantPool;)Lorg/apache/tomcat/util/bcel/classfile/ElementValue;
+ Utility
+  compactClassName|(Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
 org.apache.tomcat.util.buf
  AbstractChunk
   indexOf|(Ljava/lang/String;III)I
@@ -628,6 +648,11 @@ org.apache.tomcat.util.digester
   push|(Ljava/lang/Object;)Ljava/lang/Object;
  Digester
   characters|([CII)V
+org.apache.tomcat.util.file
+ Matcher
+  match|(Ljava/lang/String;Ljava/lang/String;Z)Z
+  matchPath|([Ljava/lang/String;[Ljava/lang/String;Z)Z
+  tokenizePathAsArray|(Ljava/lang/String;)[Ljava/lang/String;
 org.apache.tomcat.util.http
  CookieSupport
   isHttpSeparator|(C)Z

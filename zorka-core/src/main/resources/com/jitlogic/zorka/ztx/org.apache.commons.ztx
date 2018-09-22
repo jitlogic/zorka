@@ -35,6 +35,8 @@ org.apache.commons.collections.map
   remove|(Ljava/lang/Object;)Ljava/lang/Object;
  AbstractLinkedMap$KeySetIterator
   next|()Ljava/lang/Object;
+ AbstractReferenceMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
  LRUMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.commons.configuration

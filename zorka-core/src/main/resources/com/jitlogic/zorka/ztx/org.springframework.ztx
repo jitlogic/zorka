@@ -23,6 +23,19 @@ org.springframework.asm
   readClass|(I[C)Ljava/lang/String;
   readUTF8|(I[C)Ljava/lang/String;
   readUnsignedShort|(I)I
+org.springframework.asm.commons
+ EmptyVisitor
+  visitCode|()V
+  visitEnd|()V
+  visitFieldInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitInsn|(I)V
+  visitJumpInsn|(ILorg/springframework/asm/Label;)V
+  visitLabel|(Lorg/springframework/asm/Label;)V
+  visitLdcInsn|(Ljava/lang/Object;)V
+  visitMaxs|(II)V
+  visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitTypeInsn|(ILjava/lang/String;)V
+  visitVarInsn|(II)V
 org.springframework.beans
  BeanUtils
   instantiateClass
@@ -156,6 +169,8 @@ org.springframework.core.convert.support
   convert|(Ljava/lang/Object;Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
  GenericConversionService$ConverterFactoryAdapter
   convert|(Ljava/lang/Object;Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
+ GenericConversionService$MatchableConverters
+  add|(Lorg/springframework/core/convert/converter/GenericConverter;)V
  GenericConversionService$NoOpConverter
   convert|(Ljava/lang/Object;Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
  StringToNumberConverterFactory
@@ -165,6 +180,7 @@ org.springframework.core.convert.support
    (Ljava/lang/Object;)Ljava/lang/Object;
    (Ljava/lang/String;)Ljava/lang/Number;
 org.springframework.core.env|AbstractPropertyResolver|resolveRequiredPlaceholders|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.core.type.classreading|AnnotationMetadataReadingVisitor|visitMethod|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Lorg/springframework/asm/MethodVisitor;
 org.springframework.expression.common
  LiteralExpression
   getValue
@@ -261,6 +277,7 @@ org.springframework.orm.hibernate3
   getSession|(Ljava/lang/Object;)Lorg/hibernate/Session;
  SpringTransactionFactory
   areCallbacksLocalToHibernateTransactions|()Z
+org.springframework.transaction.annotation|SpringTransactionAnnotationParser|parseTransactionAnnotation|(Ljava/lang/reflect/AnnotatedElement;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
 org.springframework.transaction.interceptor
  NameMatchTransactionAttributeSource
   getTransactionAttribute|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
@@ -401,6 +418,7 @@ org.springframework.web.context.request
  ServletWebRequest
   getNativeRequest|(Ljava/lang/Class;)Ljava/lang/Object;
 org.springframework.web.context.request.async|WebAsyncUtils|getAsyncManager|(Ljavax/servlet/ServletRequest;)Lorg/springframework/web/context/request/async/WebAsyncManager;
+org.springframework.web.context.support|ContextExposingHttpServletRequest|getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
 org.springframework.web.cors
  CorsUtils
   isCorsRequest|(Ljavax/servlet/http/HttpServletRequest;)Z

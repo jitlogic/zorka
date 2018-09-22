@@ -1,0 +1,7 @@
+com.jaspersoft.connectors.cassandra.query|CassandraQueryExecuterExtensionsRegistryFactory$1|getExtensions|(Ljava/lang/Class;)Ljava/util/List;
+com.jaspersoft.connectors.hive.query|HiveQueryExecuterExtensionsRegistryFactory$1|getExtensions|(Ljava/lang/Class;)Ljava/util/List;
+com.jaspersoft.jasperserver.api.engine.jasperreports.util
+ JRTimezoneResultSetDataSource
+  getFieldValue|(Lnet/sf/jasperreports/engine/JRField;)Ljava/lang/Object;
+  next|()Z
+com.jaspersoft.mongodb.query|MongoDbQueryExecuterExtensionsRegistryFactory$1|getExtensions|(Ljava/lang/Class;)Ljava/util/List;

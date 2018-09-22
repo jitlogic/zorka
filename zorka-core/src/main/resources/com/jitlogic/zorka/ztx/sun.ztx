@@ -1,4 +1,13 @@
-sun.java2d|StateTrackableDelegate|markDirty|()V
+sun.font|FontLineMetrics|clone|()Ljava/lang/Object;
+sun.java2d
+ StateTrackableDelegate
+  createInstance|(Lsun/java2d/StateTrackable$State;)Lsun/java2d/StateTrackableDelegate;
+  markDirty|()V
+sun.java2d.loops
+ GraphicsPrimitive
+  makeUniqueID|(ILsun/java2d/loops/SurfaceType;Lsun/java2d/loops/CompositeType;Lsun/java2d/loops/SurfaceType;)I
+ GraphicsPrimitiveMgr$2
+  compare|(Ljava/lang/Object;Ljava/lang/Object;)I
 sun.misc
  FDBigInteger
   cmp|(Lsun/misc/FDBigInteger;)I
@@ -9,6 +18,8 @@ sun.misc
   multByPow52|(II)Lsun/misc/FDBigInteger;
   rightInplaceSub|(Lsun/misc/FDBigInteger;)Lsun/misc/FDBigInteger;
   valueOfMulPow52|(JII)Lsun/misc/FDBigInteger;
+ FpUtils
+  getExponent|(D)I
 sun.net|DefaultProgressMeteringPolicy|shouldMeterInput|(Ljava/net/URL;Ljava/lang/String;)Z
 sun.net.www|MeteredStream|read|([BII)I
 sun.net.www.http
@@ -89,6 +100,8 @@ sun.text
  UCompactIntArray
   elementAt|(I)I
 sun.text.normalizer
+ CharTrie
+  getCodePointValue|(I)C
  IntTrie
   getCodePointValue|(I)I
  NormalizerBase

@@ -1,3 +1,9 @@
 com.opensymphony.module.propertyset|AbstractPropertySet|getString|(Ljava/lang/String;)Ljava/lang/String;
 com.opensymphony.module.propertyset.ofbiz|StringPropertyHandler|processGet|(ILjava/lang/Object;)Ljava/lang/Object;
+com.opensymphony.module.sitemesh.html.util
+ CharArray
+  append|(C)Lcom/opensymphony/module/sitemesh/html/util/CharArray;
+  charAt|(I)C
+  length|()I
+com.opensymphony.module.sitemesh.util|CharArrayReader|read|()I
 com.opensymphony.workflow.loader|XMLUtil|printIndent|(Ljava/io/PrintWriter;I)V

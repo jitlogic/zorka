@@ -168,6 +168,8 @@ org.apache.xerces.impl.validation
   needFacetChecking|()Z
   needToNormalize|()Z
 org.apache.xerces.impl.xs
+ SchemaGrammar
+  getGlobalElementDecl|(Ljava/lang/String;)Lorg/apache/xerces/impl/xs/XSElementDecl;
  SchemaNamespaceSupport
   getURI|(Ljava/lang/String;)Ljava/lang/String;
  SubstitutionGroupHandler
@@ -189,14 +191,17 @@ org.apache.xerces.impl.xs.identity
   startElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;)V
 org.apache.xerces.impl.xs.opti
  ElementImpl
+  getAttribute|(Ljava/lang/String;)Ljava/lang/String;
   getAttributeNode|(Ljava/lang/String;)Lorg/w3c/dom/Attr;
  NamedNodeMapImpl
   item|(I)Lorg/w3c/dom/Node;
  SchemaDOM
+  emptyElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;III)Lorg/apache/xerces/impl/xs/opti/ElementImpl;
   endElement|()V
   startElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;III)Lorg/apache/xerces/impl/xs/opti/ElementImpl;
  SchemaDOMParser
   characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
+  emptyElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;Lorg/apache/xerces/xni/Augmentations;)V
   endElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/Augmentations;)V
   startElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;Lorg/apache/xerces/xni/Augmentations;)V
 org.apache.xerces.impl.xs.traversers
@@ -262,12 +267,16 @@ org.apache.xerces.util
   getItem|(Ljava/lang/Object;)Ljava/lang/Object;
   putItem|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  DOMUtil
+  getAttr|(Lorg/w3c/dom/Element;Ljava/lang/String;)Lorg/w3c/dom/Attr;
   getAttrs|(Lorg/w3c/dom/Element;)[Lorg/w3c/dom/Attr;
+  getDocument|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Document;
   getFirstChildElement|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Element;
   getLocalName|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getName|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getNamespaceURI|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getNextSiblingElement|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Element;
+  getParent|(Lorg/w3c/dom/Element;)Lorg/w3c/dom/Element;
+  getRoot|(Lorg/w3c/dom/Document;)Lorg/w3c/dom/Element;
   getSyntheticAnnotation|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getValue|(Lorg/w3c/dom/Attr;)Ljava/lang/String;
  IntStack

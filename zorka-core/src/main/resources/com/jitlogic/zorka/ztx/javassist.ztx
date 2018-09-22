@@ -1,0 +1,17 @@
+javassist.bytecode
+ ByteVector
+  addGap|(I)V
+ Bytecode
+  growStack|(I)V
+ ConstPool
+  addClassInfo|(Ljava/lang/String;)I
+  addUtf8Info|(Ljava/lang/String;)I
+ Descriptor
+  dataSize|(Ljava/lang/String;)I
+ LongVector
+  addElement|(Ljava/lang/Object;)V
+  elementAt|(I)Ljava/lang/Object;
+ MemberrefInfo
+  write|(Ljava/io/DataOutputStream;)V
+ NameAndTypeInfo
+  write|(Ljava/io/DataOutputStream;)V

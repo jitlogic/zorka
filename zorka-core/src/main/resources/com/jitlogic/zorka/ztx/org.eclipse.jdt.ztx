@@ -16,6 +16,7 @@ org.eclipse.jdt.core.compiler
   subarray|([CII)[C
 org.eclipse.jdt.internal.compiler
  ClassFile
+  searchLineNumber|([II)I
   utf8At|([BII)[C
  ClassFile$3
   compare|(Ljava/lang/Object;Ljava/lang/Object;)I
@@ -41,18 +42,31 @@ org.eclipse.jdt.internal.compiler.ast
  CompilationUnitDeclaration
   compilationResult|()Lorg/eclipse/jdt/internal/compiler/CompilationResult;
  Expression
-  checkNPE|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/flow/FlowContext;Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;)Z
+  checkNPE
+   (Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/flow/FlowContext;Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;)V
+   (Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/flow/FlowContext;Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;)Z
   computeConversion|(Lorg/eclipse/jdt/internal/compiler/lookup/Scope;Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;)V
   generateCode|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/codegen/CodeStream;)V
   getDirectBinding|(Lorg/eclipse/jdt/internal/compiler/ast/Expression;)Lorg/eclipse/jdt/internal/compiler/lookup/Binding;
   isConstantValueOfTypeAssignableToType|(Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;)Z
   localVariableBinding|()Lorg/eclipse/jdt/internal/compiler/lookup/LocalVariableBinding;
   resolve|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;)V
+ FakedTrackingVariable
+  getCloseTrackingVariable|(Lorg/eclipse/jdt/internal/compiler/ast/Expression;)Lorg/eclipse/jdt/internal/compiler/ast/FakedTrackingVariable;
+  isAnyCloseable|(Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;)Z
+  markPassedToOutside|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/ast/Expression;Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;Z)Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;
+  reportError|(Lorg/eclipse/jdt/internal/compiler/problem/ProblemReporter;Lorg/eclipse/jdt/internal/compiler/ast/ASTNode;I)I
  Literal
   analyseCode|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/flow/FlowContext;Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;)Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;
   resolveType|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;)Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;
  LocalDeclaration
   checkModifiers|()V
+ MessageSend
+  analyseCode|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/flow/FlowContext;Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;)Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;
+  generateCode|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/codegen/CodeStream;Z)V
+  genericTypeArguments|()[Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;
+  manageSyntheticAccessIfNecessary|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;)V
+  resolveType|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;)Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;
  Reference
   checkNPE|(Lorg/eclipse/jdt/internal/compiler/lookup/BlockScope;Lorg/eclipse/jdt/internal/compiler/flow/FlowContext;Lorg/eclipse/jdt/internal/compiler/flow/FlowInfo;)Z
  SingleNameReference
@@ -109,6 +123,18 @@ org.eclipse.jdt.internal.compiler.classfmt
 org.eclipse.jdt.internal.compiler.codegen
  CharArrayCache
   putIfAbsent|([CI)I
+ CodeStream
+  aload|(I)V
+  generateImplicitConversion|(I)V
+  getConstantPoolDeclaringClass|(Lorg/eclipse/jdt/internal/compiler/lookup/Scope;Lorg/eclipse/jdt/internal/compiler/lookup/MethodBinding;Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Z)Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;
+  indexOfSameLineEntrySincePC|(II)I
+  insertionIndex|([III)I
+  invoke|(BLorg/eclipse/jdt/internal/compiler/lookup/MethodBinding;Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;)V
+  isDefinitelyAssigned|(Lorg/eclipse/jdt/internal/compiler/lookup/Scope;ILorg/eclipse/jdt/internal/compiler/lookup/LocalVariableBinding;)Z
+  load|(Lorg/eclipse/jdt/internal/compiler/lookup/LocalVariableBinding;)V
+  recordPositionsFrom
+   (II)V
+   (IIZ)V
  ConstantPool
   literalIndex|([C)I
   literalIndexForField|([C[C[C)I
@@ -190,6 +216,7 @@ org.eclipse.jdt.internal.compiler.impl
   typeID|()I
 org.eclipse.jdt.internal.compiler.lookup
  ArrayBinding
+  constantPoolName|()[C
   dimensions|()I
   kind|()I
   leafComponentType|()Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;
@@ -283,7 +310,9 @@ org.eclipse.jdt.internal.compiler.lookup
   computeId|()V
   constantPoolName|()[C
   getTypeVariable|([C)Lorg/eclipse/jdt/internal/compiler/lookup/TypeVariableBinding;
-  isCompatibleWith|(Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Lorg/eclipse/jdt/internal/compiler/lookup/Scope;)Z
+  isCompatibleWith
+   (Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;)Z
+   (Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Lorg/eclipse/jdt/internal/compiler/lookup/Scope;)Z
   signature|()[C
   sourceName|()[C
  ReferenceBinding$2
@@ -294,6 +323,23 @@ org.eclipse.jdt.internal.compiler.lookup
   compare
    (Ljava/lang/Object;Ljava/lang/Object;)I
    (Lorg/eclipse/jdt/internal/compiler/lookup/MethodBinding;Lorg/eclipse/jdt/internal/compiler/lookup/MethodBinding;)I
+ Scope
+  compareTypes|(Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;)I
+  compilationUnitScope|()Lorg/eclipse/jdt/internal/compiler/lookup/CompilationUnitScope;
+  compilerOptions|()Lorg/eclipse/jdt/internal/compiler/impl/CompilerOptions;
+  enclosingReceiverType|()Lorg/eclipse/jdt/internal/compiler/lookup/ReferenceBinding;
+  enclosingSourceType|()Lorg/eclipse/jdt/internal/compiler/lookup/SourceTypeBinding;
+  environment|()Lorg/eclipse/jdt/internal/compiler/lookup/LookupEnvironment;
+  findExactMethod|(Lorg/eclipse/jdt/internal/compiler/lookup/ReferenceBinding;[C[Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Lorg/eclipse/jdt/internal/compiler/lookup/InvocationSite;)Lorg/eclipse/jdt/internal/compiler/lookup/MethodBinding;
+  findField
+   (Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;[CLorg/eclipse/jdt/internal/compiler/lookup/InvocationSite;Z)Lorg/eclipse/jdt/internal/compiler/lookup/FieldBinding;
+   (Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;[CLorg/eclipse/jdt/internal/compiler/lookup/InvocationSite;ZZ)Lorg/eclipse/jdt/internal/compiler/lookup/FieldBinding;
+  findMemberType|([CLorg/eclipse/jdt/internal/compiler/lookup/ReferenceBinding;)Lorg/eclipse/jdt/internal/compiler/lookup/ReferenceBinding;
+  getBinding|([CILorg/eclipse/jdt/internal/compiler/lookup/InvocationSite;Z)Lorg/eclipse/jdt/internal/compiler/lookup/Binding;
+  getMethod|(Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;[C[Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Lorg/eclipse/jdt/internal/compiler/lookup/InvocationSite;)Lorg/eclipse/jdt/internal/compiler/lookup/MethodBinding;
+  methodScope|()Lorg/eclipse/jdt/internal/compiler/lookup/MethodScope;
+  parameterCompatibilityLevel|(Lorg/eclipse/jdt/internal/compiler/lookup/MethodBinding;[Lorg/eclipse/jdt/internal/compiler/lookup/TypeBinding;Z)I
+  referenceCompilationUnit|()Lorg/eclipse/jdt/internal/compiler/ast/CompilationUnitDeclaration;
  SignatureWrapper
   atEnd|()Z
   computeEnd|()I

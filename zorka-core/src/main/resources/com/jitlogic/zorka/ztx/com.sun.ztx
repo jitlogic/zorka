@@ -28,6 +28,7 @@ com.sun.el.parser
 com.sun.imageio.plugins.png
  IDATOutputStream
   deflate|()V
+  write|([BII)V
  RowFilter
   filterRow|(I[B[B[[BII)I
 com.sun.jersey.api.uri|UriPattern|match|(Ljava/lang/CharSequence;)Ljava/util/regex/MatchResult;

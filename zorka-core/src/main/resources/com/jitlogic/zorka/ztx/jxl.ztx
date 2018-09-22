@@ -1,0 +1,29 @@
+jxl.biff
+ IntegerHelper
+  getFourBytes
+   (I)[B
+   (I[BI)V
+  getTwoBytes|(I[BI)V
+ SheetRangeImpl
+  intersects|(Ljxl/biff/SheetRangeImpl;)Z
+jxl.format
+ Colour
+  getInternalColour|(I)Ljxl/format/Colour;
+ UnderlineStyle
+  getStyle|(I)Ljxl/format/UnderlineStyle;
+jxl.write.biff
+ CellValue
+  addCellFeatures|()V
+ File
+  write|(Ljxl/biff/ByteData;)V
+ MemoryDataOutput
+  write|([B)V
+ RowRecord
+  addCell|(Ljxl/write/biff/CellValue;)V
+  getCell|(I)Ljxl/write/biff/CellValue;
+ Styles
+  getFormat|(Ljxl/biff/XFRecord;)Ljxl/biff/XFRecord;
+ WritableSheetImpl
+  addCell|(Ljxl/write/WritableCell;)V
+  getCell|(II)Ljxl/Cell;
+  getWritableCell|(II)Ljxl/write/WritableCell;

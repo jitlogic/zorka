@@ -3,9 +3,12 @@ org.hibernate
   findDirty|(Ljava/lang/Object;Ljava/io/Serializable;[Ljava/lang/Object;[Ljava/lang/Object;[Ljava/lang/String;[Lorg/hibernate/type/Type;)[I
  LockOptions
   setLockMode|(Lorg/hibernate/LockMode;)Lorg/hibernate/LockOptions;
+org.hibernate.bytecode.javassist|ProxyFactoryFactoryImpl$PassThroughHandler|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 org.hibernate.cfg|Environment|jvmHasJDK14Timestamp|()Z
 org.hibernate.dialect|Dialect|openQuote|()C
 org.hibernate.engine
+ CascadeStyle$12
+  doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
  CascadingAction
   requiresNoCascadeChecking|()Z
  EntityEntry
@@ -15,7 +18,10 @@ org.hibernate.engine
   incrementCascadeLevel|()I
 org.hibernate.engine.query|ParamLocationRecognizer|other|(C)V
 org.hibernate.hql.classic|ParserHelper|isWhitespace|(Ljava/lang/String;)Z
-org.hibernate.impl|SessionFactoryImpl|getEntityPersister|(Ljava/lang/String;)Lorg/hibernate/persister/entity/EntityPersister;
+org.hibernate.impl
+ SessionFactoryImpl
+  getCollectionPersister|(Ljava/lang/String;)Lorg/hibernate/persister/collection/CollectionPersister;
+  getEntityPersister|(Ljava/lang/String;)Lorg/hibernate/persister/entity/EntityPersister;
 org.hibernate.intercept
  FieldInterceptionHelper
   extractFieldInterceptor|(Ljava/lang/Object;)Lorg/hibernate/intercept/FieldInterceptor;
@@ -27,7 +33,10 @@ org.hibernate.mapping
  Column
   getAlias|(Lorg/hibernate/dialect/Dialect;)Ljava/lang/String;
   getQuotedName|(Lorg/hibernate/dialect/Dialect;)Ljava/lang/String;
-org.hibernate.persister.entity|AbstractEntityPersister|getSubclassPropertyType|(I)Lorg/hibernate/type/Type;
+org.hibernate.persister.entity
+ AbstractEntityPersister
+  getMappedClass|(Lorg/hibernate/EntityMode;)Ljava/lang/Class;
+  getSubclassPropertyType|(I)Lorg/hibernate/type/Type;
 org.hibernate.property
  BasicPropertyAccessor$BasicGetter
   get|(Ljava/lang/Object;)Ljava/lang/Object;
@@ -44,6 +53,7 @@ org.hibernate.tuple
   getTuplizerOrNull|(Lorg/hibernate/EntityMode;)Lorg/hibernate/tuple/Tuplizer;
  StandardProperty
   isDirtyCheckable|(Z)Z
+org.hibernate.tuple.component|AbstractComponentTuplizer|getPropertyValue|(Ljava/lang/Object;I)Ljava/lang/Object;
 org.hibernate.tuple.entity
  EntityMetamodel
   getTuplizer|(Lorg/hibernate/EntityMode;)Lorg/hibernate/tuple/entity/EntityTuplizer;
@@ -58,6 +68,7 @@ org.hibernate.type
   nullSafeSet|(Ljava/sql/PreparedStatement;Ljava/lang/Object;ILorg/hibernate/engine/SessionImplementor;)V
   sqlTypes|(Lorg/hibernate/engine/Mapping;)[I
  AbstractType
+  getHashCode|(Ljava/lang/Object;Lorg/hibernate/EntityMode;)I
   isDirty|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)Z
   isSame|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
  BasicTypeRegistry
@@ -71,10 +82,18 @@ org.hibernate.type
   isDirty|(Ljava/lang/Object;Ljava/lang/Object;[ZLorg/hibernate/engine/SessionImplementor;)Z
   isEqual|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
   nullSafeSet|(Ljava/sql/PreparedStatement;Ljava/lang/Object;I[ZLorg/hibernate/engine/SessionImplementor;)V
+ ImmutableType
+  deepCopy|(Ljava/lang/Object;Lorg/hibernate/EntityMode;Lorg/hibernate/engine/SessionFactoryImplementor;)Ljava/lang/Object;
  ManyToOneType
   useLHSPrimaryKey|()Z
  NullableType
   getColumnSpan|(Lorg/hibernate/engine/Mapping;)I
+  isDirty|(Ljava/lang/Object;Ljava/lang/Object;[ZLorg/hibernate/engine/SessionImplementor;)Z
+  isEqual
+   (Ljava/lang/Object;Ljava/lang/Object;)Z
+   (Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
+ TimestampType
+  isEqual|(Ljava/lang/Object;Ljava/lang/Object;)Z
  TypeFactory
   injectParameters|(Ljava/lang/Object;Ljava/util/Properties;)V
 org.hibernate.type.descriptor.java
@@ -97,8 +116,11 @@ org.hibernate.util
  ArrayHelper
   countTrue|([Z)I
   isAllFalse|([Z)Z
+ FastHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
  IdentityMap
   clear|()V
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
  JoinedIterator
   next|()Ljava/lang/Object;
  PropertiesHelper
