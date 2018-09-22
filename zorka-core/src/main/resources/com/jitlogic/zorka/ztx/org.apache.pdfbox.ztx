@@ -21,6 +21,7 @@ org.apache.pdfbox.cos
    (Lorg/apache/pdfbox/cos/COSName;Lorg/apache/pdfbox/cos/COSName;I)I
   getItem|(Lorg/apache/pdfbox/cos/COSName;)Lorg/apache/pdfbox/cos/COSBase;
   getNameAsString|(Lorg/apache/pdfbox/cos/COSName;)Ljava/lang/String;
+  getString|(Lorg/apache/pdfbox/cos/COSName;)Ljava/lang/String;
   keySet|()Ljava/util/Set;
  COSDocument
   getObjectFromPool|(Lorg/apache/pdfbox/persistence/util/COSObjectKey;)Lorg/apache/pdfbox/cos/COSObject;
@@ -36,6 +37,9 @@ org.apache.pdfbox.cos
   getPDFName|(Ljava/lang/String;)Lorg/apache/pdfbox/cos/COSName;
  COSNumber
   get|(Ljava/lang/String;)Lorg/apache/pdfbox/cos/COSNumber;
+ COSStream
+  close|()V
+  createFilteredStream|(Lorg/apache/pdfbox/cos/COSBase;)Ljava/io/OutputStream;
  COSString
   append|(I)V
   createFromHexString|(Ljava/lang/String;Z)Lorg/apache/pdfbox/cos/COSString;
@@ -71,6 +75,7 @@ org.apache.pdfbox.io
    ([BII)V
  RandomAccessBuffer
   clone|()Lorg/apache/pdfbox/io/RandomAccessBuffer;
+  close|()V
   length|()J
   read|([BII)I
   seek|(J)V
@@ -91,9 +96,12 @@ org.apache.pdfbox.pdmodel
   findRotation|()I
 org.apache.pdfbox.pdmodel.common
  COSArrayList
+  contains|(Ljava/lang/Object;)Z
   convertFloatCOSArrayToList|(Lorg/apache/pdfbox/cos/COSArray;)Ljava/util/List;
   get|(I)Ljava/lang/Object;
   size|()I
+ COSDictionaryMap
+  convert|(Ljava/util/Map;)Lorg/apache/pdfbox/cos/COSDictionary;
  PDStream
   createInputStream|()Ljava/io/InputStream;
 org.apache.pdfbox.pdmodel.font
@@ -119,6 +127,9 @@ org.apache.pdfbox.pdmodel.graphics
  PDGraphicsState
   clone|()Ljava/lang/Object;
 org.apache.pdfbox.pdmodel.graphics.color|PDColorState|clone|()Ljava/lang/Object;
+org.apache.pdfbox.pdmodel.graphics.xobject|PDXObject|createXObject|(Lorg/apache/pdfbox/cos/COSBase;)Lorg/apache/pdfbox/pdmodel/graphics/xobject/PDXObject;
+org.apache.pdfbox.pdmodel.interactive.action|PDActionFactory|createAction|(Lorg/apache/pdfbox/cos/COSDictionary;)Lorg/apache/pdfbox/pdmodel/interactive/action/type/PDAction;
+org.apache.pdfbox.pdmodel.interactive.annotation|PDAnnotation|createAnnotation|(Lorg/apache/pdfbox/cos/COSBase;)Lorg/apache/pdfbox/pdmodel/interactive/annotation/PDAnnotation;
 org.apache.pdfbox.pdmodel.text|PDTextState|clone|()Ljava/lang/Object;
 org.apache.pdfbox.util
  Matrix
@@ -149,6 +160,8 @@ org.apache.pdfbox.util.operator
   process|(Lorg/apache/pdfbox/util/PDFOperator;Ljava/util/List;)V
  MoveText
   process|(Lorg/apache/pdfbox/util/PDFOperator;Ljava/util/List;)V
+ MoveTextSetLeading
+  process|(Lorg/apache/pdfbox/util/PDFOperator;Ljava/util/List;)V
  NextLine
   process|(Lorg/apache/pdfbox/util/PDFOperator;Ljava/util/List;)V
  SetCharSpacing
@@ -164,6 +177,8 @@ org.apache.pdfbox.util.operator
  SetTextFont
   process|(Lorg/apache/pdfbox/util/PDFOperator;Ljava/util/List;)V
  SetTextLeading
+  process|(Lorg/apache/pdfbox/util/PDFOperator;Ljava/util/List;)V
+ SetWordSpacing
   process|(Lorg/apache/pdfbox/util/PDFOperator;Ljava/util/List;)V
  ShowText
   process|(Lorg/apache/pdfbox/util/PDFOperator;Ljava/util/List;)V

@@ -6,7 +6,10 @@ com.ibm.icu.impl
   nextTrail32|(Ljava/text/CharacterIterator;I)I
  Norm2AllModes$ComposeNormalizer2
   quickCheck|(Ljava/lang/CharSequence;)Lcom/ibm/icu/text/Normalizer$QuickCheckResult;
+ Norm2AllModes$Normalizer2WithImpl
+  normalize|(Ljava/lang/CharSequence;Ljava/lang/StringBuilder;)Ljava/lang/StringBuilder;
  Normalizer2Impl
+  compose|(Ljava/lang/CharSequence;IIZZLcom/ibm/icu/impl/Normalizer2Impl$ReorderingBuffer;)Z
   composeQuickCheck|(Ljava/lang/CharSequence;IIZZ)I
   decomposeShort|(Ljava/lang/CharSequence;IILcom/ibm/icu/impl/Normalizer2Impl$ReorderingBuffer;)V
   getCCFromYesOrMaybe|(I)I
@@ -29,7 +32,12 @@ com.ibm.icu.impl
   getAdditional|(II)I
   getProperty|(I)I
   getType|(I)I
-com.ibm.icu.lang|UScript|getScript|(I)I
+com.ibm.icu.lang
+ UCharacter
+  getType|(I)I
+  isWhitespace|(I)Z
+ UScript
+  getScript|(I)I
 com.ibm.icu.text
  RuleBasedBreakIterator
   current|()I

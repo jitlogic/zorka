@@ -36,6 +36,7 @@ org.hibernate.sql
  Alias
   toAliasString|(Ljava/lang/String;)Ljava/lang/String;
  SelectFragment
+  addColumn|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/hibernate/sql/SelectFragment;
   addFormula|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/hibernate/sql/SelectFragment;
 org.hibernate.tuple
  EntityModeToTuplizerMapping

@@ -21,6 +21,7 @@ javax.el
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  ResourceBundleELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+javax.management|ImmutableDescriptor|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
 javax.management.modelmbean|DescriptorSupport|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
 javax.management.openmbean
  ArrayType
@@ -41,6 +42,8 @@ javax.media.jai
   tileXToX|(III)I
   tileYToY|(III)I
 javax.naming
+ CompositeName
+  get|(I)Ljava/lang/String;
  NameImpl
   get|(I)Ljava/lang/String;
   size|()I

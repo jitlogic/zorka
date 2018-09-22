@@ -4,6 +4,7 @@ net.sf.acegisecurity.vote
   vote|(Lnet/sf/acegisecurity/Authentication;Ljava/lang/Object;Lnet/sf/acegisecurity/ConfigAttributeDefinition;)I
 net.sf.cglib.core
  CodeEmitter
+  load_this|()V
   make_label|()Lorg/objectweb/asm/Label;
  TypeUtils
   ICONST|(I)I

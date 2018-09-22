@@ -20,6 +20,7 @@ org.springframework.aop.support
 org.springframework.aop.target|AbstractBeanFactoryBasedTargetSource|releaseTarget|(Ljava/lang/Object;)V
 org.springframework.asm
  ClassReader
+  readClass|(I[C)Ljava/lang/String;
   readUTF8|(I[C)Ljava/lang/String;
   readUnsignedShort|(I)I
 org.springframework.beans
@@ -40,6 +41,8 @@ org.springframework.beans
  PropertyEditorRegistrySupport
   findCustomEditor|(Ljava/lang/Class;Ljava/lang/String;)Ljava/beans/PropertyEditor;
   overrideDefaultEditor|(Ljava/lang/Class;Ljava/beans/PropertyEditor;)V
+ TypeConverterDelegate
+  convertIfNecessary|(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Class;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
  TypeConverterSupport
   convertIfNecessary|(Ljava/lang/Object;Ljava/lang/Class;Lorg/springframework/core/MethodParameter;)Ljava/lang/Object;
 org.springframework.beans.factory
@@ -52,17 +55,24 @@ org.springframework.beans.factory.config
   addArgumentValues|(Lorg/springframework/beans/factory/config/ConstructorArgumentValues;)V
  InstantiationAwareBeanPostProcessorAdapter
   predictBeanType|(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Class;
+ PropertyPlaceholderConfigurer$PlaceholderResolvingStringValueResolver
+  resolveStringValue|(Ljava/lang/String;)Ljava/lang/String;
 org.springframework.beans.factory.parsing
  NullSourceExtractor
   extractSource|(Ljava/lang/Object;Lorg/springframework/core/io/Resource;)Ljava/lang/Object;
  ParseState
   pop|()V
   push|(Lorg/springframework/beans/factory/parsing/ParseState$Entry;)V
+ ReaderContext
+  extractSource|(Ljava/lang/Object;)Ljava/lang/Object;
 org.springframework.beans.factory.support
  AbstractBeanDefinition
   copyQualifiersFrom|(Lorg/springframework/beans/factory/support/AbstractBeanDefinition;)V
+  overrideFrom|(Lorg/springframework/beans/factory/config/BeanDefinition;)V
+  resolveBeanClass|(Ljava/lang/ClassLoader;)Ljava/lang/Class;
  AbstractBeanFactory
   getBean|(Ljava/lang/String;)Ljava/lang/Object;
+  getMergedBeanDefinition|(Ljava/lang/String;)Lorg/springframework/beans/factory/config/BeanDefinition;
   getRegisteredScope|(Ljava/lang/String;)Lorg/springframework/beans/factory/config/Scope;
  AutowireUtils
   isExcludedFromDependencyCheck|(Ljava/beans/PropertyDescriptor;)Z
@@ -80,6 +90,9 @@ org.springframework.beans.factory.xml
  BeanDefinitionParserDelegate
   getLocalName|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getNamespaceURI|(Lorg/w3c/dom/Node;)Ljava/lang/String;
+  isDefaultNamespace
+   (Ljava/lang/String;)Z
+   (Lorg/w3c/dom/Node;)Z
   nodeNameEquals|(Lorg/w3c/dom/Node;Ljava/lang/String;)Z
 org.springframework.context.event|EventListenerMethodProcessor$1|inspect|(Ljava/lang/reflect/Method;)Lorg/springframework/context/event/EventListener;
 org.springframework.context.expression|StandardBeanExpressionResolver|evaluate|(Ljava/lang/String;Lorg/springframework/beans/factory/config/BeanExpressionContext;)Ljava/lang/Object;
@@ -93,6 +106,7 @@ org.springframework.core
  GenericTypeResolver
   getTargetType|(Lorg/springframework/core/MethodParameter;)Ljava/lang/reflect/Type;
   getTypeVariableMap|(Ljava/lang/Class;)Ljava/util/Map;
+  resolveParameterType|(Lorg/springframework/core/MethodParameter;Ljava/lang/Class;)Ljava/lang/Class;
  KotlinDetector
   isKotlinType|(Ljava/lang/Class;)Z
  MethodParameter
@@ -180,10 +194,14 @@ org.springframework.extensions.webscripts
  ClassPathStore
   exists|()Z
  JaxRSUriIndex$1
-  compare|(Lorg/springframework/extensions/webscripts/JaxRSUriIndex$IndexEntry;Lorg/springframework/extensions/webscripts/JaxRSUriIndex$IndexEntry;)I
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Lorg/springframework/extensions/webscripts/JaxRSUriIndex$IndexEntry;Lorg/springframework/extensions/webscripts/JaxRSUriIndex$IndexEntry;)I
  NativeMap
   get|(Ljava/lang/String;Lorg/mozilla/javascript/Scriptable;)Ljava/lang/Object;
   unwrap|()Ljava/lang/Object;
+ PathImpl
+  concatPath|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  UriTemplate
   match|(Ljava/lang/String;)Ljava/util/Map;
  WebScriptPropertyResourceBundle
@@ -288,7 +306,9 @@ org.springframework.util
   notNull|(Ljava/lang/Object;Ljava/lang/String;)V
   state|(ZLjava/lang/String;)V
  ClassUtils
+  forName|(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;
   isAssignable|(Ljava/lang/Class;Ljava/lang/Class;)Z
+  isAssignableValue|(Ljava/lang/Class;Ljava/lang/Object;)Z
   resolvePrimitiveClassName|(Ljava/lang/String;)Ljava/lang/Class;
  CollectionUtils
   isEmpty|(Ljava/util/Collection;)Z
@@ -327,6 +347,8 @@ org.springframework.util
   makeAccessible|(Ljava/lang/reflect/Method;)V
  ReflectionUtils$1
   doWith|(Ljava/lang/reflect/Method;)V
+ ReflectionUtils$2
+  doWith|(Ljava/lang/reflect/Method;)V
  ReflectionUtils$4
   doWith|(Ljava/lang/reflect/Method;)V
  ReflectionUtils$6
@@ -339,7 +361,10 @@ org.springframework.util
   hasLength
    (Ljava/lang/CharSequence;)Z
    (Ljava/lang/String;)Z
-  hasText|(Ljava/lang/CharSequence;)Z
+  hasText
+   (Ljava/lang/CharSequence;)Z
+   (Ljava/lang/String;)Z
+  replace|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
   substringMatch|(Ljava/lang/CharSequence;ILjava/lang/CharSequence;)Z
   toStringArray|(Ljava/util/Collection;)[Ljava/lang/String;
   tokenizeToStringArray|(Ljava/lang/String;Ljava/lang/String;ZZ)[Ljava/lang/String;

@@ -54,12 +54,17 @@ org.apache.xerces.dom
   insertBefore|(Lorg/w3c/dom/Node;Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
   item|(I)Lorg/w3c/dom/Node;
 org.apache.xerces.impl
+ XMLDTDScannerImpl
+  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
  XMLDocumentFragmentScannerImpl
   getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
   getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
  XMLDocumentFragmentScannerImpl$ElementStack
   popElement|(Lorg/apache/xerces/xni/QName;)V
   pushElement|(Lorg/apache/xerces/xni/QName;)Lorg/apache/xerces/xni/QName;
+ XMLDocumentScannerImpl
+  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
+  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
  XMLEntityManager
   getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
   getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
@@ -73,14 +78,17 @@ org.apache.xerces.impl
   scanData|(Ljava/lang/String;Lorg/apache/xerces/util/XMLStringBuffer;)Z
   scanLiteral|(ILorg/apache/xerces/xni/XMLString;)I
   scanName|()Ljava/lang/String;
+  scanNmtoken|()Ljava/lang/String;
   scanQName|(Lorg/apache/xerces/xni/QName;)Z
   skipChar|(I)Z
   skipSpaces|()Z
   skipString|(Ljava/lang/String;)Z
 org.apache.xerces.impl.dtd
  DTDGrammar
+  attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   comment|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   element|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
+  elementDecl|(Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
   endAttlist|(Lorg/apache/xerces/xni/Augmentations;)V
   endContentModel|(Lorg/apache/xerces/xni/Augmentations;)V
   endGroup|(Lorg/apache/xerces/xni/Augmentations;)V
@@ -103,12 +111,19 @@ org.apache.xerces.impl.dtd
   get|(Ljava/lang/String;)I
   put|(Ljava/lang/String;I)V
  XMLDTDProcessor
+  attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
+  comment|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   element|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
   endAttlist|(Lorg/apache/xerces/xni/Augmentations;)V
+  endContentModel|(Lorg/apache/xerces/xni/Augmentations;)V
+  endGroup|(Lorg/apache/xerces/xni/Augmentations;)V
   getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
   getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
+  occurrence|(SLorg/apache/xerces/xni/Augmentations;)V
   separator|(SLorg/apache/xerces/xni/Augmentations;)V
   startAttlist|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
+  startContentModel|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
+  startGroup|(Lorg/apache/xerces/xni/Augmentations;)V
  XMLDTDValidator
   characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   endElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/Augmentations;)V
@@ -206,6 +221,7 @@ org.apache.xerces.parsers
  AbstractSAXParser
   attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
+  comment|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   endCDATA|(Lorg/apache/xerces/xni/Augmentations;)V
   endElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/Augmentations;)V
   ignorableWhitespace|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V

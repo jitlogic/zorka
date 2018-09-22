@@ -1,20 +1,30 @@
+org.jibx.runtime|Utility|serializeBoolean|(Z)Ljava/lang/String;
 org.jibx.runtime.impl
  MarshallingContext
   attribute|(ILjava/lang/String;Ljava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
   closeStartContent|()Lorg/jibx/runtime/impl/MarshallingContext;
   element|(ILjava/lang/String;Ljava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
   endTag|(ILjava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
+  getMarshaller|(Ljava/lang/String;)Lorg/jibx/runtime/IMarshaller;
+  popNamespaces|()V
   popObject|()V
+  pushNamespaces|(Ljava/lang/String;)V
   pushObject|(Ljava/lang/Object;)V
   startTag|(ILjava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
   startTagAttributes|(ILjava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
   startTagNamespaces|(ILjava/lang/String;[I[Ljava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
+  writeContent|(Ljava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
  StreamWriterBase
   indent|(I)V
+ StringIntHashMap
+  get|(Ljava/lang/String;)I
  UTF8StreamWriter
   writeTextContent|(Ljava/lang/String;)V
  UnmarshallingContext
   isAt|(Ljava/lang/String;Ljava/lang/String;)Z
+  parsePastStartTag|(Ljava/lang/String;Ljava/lang/String;)V
+  popObject|()V
+  pushObject|(Ljava/lang/Object;)V
   toTag|()I
  XMLPullReaderFactory$XMLPullReader
   nextToken|()I
@@ -28,4 +38,6 @@ org.jibx.runtime.impl
  XMLWriterNamespaceBase
   getNamespacePrefix|(I)Ljava/lang/String;
   openNamespaces|([I[Ljava/lang/String;)[I
+  popTranslationTable|()V
+  pushTranslationTable|([I)V
   translateNamespace|(I)I

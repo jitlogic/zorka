@@ -138,6 +138,9 @@ com.sun.org.apache.xerces.internal.impl.dtd
  DTDGrammar
   getAttributeDecl|(ILcom/sun/org/apache/xerces/internal/impl/dtd/XMLAttributeDecl;)Z
   getContentSpecType|(I)S
+  getElementDeclIndex
+   (Lcom/sun/org/apache/xerces/internal/xni/QName;)I
+   (Ljava/lang/String;)I
   getFirstAttributeDeclIndex|(I)I
   getNextAttributeDeclIndex|(I)I
  DTDGrammar$QNameHashtable
@@ -296,7 +299,44 @@ com.sun.org.apache.xerces.internal.xni
 com.sun.org.apache.xml.internal.dtm.ref.sax2dtm|SAX2DTM2|_exptype2|(I)I
 com.sun.org.apache.xml.internal.serializer|WriterToUTF8Buffered|write|(I)V
 com.sun.org.apache.xpath.internal.compiler|OpMapVector|elementAt|(I)I
-com.sun.xml.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+com.sun.xml.bind.v2.bytecode
+ ClassTailor
+  toVMClassName|(Ljava/lang/Class;)Ljava/lang/String;
+  toVMTypeName|(Ljava/lang/Class;)Ljava/lang/String;
+com.sun.xml.bind.v2.model.annotation
+ LocatableAnnotation
+  create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+ RuntimeInlineAnnotationReader
+  getClassAnnotation|(Ljava/lang/Class;Ljava/lang/Class;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+  getFieldAnnotation
+   (Ljava/lang/Class;Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+   (Ljava/lang/Class;Ljava/lang/reflect/Field;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+  getPackageAnnotation
+   (Ljava/lang/Class;Ljava/lang/Class;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+   (Ljava/lang/Class;Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+  hasFieldAnnotation|(Ljava/lang/Class;Ljava/lang/reflect/Field;)Z
+com.sun.xml.bind.v2.model.impl
+ ElementPropertyInfoImpl
+  kind|()Lcom/sun/xml/bind/v2/model/core/PropertyKind;
+  ref|()Ljava/util/List;
+ ElementPropertyInfoImpl$1
+  get|(I)Lcom/sun/xml/bind/v2/model/core/TypeInfo;
+  size|()I
+ PropertyInfoImpl
+  id|()Lcom/sun/xml/bind/v2/model/core/ID;
+com.sun.xml.bind.v2.model.nav
+ ReflectionNavigator
+  asDecl|(Ljava/lang/Class;)Ljava/lang/Class;
+  getFieldName|(Ljava/lang/reflect/Field;)Ljava/lang/String;
+  getFieldType|(Ljava/lang/reflect/Field;)Ljava/lang/reflect/Type;
+  getMethodParameters|(Ljava/lang/reflect/Method;)[Ljava/lang/reflect/Type;
+  isSameType|(Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)Z
+  ref|(Ljava/lang/Class;)Ljava/lang/Class;
+ ReflectionNavigator$3
+  onClass
+   (Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/Class;Ljava/lang/Void;)Ljava/lang/Class;
+com.sun.xml.bind.v2.util|QNameMap|put|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V
 com.sun.xml.internal.bind|WhiteSpaceProcessor|isWhiteSpace|(Ljava/lang/CharSequence;)Z
 com.sun.xml.internal.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/internal/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
 com.sun.xml.internal.bind.v2.model.impl
@@ -338,3 +378,16 @@ com.sun.xml.internal.stream.util
  BufferAllocator
   getCharBuffer|(I)[C
   returnCharBuffer|([C)V
+com.sun.xml.stream.buffer|AttributesHolder|addAttributeWithPrefix|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+com.sun.xml.stream.buffer.sax|SAXBufferCreator|characters|([CII)V
+com.sun.xml.stream.buffer.stax|StreamReaderBufferProcessor|next|()I
+com.sun.xml.txw2
+ DatatypeWriter$1$1
+  print|(Ljava/lang/String;Lcom/sun/xml/txw2/NamespaceResolver;Ljava/lang/StringBuilder;)V
+ NamespaceSupport
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+  getURI|(Ljava/lang/String;)Ljava/lang/String;
+ StartTag
+  addNamespaceDecl|(Ljava/lang/String;Ljava/lang/String;Z)Lcom/sun/xml/txw2/NamespaceDecl;
+com.sun.xml.txw2.output|SaxSerializer|writeAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/StringBuilder;)V
+com.sun.xml.ws.streaming|XMLStreamReaderUtil|next|(Ljavax/xml/stream/XMLStreamReader;)I

@@ -210,9 +210,12 @@ org.apache.fontbox.cff
   getOperator
    (Ljava/lang/String;)Lorg/apache/fontbox/cff/CFFOperator;
    (Lorg/apache/fontbox/cff/CFFOperator$Key;)Lorg/apache/fontbox/cff/CFFOperator;
+ CFFParser
+  parse|([B)Ljava/util/List;
  CFFParser$DictData
   getEntry|(Ljava/lang/String;)Lorg/apache/fontbox/cff/CFFParser$DictData$Entry;
  CFFParser$DictData$Entry
+  getBoolean|(I)Ljava/lang/Boolean;
   getNumber|(I)Ljava/lang/Number;
  CFFStandardString
   getName|(I)Ljava/lang/String;
@@ -290,6 +293,8 @@ org.apache.ibatis.parsing
    (Ljava/lang/String;)Ljava/lang/String;
    (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
   getStringBody|(Ljava/lang/String;)Ljava/lang/String;
+  newXNode|(Lorg/w3c/dom/Node;)Lorg/apache/ibatis/parsing/XNode;
+org.apache.ibatis.plugin|InterceptorChain|pluginAll|(Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.ibatis.reflection
  MetaClass
   forClass|(Ljava/lang/Class;)Lorg/apache/ibatis/reflection/MetaClass;
@@ -304,6 +309,11 @@ org.apache.ibatis.reflection
   forClass|(Ljava/lang/Class;)Lorg/apache/ibatis/reflection/Reflector;
   getGetInvoker|(Ljava/lang/String;)Lorg/apache/ibatis/reflection/invoker/Invoker;
   getSetInvoker|(Ljava/lang/String;)Lorg/apache/ibatis/reflection/invoker/Invoker;
+org.apache.ibatis.reflection.factory
+ DefaultObjectFactory
+  create
+   (Ljava/lang/Class;)Ljava/lang/Object;
+   (Ljava/lang/Class;Ljava/util/List;Ljava/util/List;)Ljava/lang/Object;
 org.apache.ibatis.reflection.invoker|MethodInvoker|invoke|(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.ibatis.reflection.wrapper
  BeanWrapper
@@ -312,14 +322,26 @@ org.apache.ibatis.reflection.wrapper
   hasWrapperFor|(Ljava/lang/Object;)Z
  MapWrapper
   hasGetter|(Ljava/lang/String;)Z
-org.apache.ibatis.scripting.xmltags|DynamicContext|appendSql|(Ljava/lang/String;)V
+org.apache.ibatis.scripting.xmltags
+ DynamicContext
+  appendSql|(Ljava/lang/String;)V
+ DynamicContext$ContextMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ StaticTextSqlNode
+  apply|(Lorg/apache/ibatis/scripting/xmltags/DynamicContext;)Z
 org.apache.ibatis.type
  BaseTypeHandler
   getResult|(Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
  JdbcType
   forCode|(I)Lorg/apache/ibatis/type/JdbcType;
+ LongTypeHandler
+  getNullableResult
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Long;
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
  StringTypeHandler
-  getNullableResult|(Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/String;
+  getNullableResult
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/String;
  TypeHandlerRegistry
   hasTypeHandler
    (Ljava/lang/Class;)Z
@@ -465,13 +487,21 @@ org.apache.openjpa.meta
   getFullName|(Z)Ljava/lang/String;
 org.apache.openjpa.persistence|AnnotationPersistenceMetaDataParser$MethodComparator|compare|(Ljava/lang/Object;Ljava/lang/Object;)I
 org.apache.oro.util|CacheLRU|getElement|(Ljava/lang/Object;)Ljava/lang/Object;
-org.apache.solr.common.util|FastOutputStream|write|(B)V
+org.apache.solr.common.util
+ FastInputStream
+  readByte|()B
+ FastOutputStream
+  write|(B)V
+  writeByte|(I)V
+ NamedList
+  getName|(I)Ljava/lang/String;
 org.apache.solr.schema
  IndexSchema$DynamicReplacement
   matches|(Ljava/lang/String;)Z
  SchemaField
   indexed|()Z
 org.apache.solr.search|DocSetCollector|collect|(I)V
+org.apache.solr.update|LoggingInfoStream|isEnabled|(Ljava/lang/String;)Z
 org.apache.taglibs.standard.tlv
  JstlCoreTLV$Handler
   characters|([CII)V
@@ -490,6 +520,8 @@ org.apache.taglibs.standard.tlv
   endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
 org.apache.tika.io|ProxyInputStream|read|([BII)I
+org.apache.tika.metadata|Metadata|get|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.tika.parser|ParseContext|get|(Ljava/lang/Class;)Ljava/lang/Object;
 org.apache.tika.parser.pdf|PDF2XHTML$1|write|([CII)V
 org.apache.tika.sax
  ContentHandlerDecorator
@@ -728,9 +760,12 @@ org.apache.velocity.runtime.visitor
    (Lorg/apache/velocity/runtime/parser/node/ASTText;Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.xml.dtm.ref
  DTMDefaultBase
+  getNextSibling|(I)I
   getNodeType|(I)S
   makeNodeHandle|(I)I
   makeNodeIdentity|(I)I
+ DTMDefaultBaseTraversers$ChildTraverser
+  next|(II)I
  DTMManagerDefault
   getDTM|(I)Lorg/apache/xml/dtm/DTM;
  ExpandedNameTable
@@ -761,11 +796,20 @@ org.apache.xml.utils
   isWhiteSpace
    (C)Z
    (Ljava/lang/String;)Z
-org.apache.xpath|XPathContext|getDTM|(I)Lorg/apache/xml/dtm/DTM;
-org.apache.xpath.axes|WalkerFactory|isSet|(II)Z
+org.apache.xpath
+ XPathContext
+  getDTM|(I)Lorg/apache/xml/dtm/DTM;
+  popCurrentNode|()V
+  pushCurrentNode|(I)V
+org.apache.xpath.axes
+ PredicatedNodeTest
+  acceptNode|(I)S
+ WalkerFactory
+  isSet|(II)Z
 org.apache.xpath.compiler
  OpMap
   getArgLengthOfStep|(I)I
   getOp|(I)I
  OpMapVector
   elementAt|(I)I
+org.apache.xpath.patterns|NodeTest|execute|(Lorg/apache/xpath/XPathContext;I)Lorg/apache/xpath/objects/XObject;

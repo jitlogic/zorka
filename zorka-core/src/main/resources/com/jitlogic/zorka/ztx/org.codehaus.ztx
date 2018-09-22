@@ -6,6 +6,8 @@ org.codehaus.jackson.impl
   createChildObjectContext|()Lorg/codehaus/jackson/impl/JsonWriteContext;
   writeFieldName|(Ljava/lang/String;)I
   writeValue|()I
+ ReaderBasedParser
+  nextToken|()Lorg/codehaus/jackson/JsonToken;
  Utf8Generator
   writeEndObject|()V
   writeFieldName|(Lorg/codehaus/jackson/io/SerializedString;)V

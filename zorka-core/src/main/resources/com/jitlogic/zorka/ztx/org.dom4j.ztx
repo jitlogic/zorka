@@ -45,6 +45,7 @@ org.dom4j.tree
  AbstractElement
   add|(Lorg/dom4j/Element;)V
   addText|(Ljava/lang/String;)Lorg/dom4j/Element;
+  attributeValue|(Ljava/lang/String;)Ljava/lang/String;
  AbstractNode
   createXPath|(Ljava/lang/String;)Lorg/dom4j/XPath;
  AbstractText

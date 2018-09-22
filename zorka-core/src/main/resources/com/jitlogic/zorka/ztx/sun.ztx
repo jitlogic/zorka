@@ -81,6 +81,8 @@ sun.security.util
  SignatureFileVerifier
   isBlockOrSF|(Ljava/lang/String;)Z
 sun.text
+ CollatorUtilities
+  toNormalizerMode|(I)Lsun/text/normalizer/NormalizerBase$Mode;
  ComposedCharIter
   decomposition|()Ljava/lang/String;
   next|()I
@@ -89,13 +91,30 @@ sun.text
 sun.text.normalizer
  IntTrie
   getCodePointValue|(I)I
+ NormalizerBase
+  next|()I
+ NormalizerBase$IsNextNFDSafe
+  isNextBoundary|(Lsun/text/normalizer/UCharacterIterator;II[I)Z
+ NormalizerImpl
+  decompose|([CII[CIIZ[ILsun/text/normalizer/UnicodeSet;)I
+  getNX|(I)Lsun/text/normalizer/UnicodeSet;
+  isNFDSafe|(JII)Z
  ReplaceableString
   charAt|(I)C
   length|()I
  ReplaceableUCharacterIterator
   current|()I
   next|()I
-sun.util|ResourceBundleEnumeration|nextElement|()Ljava/lang/String;
+ UCharacterIterator
+  moveIndex|(I)I
+ UTF16
+  isLeadSurrogate|(C)Z
+  isSurrogate|(C)Z
+sun.util
+ ResourceBundleEnumeration
+  nextElement
+   ()Ljava/lang/Object;
+   ()Ljava/lang/String;
 sun.util.logging
  LoggingSupport
   isLoggable|(Ljava/lang/Object;Ljava/lang/Object;)Z

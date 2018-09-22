@@ -3,7 +3,6 @@ org.eclipse.jetty.server
   write|([BII)V
  Response
   isAllContentWritten|(J)Z
-org.eclipse.jetty.servlet
 org.eclipse.jetty.util
  BufferUtil
   fill|(Ljava/nio/ByteBuffer;[BII)I

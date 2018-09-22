@@ -60,6 +60,7 @@ org.apache.commons.configuration
 org.apache.commons.configuration.reloading|InvariantReloadingStrategy|reloadingRequired|()Z
 org.apache.commons.dbcp
  DelegatingResultSet
+  getInt|(Ljava/lang/String;)I
   getLong|(Ljava/lang/String;)J
   getString|(Ljava/lang/String;)Ljava/lang/String;
   next|()Z
@@ -151,3 +152,22 @@ org.apache.commons.logging.impl
  SLF4JLocationAwareLog
   debug|(Ljava/lang/Object;)V
   trace|(Ljava/lang/Object;)V
+org.apache.commons.math3.stat.descriptive|SummaryStatistics|addValue|(D)V
+org.apache.commons.math3.stat.descriptive.moment
+ FirstMoment
+  increment|(D)V
+ SecondMoment
+  increment|(D)V
+org.apache.commons.math3.stat.descriptive.rank
+ Max
+  increment|(D)V
+ Min
+  increment|(D)V
+org.apache.commons.math3.stat.descriptive.summary
+ Sum
+  increment|(D)V
+ SumOfLogs
+  increment|(D)V
+ SumOfSquares
+  increment|(D)V
+org.apache.commons.math3.util|FastMath|log|(D)D

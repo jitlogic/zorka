@@ -10,3 +10,5 @@ org.xml.sax.helpers
  DefaultHandler
   endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+ XMLFilterImpl
+  characters|([CII)V

@@ -1,6 +1,7 @@
 org.xmlpull.mxp1
  MXParser
   getNamespace|(Ljava/lang/String;)Ljava/lang/String;
+  next|()I
   nextToken|()I
   parseEndTag|()I
   parseStartTag|()I
