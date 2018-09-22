@@ -4,6 +4,14 @@ groovyjarjarantlr
   length|()I
  ASTFactory
   addASTChild|(Lgroovyjarjarantlr/ASTPair;Lgroovyjarjarantlr/collections/AST;)V
+  create
+   (I)Lgroovyjarjarantlr/collections/AST;
+   (ILjava/lang/String;)Lgroovyjarjarantlr/collections/AST;
+   (Lgroovyjarjarantlr/Token;)Lgroovyjarjarantlr/collections/AST;
+  getASTNodeType|(I)Ljava/lang/Class;
+  make
+   (Lgroovyjarjarantlr/collections/impl/ASTArray;)Lgroovyjarjarantlr/collections/AST;
+   ([Lgroovyjarjarantlr/collections/AST;)Lgroovyjarjarantlr/collections/AST;
  ASTPair
   advanceChildToEnd|()V
  CharBuffer
@@ -16,13 +24,33 @@ groovyjarjarantlr
   LA|(I)C
   append|(C)V
   consume|()V
+  match
+   (C)V
+   (Lgroovyjarjarantlr/collections/impl/BitSet;)V
+  matchRange|(CC)V
+  resetText|()V
+ CommonAST
+  initialize
+   (ILjava/lang/String;)V
+   (Lgroovyjarjarantlr/Token;)V
+   (Lgroovyjarjarantlr/collections/AST;)V
  InputBuffer
   LA|(I)C
   consume|()V
  LLkParser
   LA|(I)I
+  LT|(I)Lgroovyjarjarantlr/Token;
+  consume|()V
  TokenBuffer
   LA|(I)I
+  LT|(I)Lgroovyjarjarantlr/Token;
+  consume|()V
  TokenQueue
+  append|(Lgroovyjarjarantlr/Token;)V
   elementAt|(I)Lgroovyjarjarantlr/Token;
-groovyjarjarantlr.collections.impl|BitSet|member|(I)Z
+  removeFirst|()V
+groovyjarjarantlr.collections.impl
+ ASTArray
+  add|(Lgroovyjarjarantlr/collections/AST;)Lgroovyjarjarantlr/collections/impl/ASTArray;
+ BitSet
+  member|(I)Z

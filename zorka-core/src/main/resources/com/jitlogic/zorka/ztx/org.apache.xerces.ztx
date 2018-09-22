@@ -68,6 +68,9 @@ org.apache.xerces.impl
  XMLEntityManager
   getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
   getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
+ XMLEntityManager$CharacterBufferPool
+  getBuffer|(Z)Lorg/apache/xerces/impl/XMLEntityManager$CharacterBuffer;
+  returnBuffer|(Lorg/apache/xerces/impl/XMLEntityManager$CharacterBuffer;)V
  XMLEntityManager$RewindableInputStream
   read|([BII)I
   readAndBuffer|()I
@@ -83,6 +86,9 @@ org.apache.xerces.impl
   skipChar|(I)Z
   skipSpaces|()Z
   skipString|(Ljava/lang/String;)Z
+ XMLScanner
+  endEntity|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
+  startEntity|(Ljava/lang/String;Lorg/apache/xerces/xni/XMLResourceIdentifier;Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
 org.apache.xerces.impl.dtd
  DTDGrammar
   attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
@@ -170,6 +176,7 @@ org.apache.xerces.impl.validation
 org.apache.xerces.impl.xs
  SchemaGrammar
   getGlobalElementDecl|(Ljava/lang/String;)Lorg/apache/xerces/impl/xs/XSElementDecl;
+  getGlobalTypeDecl|(Ljava/lang/String;)Lorg/apache/xerces/xs/XSTypeDefinition;
  SchemaNamespaceSupport
   getURI|(Ljava/lang/String;)Ljava/lang/String;
  SubstitutionGroupHandler
@@ -180,6 +187,9 @@ org.apache.xerces.impl.xs
  XMLSchemaValidator$XSIErrorReporter
   mergeContext|()[Ljava/lang/String;
   pushContext|()V
+ XSAttributeGroupDecl
+  addAttributeUse|(Lorg/apache/xerces/impl/xs/XSAttributeUseImpl;)Ljava/lang/String;
+  getAttributeUse|(Ljava/lang/String;Ljava/lang/String;)Lorg/apache/xerces/xs/XSAttributeUse;
  XSGrammarBucket
   getGrammar|(Ljava/lang/String;)Lorg/apache/xerces/impl/xs/SchemaGrammar;
 org.apache.xerces.impl.xs.identity
@@ -211,9 +221,14 @@ org.apache.xerces.impl.xs.traversers
    (Lorg/w3c/dom/Element;ZLorg/apache/xerces/impl/xs/traversers/XSDocumentInfo;Z)[Ljava/lang/Object;
   resolveNamespace|(Lorg/w3c/dom/Element;[Lorg/w3c/dom/Attr;Lorg/apache/xerces/impl/xs/SchemaNamespaceSupport;)V
   returnAttrArray|([Ljava/lang/Object;Lorg/apache/xerces/impl/xs/traversers/XSDocumentInfo;)V
+ XSDocumentInfo
+  isAllowedNS|(Ljava/lang/String;)Z
 org.apache.xerces.impl.xs.util
  XInt
   intValue|()I
+  shortValue|()S
+ XIntPool
+  getXInt|(I)Lorg/apache/xerces/impl/xs/util/XInt;
  XSObjectListImpl
   item|(I)Lorg/apache/xerces/xs/XSObject;
 org.apache.xerces.parsers

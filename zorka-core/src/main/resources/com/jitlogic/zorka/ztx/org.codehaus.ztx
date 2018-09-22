@@ -1,9 +1,49 @@
 org.codehaus.groovy.antlr
+ AntlrParserPlugin
+  isType|(ILgroovyjarjarantlr/collections/AST;)Z
+ GroovySourceAST
+  initialize
+   (Lgroovyjarjarantlr/Token;)V
+   (Lgroovyjarjarantlr/collections/AST;)V
  SourceBuffer
   write|(I)V
  UnicodeEscapingReader
   read|()I
-org.codehaus.groovy.ast|ClassNode|redirect|()Lorg/codehaus/groovy/ast/ClassNode;
+org.codehaus.groovy.antlr.parser
+ GroovyLexer
+  nextToken|()Lgroovyjarjarantlr/Token;
+ GroovyLexer$1
+  nextToken|()Lgroovyjarjarantlr/Token;
+ GroovyRecognizer
+  create|(ILjava/lang/String;Lgroovyjarjarantlr/collections/AST;)Lgroovyjarjarantlr/collections/AST;
+  nls|()V
+org.codehaus.groovy.ast
+ ClassHelper
+  makeWithoutCaching|(Ljava/lang/String;)Lorg/codehaus/groovy/ast/ClassNode;
+ ClassNode
+  addField
+   (Ljava/lang/String;ILorg/codehaus/groovy/ast/ClassNode;Lorg/codehaus/groovy/ast/expr/Expression;)Lorg/codehaus/groovy/ast/FieldNode;
+   (Lorg/codehaus/groovy/ast/FieldNode;)V
+  redirect|()Lorg/codehaus/groovy/ast/ClassNode;
+ CodeVisitorSupport
+  visitConstantExpression|(Lorg/codehaus/groovy/ast/expr/ConstantExpression;)V
+org.codehaus.groovy.ast.expr
+ ConstantExpression
+  visit|(Lorg/codehaus/groovy/ast/GroovyCodeVisitor;)V
+ VariableExpression
+  visit|(Lorg/codehaus/groovy/ast/GroovyCodeVisitor;)V
+org.codehaus.groovy.ast.stmt|ExpressionStatement|visit|(Lorg/codehaus/groovy/ast/GroovyCodeVisitor;)V
+org.codehaus.groovy.reflection|CachedClass$CachedMethodComparatorWithString|compare|(Ljava/lang/Object;Ljava/lang/Object;)I
+org.codehaus.groovy.runtime.metaclass
+ MetaMethodIndex
+  addMethodToList|(Ljava/lang/Object;Lgroovy/lang/MetaMethod;)Ljava/lang/Object;
+  getOrPutMethods|(Ljava/lang/String;Lorg/codehaus/groovy/runtime/metaclass/MetaMethodIndex$Header;)Lorg/codehaus/groovy/runtime/metaclass/MetaMethodIndex$Entry;
+  hash|(I)I
+org.codehaus.groovy.util
+ ComplexKeyHashMap
+  hash|(I)I
+ FastArray
+  size|()I
 org.codehaus.jackson|JsonStreamContext|inObject|()Z
 org.codehaus.jackson.impl
  JsonGeneratorBase

@@ -75,6 +75,7 @@ org.apache.commons.dbcp2
    (Ljava/lang/String;)Ljava/lang/String;
   next|()Z
   wasNull|()Z
+org.apache.commons.digester|Digester|characters|([CII)V
 org.apache.commons.fileupload
  MultipartStream
   readByte|()B
@@ -145,15 +146,21 @@ org.apache.commons.logging
   getLog
    (Ljava/lang/Class;)Lorg/apache/commons/logging/Log;
    (Ljava/lang/String;)Lorg/apache/commons/logging/Log;
+ LogFactory$1
+  run|()Ljava/lang/Object;
  LogFactory$Log4jDelegate
   createLog|(Ljava/lang/String;)Lorg/apache/commons/logging/Log;
 org.apache.commons.logging.impl
  Log4JLogger
   debug|(Ljava/lang/Object;)V
   trace|(Ljava/lang/Object;)V
+ Log4jProxy
+  trace|(Ljava/lang/Object;)V
  SLF4JLocationAwareLog
   debug|(Ljava/lang/Object;)V
   trace|(Ljava/lang/Object;)V
+ WeakHashtable
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.commons.math3.stat.descriptive|SummaryStatistics|addValue|(D)V
 org.apache.commons.math3.stat.descriptive.moment
  FirstMoment

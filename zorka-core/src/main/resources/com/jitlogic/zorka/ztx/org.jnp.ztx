@@ -1,0 +1,1 @@
+org.jnp.interfaces|FastNamingProperties|getProperty|(Ljava/lang/String;)Ljava/lang/String;

@@ -23,6 +23,8 @@ org.hsqldb
   newColumnSchemaHsqlName|(Lorg/hsqldb/HsqlNameManager$HsqlName;Lorg/hsqldb/HsqlNameManager$SimpleName;)Lorg/hsqldb/HsqlNameManager$HsqlName;
  HsqlNameManager$HsqlName
   rename|(Ljava/lang/String;Z)V
+ Index$IndexRowIterator
+  next|()Lorg/hsqldb/Row;
  ParserDQL$CompileContext
   rewind|(I)V
  RangeVariable
@@ -36,14 +38,22 @@ org.hsqldb
  RangeVariable$RangeIteratorMain
   next|()Z
   reset|()V
+ Result
+  add|([Ljava/lang/Object;)V
+  iterator|()Lorg/hsqldb/lib/Iterator;
+ Result$ResultIterator
+  next|()Ljava/lang/Object;
  RowAVL
   getNode|(I)Lorg/hsqldb/index/NodeAVL;
  Scanner
   scanNext|()V
   scanUndelimitedIdentifier|()Z
   scanWhitespace|()Z
+ SchemaManager
+  getUserTable|(Lorg/hsqldb/Session;Ljava/lang/String;Ljava/lang/String;)Lorg/hsqldb/Table;
  Session
   execute|(Lorg/hsqldb/result/Result;)Lorg/hsqldb/result/Result;
+  getSchemaName|(Ljava/lang/String;)Ljava/lang/String;
  SessionData
   startRowProcessing|()V
  Table
@@ -53,6 +63,8 @@ org.hsqldb
   insertSys|(Lorg/hsqldb/Session;Lorg/hsqldb/persist/PersistentStore;[Ljava/lang/Object;)V
  TableBase
   getIndex|(I)Lorg/hsqldb/index/Index;
+ Tokenizer
+  reset|(Ljava/lang/String;)V
  Tokens
   getKeywordID|(Ljava/lang/String;I)I
   getNonKeywordID|(Ljava/lang/String;I)I
@@ -75,6 +87,12 @@ org.hsqldb.jdbc
  JDBCResultSet
   getLong|(I)J
   next|()Z
+ jdbcResultSet
+  close|()V
+  findColumn|(Ljava/lang/String;)I
+  getInt|(I)I
+  getString|(I)Ljava/lang/String;
+  next|()Z
 org.hsqldb.lib
  ArrayUtil
   fillArray|([CIC)V
@@ -95,7 +113,11 @@ org.hsqldb.lib
   toArray|(Ljava/lang/Object;)Ljava/lang/Object;
  HsqlByteArrayOutputStream
   ensureRoom|(I)V
-  write|(I)V
+  reset|()V
+  size|()I
+  write
+   (I)V
+   ([BII)V
   writeBytes|(Ljava/lang/String;)V
   writeNoCheck|(I)V
  IntKeyHashMap
@@ -119,7 +141,11 @@ org.hsqldb.lib
   lock|()V
   unlock|()V
  StringConverter
+  asciiToUnicode|(Ljava/lang/String;)Ljava/lang/String;
+  hexToByte|(Ljava/lang/String;)[B
   stringToUnicodeBytes|(Lorg/hsqldb/lib/HsqlByteArrayOutputStream;Ljava/lang/String;Z)V
+  unicodeToAscii|(Lorg/hsqldb/lib/HsqlByteArrayOutputStream;Ljava/lang/String;Z)I
+  writeHex|([BI[B)V
  WrapperIterator
   next|()Ljava/lang/Object;
 org.hsqldb.lib.java|JavaSystem|gc|()V
@@ -131,6 +157,8 @@ org.hsqldb.navigator
   compare|(Ljava/lang/Object;Ljava/lang/Object;)I
   next|()Z
 org.hsqldb.persist
+ Logger
+  needsCheckpoint|()Z
  RowStoreAVL
   getAccessor|(Lorg/hsqldb/index/Index;)Lorg/hsqldb/persist/CachedObject;
   indexRow|(Lorg/hsqldb/Session;Lorg/hsqldb/Row;)V
@@ -159,6 +187,10 @@ org.hsqldb.store
  BaseHashMap$BaseHashIterator
   next|()Ljava/lang/Object;
   nextInt|()I
+ ValuePool
+  getInt|(I)Ljava/lang/Integer;
+  getLong|(J)Ljava/lang/Long;
+  getString|(Ljava/lang/String;)Ljava/lang/String;
 org.hsqldb.types
  BinaryData
   bitLength|(Lorg/hsqldb/SessionInterface;)J

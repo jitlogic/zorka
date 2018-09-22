@@ -129,8 +129,14 @@ com.sun.org.apache.xalan.internal.utils
  XMLSecurityPropertyManager$Property
   values|()[Lcom/sun/org/apache/xalan/internal/utils/XMLSecurityPropertyManager$Property;
 com.sun.org.apache.xerces.internal.dom
+ DeferredDocumentImpl
+  appendChild|(II)V
+  getNodeExtra|(IZ)I
+  getPrevSibling|(IZ)I
  NamedNodeMapImpl
   getNamedItem|(Ljava/lang/String;)Lorg/w3c/dom/Node;
+ NodeImpl
+  needsSyncChildren|(Z)V
  ParentNode
   item|(I)Lorg/w3c/dom/Node;
 com.sun.org.apache.xerces.internal.impl
@@ -372,7 +378,9 @@ com.sun.xml.bind.v2.model.annotation
   getPackageAnnotation
    (Ljava/lang/Class;Ljava/lang/Class;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
    (Ljava/lang/Class;Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
-  hasFieldAnnotation|(Ljava/lang/Class;Ljava/lang/reflect/Field;)Z
+  hasFieldAnnotation
+   (Ljava/lang/Class;Ljava/lang/Object;)Z
+   (Ljava/lang/Class;Ljava/lang/reflect/Field;)Z
 com.sun.xml.bind.v2.model.impl
  ElementPropertyInfoImpl
   kind|()Lcom/sun/xml/bind/v2/model/core/PropertyKind;
@@ -380,13 +388,19 @@ com.sun.xml.bind.v2.model.impl
  ElementPropertyInfoImpl$1
   get|(I)Lcom/sun/xml/bind/v2/model/core/TypeInfo;
   size|()I
+ FieldPropertySeed
+  readAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
  PropertyInfoImpl
   id|()Lcom/sun/xml/bind/v2/model/core/ID;
 com.sun.xml.bind.v2.model.nav
  ReflectionNavigator
   asDecl|(Ljava/lang/Class;)Ljava/lang/Class;
-  getFieldName|(Ljava/lang/reflect/Field;)Ljava/lang/String;
-  getFieldType|(Ljava/lang/reflect/Field;)Ljava/lang/reflect/Type;
+  getFieldName
+   (Ljava/lang/Object;)Ljava/lang/String;
+   (Ljava/lang/reflect/Field;)Ljava/lang/String;
+  getFieldType
+   (Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/reflect/Field;)Ljava/lang/reflect/Type;
   getMethodParameters|(Ljava/lang/reflect/Method;)[Ljava/lang/reflect/Type;
   isSameType|(Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)Z
   ref|(Ljava/lang/Class;)Ljava/lang/Class;
@@ -394,6 +408,8 @@ com.sun.xml.bind.v2.model.nav
   onClass
    (Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
    (Ljava/lang/Class;Ljava/lang/Void;)Ljava/lang/Class;
+ TypeVisitor
+  visit|(Ljava/lang/reflect/Type;Ljava/lang/Object;)Ljava/lang/Object;
 com.sun.xml.bind.v2.runtime.unmarshaller|ValidatingUnmarshaller|expectText|()Z
 com.sun.xml.bind.v2.util
  QNameMap

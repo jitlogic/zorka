@@ -1,0 +1,9 @@
+groovyjarjarasm.asm
+ ByteVector
+  putByte|(I)Lgroovyjarjarasm/asm/ByteVector;
+  putInt|(I)Lgroovyjarjarasm/asm/ByteVector;
+  putShort|(I)Lgroovyjarjarasm/asm/ByteVector;
+ ClassWriter
+  newUTF8|(Ljava/lang/String;)I
+ MethodWriter
+  visitInsn|(I)V

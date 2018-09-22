@@ -308,7 +308,12 @@ com.google.inject.internal
   get|(Lcom/google/inject/internal/Errors;Lcom/google/inject/internal/InternalContext;Lcom/google/inject/spi/Dependency;Z)Ljava/lang/Object;
  InternalFactoryToProviderAdapter
   get|(Lcom/google/inject/internal/Errors;Lcom/google/inject/internal/InternalContext;Lcom/google/inject/spi/Dependency;Z)Ljava/lang/Object;
-com.google.inject.internal.asm|$ByteVector|putByte|(I)Lcom/google/inject/internal/asm/$ByteVector;
+com.google.inject.internal.asm
+ $ByteVector
+  putByte|(I)Lcom/google/inject/internal/asm/$ByteVector;
+ ByteVector
+  putByte|(I)Lcom/google/inject/internal/asm/ByteVector;
+  putShort|(I)Lcom/google/inject/internal/asm/ByteVector;
 com.google.template.soy.base.internal
  BaseUtils
   isIdentifierWithLeadingDot|(Ljava/lang/String;)Z

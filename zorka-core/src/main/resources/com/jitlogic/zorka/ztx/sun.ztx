@@ -9,6 +9,8 @@ sun.java2d.loops
  GraphicsPrimitiveMgr$2
   compare|(Ljava/lang/Object;Ljava/lang/Object;)I
 sun.misc
+ CharacterDecoder
+  decodeBuffer|(Ljava/io/InputStream;Ljava/io/OutputStream;)V
  FDBigInteger
   cmp|(Lsun/misc/FDBigInteger;)I
   cmpPow52|(II)I
@@ -87,6 +89,8 @@ sun.nio.cs
   decode|([BII[C)I
  ISO_8859_1$Encoder
   encode|([CII[B)I
+ Surrogate
+  is|(I)Z
  ThreadLocalCoders
   decoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetDecoder;
   encoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetEncoder;
@@ -102,12 +106,34 @@ sun.security.jca
   toArray|()[Ljava/lang/Object;
  ProviderList
   getService|(Ljava/lang/String;Ljava/lang/String;)Ljava/security/Provider$Service;
-sun.security.provider|PolicyFile$8|run|()Ljava/lang/Object;
+sun.security.provider
+ IdentityDatabase
+  identities|()Ljava/util/Enumeration;
+ PolicyFile$8
+  run|()Ljava/lang/Object;
 sun.security.util
  DerInputStream
   available|()I
+ DerValue
+  isPrintableStringChar|(C)Z
+ ManifestEntryVerifier
+  update
+   (B)V
+   ([BII)V
+  verify|(Ljava/util/Hashtable;Ljava/util/Hashtable;)[Ljava/security/CodeSigner;
  SignatureFileVerifier
   isBlockOrSF|(Ljava/lang/String;)Z
+sun.security.x509
+ CertificateIssuerName
+  get|(Ljava/lang/String;)Ljava/lang/Object;
+ CertificateSubjectName
+  get|(Ljava/lang/String;)Ljava/lang/Object;
+ CertificateX509Key
+  get|(Ljava/lang/String;)Ljava/lang/Object;
+ X509CertImpl
+  getEncodedInternal|(Ljava/security/cert/Certificate;)[B
+ X509CertInfo
+  get|(Ljava/lang/String;)Ljava/lang/Object;
 sun.text
  CollatorUtilities
   toNormalizerMode|(I)Lsun/text/normalizer/NormalizerBase$Mode;

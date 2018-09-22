@@ -1,0 +1,31 @@
+com.arjuna.ats.arjuna.common
+ Uid
+  copy|(Lcom/arjuna/ats/arjuna/common/Uid;)V
+  nullUid|()Lcom/arjuna/ats/arjuna/common/Uid;
+com.arjuna.ats.arjuna.coordinator
+ ActionManager
+  manager|()Lcom/arjuna/ats/arjuna/coordinator/ActionManager;
+  put|(Lcom/arjuna/ats/arjuna/coordinator/BasicAction;)V
+  remove|(Lcom/arjuna/ats/arjuna/common/Uid;)V
+ BasicAction
+  Current|()Lcom/arjuna/ats/arjuna/coordinator/BasicAction;
+  parent|()Lcom/arjuna/ats/arjuna/coordinator/BasicAction;
+  status|()I
+ TransactionReaper
+  transactionReaper|()Lcom/arjuna/ats/arjuna/coordinator/TransactionReaper;
+com.arjuna.ats.arjuna.utils
+ ThreadUtil
+  getThreadId|(Ljava/lang/Thread;)Ljava/lang/String;
+ Utility
+  hostInetAddr|()I
+com.arjuna.ats.internal.arjuna.coordinator
+ ReaperElementManager
+  add|(Lcom/arjuna/ats/internal/arjuna/coordinator/ReaperElement;)V
+  remove|(Lcom/arjuna/ats/internal/arjuna/coordinator/ReaperElement;)V
+com.arjuna.ats.internal.arjuna.thread|ThreadActionData|currentAction|()Lcom/arjuna/ats/arjuna/coordinator/BasicAction;
+com.arjuna.ats.internal.jta.utils.arjunacore|StatusConverter|convert|(I)I
+com.arjuna.common.internal.util.logging
+ AbstractLogImpl
+  debugAllowed|(JJJ)Z
+ LogNoi18nImpl
+  debugAllowed|(JJJ)Z

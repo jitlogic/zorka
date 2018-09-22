@@ -1,0 +1,52 @@
+org.exoplatform.commons.utils
+ BufferingOutputStream
+  write|(I)V
+ CharsetTextEncoder
+  encode|(CLjava/io/OutputStream;)V
+ GrowingOutputStream
+  write|(I)V
+ MapResourceBundle$1
+  nextElement|()Ljava/lang/String;
+org.exoplatform.container|ConcurrentPicoContainer$ContainerVisitor|visitComponentAdapter|(Lorg/picocontainer/ComponentAdapter;)V
+org.exoplatform.container.configuration|Namespaces|isKernelNamespace|(Ljava/lang/String;)Z
+org.exoplatform.services.jcr.datamodel|QPathEntry|getAsString|(Z)Ljava/lang/String;
+org.exoplatform.services.jcr.impl.core
+ JCRPath$PathElement
+  getAsString|(Z)Ljava/lang/String;
+ LocationFactory
+  createJCRName|(Lorg/exoplatform/services/jcr/datamodel/InternalQName;)Lorg/exoplatform/services/jcr/impl/core/JCRName;
+ NamespaceRegistryImpl
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+ SessionImpl
+  getNamespacePrefix|(Ljava/lang/String;)Ljava/lang/String;
+  getNamespacePrefixByURI|(Ljava/lang/String;)Ljava/lang/String;
+  updateLastAccessTime|()V
+org.exoplatform.services.jcr.impl.core.nodetype
+ InmemoryNodeTypeRepository
+  getNodeType|(Lorg/exoplatform/services/jcr/datamodel/InternalQName;)Lorg/exoplatform/services/jcr/core/nodetype/NodeTypeData;
+ NodeTypeDataHierarchyHolder
+  getNodeType|(Lorg/exoplatform/services/jcr/datamodel/InternalQName;)Lorg/exoplatform/services/jcr/core/nodetype/NodeTypeData;
+  isNodeType|(Lorg/exoplatform/services/jcr/datamodel/InternalQName;[Lorg/exoplatform/services/jcr/datamodel/InternalQName;)Z
+ NodeTypeDataManagerImpl
+  getNodeType|(Lorg/exoplatform/services/jcr/datamodel/InternalQName;)Lorg/exoplatform/services/jcr/core/nodetype/NodeTypeData;
+ NodeTypeManagerImpl
+  findNodeType|(Lorg/exoplatform/services/jcr/datamodel/InternalQName;)Ljavax/jcr/nodetype/NodeType;
+org.exoplatform.services.jcr.impl.dataflow.persistent.jbosscache
+ BufferedJBossCache
+  get|(Lorg/jboss/cache/Fqn;Ljava/io/Serializable;)Ljava/lang/Object;
+ BufferedJBossCache$ChangesContainer
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/exoplatform/services/jcr/impl/dataflow/persistent/jbosscache/BufferedJBossCache$ChangesContainer;)I
+ JBossCacheWorkspaceStorageCache
+  get|(Ljava/lang/String;)Lorg/exoplatform/services/jcr/datamodel/ItemData;
+org.exoplatform.services.jcr.impl.dataflow.session
+ SessionChangesLog
+  getItemState|(Ljava/lang/String;)Lorg/exoplatform/services/jcr/dataflow/ItemState;
+ TransactionableDataManager
+  txStarted|()Z
+org.exoplatform.services.jcr.impl.xml
+ XMLChar
+  isBaseChar|(I)Z
+  isLetter|(I)Z
+  isName|(I)Z
