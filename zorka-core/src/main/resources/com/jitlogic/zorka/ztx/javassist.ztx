@@ -1,13 +1,26 @@
+javassist|ClassPool|get|(Ljava/lang/String;)Ljavassist/CtClass;
 javassist.bytecode
+ ByteArray
+  readU16bit|([BI)I
  ByteVector
+  add|(I)V
   addGap|(I)V
  Bytecode
+  add|(I)V
+  addGap|(I)V
   growStack|(I)V
+ ClassInfo
+  getClassName|(Ljavassist/bytecode/ConstPool;)Ljava/lang/String;
  ConstPool
   addClassInfo|(Ljava/lang/String;)I
   addUtf8Info|(Ljava/lang/String;)I
+  getUtf8Info|(I)Ljava/lang/String;
  Descriptor
   dataSize|(Ljava/lang/String;)I
+  numOfParameters|(Ljava/lang/String;)I
+  toJavaName|(Ljava/lang/String;)Ljava/lang/String;
+ FieldInfo
+  getAttribute|(Ljava/lang/String;)Ljavassist/bytecode/AttributeInfo;
  LongVector
   addElement|(Ljava/lang/Object;)V
   elementAt|(I)Ljava/lang/Object;

@@ -34,34 +34,35 @@ __alfresco() {
     zorka.defCfg("alfresco.batch.trace.time", zorka.longCfg("tracer.min.trace.time"));
     zorka.defCfg("alfresco.batch.import.time", zorka.longCfg("tracer.min.trace.time"));
 
-    _mbean = "zorka:type=ZorkaStats,name=AlfrescoBatches";
+    _mbean = "zorka:type=ZorkaStats,name=Alfresco";
     _trace = zorka.boolCfg("alfresco.batch.trace");
     _traceTime = zorka.longCfg("alfresco.batch.trace.time");
     _importTime = zorka.longCfg("alfresco.batch.import.time");
 
 
-    spy.add(spy.instrument("ALFRESCO_BATCH")
-       .onEnter(spy.fetchArg("THIS", 0),
-           _trace ? spy.subchain(
-               tracer.begin("AF_BATCH", _traceTime),
-               tracer.formatAttr("WORKER", "${THIS}")
-           ) : null)
-       .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
-       .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
-       .include(
-           spy.byInterfaceAndMethod("org.alfresco.repo.batch.Batch**", "process")
-        ));
+    if (zorka.boolCfg("alfresco.trace.batches", true)) {
+      spy.add(spy.instrument("ALFRESCO_BATCH")
+         .onEnter(spy.fetchArg("THIS", 0),
+             _trace ? spy.subchain(
+                 tracer.begin("AF_BATCH", _traceTime),
+                 tracer.formatAttr("WORKER", "${THIS}")
+             ) : null)
+         .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
+         .onSubmit(spy.zorkaStats("java", _mbean, "stats", "AF_BATCH"))
+         .include(spy.byInterfaceAndMethod("org.alfresco.repo.batch.Batch**", "process")));
+    }
 
-
-    spy.add(spy.instrument("ALFRESCO_IMPORT_FILE")
-       .onEnter(spy.fetchArg("NODE_REF", 1),
-           _trace ? spy.subchain(
-               tracer.begin("AF_IMP_FILE", _importTime),
-               tracer.formatAttr("NODE", "${NODE_REF}")
-           ) : null)
-       .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
-       .onSubmit(spy.zorkaStats("java", _mbean, "stats", "importFile"))
-       .include(spy.byMethod(0, "org.alfresco.repo.bulkimport.impl.AbstractNodeImporter", "importImportableItemFile", null)));
+    if (zorka.boolCfg("alfresco.trace.imports", true)) {
+      spy.add(spy.instrument("ALFRESCO_IMPORT_FILE")
+         .onEnter(spy.fetchArg("NODE_REF", 1),
+             _trace ? spy.subchain(
+                 tracer.begin("AF_IMPORT", _importTime),
+                 tracer.formatAttr("NODE", "${NODE_REF}")
+             ) : null)
+         .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
+         .onSubmit(spy.zorkaStats("java", _mbean, "stats", "AF_IMPORT"))
+         .include(spy.byMethod(0, "org.alfresco.repo.bulkimport.impl.AbstractNodeImporter", "importImportableItemFile", null)));
+    }
 
     return this;
 }

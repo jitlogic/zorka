@@ -15,7 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Common JBoss 4/5/6 support functions
+// Common JBoss 5/6 support functions
 
 zorka.require(
   "jsf.bsh",
@@ -108,6 +108,10 @@ __jboss() {
 
      // Nothing here (yet), Catalina does (most of the) work
 
+  }
+
+  if (zorka.boolCfg("tracer", false)) {
+    tracer.exclude("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate");
   }
 
   // Catch MX mbean server initialization and register JBoss MBean Server here ...

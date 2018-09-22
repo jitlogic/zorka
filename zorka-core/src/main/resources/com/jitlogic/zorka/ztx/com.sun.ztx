@@ -25,6 +25,58 @@ com.sun.el.parser
   getValue|(Lcom/sun/el/lang/EvaluationContext;)Ljava/lang/Object;
  SimpleNode
   accept|(Lcom/sun/el/parser/NodeVisitor;)V
+com.sun.facelets
+ StateWriter
+  write
+   (I)V
+   (Ljava/lang/String;)V
+   ([CII)V
+com.sun.facelets.el|TagValueExpression|getValue|(Ljavax/el/ELContext;)Ljava/lang/Object;
+com.sun.facelets.util
+ FastWriter
+  write
+   (I)V
+   (Ljava/lang/String;)V
+   ([CII)V
+com.sun.faces.context
+ ApplicationMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ RequestMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ SessionMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+com.sun.faces.el
+ FacesCompositeELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ FacesResourceBundleELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ImplicitObjectELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ManagedBeanELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+com.sun.faces.io
+ FastStringWriter
+  write
+   (Ljava/lang/String;)V
+   ([CII)V
+com.sun.faces.renderkit|RenderKitImpl|getRenderer|(Ljava/lang/String;Ljava/lang/String;)Ljavax/faces/render/Renderer;
+com.sun.faces.renderkit.html_basic
+ HtmlResponseWriter
+  endElement|(Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljavax/faces/component/UIComponent;)V
+  write
+   (I)V
+   (Ljava/lang/String;)V
+  writeAttribute|(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;)V
+com.sun.faces.util
+ HtmlUtils
+  writeAttribute
+   (Ljava/io/Writer;ZZ[CLjava/lang/String;[CZ)V
+   (Ljava/io/Writer;ZZ[C[CIIZ)V
+ RequestStateManager
+  remove|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/lang/Object;
+ Util
+  notNull|(Ljava/lang/String;Ljava/lang/Object;)V
 com.sun.imageio.plugins.png
  IDATOutputStream
   deflate|()V
@@ -49,8 +101,12 @@ com.sun.jersey.core.reflection
 com.sun.jmx.mbeanserver
  DefaultMXBeanMappingFactory$NonNullMXBeanMapping
   toOpenValue|(Ljava/lang/Object;)Ljava/lang/Object;
+ Introspector
+  descriptorForAnnotations|([Ljava/lang/annotation/Annotation;)Ljavax/management/Descriptor;
+  descriptorForElement|(Ljava/lang/reflect/AnnotatedElement;)Ljavax/management/Descriptor;
  Repository$ObjectNamePattern
   matchKeys|(Ljavax/management/ObjectName;)Z
+com.sun.jmx.trace|TraceManager|isSelected|(II)Z
 com.sun.media.jai.codecimpl|PNGChunk|getByte|(I)B
 com.sun.media.jai.util|CaselessStringArrayTable|indexOf|(Ljavax/media/jai/util/CaselessStringKey;)I
 com.sun.org.apache.regexp.internal
@@ -300,6 +356,7 @@ com.sun.org.apache.xerces.internal.xni
 com.sun.org.apache.xml.internal.dtm.ref.sax2dtm|SAX2DTM2|_exptype2|(I)I
 com.sun.org.apache.xml.internal.serializer|WriterToUTF8Buffered|write|(I)V
 com.sun.org.apache.xpath.internal.compiler|OpMapVector|elementAt|(I)I
+com.sun.xml.bind|WhiteSpaceProcessor|isWhiteSpace|(C)Z
 com.sun.xml.bind.v2.bytecode
  ClassTailor
   toVMClassName|(Ljava/lang/Class;)Ljava/lang/String;
@@ -337,7 +394,11 @@ com.sun.xml.bind.v2.model.nav
   onClass
    (Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
    (Ljava/lang/Class;Ljava/lang/Void;)Ljava/lang/Class;
-com.sun.xml.bind.v2.util|QNameMap|put|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V
+com.sun.xml.bind.v2.runtime.unmarshaller|ValidatingUnmarshaller|expectText|()Z
+com.sun.xml.bind.v2.util
+ QNameMap
+  get|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
+  put|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V
 com.sun.xml.internal.bind|WhiteSpaceProcessor|isWhiteSpace|(Ljava/lang/CharSequence;)Z
 com.sun.xml.internal.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/internal/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
 com.sun.xml.internal.bind.v2.model.impl

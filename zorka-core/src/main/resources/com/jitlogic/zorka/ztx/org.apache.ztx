@@ -28,6 +28,7 @@ org.apache.catalina.connector
   flush|()V
  CoyoteWriter
   write
+   (I)V
    (Ljava/lang/String;)V
    (Ljava/lang/String;II)V
    ([C)V
@@ -42,11 +43,13 @@ org.apache.catalina.connector
  OutputBuffer
   flush|()V
   write
+   (I)V
    (Ljava/lang/String;II)V
    ([CII)V
  Request
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
+  getSession|(Z)Ljavax/servlet/http/HttpSession;
   removeAttribute|(Ljava/lang/String;)V
  Request$1
   get|(Lorg/apache/catalina/connector/Request;Ljava/lang/String;)Ljava/lang/Object;
@@ -55,6 +58,7 @@ org.apache.catalina.connector
  RequestFacade
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
+  getSession|(Z)Ljavax/servlet/http/HttpSession;
   removeAttribute|(Ljava/lang/String;)V
  Response
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
@@ -112,7 +116,11 @@ org.apache.catalina.mapper
   map|(Lorg/apache/tomcat/util/buf/MessageBytes;Lorg/apache/tomcat/util/buf/MessageBytes;Ljava/lang/String;Lorg/apache/catalina/mapper/MappingData;)V
  MappingData
   recycle|()V
-org.apache.catalina.session|StandardSessionFacade|getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+org.apache.catalina.session
+ StandardSession
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+ StandardSessionFacade
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
 org.apache.catalina.util
  ParameterMap
   clear|()V
@@ -441,6 +449,8 @@ org.apache.log4j
   log|(Ljava/lang/String;Lorg/apache/log4j/Priority;Ljava/lang/Object;Ljava/lang/Throwable;)V
  Hierarchy
   isDisabled|(I)Z
+ LogManager
+  getLogger|(Ljava/lang/String;)Lorg/apache/log4j/Logger;
  Priority
   isGreaterOrEqual|(Lorg/apache/log4j/Priority;)Z
 org.apache.log4j.helpers
@@ -614,6 +624,7 @@ org.apache.tomcat.util.buf
  CharChunk
   allocate|(II)V
   append
+   (C)V
    (Ljava/lang/String;II)V
    ([CII)V
   equalsIgnoreCase|(Ljava/lang/String;)Z
@@ -656,6 +667,8 @@ org.apache.tomcat.util.file
 org.apache.tomcat.util.http
  CookieSupport
   isHttpSeparator|(C)Z
+ Cookies
+  isSeparator|(B)Z
  MimeHeaderField
   recycle|()V
  MimeHeaders

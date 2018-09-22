@@ -20,6 +20,12 @@ sun.misc
   valueOfMulPow52|(JII)Lsun/misc/FDBigInteger;
  FpUtils
   getExponent|(D)I
+ ProxyGenerator$ConstantPool
+  getUtf8|(Ljava/lang/String;)S
+ ProxyGenerator$ConstantPool$IndirectEntry
+  write|(Ljava/io/DataOutputStream;)V
+ ProxyGenerator$ConstantPool$ValueEntry
+  write|(Ljava/io/DataOutputStream;)V
 sun.net|DefaultProgressMeteringPolicy|shouldMeterInput|(Ljava/net/URL;Ljava/lang/String;)Z
 sun.net.www|MeteredStream|read|([BII)I
 sun.net.www.http
@@ -86,6 +92,17 @@ sun.nio.cs
   encoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetEncoder;
  US_ASCII$Decoder
   decode|([BII[C)I
+sun.security.jca
+ GetInstance
+  checkSuperClass|(Ljava/security/Provider$Service;Ljava/lang/Class;Ljava/lang/Class;)V
+  getInstance
+   (Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;)Lsun/security/jca/GetInstance$Instance;
+   (Ljava/security/Provider$Service;Ljava/lang/Class;)Lsun/security/jca/GetInstance$Instance;
+ GetInstance$Instance
+  toArray|()[Ljava/lang/Object;
+ ProviderList
+  getService|(Ljava/lang/String;Ljava/lang/String;)Ljava/security/Provider$Service;
+sun.security.provider|PolicyFile$8|run|()Ljava/lang/Object;
 sun.security.util
  DerInputStream
   available|()I

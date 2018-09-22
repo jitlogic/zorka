@@ -11,6 +11,8 @@ javax.el
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  BeanELResolver$BeanProperties
   getBeanProperty|(Ljava/lang/String;)Ljavax/el/BeanELResolver$BeanProperty;
+ BeanELResolver$ConcurrentCache
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
  CompositeELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  ELContext
@@ -21,7 +23,30 @@ javax.el
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  ResourceBundleELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-javax.management|ImmutableDescriptor|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
+javax.faces.component
+ UIComponent
+  getValueExpression|(Ljava/lang/String;)Ljavax/el/ValueExpression;
+ UIComponentBase
+  getValueBinding|(Ljava/lang/String;)Ljavax/faces/el/ValueBinding;
+ UIComponentBase$AttributesMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ UIComponentBase$ChildrenList
+  iterator|()Ljava/util/Iterator;
+ UIComponentBase$ChildrenListIterator
+  next
+   ()Ljava/lang/Object;
+   ()Ljavax/faces/component/UIComponent;
+ UIComponentBase$FacetsMap
+  values|()Ljava/util/Collection;
+ UIComponentBase$FacetsMapValues
+  iterator|()Ljava/util/Iterator;
+javax.faces.event|PhaseId|compareTo|(Ljava/lang/Object;)I
+javax.management
+ ImmutableDescriptor
+  getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
+  union|([Ljavax/management/Descriptor;)Ljavax/management/ImmutableDescriptor;
+ ObjectName
+  apply|(Ljavax/management/ObjectName;)Z
 javax.management.modelmbean|DescriptorSupport|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
 javax.management.openmbean
  ArrayType
@@ -59,6 +84,8 @@ javax.servlet.http
   service|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
  HttpServletRequestWrapper
   getSession|(Z)Ljavax/servlet/http/HttpSession;
+ HttpServletResponseWrapper
+  encodeURL|(Ljava/lang/String;)Ljava/lang/String;
 javax.servlet.jsp.el
  ImplicitObjectELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;

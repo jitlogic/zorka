@@ -343,6 +343,7 @@ org.apache.xerces.util
    (Lorg/apache/xerces/xni/XMLString;)V
    ([CII)V
   clear|()V
+org.apache.xerces.xinclude|MultipleScopeNamespaceSupport|getURI|(Ljava/lang/String;II)Ljava/lang/String;
 org.apache.xerces.xni
  QName
   clear|()V

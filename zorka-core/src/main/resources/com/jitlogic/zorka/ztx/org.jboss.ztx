@@ -1,3 +1,39 @@
+org.jboss.aop
+ ClassAdvisor
+  isAdvisable|(Ljava/lang/reflect/Method;)Z
+  isWithoutAdvisement|(Ljava/lang/String;)Z
+ MethodMatchInfo
+  populateBindings|()Ljava/util/ArrayList;
+ SecurityActions$GetClassLoaderAction$1
+  getClassLoader|(Ljava/lang/Class;)Ljava/lang/ClassLoader;
+org.jboss.aop.metadata
+ SimpleMetaData
+  getMetaData|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  mergeIn|(Lorg/jboss/aop/metadata/SimpleMetaData;)V
+org.jboss.aop.pointcut
+ MatcherStrategy
+  getMatcher|(Lorg/jboss/aop/Advisor;)Lorg/jboss/aop/pointcut/MatcherStrategy;
+  subtypeOf|(Ljava/lang/Class;Lorg/jboss/aop/pointcut/ast/ClassExpression;Lorg/jboss/aop/Advisor;)Z
+ ProxyMatcherStrategy
+  getDeclaringClass|(Lorg/jboss/aop/Advisor;Ljava/lang/reflect/Method;)Ljava/lang/Class;
+org.jboss.aop.pointcut.ast
+ ClassExpression
+  matches|(Ljava/lang/String;)Z
+ SimpleNode
+  jjtGetChild|(I)Lorg/jboss/aop/pointcut/ast/Node;
+org.jboss.aop.proxy.container|ClassProxyContainer|chainOverridingForInheritedMethods|()Z
+org.jboss.aop.util
+ Advisable
+  isAdvisableMethod|(ILjava/lang/String;)Z
+ ClassLoaderUtils
+  stripArrayFromClassName|(Ljava/lang/String;)Ljava/lang/String;
+ FieldComparator
+  compare|(Ljava/lang/reflect/Field;Ljava/lang/reflect/Field;)I
+ MethodHashing
+  createHash|(Ljava/lang/String;)J
+ ReflectUtils
+  isNotAccessMethod|(Ljava/lang/reflect/Method;)Z
+org.jboss.aop.util.reference|PersistentReference|buildReference|(Ljava/lang/Object;)V
 org.jboss.as.controller
  PathAddress
   append
@@ -21,7 +57,29 @@ org.jboss.as.controller.registry
 org.jboss.as.ee.component.interceptors|OrderedItemContainer|add|(Ljava/lang/Object;I)V
 org.jboss.as.server.deployment|SimpleAttachmentKey|cast|(Ljava/lang/Object;)Ljava/lang/Object;
 org.jboss.as.server.deployment.module|VFSResourceLoader$4|accepts|(Lorg/jboss/vfs/VirtualFile;)Z
+org.jboss.aspects.security|SecurityActions$GetSecurityContextAction|run|()Ljava/lang/Object;
+org.jboss.beans.metadata.plugins|AbstractValueMetaData|getValue|(Lorg/jboss/reflect/spi/TypeInfo;Ljava/lang/ClassLoader;)Ljava/lang/Object;
 org.jboss.classfilewriter.code|StackEntry|write|(Ljava/io/DataOutputStream;)V
+org.jboss.classloader.plugins
+ ClassLoaderUtils
+  checkClassName|(Ljava/lang/String;)V
+  classNameToPath|(Ljava/lang/String;)Ljava/lang/String;
+org.jboss.classloader.plugins.filter|EverythingClassFilter|matchesClassName|(Ljava/lang/String;)Z
+org.jboss.classloading.plugins.vfs|PackageVisitor|visit|(Lorg/jboss/virtual/VirtualFile;)V
+org.jboss.dependency.plugins
+ AbstractController
+  getContext|(Ljava/lang/Object;Lorg/jboss/dependency/spi/ControllerState;)Lorg/jboss/dependency/spi/ControllerContext;
+  getContextsByState|(Lorg/jboss/dependency/spi/ControllerState;)Ljava/util/Set;
+  getInstalledContext|(Ljava/lang/Object;)Lorg/jboss/dependency/spi/ControllerContext;
+  isBeforeState|(Lorg/jboss/dependency/spi/ControllerState;Lorg/jboss/dependency/spi/ControllerState;)Z
+ AbstractDependencyInfo
+  getUnresolvedDependencies|(Lorg/jboss/dependency/spi/ControllerState;)Ljava/util/Set;
+ JMXObjectNameFix
+  needsAnAlias|(Ljava/lang/Object;)Ljava/lang/Object;
+org.jboss.deployers.plugins.attachments|AttachmentsImpl|getAttachment|(Ljava/lang/String;)Ljava/lang/Object;
+org.jboss.deployers.plugins.sort|SetDots|match|(Lorg/jboss/deployers/plugins/sort/Dots;)Z
+org.jboss.deployers.structure.spi.helpers|AbstractDeploymentContext|deployed|()V
+org.jboss.deployers.vfs.spi.structure.modified|DefaultStructureCache|getCacheValue|(Ljava/lang/String;)Ljava/lang/Object;
 org.jboss.dmr
  ModelNode
   asString|()Ljava/lang/String;
@@ -33,6 +91,28 @@ org.jboss.dmr
    (Ljava/lang/String;)Lorg/jboss/dmr/ModelNode;
    (Lorg/jboss/dmr/ModelNode;)Lorg/jboss/dmr/ModelNode;
    (Z)Lorg/jboss/dmr/ModelNode;
+org.jboss.ejb3.kernel|JNDIKernelRegistryPlugin|getEntry|(Ljava/lang/Object;)Lorg/jboss/kernel/spi/registry/KernelRegistryEntry;
+org.jboss.el|ValueExpressionImpl|getValue|(Ljavax/el/ELContext;)Ljava/lang/Object;
+org.jboss.el.lang
+ ELArithmetic
+  isNumberType|(Ljava/lang/Class;)Z
+ ELSupport
+  coerceToString|(Ljava/lang/Object;)Ljava/lang/String;
+  coerceToType|(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+ EvaluationContext
+  getContext|(Ljava/lang/Class;)Ljava/lang/Object;
+ ExpressionBuilder
+  visit|(Lorg/jboss/el/parser/Node;)V
+org.jboss.el.parser
+ AstIdentifier
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstPropertySuffix
+  getValue|(Ljava/lang/Object;Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstValue
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ SimpleNode
+  accept|(Lorg/jboss/el/parser/NodeVisitor;)V
+  jjtGetNumChildren|()I
 org.jboss.invocation.proxy|MethodIdentifier|getIdentifierForMethod|(Ljava/lang/reflect/Method;)Lorg/jboss/invocation/proxy/MethodIdentifier;
 org.jboss.jandex
  ClassInfo
@@ -56,6 +136,23 @@ org.jboss.jandex
   intern|(Ljava/lang/Object;)Ljava/lang/Object;
  Type
   name|()Lorg/jboss/jandex/DotName;
+org.jboss.kernel|Kernel|checkAccess|()V
+org.jboss.kernel.plugins.annotations|PropertyAnnotationPluginFilter|accept|(Lorg/jboss/kernel/plugins/annotations/MetaDataAnnotationPlugin;)Z
+org.jboss.kernel.plugins.dependency|AbstractKernelController|getEntry|(Ljava/lang/Object;)Lorg/jboss/kernel/spi/registry/KernelRegistryEntry;
+org.jboss.kernel.plugins.registry.basic|BasicKernelRegistryFactory|getEntry|(Ljava/lang/Object;)Lorg/jboss/kernel/spi/registry/KernelRegistryEntry;
+org.jboss.logging.log4j
+ Log4jLoggerPlugin
+  debug|(Ljava/lang/Object;)V
+  trace|(Ljava/lang/Object;)V
+org.jboss.logmanager
+ ConcurrentReferenceHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ LogContext
+  getLogger|(Ljava/lang/String;)Ljava/util/logging/Logger;
+ LogManager
+  getLogger|(Ljava/lang/String;)Ljava/util/logging/Logger;
+ LoggerInstance
+  isLoggable|(Ljava/util/logging/Level;)Z
 org.jboss.metadata.javaee.support
  MappedAnnotationMetaData
   add|(Lorg/jboss/metadata/javaee/support/MappableMetaData;)Z
@@ -71,17 +168,173 @@ org.jboss.metadata.parser.ee
  Element
   forName|(Ljava/lang/String;)Lorg/jboss/metadata/parser/ee/Element;
 org.jboss.metadata.parser.jsp|Element|forName|(Ljava/lang/String;)Lorg/jboss/metadata/parser/jsp/Element;
+org.jboss.metadata.plugins.loader|AbstractMutableComponentMetaDataLoader|getComponentMetaDataRetrieval|(Lorg/jboss/metadata/spi/signature/Signature;)Lorg/jboss/metadata/spi/retrieval/MetaDataRetrieval;
+org.jboss.metadata.plugins.loader.memory|MemoryMetaDataLoader|retrieveAnnotation|(Ljava/lang/Class;)Lorg/jboss/metadata/spi/retrieval/AnnotationItem;
+org.jboss.metadata.plugins.loader.reflection
+ AnnotatedElementMetaDataLoader
+  retrieveAnnotation|(Ljava/lang/Class;)Lorg/jboss/metadata/spi/retrieval/AnnotationItem;
+  retrieveAnnotations|()Lorg/jboss/metadata/spi/retrieval/AnnotationsItem;
 org.jboss.metadata.property
  PropertyReplacers
   noop|()Lorg/jboss/metadata/property/PropertyReplacer;
  PropertyReplacers$1
   replaceProperties|(Ljava/lang/String;)Ljava/lang/String;
+org.jboss.metadata.spi.scope
+ ScopeKey
+  addScope|(Lorg/jboss/metadata/spi/scope/Scope;)Lorg/jboss/metadata/spi/scope/Scope;
+ ScopeLevel
+  compareTo|(Lorg/jboss/metadata/spi/scope/ScopeLevel;)I
+org.jboss.metadata.spi.signature
+ Signature
+  convertParameterTypes|([Lorg/jboss/reflect/spi/TypeInfo;)[Ljava/lang/Class;
+  getParametersTypes|(Ljava/lang/Class;)[Ljava/lang/Class;
+org.jboss.metadata.spi.signature.javassist|JavassistSignatureFactory|convertParameters|([Ljavassist/CtClass;)[Ljava/lang/String;
 org.jboss.msc.service
  IdentityHashSet
   add|(Ljava/lang/Object;)Z
   iterator|()Ljava/util/Iterator;
  IdentityHashSet$IdentityHashSetIterator
   next|()Ljava/lang/Object;
+org.jboss.mx.server|MethodMapper|methodSignature|(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/String;
+org.jboss.on.embedded.ui.nav|BaseTreeNode$PathBasedNodeMatcher|matchesNode|(Lorg/jboss/on/embedded/ui/nav/JONTreeNode;)Z
+org.jboss.profileservice.spi|ProfileKey|compareTo|(Ljava/lang/Object;)I
+org.jboss.reflect.plugins|AnnotationHolder|getAnnotation|(Ljava/lang/String;)Lorg/jboss/reflect/spi/AnnotationValue;
+org.jboss.reflect.plugins.introspection
+ IntrospectionTypeInfoFactoryImpl
+  getAnnotations|(Ljava/lang/Object;)[Lorg/jboss/reflect/spi/AnnotationValue;
+ ReflectionUtils
+  findMethod|(Ljava/lang/Class;Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;
+  invoke|(Ljava/lang/reflect/Method;Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
+org.jboss.seam
+ Component
+  callPostConstructMethod|(Ljava/lang/Object;)V
+  disinject|(Ljava/lang/Object;)V
+  forName|(Ljava/lang/String;)Lorg/jboss/seam/Component;
+  getComponentName|(Ljava/lang/Class;)Ljava/lang/String;
+  getInstance
+   (Ljava/lang/Class;Lorg/jboss/seam/ScopeType;)Ljava/lang/Object;
+   (Ljava/lang/Class;Lorg/jboss/seam/ScopeType;Z)Ljava/lang/Object;
+   (Ljava/lang/String;Lorg/jboss/seam/ScopeType;Z)Ljava/lang/Object;
+   (Ljava/lang/String;Lorg/jboss/seam/ScopeType;ZZ)Ljava/lang/Object;
+   (Ljava/lang/String;Z)Ljava/lang/Object;
+   (Ljava/lang/String;ZZ)Ljava/lang/Object;
+  getInstanceFromFactory|(Ljava/lang/String;)Ljava/lang/Object;
+  getInterceptors|(Lorg/jboss/seam/annotations/intercept/InterceptorType;)Ljava/util/List;
+  initialize|(Ljava/lang/Object;)V
+  inject|(Ljava/lang/Object;Z)V
+  isInstance|(Ljava/lang/Object;)Z
+  isLifecycleMethod|(Ljava/lang/reflect/Method;)Z
+  newInstance|()Ljava/lang/Object;
+  outject|(Ljava/lang/Object;Z)V
+ Namespace
+  getComponentInstance
+   (Ljava/lang/String;)Ljava/lang/Object;
+   (Ljava/lang/String;Z)Ljava/lang/Object;
+ Seam
+  getComponentName|(Ljava/lang/Class;)Ljava/lang/String;
+org.jboss.seam.contexts
+ BasicContext
+  get
+   (Ljava/lang/Class;)Ljava/lang/Object;
+   (Ljava/lang/String;)Ljava/lang/Object;
+ BusinessProcessContext
+  get|(Ljava/lang/String;)Ljava/lang/Object;
+ Contexts
+  lookupInStatefulContexts|(Ljava/lang/String;)Ljava/lang/Object;
+ Lifecycle
+  beginMethod|()Lorg/jboss/seam/contexts/Context;
+  endMethod|(Lorg/jboss/seam/contexts/Context;)V
+ PageContext
+  get|(Ljava/lang/String;)Ljava/lang/Object;
+ ServerConversationContext
+  get|(Ljava/lang/String;)Ljava/lang/Object;
+org.jboss.seam.core
+ Events
+  exists|()Z
+  instance|()Lorg/jboss/seam/core/Events;
+  raiseEvent|(Ljava/lang/String;[Ljava/lang/Object;)V
+ Init
+  getFactory|(Ljava/lang/String;)Lorg/jboss/seam/core/Init$FactoryMethod;
+  getFactoryMethodExpression|(Ljava/lang/String;)Lorg/jboss/seam/core/Init$FactoryExpression;
+  getFactoryValueExpression|(Ljava/lang/String;)Lorg/jboss/seam/core/Init$FactoryExpression;
+  getObserverMethodExpressions|(Ljava/lang/String;)Ljava/util/List;
+  getObserverMethods|(Ljava/lang/String;)Ljava/util/List;
+  instance|()Lorg/jboss/seam/core/Init;
+ Manager
+  instance|()Lorg/jboss/seam/core/Manager;
+org.jboss.seam.el|SeamELResolver|getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+org.jboss.seam.intercept|SeamInvocationContext|proceed|()Ljava/lang/Object;
+org.jboss.seam.log|Log4JProvider|debug|(Ljava/lang/Object;)V
+org.jboss.seam.ui.util
+ HTML
+  isDefaultAttributeValue|(Ljava/lang/Object;)Z
+  renderHTMLAttribute
+   (Ljavax/faces/context/ResponseWriter;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)Z
+   (Ljavax/faces/context/ResponseWriter;Ljavax/faces/component/UIComponent;Ljava/lang/String;Ljava/lang/String;)Z
+org.jboss.seam.web|Parameters|instance|()Lorg/jboss/seam/web/Parameters;
+org.jboss.security|SubjectInfo|getIdentity|(Ljava/lang/Class;)Ljava/lang/Object;
+org.jboss.security.identity.extensions|CredentialIdentityFactory$1|asPrincipal|()Ljava/security/Principal;
+org.jboss.system.server.profileservice|ProfileServiceBootstrap|getEntry|(Ljava/lang/Object;)Lorg/jboss/kernel/spi/registry/KernelRegistryEntry;
+org.jboss.util
+ JBossStringBuilder
+  append|(Ljava/lang/String;)Lorg/jboss/util/JBossStringBuilder;
+ WeakObject
+  create|(Ljava/lang/Object;Ljava/lang/ref/ReferenceQueue;)Lorg/jboss/util/WeakObject;
+org.jboss.util.collection
+ LazySet
+  add|(Ljava/lang/Object;)Z
+ ReferenceValueMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ SecurityActions$GetClassLoaderAction$1
+  getClassLoader|(Ljava/lang/Class;)Ljava/lang/ClassLoader;
+org.jboss.virtual
+ VFSUtils
+  fixName|(Ljava/lang/String;)Ljava/lang/String;
+  stripProtocol|(Ljava/net/URI;)Ljava/lang/String;
+ VirtualFile
+  getChild|(Ljava/lang/String;)Lorg/jboss/virtual/VirtualFile;
+org.jboss.virtual.plugins.context
+ AbstractVFSContext$TempInfoKey
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/jboss/virtual/plugins/context/AbstractVFSContext$TempInfoKey;)I
+ AbstractVirtualFileHandler
+  structuredFindChild|(Ljava/lang/String;)Lorg/jboss/virtual/spi/VirtualFileHandler;
+  toVfsUrl|()Ljava/net/URL;
+ DefaultOptions
+  getOption|(Ljava/lang/String;)Ljava/lang/Object;
+ DelegatingHandler
+  getChild|(Ljava/lang/String;)Lorg/jboss/virtual/spi/VirtualFileHandler;
+org.jboss.virtual.plugins.context.file
+ FileHandler
+  createChildHandler|(Ljava/lang/String;)Lorg/jboss/virtual/spi/VirtualFileHandler;
+  exists|()Z
+org.jboss.virtual.plugins.context.jar|JarUtils|isArchive|(Ljava/lang/String;)Z
+org.jboss.virtual.plugins.context.zip
+ ZipEntryContext
+  getChildren|(Lorg/jboss/virtual/spi/VirtualFileHandler;Z)Ljava/util/List;
+  splitParentChild|(Ljava/lang/String;)[Ljava/lang/String;
+ ZipEntryContext$EntryInfo
+  add|(Lorg/jboss/virtual/plugins/context/AbstractVirtualFileHandler;)V
+ ZipEntryHandler
+  createChildHandler|(Ljava/lang/String;)Lorg/jboss/virtual/spi/VirtualFileHandler;
+  exists|()Z
+  getChild|(Ljava/lang/String;)Lorg/jboss/virtual/spi/VirtualFileHandler;
+  openStream|()Ljava/io/InputStream;
+ ZipEntryInputStream
+  close|()V
+  read
+   ()I
+   ([B)I
+   ([BII)I
+org.jboss.virtual.plugins.vfs.helpers
+ MatchAllVirtualFileFilter
+  accepts|(Lorg/jboss/virtual/VirtualFile;)Z
+ PathTokenizer
+  getRemainingPath|(Ljava/util/List;I)Ljava/lang/String;
+  getTokens|(Ljava/lang/String;)Ljava/util/List;
+  isCurrentToken|(Ljava/lang/String;)Z
+  isReverseToken|(Ljava/lang/String;)Z
 org.jboss.weld.annotated.enhanced.jlr|AbstractEnhancedAnnotated|isAnnotationPresent|(Ljava/lang/Class;)Z
 org.jboss.weld.bootstrap.api.helpers|SimpleServiceRegistry|get|(Ljava/lang/Class;)Lorg/jboss/weld/bootstrap/api/Service;
 org.jboss.weld.executor|IterativeWorkerTaskFactory$1|call|()Ljava/lang/Void;
@@ -132,3 +385,9 @@ org.jboss.weld.util.reflection
   cast|(Ljava/lang/Object;)Ljava/lang/Object;
   getRawType|(Ljava/lang/reflect/Type;)Ljava/lang/Class;
   isPackagePrivate|(I)Z
+org.jboss.xb.binding.sunday.unmarshalling
+ SundayContentHandler$StackImpl
+  peek
+   ()Lorg/jboss/xb/binding/sunday/unmarshalling/SundayContentHandler$StackItem;
+   (I)Lorg/jboss/xb/binding/sunday/unmarshalling/SundayContentHandler$StackItem;
+  size|()I
