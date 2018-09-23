@@ -82,13 +82,14 @@ __cxf() {
     return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
   }
 
-  if (soap._fetch_xml_in) {
-    spy.add(spy.instance("CXF_TAP_XML_INPUT")
-      .onEnter(spy.fetchArg("MSG", 1), _tap_xml_input())
-      .include(
-        spy.byMethod("org.apache.cxf.interceptor.StaxInInterceptor", "handleMessage"),
-        spy.byMethod("org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor", "handleMessage")));
-  }
+  // TODO unstable, to be fixed
+  //if (soap._fetch_xml_in) {
+  //  spy.add(spy.instance("CXF_TAP_XML_INPUT")
+  //    .onEnter(spy.fetchArg("MSG", 1), _tap_xml_input())
+  //    .include(
+  //      spy.byMethod("org.apache.cxf.interceptor.StaxInInterceptor", "handleMessage"),
+  //      spy.byMethod("org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor", "handleMessage")));
+  //}
 
 
   _tap_xml_out = new ThreadLocal();
@@ -140,13 +141,14 @@ __cxf() {
   }
 
 
-  if (soap._fetch_xml_out) {
-    spy.add(spy.instance("CXF_TAP_XML_OUTPUT")
-      .onEnter(spy.fetchArg("MSG", 1), _tap_xml_output())
-      .include(
-        spy.byMethod("org.apache.cxf.interceptor.StaxOutInterceptor", "handleMessage"),
-        spy.byMethod("org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor", "handleMessage")));
-  }
+  // TODO unstable, to be fixed
+  //if (soap._fetch_xml_out) {
+  //  spy.add(spy.instance("CXF_TAP_XML_OUTPUT")
+  //    .onEnter(spy.fetchArg("MSG", 1), _tap_xml_output())
+  //    .include(
+  //      spy.byMethod("org.apache.cxf.interceptor.StaxOutInterceptor", "handleMessage"),
+  //      spy.byMethod("org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor", "handleMessage")));
+  //}
 
 
   _check_xml_taps(rec, encoding) {
