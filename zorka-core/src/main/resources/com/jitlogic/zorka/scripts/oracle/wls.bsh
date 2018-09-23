@@ -18,7 +18,6 @@
 zorka.require(
   "ejb.bsh",
   "jvm.bsh",
-  "jsf.bsh",
   "http.bsh",
   "javax/jms.bsh",
   "apache/cxf.bsh"

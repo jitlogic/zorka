@@ -17,7 +17,6 @@
 
 zorka.require(
   "jvm.bsh",
-  "jsf.bsh",
   "ejb.bsh",
   "oracle/grizzly.bsh",
   "oracle/jersey.bsh"

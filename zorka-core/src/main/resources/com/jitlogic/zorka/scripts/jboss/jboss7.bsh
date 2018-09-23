@@ -18,7 +18,6 @@
 
 zorka.require(
   "ejb.bsh",
-  "jsf.bsh",
   "audit.bsh",
   "javax/jms.bsh",
   "apache/catalina.bsh",
