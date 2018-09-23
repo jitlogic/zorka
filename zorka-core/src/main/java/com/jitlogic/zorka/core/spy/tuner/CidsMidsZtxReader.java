@@ -33,7 +33,7 @@ public class CidsMidsZtxReader extends AbstractZtxReader {
 
     @Override
     public void add(String p, String c, String m, String s) {
-        String cl = p + "." + c;
+        String cl = p.length() > 0 ? p+"."+c : c;
         cids.set(registry.symbolId(cl));
         mids.set(registry.methodId(cl, m, s));
     }

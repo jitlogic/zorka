@@ -62,11 +62,17 @@ public abstract class AbstractZtxReader {
         for (String l = rdr.readLine(); l != null; l = rdr.readLine(),ln++) {
             Matcher m;
 
-            if (RE_EMPTY.matcher(l).matches() || RE_COMMENT.matcher(l).matches()) continue;
+            if (RE_COMMENT.matcher(l).matches()) continue;
+
+            if (RE_EMPTY.matcher(l).matches()) {
+                pkg = "";
+                continue;
+            }
 
             m = RE_SINGLE.matcher(l);
             if (m.matches()) {
                 add(m.group(1), m.group(2), m.group(3), m.group(4));
+                pkg = cls = met = null;
                 continue;
             }
 
