@@ -1,7 +1,7 @@
-Zorka 1.90.4 (2018-09-30)
+Zorka 1.90.4 (2018-09-24)
 -------------------------
 
-* new high performance tracer implementation (experimental, not fully stable);
+* new high performance tracer implementation (experimental, not yet fully stable);
 * automated tracer tuning;
 * flex messaging library support; 
 * fixes: agent config reload;
