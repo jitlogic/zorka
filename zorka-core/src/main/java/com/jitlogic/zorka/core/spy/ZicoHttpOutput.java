@@ -84,7 +84,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.retryTime = parseInt(conf.get("http.retry.time"), 125, "tracer.http.retry.time");
         this.retryTimeExp = parseInt(conf.get("http.retry.exp"), 2, "tracer.http.retry.exp");
         this.timeout = parseInt(conf.get("http.timeout"), 60000, "tracer.http.output");
-
+        this.registry = registry;
     }
 
     /**
