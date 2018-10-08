@@ -207,7 +207,7 @@ public class SpyClassVisitor extends ClassVisitor {
                     log.error("Cannot instrument method " + className + "." + methodName
                         + "(). SpyDef " + sdef.getName() + " refers to argument(s) beyond method argument list.");
                 } else {
-                    log.debug("Instrumenting method (full SPY): " + className + "." + methodName + " " + methodDesc);
+                    log.info("Instrumenting method for " + sdef.getName() + ": " + className + "." + methodName + " " + methodDesc);
                     ctxs.add(transformer.lookup(
                         new SpyContext(sdef, className, methodName, methodDesc, access)));
                 }
