@@ -120,6 +120,8 @@ __jvm() {
 
   __http_client() {
 
+    outReqHeaders = new ThreadLocal();
+
     dtrace_req() {
 
       dtop = tracer.dtraceOutput();
@@ -175,16 +177,24 @@ __jvm() {
     }
 
     clazzes = zorka.listCfg("jvm.httpclient.classes",
-      "java.net.HttpURLConnection,sun.net.www.protocol.http.HttpURLConnection,javax.net.ssl.HttpsURLConnection,"+
+      "java.net.HttpURLConnection",
+      "sun.net.www.protocol.http.HttpURLConnection",
+      "javax.net.ssl.HttpsURLConnection",
       "com.sun.net.ssl.HttpsURLConnection");
+
 
     if (zorka.boolCfg("jvm.httpclient.trace", false)) {
 
       if (_dtrace_enabled) {
         sdef = spy.instrument("JAVA_NET_HTTPURLCONNECTION_DTRACE")
-               .onEnter(spy.fetchArg("THIS", 0), dtrace_req());
+          .onEnter(
+            spy.fetchArg("THIS", 0),
+            dtrace_req(),
+            spy.get("REQ_HDRS", "THIS", "requestProperties"),
+            spy.tlSet("REQ_HDRS", outReqHeaders));
 
         for (clazz : clazzes) {
+          zorka.logInfo("HttpUrlConnection implementation: " + clazz);
           sdef = sdef.include(spy.byMethod(clazz, "connect"));
         }
 
@@ -202,7 +212,7 @@ __jvm() {
                  tracer.formatAttr("METHOD", "${THIS.requestMethod}"),
                  spy.get("RES_HDRS", "THIS", "headerFields"),
                  proc_headers("RES_HDRS", "HdrIn__"),
-                 spy.get("REQ_HDRS", "THIS", "requestProperties"),
+                 spy.tlGet("REQ_HDRS", outReqHeaders),
                  proc_headers("REQ_HDRS", "HdrOut__"));
 
       for (clazz : clazzes) {
