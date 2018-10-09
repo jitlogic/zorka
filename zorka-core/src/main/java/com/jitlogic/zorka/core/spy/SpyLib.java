@@ -174,6 +174,7 @@ public class SpyLib {
     public static final String FATAL = "FATAL";
 
     private SpyClassTransformer classTransformer;
+    private SpyRetransformer retransformer;
     private MBeanServerRegistry mbsRegistry;
 
     /**
@@ -181,9 +182,10 @@ public class SpyLib {
      *
      * @param classTransformer spy transformer
      */
-    public SpyLib(SpyClassTransformer classTransformer, MBeanServerRegistry mbsRegistry) {
+    public SpyLib(SpyClassTransformer classTransformer, MBeanServerRegistry mbsRegistry, SpyRetransformer retransformer) {
         this.classTransformer = classTransformer;
         this.mbsRegistry = mbsRegistry;
+        this.retransformer = retransformer;
     }
 
 
@@ -1059,5 +1061,15 @@ public class SpyLib {
 
     public SpyProcessor subchain(SpyProcessor... processors) {
         return new LogicalFilterProcessor(LogicalFilterProcessor.FILTER_NONE, processors);
+    }
+
+    public SpyProcessor silentBreaker(SpyProcessor...processors) {
+        return new SilentBreakerSpyProcessor(processors);
+    }
+
+    public void reinstrument(String...classes) {
+        Set<String> cs = new HashSet<String>();
+        for (String c : classes) cs.add(c);
+        retransformer.retransform(cs);
     }
 }

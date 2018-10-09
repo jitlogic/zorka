@@ -478,7 +478,7 @@ public class AgentInstance implements ZorkaService {
     public synchronized SpyLib getSpyLib() {
 
         if (spyLib == null) {
-            spyLib = new SpyLib(getClassTransformer(), getMBeanServerRegistry());
+            spyLib = new SpyLib(getClassTransformer(), getMBeanServerRegistry(), getRetransformer());
         }
 
         return spyLib;

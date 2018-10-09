@@ -314,7 +314,7 @@ public final class ObjectInspector {
                 }
                 ret = method.invoke(obj);
             } catch (Exception e) {
-                log.error("Method '" + method.getName() + "' invocation failed", e);
+                log.debug("Method '" + method.getName() + "' invocation failed", e);
             } finally {
                 method.setAccessible(false);
             }
@@ -342,7 +342,7 @@ public final class ObjectInspector {
                 Object ret = method.invoke(obj);
                 return ret;
             } catch (Exception e) {
-                log.error("Method '" + method.getName() + "' invocation failed", e);
+                log.debug("Method '" + method.getName() + "' invocation failed", e);
                 return null;
             }
         }
@@ -449,7 +449,7 @@ public final class ObjectInspector {
             ObjectName on = new ObjectName(query);
             return conn.queryNames(on, null);
         } catch (Exception e) {
-            log.error("Error performing '" + query + "' JMX query", e);
+            log.debug("Error performing '" + query + "' JMX query", e);
             return new HashSet<ObjectName>();
         }
     }
