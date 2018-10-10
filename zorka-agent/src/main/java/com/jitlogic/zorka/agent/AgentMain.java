@@ -24,12 +24,11 @@ import com.jitlogic.zorka.core.ZorkaControl;
 import com.jitlogic.zorka.core.spy.MainSubmitter;
 import com.jitlogic.zorka.core.spy.RealSpyRetransformer;
 import com.jitlogic.zorka.core.spy.SpyClassLookup;
-import com.jitlogic.zorka.core.spy.Tracer;
-import com.jitlogic.zorka.core.spy.lt.LTracer;
-import com.jitlogic.zorka.core.spy.st.STracer;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.instrument.Instrumentation;
+import java.util.jar.JarFile;
 
 /**
  * This class is responsible for bootstrapping zorka agent.
@@ -46,12 +45,27 @@ public class AgentMain {
      */
     public static void premain(String args, Instrumentation instrumentation) {
 
-        String home = System.getProperties().getProperty("zorka.home.dir", args);
+        String home = System.getProperty("zorka.home.dir", args);
 
         if (new File(home, "zorka.properties").canRead()) {
             System.out.println("ZORKA agent starting at " + home);
         } else {
             System.out.println("ERROR: " + home + " is not a proper ZORKA home directory.");
+        }
+
+        String agentJar = System.getProperty("zorka.agent.jar");
+        if (agentJar != null) {
+            try {
+                if (new File(agentJar).canRead()) {
+                    JarFile jf = new JarFile(agentJar);
+                    instrumentation.appendToBootstrapClassLoaderSearch(jf);
+                    System.out.println("ZORKA: Added " + jf + " to system boot classpath.");
+                } else {
+                    System.out.println("ERROR: File " + agentJar + " is not readable.");
+                }
+            } catch (IOException e) {
+                System.out.println("ERROR: Cannot open agent JAR file: " + agentJar + ": " + e.getMessage());
+            }
         }
 
         AgentConfig config = new AgentConfig(ZorkaUtil.path(home));
