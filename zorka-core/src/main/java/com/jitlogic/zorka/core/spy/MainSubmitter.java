@@ -19,7 +19,6 @@ package com.jitlogic.zorka.core.spy;
 
 import bsh.EvalError;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.core.spy.lt.LTracer;
 import com.jitlogic.zorka.core.spy.st.STracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +33,8 @@ import org.slf4j.LoggerFactory;
 public class MainSubmitter {
 
     private static final Logger log = LoggerFactory.getLogger(MainSubmitter.class);
+
+    private static final boolean logTrace = "yes".equalsIgnoreCase(System.getProperty("zorka.tracer.full.trace", "no"));
 
     /**
      * Submitter receiving full submissions
@@ -53,8 +54,7 @@ public class MainSubmitter {
         }
     };
 
-    public MainSubmitter() {
-
+    private MainSubmitter() {
     }
 
     /**
@@ -66,6 +66,12 @@ public class MainSubmitter {
      * @param vals        values fetched by probe
      */
     public static void submit(int stage, int id, int submitFlags, Object[] vals) {
+
+        if (logTrace) {
+            if (log.isTraceEnabled()) {
+                log.trace("Submit: id=" + id + ", stage=" + stage);
+            }
+        }
 
         if (inSubmit.get()) {
             return;
@@ -100,6 +106,12 @@ public class MainSubmitter {
      */
     public static void traceEnter(int mid) {
 
+        if (logTrace) {
+            if (log.isTraceEnabled()) {
+                log.trace("TraceEnter: id=" + mid);
+            }
+        }
+
         if (t != null) {
             try {
                 t.getHandler().traceEnter(mid, System.nanoTime());
@@ -119,6 +131,12 @@ public class MainSubmitter {
      * This method is called by tracer probes at method exit.
      */
     public static void traceReturn() {
+
+        if (logTrace) {
+            if (log.isTraceEnabled()) {
+                log.trace("TraceReturn:");
+            }
+        }
 
         if (t != null) {
             try {
@@ -140,6 +158,12 @@ public class MainSubmitter {
      * @param exception exception thrown
      */
     public static void traceError(Throwable exception) {
+
+        if (logTrace) {
+            if (log.isTraceEnabled()) {
+                log.trace("TraceError: " + exception.getMessage());
+            }
+        }
 
         if (t != null) {
             try {
