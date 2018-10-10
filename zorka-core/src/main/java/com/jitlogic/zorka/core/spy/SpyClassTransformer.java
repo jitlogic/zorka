@@ -88,6 +88,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private boolean computeFrames;
 
+    private boolean expandedFrames;
+
     private boolean scriptsAuto;
 
     private ZorkaBshAgent bshAgent;
@@ -119,6 +121,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
         this.useCustomResolver = config.boolCfg("zorka.spy.custom.resolver", true);
         this.scriptsAuto = config.boolCfg("scripts.auto", true);
         this.retransformer = retransformer;
+        this.expandedFrames = config.boolCfg("zorka.spy.expanded.frames", false);
 
         if (useCustomResolver) {
             this.resolver = new SpyClassResolver(statistics);
@@ -346,7 +349,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
                 ? new SpyClassWriter(cr, doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0, classLoader, resolver)
                 : new ClassWriter(cr, doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0);
             SpyClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
-            cr.accept(scv, 0);
+            cr.accept(scv, expandedFrames ? ClassReader.EXPAND_FRAMES : 0);
 
             if(scv.wasBytecodeModified()) {
                 buf = cw.toByteArray();
