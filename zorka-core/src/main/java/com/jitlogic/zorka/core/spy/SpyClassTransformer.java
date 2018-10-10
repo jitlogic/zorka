@@ -174,6 +174,8 @@ public class SpyClassTransformer implements ClassFileTransformer {
                 ctx.setId(nextId++);
                 ctxInstances.put(ctx, ctx);
                 ctxById.put(ctx.getId(), ctx);
+                log.info("NEW: SpyContext: id=" + ctx.getId() + ", name=" + ctx.getSpyDefinition().getName() + ", code="
+                    + ctx.getClassName() + "." + ctx.getMethodName() + "()");
             }
             return ctx;
         }
