@@ -23,6 +23,7 @@ import com.jitlogic.zorka.core.integ.SyslogLib;
 import com.jitlogic.zorka.core.integ.SyslogTrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.impl.ConsoleTrapper;
 import org.slf4j.impl.ZorkaLogLevel;
 import org.slf4j.impl.ZorkaLoggerFactory;
 import org.slf4j.impl.ZorkaTrapper;
@@ -96,12 +97,25 @@ public class AgentConfig extends ZorkaConfig {
             initSyslogTrapper();
         }
 
+        if (boolCfg(ZORKA_LOG_CONSOLE_PROP, ZORKA_LOG_CONSOLE_DVAL)) {
+            initConsoleTrapper();
+        }
+
         // TODO configure logger here
         ZorkaLoggerFactory.getInstance().configure(this.getProperties());
 
         log.info("Starting ZORKA agent " + get("zorka.version"));
     }
 
+
+    private void initConsoleTrapper() {
+        ConsoleTrapper trapper = new ConsoleTrapper();
+
+        ZorkaTrapper oldTrapper = ZorkaLoggerFactory.getInstance().swapTrapper(trapper);
+        if (oldTrapper instanceof ZorkaService) {
+            ((ZorkaService)oldTrapper).shutdown();
+        }
+    }
 
     /**
      * Creates and configures syslogt trapper according to configuration properties

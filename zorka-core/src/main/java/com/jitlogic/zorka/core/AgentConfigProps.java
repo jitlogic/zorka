@@ -138,6 +138,9 @@ public class AgentConfigProps {
     public static final String ZORKA_LOG_SYSLOG_PROP = "zorka.log.syslog";
     public static final boolean ZORKA_LOG_SYSLOG_DVAL = false;
 
+    public static final String ZORKA_LOG_CONSOLE_PROP = "zorka.log.console";
+    public static final boolean ZORKA_LOG_CONSOLE_DVAL = false;
+
     public static final String ZORKA_LOG_SYSLOG_ADDR_PROP = "zorka.log.syslog.addr";
     public static final String ZORKA_LOG_SYSLOG_ADDR_DVAL = "127.0.0.1";
 
