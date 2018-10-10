@@ -167,7 +167,7 @@ public class SpyMethodVisitor extends MethodVisitor {
                             String className, List<String> superclasses, List<String> classAnnotations, List<String> classInterfaces,
                             int access, String methodName, String methodSignature,
                             List<SpyContext> ctxs, MethodVisitor mv) {
-        super(Opcodes.ASM4, mv);
+        super(Opcodes.ASM6, mv);
         this.matches = matches;
         this.symbolRegistry = symbolRegistry;
         this.className = className;

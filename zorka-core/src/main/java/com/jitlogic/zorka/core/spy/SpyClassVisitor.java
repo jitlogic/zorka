@@ -89,7 +89,7 @@ public class SpyClassVisitor extends ClassVisitor {
      */
     public SpyClassVisitor(SpyClassTransformer transformer, ClassLoader classLoader, SymbolRegistry symbolRegistry,
                            String className, List<SpyDefinition> sdefs, Tracer tracer, ClassVisitor cv) {
-        super(Opcodes.ASM5, cv);
+        super(Opcodes.ASM6, cv);
         this.transformer = transformer;
         this.classLoader = classLoader;
         this.symbolRegistry = symbolRegistry;
