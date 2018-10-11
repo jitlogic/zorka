@@ -5,7 +5,10 @@ net.sf.acegisecurity.vote
 net.sf.cglib.asm
  ByteVector
   putByte|(I)Lnet/sf/cglib/asm/ByteVector;
+  putByteArray|([BII)Lnet/sf/cglib/asm/ByteVector;
+  putInt|(I)Lnet/sf/cglib/asm/ByteVector;
   putShort|(I)Lnet/sf/cglib/asm/ByteVector;
+  putUTF8|(Ljava/lang/String;)Lnet/sf/cglib/asm/ByteVector;
  ClassReader
   readUnsignedShort|(I)I
  ClassWriter
@@ -20,6 +23,8 @@ net.sf.cglib.asm
   visitLabel|(Lnet/sf/cglib/asm/Label;)V
   visitLdcInsn|(Ljava/lang/Object;)V
   visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitTryCatchBlock|(Lnet/sf/cglib/asm/Label;Lnet/sf/cglib/asm/Label;Lnet/sf/cglib/asm/Label;Ljava/lang/String;)V
+  visitTypeInsn|(ILjava/lang/String;)V
   visitVarInsn|(II)V
  Type
   getArgumentTypes
@@ -38,8 +43,17 @@ net.sf.cglib.asm
    (Ljava/lang/String;)Lnet/sf/cglib/asm/Type;
 net.sf.cglib.core
  CodeEmitter
+  catch_exception|(Lnet/sf/cglib/core/Block;Lnet/sf/cglib/asm/Type;)V
+  getfield|(Ljava/lang/String;)V
+  invoke_static|(Lnet/sf/cglib/asm/Type;Lnet/sf/cglib/core/Signature;)V
   load_this|()V
-  make_label|()Lorg/objectweb/asm/Label;
+  make_label
+   ()Lnet/sf/cglib/asm/Label;
+   ()Lorg/objectweb/asm/Label;
+  push
+   (I)V
+   (Ljava/lang/String;)V
+  return_value|()V
  EmitUtils$5
   transform|(Ljava/lang/Object;)Ljava/lang/Object;
  EmitUtils$6
@@ -51,10 +65,18 @@ net.sf.cglib.core
  ReflectUtils
   getNames|([Ljava/lang/Class;)[Ljava/lang/String;
   getSignature|(Ljava/lang/reflect/Member;)Lnet/sf/cglib/core/Signature;
+ RejectModifierPredicate
+  evaluate|(Ljava/lang/Object;)Z
  TypeUtils
   ICONST|(I)I
-  isArray|(Lorg/objectweb/asm/Type;)Z
-  isPrimitive|(Lorg/objectweb/asm/Type;)Z
+  getTypes|([Ljava/lang/Class;)[Lnet/sf/cglib/asm/Type;
+  isAbstract|(I)Z
+  isArray
+   (Lnet/sf/cglib/asm/Type;)Z
+   (Lorg/objectweb/asm/Type;)Z
+  isPrimitive
+   (Lnet/sf/cglib/asm/Type;)Z
+   (Lorg/objectweb/asm/Type;)Z
   isStatic|(I)Z
 net.sf.cglib.proxy|MethodProxy|find|(Ljava/lang/Class;Lnet/sf/cglib/core/Signature;)Lnet/sf/cglib/proxy/MethodProxy;
 net.sf.jasperreports.data.cache

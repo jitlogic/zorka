@@ -14,6 +14,13 @@ org.apache.commons.beanutils.expression
   isIndexed|(Ljava/lang/String;)Z
   isMapped|(Ljava/lang/String;)Z
   next|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.commons.betwixt|XMLUtils|isNameChar|(I)Z
+org.apache.commons.betwixt.expression
+ Context
+  popOptions|()V
+  pushOptions|(Lorg/apache/commons/betwixt/Options;)V
+ MethodExpression
+  evaluate|(Lorg/apache/commons/betwixt/expression/Context;)Ljava/lang/Object;
 org.apache.commons.collections
  ArrayStack
   pop|()Ljava/lang/Object;
@@ -27,6 +34,18 @@ org.apache.commons.collections
    (Ljava/lang/String;Z)Z
  FastHashMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ReferenceMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ SequencedHashMap
+  containsKey|(Ljava/lang/Object;)Z
+  entrySet|()Ljava/util/Set;
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  size|()I
+ SequencedHashMap$3
+  iterator|()Ljava/util/Iterator;
+ SequencedHashMap$OrderedIterator
+  next|()Ljava/lang/Object;
 org.apache.commons.collections.map
  AbstractHashedMap
   containsKey|(Ljava/lang/Object;)Z

@@ -840,6 +840,30 @@ org.apache.xml.utils
   isWhiteSpace
    (C)Z
    (Ljava/lang/String;)Z
+org.apache.xmlbeans|QNameCache|getName|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/namespace/QName;
+org.apache.xmlbeans.impl.piccolo.util|CharStringConverter|convert|([CII)Ljava/lang/String;
+org.apache.xmlbeans.impl.piccolo.xml
+ AttributesHolder
+  getURI|(I)Ljava/lang/String;
+ PiccoloLexer
+  yybegin|(I)V
+  yynextChar|()I
+  yystate|()I
+org.apache.xmlbeans.impl.store
+ CharUtil
+  getString|(Ljava/lang/Object;II)Ljava/lang/String;
+ Locale
+  enter|()V
+  exit|()V
+  noSync|()Z
+ Xobj
+  find_attribute_user|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+org.apache.xmlbeans.impl.values
+ JavaLongHolder
+  longValue|()J
+ XmlObjectBase
+  check_dated|()V
+  monitor|()Ljava/lang/Object;
 org.apache.xpath
  XPathContext
   getDTM|(I)Lorg/apache/xml/dtm/DTM;

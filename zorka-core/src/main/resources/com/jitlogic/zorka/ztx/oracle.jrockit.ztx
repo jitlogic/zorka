@@ -1,0 +1,6 @@
+oracle.jrockit.jfr
+ StringConstantPool
+  asConstant|(Ljava/lang/String;)I
+ VMJFR
+  counterTime|()J
+oracle.jrockit.jfr.events|EventHandlerImpl|counterTime|()J

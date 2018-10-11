@@ -4,6 +4,7 @@ weblogic.application.io
   getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
  ManifestFinder
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+weblogic.application.utils|CompositeWebAppFinder|getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
 weblogic.deploy.internal|DeploymentType|isInstance|(Ljava/lang/Object;)Z
 weblogic.j2ee
  ApplicationManager
@@ -11,6 +12,20 @@ weblogic.j2ee
    (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;Z)Ljava/lang/Class;
    (Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/Class;
 weblogic.jdbc.common.internal|JdbcDebug|isEnabled|(Lweblogic/jdbc/jta/DataSource;I)Z
+weblogic.jdbc.wrapper
+ JDBCWrapperFactory
+  getWrapper|(ILjava/lang/Object;Z)Ljava/lang/Object;
+ ResultSet
+  checkResultSet|()V
+  postInvocationHandler|(Ljava/lang/String;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  preInvocationHandler|(Ljava/lang/String;[Ljava/lang/Object;)V
+ ResultSet_oracle_jdbc_driver_OracleResultSetImpl
+  getBoolean|(Ljava/lang/String;)Z
+  getInt|(Ljava/lang/String;)I
+  getString|(Ljava/lang/String;)Ljava/lang/String;
+  getTimestamp|(Ljava/lang/String;)Ljava/sql/Timestamp;
+  next|()Z
+  wasNull|()Z
 weblogic.jsp.internal.jsp.utils|JspRuntimeUtils|convertType|(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Object;
 weblogic.kernel
  FinalThreadLocal$FinalThreadStorage
@@ -19,6 +34,7 @@ weblogic.kernel
   get|(I)Ljava/lang/Object;
 weblogic.management.jmx.mbeanserver|WLSMBeanServerInterceptorBase|getAttribute|(Ljavax/management/ObjectName;Ljava/lang/String;)Ljava/lang/Object;
 weblogic.management.mbeanservers.internal|WLSObjectNameManager|isClassMapped|(Ljava/lang/Class;)Z
+weblogic.net.http|HttpOutputStream|write|(I)V
 weblogic.rmi.extensions.server
  CBVInputStream
   readObjectSpecial|()Ljava/lang/Object;
@@ -33,6 +49,7 @@ weblogic.rmi.utils.io
  RemoteObjectReplacer
   replaceObject|(Ljava/lang/Object;)Ljava/lang/Object;
   resolveObject|(Ljava/lang/Object;)Ljava/lang/Object;
+weblogic.security.provider|JavaMD5|update|(B)V
 weblogic.security.service
  SubjectManagerImpl
   checkKernelIdentity|(Lweblogic/security/subject/AbstractSubject;)V
@@ -46,6 +63,10 @@ weblogic.servlet.internal
  ChunkOutputWrapper
   print|(Ljava/lang/String;)V
   write|([BII)V
+ PostInputStream
+  read|()I
+ ServletInputStreamImpl
+  read|()I
  ServletRequestImpl
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
   getParameter|(Ljava/lang/String;)Ljava/lang/String;
@@ -76,10 +97,12 @@ weblogic.servlet.jsp
    (Ljava/lang/String;I)Ljava/lang/Object;
 weblogic.store
  StoreWritePolicy
+  genuineMemoryMap|()Z
   unforced|()Z
   usesCacheFile|()Z
 weblogic.store.io.file|StoreDir|get|(I)Lweblogic/store/io/file/StoreFile;
 weblogic.store.io.file.direct|DirectIOManager|nativeCodeAvailable|()Z
+weblogic.timers.internal|TimerImpl|compareTo|(Ljava/lang/Object;)I
 weblogic.utils
  Debug
   assertion|(ZLjava/lang/String;)V
@@ -122,14 +145,22 @@ weblogic.utils.classfile.ops|ConstPoolOp|write|(Ljava/io/DataOutput;)V
 weblogic.utils.classloaders
  AbstractClassFinder
   getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+  getSources|(Ljava/lang/String;)Ljava/util/Enumeration;
+ ChangeAwareClassLoader
+  loadClass|(Ljava/lang/String;)Ljava/lang/Class;
  ClasspathClassFinder
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ CodeGenClassFinder
+  getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
  DirectoryClassFinder
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+ FilteringClassLoader
+  loadClass|(Ljava/lang/String;Z)Ljava/lang/Class;
  GenericClassLoader
   loadClass|(Ljava/lang/String;)Ljava/lang/Class;
  JarClassFinder
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+  getSources|(Ljava/lang/String;)Ljava/util/Enumeration;
  MultiClassFinder
   getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
@@ -140,20 +171,32 @@ weblogic.utils.classloaders
 weblogic.utils.collections
  ArrayMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ArraySet
+  contains|(Ljava/lang/Object;)Z
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
  ConcurrentHashMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  CopyOnWriteArrayList
   iterator|()Ljava/util/Iterator;
  CopyOnWriteArrayList$COWIterator
   next|()Ljava/lang/Object;
+ SecondChanceCacheMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
  Stack
+  clear|()V
   peek|()Ljava/lang/Object;
   pop|()Ljava/lang/Object;
   push|(Ljava/lang/Object;)V
   size|()I
+weblogic.utils.enumerations|SequencingEnumerator|addEnumeration|(Ljava/util/Enumeration;)V
 weblogic.utils.http
  BytesToString
   is8BitUnicodeSubset|(Ljava/lang/String;)Z
+ HttpChunkInputStream
+  read|()I
+ HttpParsing
+  isNetscapeSpecial|(C)Z
  QueryParams
   getValue|(Ljava/lang/Object;)Ljava/lang/String;
   getValues|(Ljava/lang/Object;)[Ljava/lang/String;
@@ -168,6 +211,8 @@ weblogic.utils.io
    ([BII)I
  ChunkedOutputStream
   write|([BII)V
+ DataIO
+  readUnsignedByte|(Ljava/io/InputStream;)I
  DelegatingOutputStream
   flush|()V
   write|([BII)V
@@ -180,6 +225,13 @@ weblogic.utils.io
   write
    (I)V
    ([BII)V
+weblogic.utils.time|JDK15NanoTimer|timestamp|()J
+weblogic.utils.wrapper|WrapperFactory|createWrapper|(Ljava/lang/Class;Ljava/lang/Object;Z)Ljava/lang/Object;
+weblogic.work
+ ServerWorkManagerImpl$1
+  debugEnabled|()Z
+ ServiceClassesStats
+  adjustFairShare|(D)J
 weblogic.xml.babel.baseparser
  BaseParser
   compare|(I)Z

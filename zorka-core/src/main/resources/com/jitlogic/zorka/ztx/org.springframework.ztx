@@ -20,11 +20,14 @@ org.springframework.aop.support
 org.springframework.aop.target|AbstractBeanFactoryBasedTargetSource|releaseTarget|(Ljava/lang/Object;)V
 org.springframework.asm
  ClassReader
+  readByte|(I)I
   readClass|(I[C)Ljava/lang/String;
+  readConst|(I[C)Ljava/lang/Object;
+  readInt|(I)I
+  readShort|(I)S
   readUTF8|(I[C)Ljava/lang/String;
   readUnsignedShort|(I)I
-org.springframework.asm.commons
- EmptyVisitor
+ MethodAdapter
   visitCode|()V
   visitEnd|()V
   visitFieldInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
@@ -32,6 +35,23 @@ org.springframework.asm.commons
   visitJumpInsn|(ILorg/springframework/asm/Label;)V
   visitLabel|(Lorg/springframework/asm/Label;)V
   visitLdcInsn|(Ljava/lang/Object;)V
+  visitMaxs|(II)V
+  visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitTypeInsn|(ILjava/lang/String;)V
+  visitVarInsn|(II)V
+ Type
+  getType|(Ljava/lang/String;)Lorg/springframework/asm/Type;
+org.springframework.asm.commons
+ EmptyVisitor
+  visit|(Ljava/lang/String;Ljava/lang/Object;)V
+  visitCode|()V
+  visitEnd|()V
+  visitFieldInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  visitInsn|(I)V
+  visitJumpInsn|(ILorg/springframework/asm/Label;)V
+  visitLabel|(Lorg/springframework/asm/Label;)V
+  visitLdcInsn|(Ljava/lang/Object;)V
+  visitLineNumber|(ILorg/springframework/asm/Label;)V
   visitMaxs|(II)V
   visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   visitTypeInsn|(ILjava/lang/String;)V
@@ -87,6 +107,7 @@ org.springframework.beans.factory.support
   getBean|(Ljava/lang/String;)Ljava/lang/Object;
   getMergedBeanDefinition|(Ljava/lang/String;)Lorg/springframework/beans/factory/config/BeanDefinition;
   getRegisteredScope|(Ljava/lang/String;)Lorg/springframework/beans/factory/config/Scope;
+  isTypeMatch|(Ljava/lang/String;Ljava/lang/Class;)Z
  AutowireUtils
   isExcludedFromDependencyCheck|(Ljava/beans/PropertyDescriptor;)Z
   isSetterDefinedInInterface|(Ljava/beans/PropertyDescriptor;Ljava/util/Set;)Z
@@ -160,6 +181,7 @@ org.springframework.core.annotation
   sort|(Ljava/util/List;)V
  AnnotationUtils
   findAnnotation|(Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+  getAnnotationAttributes|(Ljava/lang/annotation/Annotation;Z)Ljava/util/Map;
  SynthesizedAnnotationInvocationHandler
   invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 org.springframework.core.convert|TypeDescriptor|forObject|(Ljava/lang/Object;)Lorg/springframework/core/convert/TypeDescriptor;
@@ -180,7 +202,14 @@ org.springframework.core.convert.support
    (Ljava/lang/Object;)Ljava/lang/Object;
    (Ljava/lang/String;)Ljava/lang/Number;
 org.springframework.core.env|AbstractPropertyResolver|resolveRequiredPlaceholders|(Ljava/lang/String;)Ljava/lang/String;
-org.springframework.core.type.classreading|AnnotationMetadataReadingVisitor|visitMethod|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Lorg/springframework/asm/MethodVisitor;
+org.springframework.core.type.classreading
+ AnnotationAttributesReadingVisitor
+  visit|(Ljava/lang/String;Ljava/lang/Object;)V
+  visitEnd|()V
+ AnnotationMetadataReadingVisitor
+  visitMethod|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Lorg/springframework/asm/MethodVisitor;
+ ClassMetadataReadingVisitor
+  visitField|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)Lorg/springframework/asm/FieldVisitor;
 org.springframework.expression.common
  LiteralExpression
   getValue
@@ -235,6 +264,7 @@ org.springframework.extensions.webscripts.json
    (Ljava/lang/String;Ljava/lang/String;)Lorg/springframework/extensions/webscripts/json/JSONWriter;
    (Z)Lorg/springframework/extensions/webscripts/json/JSONWriter;
 org.springframework.extensions.webscripts.processor|JSScriptProcessor$PresentationWrapFactory|wrapAsJavaObject|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;Ljava/lang/Class;)Lorg/mozilla/javascript/Scriptable;
+org.springframework.flex.core|EndpointServiceMessagePointcutAdvisor|matches|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Z
 org.springframework.http
  CacheControl
   empty|()Lorg/springframework/http/CacheControl;
@@ -277,7 +307,13 @@ org.springframework.orm.hibernate3
   getSession|(Ljava/lang/Object;)Lorg/hibernate/Session;
  SpringTransactionFactory
   areCallbacksLocalToHibernateTransactions|()Z
-org.springframework.transaction.annotation|SpringTransactionAnnotationParser|parseTransactionAnnotation|(Ljava/lang/reflect/AnnotatedElement;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
+org.springframework.security.access.intercept.aopalliance|MethodSecurityMetadataSourceAdvisor$MethodSecurityMetadataSourcePointcut|matches|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Z
+org.springframework.security.access.method|DelegatingMethodSecurityMetadataSource|getAttributes|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Ljava/util/Collection;
+org.springframework.transaction.annotation
+ Ejb3TransactionAnnotationParser
+  parseTransactionAnnotation|(Ljava/lang/reflect/AnnotatedElement;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
+ SpringTransactionAnnotationParser
+  parseTransactionAnnotation|(Ljava/lang/reflect/AnnotatedElement;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
 org.springframework.transaction.interceptor
  NameMatchTransactionAttributeSource
   getTransactionAttribute|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
@@ -323,6 +359,7 @@ org.springframework.util
   notNull|(Ljava/lang/Object;Ljava/lang/String;)V
   state|(ZLjava/lang/String;)V
  ClassUtils
+  convertResourcePathToClassName|(Ljava/lang/String;)Ljava/lang/String;
   forName|(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;
   isAssignable|(Ljava/lang/Class;Ljava/lang/Class;)Z
   isAssignableValue|(Ljava/lang/Class;Ljava/lang/Object;)Z
@@ -384,7 +421,9 @@ org.springframework.util
   replace|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
   substringMatch|(Ljava/lang/CharSequence;ILjava/lang/CharSequence;)Z
   toStringArray|(Ljava/util/Collection;)[Ljava/lang/String;
-  tokenizeToStringArray|(Ljava/lang/String;Ljava/lang/String;ZZ)[Ljava/lang/String;
+  tokenizeToStringArray
+   (Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;
+   (Ljava/lang/String;Ljava/lang/String;ZZ)[Ljava/lang/String;
  TypeUtils
   isAssignable|(Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)Z
 org.springframework.validation|DataBinder|convertIfNecessary|(Ljava/lang/Object;Ljava/lang/Class;Lorg/springframework/core/MethodParameter;)Ljava/lang/Object;

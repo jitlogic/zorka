@@ -132,7 +132,9 @@ com.sun.org.apache.xerces.internal.dom
  DeferredDocumentImpl
   appendChild|(II)V
   getNodeExtra|(IZ)I
-  getPrevSibling|(IZ)I
+  getPrevSibling
+   (I)I
+   (IZ)I
  NamedNodeMapImpl
   getNamedItem|(Ljava/lang/String;)Lorg/w3c/dom/Node;
  NodeImpl
@@ -295,7 +297,9 @@ com.sun.org.apache.xerces.internal.util
  XMLAttributesImpl
   addAttributeNS|(Lcom/sun/org/apache/xerces/internal/xni/QName;Ljava/lang/String;Ljava/lang/String;)V
   checkDuplicatesNS|()Lcom/sun/org/apache/xerces/internal/xni/QName;
-  getIndex|(Ljava/lang/String;)I
+  getIndex
+   (Ljava/lang/String;)I
+   (Ljava/lang/String;Ljava/lang/String;)I
   getLocalName|(I)Ljava/lang/String;
   getName|(ILcom/sun/org/apache/xerces/internal/xni/QName;)V
   getQName|(I)Ljava/lang/String;
@@ -303,6 +307,7 @@ com.sun.org.apache.xerces.internal.util
   getValue
    (I)Ljava/lang/String;
    (Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
   removeAllAttributes|()V
  XMLAttributesIteratorImpl
   removeAllAttributes|()V
@@ -361,6 +366,11 @@ com.sun.org.apache.xerces.internal.xni
   clear|()V
 com.sun.org.apache.xml.internal.dtm.ref.sax2dtm|SAX2DTM2|_exptype2|(I)I
 com.sun.org.apache.xml.internal.serializer|WriterToUTF8Buffered|write|(I)V
+com.sun.org.apache.xml.internal.utils
+ SuballocatedIntVector
+  elementAt|(I)I
+ XMLCharacterRecognizer
+  isWhiteSpace|(C)Z
 com.sun.org.apache.xpath.internal.compiler|OpMapVector|elementAt|(I)I
 com.sun.xml.bind|WhiteSpaceProcessor|isWhiteSpace|(C)Z
 com.sun.xml.bind.v2.bytecode

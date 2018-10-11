@@ -5,39 +5,143 @@ org.hibernate
   isInitialized|(Ljava/lang/Object;)Z
  LockOptions
   setLockMode|(Lorg/hibernate/LockMode;)Lorg/hibernate/LockOptions;
+ UnresolvableObjectException
+  throwIfNull|(Ljava/lang/Object;Ljava/io/Serializable;Ljava/lang/String;)V
+org.hibernate.annotations.common.reflection.java
+ JavaAnnotationReader
+  getAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+  isAnnotationPresent|(Ljava/lang/Class;)Z
+ JavaReflectionManager$1
+  caseClass
+   (Ljava/lang/Class;)Ljava/lang/Object;
+   (Ljava/lang/Class;)Lorg/hibernate/annotations/common/reflection/XClass;
+ JavaXAnnotatedElement
+  getAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+  isAnnotationPresent|(Ljava/lang/Class;)Z
+ JavaXClass
+  toClass|()Ljava/lang/Class;
+org.hibernate.annotations.common.reflection.java.generics|IdentityTypeEnvironment|bind|(Ljava/lang/reflect/Type;)Ljava/lang/reflect/Type;
 org.hibernate.bytecode.javassist|ProxyFactoryFactoryImpl$PassThroughHandler|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 org.hibernate.cfg|Environment|jvmHasJDK14Timestamp|()Z
 org.hibernate.collection
  AbstractPersistentCollection
+  getQueuedOrphans|(Ljava/lang/String;)Ljava/util/Collection;
+  queuedAdditionIterator|()Ljava/util/Iterator;
   setCurrentSession|(Lorg/hibernate/engine/SessionImplementor;)Z
   wasInitialized|()Z
-org.hibernate.dialect|Dialect|openQuote|()C
+ AbstractPersistentCollection$IteratorProxy
+  next|()Ljava/lang/Object;
+ PersistentSet
+  iterator|()Ljava/util/Iterator;
+org.hibernate.dialect
+ Dialect
+  openQuote|()C
+ Oracle8iDialect
+  supportsLimit|()Z
 org.hibernate.engine
+ BatchFetchQueue
+  addBatchLoadableEntityKey|(Lorg/hibernate/engine/EntityKey;)V
+ Cascade
+  cascade|(Lorg/hibernate/persister/entity/EntityPersister;Ljava/lang/Object;Ljava/lang/Object;)V
+ CascadeStyle
+  reallyDoCascade|(Lorg/hibernate/engine/CascadingAction;)Z
+ CascadeStyle$10
+  doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
+ CascadeStyle$11
+  doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
+  reallyDoCascade|(Lorg/hibernate/engine/CascadingAction;)Z
  CascadeStyle$12
   doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
  CascadeStyle$2
   doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
+ CascadeStyle$3
+  doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
+ CascadeStyle$8
+  doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
+ CascadeStyle$9
+  doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
+ CascadeStyle$MultipleCascadeStyle
+  doCascade|(Lorg/hibernate/engine/CascadingAction;)Z
+  reallyDoCascade|(Lorg/hibernate/engine/CascadingAction;)Z
  CascadingAction
+  getLoadedElementsIterator|(Lorg/hibernate/engine/SessionImplementor;Lorg/hibernate/type/CollectionType;Ljava/lang/Object;)Ljava/util/Iterator;
   requiresNoCascadeChecking|()Z
+ CascadingAction$5
+  cascade|(Lorg/hibernate/event/EventSource;Ljava/lang/Object;Ljava/lang/String;Ljava/lang/Object;Z)V
+  deleteOrphans|()Z
+  getCascadableChildrenIterator|(Lorg/hibernate/event/EventSource;Lorg/hibernate/type/CollectionType;Ljava/lang/Object;)Ljava/util/Iterator;
+ CollectionEntry
+  preFlush|(Lorg/hibernate/collection/PersistentCollection;)V
+ CollectionKey
+  generateHashCode|()I
+ Collections
+  processReachableCollection|(Lorg/hibernate/collection/PersistentCollection;Lorg/hibernate/type/CollectionType;Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)V
  EntityEntry
   requiresDirtyCheck|(Ljava/lang/Object;)Z
+ ForeignKeys
+  getEntityIdentifierIfNotUnsaved|(Ljava/lang/String;Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)Ljava/io/Serializable;
+ JoinHelper
+  getAliasedLHSColumnNames
+   (Lorg/hibernate/type/AssociationType;Ljava/lang/String;IILorg/hibernate/persister/entity/OuterJoinLoadable;Lorg/hibernate/engine/Mapping;)[Ljava/lang/String;
+   (Lorg/hibernate/type/AssociationType;Ljava/lang/String;ILorg/hibernate/persister/entity/OuterJoinLoadable;Lorg/hibernate/engine/Mapping;)[Ljava/lang/String;
+  getLHSColumnNames
+   (Lorg/hibernate/type/AssociationType;IILorg/hibernate/persister/entity/OuterJoinLoadable;Lorg/hibernate/engine/Mapping;)[Ljava/lang/String;
+   (Lorg/hibernate/type/AssociationType;ILorg/hibernate/persister/entity/OuterJoinLoadable;Lorg/hibernate/engine/Mapping;)[Ljava/lang/String;
+  getLHSTableName|(Lorg/hibernate/type/AssociationType;ILorg/hibernate/persister/entity/OuterJoinLoadable;)Ljava/lang/String;
  StatefulPersistenceContext
+  addEntry|(Ljava/lang/Object;Lorg/hibernate/engine/Status;[Ljava/lang/Object;Ljava/lang/Object;Ljava/io/Serializable;Ljava/lang/Object;Lorg/hibernate/LockMode;ZLorg/hibernate/persister/entity/EntityPersister;ZZ)Lorg/hibernate/engine/EntityEntry;
+  containsEntity|(Lorg/hibernate/engine/EntityKey;)Z
   decrementCascadeLevel|()I
   getCollectionEntry|(Lorg/hibernate/collection/PersistentCollection;)Lorg/hibernate/engine/CollectionEntry;
+  getEntity|(Lorg/hibernate/engine/EntityKey;)Ljava/lang/Object;
   getEntry|(Ljava/lang/Object;)Lorg/hibernate/engine/EntityEntry;
+  getProxy|(Lorg/hibernate/engine/EntityKey;)Ljava/lang/Object;
   incrementCascadeLevel|()I
+  proxyFor|(Lorg/hibernate/persister/entity/EntityPersister;Lorg/hibernate/engine/EntityKey;Ljava/lang/Object;)Ljava/lang/Object;
+  reassociateIfUninitializedProxy|(Ljava/lang/Object;)Z
+  unproxyAndReassociate|(Ljava/lang/Object;)Ljava/lang/Object;
 org.hibernate.engine.query|ParamLocationRecognizer|other|(C)V
+org.hibernate.event.def
+ AbstractVisitor
+  processEntityPropertyValues|([Ljava/lang/Object;[Lorg/hibernate/type/Type;)V
+ DefaultFlushEntityEventListener
+  checkId|(Ljava/lang/Object;Lorg/hibernate/persister/entity/EntityPersister;Ljava/io/Serializable;Lorg/hibernate/EntityMode;)V
+  onFlushEntity|(Lorg/hibernate/event/FlushEntityEvent;)V
+ DefaultLoadEventListener
+  onLoad|(Lorg/hibernate/event/LoadEvent;Lorg/hibernate/event/LoadEventListener$LoadType;)V
+ DefaultSaveOrUpdateEventListener
+  onSaveOrUpdate|(Lorg/hibernate/event/SaveOrUpdateEvent;)V
 org.hibernate.hql.classic|ParserHelper|isWhitespace|(Ljava/lang/String;)Z
 org.hibernate.impl
+ CriteriaImpl
+  getFetchMode|(Ljava/lang/String;)Lorg/hibernate/FetchMode;
+ FilterImpl
+  validate|()V
  SessionFactoryImpl
   getCollectionPersister|(Ljava/lang/String;)Lorg/hibernate/persister/collection/CollectionPersister;
   getEntityPersister|(Ljava/lang/String;)Lorg/hibernate/persister/entity/EntityPersister;
+  getIdentifierType|(Ljava/lang/String;)Lorg/hibernate/type/Type;
+ SessionImpl
+  getContextEntityIdentifier|(Ljava/lang/Object;)Ljava/io/Serializable;
+  getEntityUsingInterceptor|(Lorg/hibernate/engine/EntityKey;)Ljava/lang/Object;
+  internalLoad|(Ljava/lang/String;Ljava/io/Serializable;ZZ)Ljava/lang/Object;
+  saveOrUpdate|(Ljava/lang/String;Ljava/lang/Object;)V
 org.hibernate.intercept
  FieldInterceptionHelper
+  clearDirty|(Ljava/lang/Object;)V
   extractFieldInterceptor|(Ljava/lang/Object;)Lorg/hibernate/intercept/FieldInterceptor;
   isInstrumented|(Ljava/lang/Class;)Z
 org.hibernate.jdbc|JDBCContext|registerSynchronizationIfPossible|()Z
 org.hibernate.loader|PropertyPath|append|(Ljava/lang/String;)Lorg/hibernate/loader/PropertyPath;
+org.hibernate.loader.criteria
+ CriteriaQueryTranslator
+  getEntityName
+   (Lorg/hibernate/Criteria;)Ljava/lang/String;
+   (Lorg/hibernate/Criteria;Ljava/lang/String;)Ljava/lang/String;
+  getPropertyName|(Ljava/lang/String;)Ljava/lang/String;
+  getType|(Lorg/hibernate/Criteria;Ljava/lang/String;)Lorg/hibernate/type/Type;
+  getTypeUsingProjection|(Lorg/hibernate/Criteria;Ljava/lang/String;)Lorg/hibernate/type/Type;
+  isJoin|(Ljava/lang/String;)Z
 org.hibernate.loader.custom.sql|SQLQueryParser$ParameterSubstitutionRecognizer|other|(C)V
 org.hibernate.mapping
  Column
@@ -45,18 +149,40 @@ org.hibernate.mapping
   getQuotedName|(Lorg/hibernate/dialect/Dialect;)Ljava/lang/String;
 org.hibernate.persister.entity
  AbstractEntityPersister
+  canExtractIdOutOfEntity|()Z
+  findDirty|([Ljava/lang/Object;[Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)[I
+  getCascadeStyle|(I)Lorg/hibernate/engine/CascadeStyle;
+  getFetchMode|(I)Lorg/hibernate/FetchMode;
+  getIdentifier|(Ljava/lang/Object;Lorg/hibernate/EntityMode;)Ljava/io/Serializable;
   getMappedClass|(Lorg/hibernate/EntityMode;)Ljava/lang/Class;
+  getPropertyAliases|(Ljava/lang/String;I)[Ljava/lang/String;
+  getPropertyValue|(Ljava/lang/Object;ILorg/hibernate/EntityMode;)Ljava/lang/Object;
+  getPropertyValues|(Ljava/lang/Object;Lorg/hibernate/EntityMode;)[Ljava/lang/Object;
+  getSubclassPropertyColumnNames|(I)[Ljava/lang/String;
+  getSubclassPropertyName|(I)Ljava/lang/String;
   getSubclassPropertyType|(I)Lorg/hibernate/type/Type;
   hasUninitializedLazyProperties|(Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
+  isInstance|(Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
+  isSubclassPropertyNullable|(I)Z
+  toColumns|(Ljava/lang/String;I)[Ljava/lang/String;
+  toType|(Ljava/lang/String;)Lorg/hibernate/type/Type;
+ AbstractPropertyMapping
+  toType|(Ljava/lang/String;)Lorg/hibernate/type/Type;
+ SingleTableEntityPersister
+  getSubclassPropertyTableName|(I)Ljava/lang/String;
 org.hibernate.property
  BasicPropertyAccessor$BasicGetter
   get|(Ljava/lang/Object;)Ljava/lang/Object;
   getForInsert|(Ljava/lang/Object;Ljava/util/Map;Lorg/hibernate/engine/SessionImplementor;)Ljava/lang/Object;
  DirectPropertyAccessor$DirectGetter
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+org.hibernate.proxy|AbstractLazyInitializer|initialize|()V
+org.hibernate.proxy.pojo.cglib|CGLIBLazyInitializer|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 org.hibernate.sql
  Alias
   toAliasString|(Ljava/lang/String;)Ljava/lang/String;
+  toUnquotedAliasString|(Ljava/lang/String;)Ljava/lang/String;
+  toUnquotedAliasStrings|([Ljava/lang/String;)[Ljava/lang/String;
  SelectFragment
   addColumn|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/hibernate/sql/SelectFragment;
   addFormula|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/hibernate/sql/SelectFragment;
@@ -64,14 +190,29 @@ org.hibernate.tuple
  EntityModeToTuplizerMapping
   getTuplizer|(Lorg/hibernate/EntityMode;)Lorg/hibernate/tuple/Tuplizer;
   getTuplizerOrNull|(Lorg/hibernate/EntityMode;)Lorg/hibernate/tuple/Tuplizer;
+ PojoInstantiator
+  instantiate|()Ljava/lang/Object;
+  isInstance|(Ljava/lang/Object;)Z
  StandardProperty
   isDirtyCheckable|(Z)Z
-org.hibernate.tuple.component|AbstractComponentTuplizer|getPropertyValue|(Ljava/lang/Object;I)Ljava/lang/Object;
+org.hibernate.tuple.component
+ AbstractComponentTuplizer
+  getPropertyValue|(Ljava/lang/Object;I)Ljava/lang/Object;
+  getPropertyValues|(Ljava/lang/Object;)[Ljava/lang/Object;
+  instantiate|()Ljava/lang/Object;
+ PojoComponentTuplizer
+  getPropertyValues|(Ljava/lang/Object;)[Ljava/lang/Object;
 org.hibernate.tuple.entity
+ AbstractEntityTuplizer
+  getIdentifier|(Ljava/lang/Object;)Ljava/io/Serializable;
+  getPropertyValue|(Ljava/lang/Object;I)Ljava/lang/Object;
+  getPropertyValues|(Ljava/lang/Object;)[Ljava/lang/Object;
+  isInstance|(Ljava/lang/Object;)Z
  EntityMetamodel
   getTuplizer|(Lorg/hibernate/EntityMode;)Lorg/hibernate/tuple/entity/EntityTuplizer;
   getTuplizerOrNull|(Lorg/hibernate/EntityMode;)Lorg/hibernate/tuple/entity/EntityTuplizer;
  PojoEntityTuplizer
+  getPropertyValues|(Ljava/lang/Object;)[Ljava/lang/Object;
   hasUninitializedLazyProperties|(Ljava/lang/Object;)Z
 org.hibernate.type
  AbstractStandardBasicType
@@ -81,15 +222,39 @@ org.hibernate.type
   nullSafeSet|(Ljava/sql/PreparedStatement;Ljava/lang/Object;ILorg/hibernate/engine/SessionImplementor;)V
   sqlTypes|(Lorg/hibernate/engine/Mapping;)[I
  AbstractType
-  getHashCode|(Ljava/lang/Object;Lorg/hibernate/EntityMode;)I
+  getHashCode
+   (Ljava/lang/Object;Lorg/hibernate/EntityMode;)I
+   (Ljava/lang/Object;Lorg/hibernate/EntityMode;Lorg/hibernate/engine/SessionFactoryImplementor;)I
+  hydrate|(Ljava/sql/ResultSet;[Ljava/lang/String;Lorg/hibernate/engine/SessionImplementor;Ljava/lang/Object;)Ljava/lang/Object;
   isDirty|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)Z
   isEqual|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;Lorg/hibernate/engine/SessionFactoryImplementor;)Z
   isSame|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
+  resolve|(Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;Ljava/lang/Object;)Ljava/lang/Object;
  BasicTypeRegistry
   getRegisteredType|(Ljava/lang/String;)Lorg/hibernate/type/BasicType;
  CollectionType
+  getAssociatedEntityName|(Lorg/hibernate/engine/SessionFactoryImplementor;)Ljava/lang/String;
+  getElementsIterator|(Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)Ljava/util/Iterator;
+  getKeyOfOwner|(Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)Ljava/io/Serializable;
   hasHolder|(Lorg/hibernate/EntityMode;)Z
-  isDirty|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)Z
+  isDirty
+   (Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)Z
+   (Ljava/lang/Object;Ljava/lang/Object;[ZLorg/hibernate/engine/SessionImplementor;)Z
+  useLHSPrimaryKey|()Z
+ ComponentType
+  getHashCode
+   (Ljava/lang/Object;Lorg/hibernate/EntityMode;)I
+   (Ljava/lang/Object;Lorg/hibernate/EntityMode;Lorg/hibernate/engine/SessionFactoryImplementor;)I
+  getPropertyValues|(Ljava/lang/Object;Lorg/hibernate/EntityMode;)[Ljava/lang/Object;
+  hydrate|(Ljava/sql/ResultSet;[Ljava/lang/String;Lorg/hibernate/engine/SessionImplementor;Ljava/lang/Object;)Ljava/lang/Object;
+  instantiate
+   (Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;)Ljava/lang/Object;
+   (Lorg/hibernate/EntityMode;)Ljava/lang/Object;
+  isEqual
+   (Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
+   (Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;Lorg/hibernate/engine/SessionFactoryImplementor;)Z
+  nullSafeGet|(Ljava/sql/ResultSet;[Ljava/lang/String;Lorg/hibernate/engine/SessionImplementor;Ljava/lang/Object;)Ljava/lang/Object;
+  resolve|(Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;Ljava/lang/Object;)Ljava/lang/Object;
  CompositeCustomType
   deepCopy|(Ljava/lang/Object;Lorg/hibernate/EntityMode;Lorg/hibernate/engine/SessionFactoryImplementor;)Ljava/lang/Object;
   getPropertyValue|(Ljava/lang/Object;I)Ljava/lang/Object;
@@ -100,22 +265,42 @@ org.hibernate.type
   isEqual|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
   nullSafeSet|(Ljava/sql/PreparedStatement;Ljava/lang/Object;I[ZLorg/hibernate/engine/SessionImplementor;)V
  EntityType
+  getIdentifierOrUniqueKeyType|(Lorg/hibernate/engine/Mapping;)Lorg/hibernate/type/Type;
   isSame|(Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
+  resolve|(Ljava/lang/Object;Lorg/hibernate/engine/SessionImplementor;Ljava/lang/Object;)Ljava/lang/Object;
  ForeignKeyDirection$1
+  cascadeNow|(I)Z
+ ForeignKeyDirection$2
   cascadeNow|(I)Z
  ImmutableType
   deepCopy|(Ljava/lang/Object;Lorg/hibernate/EntityMode;Lorg/hibernate/engine/SessionFactoryImplementor;)Ljava/lang/Object;
+ IntegerType
+  get|(Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
  ManyToOneType
+  getColumnSpan|(Lorg/hibernate/engine/Mapping;)I
+  hydrate|(Ljava/sql/ResultSet;[Ljava/lang/String;Lorg/hibernate/engine/SessionImplementor;Ljava/lang/Object;)Ljava/lang/Object;
+  isDirty|(Ljava/lang/Object;Ljava/lang/Object;[ZLorg/hibernate/engine/SessionImplementor;)Z
   useLHSPrimaryKey|()Z
+ MutableType
+  deepCopy|(Ljava/lang/Object;Lorg/hibernate/EntityMode;Lorg/hibernate/engine/SessionFactoryImplementor;)Ljava/lang/Object;
  NullableType
   getColumnSpan|(Lorg/hibernate/engine/Mapping;)I
   isDirty|(Ljava/lang/Object;Ljava/lang/Object;[ZLorg/hibernate/engine/SessionImplementor;)Z
   isEqual
    (Ljava/lang/Object;Ljava/lang/Object;)Z
    (Ljava/lang/Object;Ljava/lang/Object;Lorg/hibernate/EntityMode;)Z
+  nullSafeGet
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
+   (Ljava/sql/ResultSet;[Ljava/lang/String;Lorg/hibernate/engine/SessionImplementor;Ljava/lang/Object;)Ljava/lang/Object;
+ StringType
+  get|(Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
  TimestampType
+  get|(Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
   isEqual|(Ljava/lang/Object;Ljava/lang/Object;)Z
  TypeFactory
+  basic|(Ljava/lang/String;)Lorg/hibernate/type/Type;
+  findDirty|([Lorg/hibernate/tuple/StandardProperty;[Ljava/lang/Object;[Ljava/lang/Object;[[ZZLorg/hibernate/engine/SessionImplementor;)[I
+  heuristicType|(Ljava/lang/String;Ljava/util/Properties;)Lorg/hibernate/type/Type;
   injectParameters|(Ljava/lang/Object;Ljava/util/Properties;)V
 org.hibernate.type.descriptor.java
  AbstractTypeDescriptor
@@ -137,17 +322,24 @@ org.hibernate.util
  ArrayHelper
   countTrue|([Z)I
   isAllFalse|([Z)Z
+  slice|([Ljava/lang/String;II)[Ljava/lang/String;
  FastHashMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  IdentityMap
   clear|()V
+  entries|(Ljava/util/Map;)Ljava/util/List;
+  entryList|()Ljava/util/List;
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  JoinedIterator
   next|()Ljava/lang/Object;
  PropertiesHelper
   resolvePlaceHolder|(Ljava/lang/String;)Ljava/lang/String;
  ReflectHelper
   classForName|(Ljava/lang/String;)Ljava/lang/Class;
+  isAbstractClass|(Ljava/lang/Class;)Z
   isPublic|(Ljava/lang/Class;Ljava/lang/reflect/Member;)Z
  StringHelper
+  isNotEmpty|(Ljava/lang/String;)Z
   qualify|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  root|(Ljava/lang/String;)Ljava/lang/String;

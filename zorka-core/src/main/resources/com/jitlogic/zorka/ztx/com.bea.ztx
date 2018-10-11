@@ -1,4 +1,5 @@
 com.bea.common.ldap.escaping|WLSEscaping|escapeString|(Ljava/lang/String;)Ljava/lang/String;
+com.bea.common.security.internal.utils|Delegator$ProxyInvocationHandler|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 com.bea.common.security.utils|JavaMD5|update|(B)V
 com.bea.netuix.nf
  ControlLifecycle$1
@@ -128,6 +129,12 @@ com.bea.netuix.util
   peek|()Ljava/lang/Object;
   pop|()Ljava/lang/Object;
   push|(Ljava/lang/Object;)V
+com.bea.objectweb.asm
+ ByteVector
+  putShort|(I)Lcom/bea/objectweb/asm/ByteVector;
+ ClassReader
+  readUTF8|(I[C)Ljava/lang/String;
+  readUnsignedShort|(I)I
 com.bea.xbean.common|XmlWhitespace|isSpace|(C)Z
 com.bea.xbean.schema
  SchemaParticleImpl

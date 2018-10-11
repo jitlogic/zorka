@@ -1,0 +1,33 @@
+flex.messaging.io
+ AbstractProxy
+  clone|()Ljava/lang/Object;
+  getInstanceToSerialize|(Ljava/lang/Object;)Ljava/lang/Object;
+  isExternalizable|(Ljava/lang/Object;)Z
+ ArrayCollection
+  writeExternal|(Ljava/io/ObjectOutput;)V
+ BeanProxy
+  clone|()Ljava/lang/Object;
+  getAlias|(Ljava/lang/Object;)Ljava/lang/String;
+  getPropertyNames|(Ljava/lang/Object;)Ljava/util/List;
+  getValue|(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+ BeanProxy$BeanProperty
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ClassAliasRegistry
+  getClassName|(Ljava/lang/String;)Ljava/lang/String;
+ PropertyProxyRegistry
+  getProxy
+   (Ljava/lang/Class;)Lflex/messaging/io/PropertyProxy;
+   (Ljava/lang/Class;ZZ)Lflex/messaging/io/PropertyProxy;
+   (Ljava/lang/Object;)Lflex/messaging/io/PropertyProxy;
+  getProxyAndRegister
+   (Ljava/lang/Class;)Lflex/messaging/io/PropertyProxy;
+   (Ljava/lang/Object;)Lflex/messaging/io/PropertyProxy;
+flex.messaging.io.amf
+ Amf3Output
+  writeAMFUTF|(Ljava/lang/String;)V
+  writeObject|(Ljava/lang/Object;)V
+  writeObjectEnd|()V
+  writeObjectProperty|(Ljava/lang/String;Ljava/lang/Object;)V
+  writeObjectTraits|(Lflex/messaging/io/amf/TraitsInfo;)V
+ Java15Amf3Output
+  writeObject|(Ljava/lang/Object;)V
