@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy.lt;
+package com.jitlogic.zorka.core.spy.ltracer;
 
 import java.io.File;
 import java.io.IOException;

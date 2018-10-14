@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy.st;
+package com.jitlogic.zorka.core.spy.stracer;
 
 import com.jitlogic.zorka.cbor.TraceRecordFlags;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
@@ -23,7 +23,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.TracerLib;
-import com.jitlogic.zorka.core.spy.lt.TraceHandler;
+import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 
 import java.util.List;

@@ -21,7 +21,6 @@ import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.core.spy.lt.LTracer;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.util.TraceClassVisitor;
 

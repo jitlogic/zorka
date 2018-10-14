@@ -19,7 +19,7 @@ package com.jitlogic.zorka.core.spy;
 
 import bsh.EvalError;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.core.spy.st.STracer;
+import com.jitlogic.zorka.core.spy.stracer.STracer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

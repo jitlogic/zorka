@@ -2,8 +2,8 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.core.spy.DTraceState;
-import com.jitlogic.zorka.core.spy.lt.LTracer;
-import com.jitlogic.zorka.core.spy.lt.LTracerLib;
+import com.jitlogic.zorka.core.spy.ltracer.LTracer;
+import com.jitlogic.zorka.core.spy.ltracer.LTracerLib;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 

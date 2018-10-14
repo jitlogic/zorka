@@ -19,7 +19,6 @@ package com.jitlogic.zorka.core.spy.plugins;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
-import com.jitlogic.zorka.core.spy.lt.LTracer;
 
 import java.util.HashSet;
 import java.util.Map;

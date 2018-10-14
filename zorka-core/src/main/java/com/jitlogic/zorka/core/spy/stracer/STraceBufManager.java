@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy.st;
+package com.jitlogic.zorka.core.spy.stracer;
 
 public class STraceBufManager {
 

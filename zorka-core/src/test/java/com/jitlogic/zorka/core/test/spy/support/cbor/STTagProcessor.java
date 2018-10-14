@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.core.spy.st.STraceHandler;
+import com.jitlogic.zorka.core.spy.stracer.STraceHandler;
 import com.jitlogic.zorka.cbor.TagProcessor;
 
 import java.util.ArrayList;

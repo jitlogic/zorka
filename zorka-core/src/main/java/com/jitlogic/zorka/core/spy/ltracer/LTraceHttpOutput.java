@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.core.spy.lt;
+package com.jitlogic.zorka.core.spy.ltracer;
 
 import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.cbor.CborDataWriter;

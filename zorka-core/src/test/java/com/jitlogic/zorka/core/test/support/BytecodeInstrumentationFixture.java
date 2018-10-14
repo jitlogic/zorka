@@ -19,9 +19,9 @@ package com.jitlogic.zorka.core.test.support;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.*;
-import com.jitlogic.zorka.core.spy.lt.LTracer;
-import com.jitlogic.zorka.core.spy.lt.LTraceHandler;
-import com.jitlogic.zorka.core.spy.lt.TraceHandler;
+import com.jitlogic.zorka.core.spy.ltracer.LTracer;
+import com.jitlogic.zorka.core.spy.ltracer.LTraceHandler;
+import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.TestSpyTransformer;
 import com.jitlogic.zorka.core.test.spy.support.TestLSubmitter;
 import com.jitlogic.zorka.core.test.spy.support.TestTraceBuilder;

@@ -19,7 +19,7 @@ package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 import com.jitlogic.zorka.cbor.ByteArrayCborInput;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.core.spy.st.STraceBufChunk;
+import com.jitlogic.zorka.core.spy.stracer.STraceBufChunk;
 import com.jitlogic.zorka.cbor.CborDataReader;
 
 

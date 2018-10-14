@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.core.spy.DTraceState;
-import com.jitlogic.zorka.core.spy.lt.LTracerLib;
+import com.jitlogic.zorka.core.spy.ltracer.LTracerLib;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.TracerLib;
 

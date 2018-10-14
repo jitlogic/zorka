@@ -19,9 +19,9 @@ package com.jitlogic.zorka.core.test.spy;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.spy.lt.TraceHandler;
-import com.jitlogic.zorka.core.spy.st.STraceBufChunk;
-import com.jitlogic.zorka.core.spy.st.STraceBufManager;
+import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
+import com.jitlogic.zorka.core.spy.stracer.STraceBufChunk;
+import com.jitlogic.zorka.core.spy.stracer.STraceBufManager;
 import com.jitlogic.zorka.core.test.spy.support.cbor.TestTraceBufOutput;
 import com.jitlogic.zorka.core.test.spy.support.cbor.TestSTraceHandler;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
@@ -29,7 +29,6 @@ import com.jitlogic.zorka.core.util.ZorkaUnsafe;
 import org.junit.After;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;

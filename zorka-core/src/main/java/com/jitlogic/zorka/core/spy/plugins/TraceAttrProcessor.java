@@ -22,7 +22,7 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
-import com.jitlogic.zorka.core.spy.lt.LTraceHandler;
+import com.jitlogic.zorka.core.spy.ltracer.LTraceHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

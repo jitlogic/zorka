@@ -19,7 +19,7 @@ package com.jitlogic.zorka.core.test.spy;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 
-import com.jitlogic.zorka.core.spy.lt.LTraceHandler;
+import com.jitlogic.zorka.core.spy.ltracer.LTraceHandler;
 import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.After;

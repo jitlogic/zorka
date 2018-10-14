@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy.st;
+package com.jitlogic.zorka.core.spy.stracer;
 
 import com.jitlogic.zorka.common.tracedata.MetadataChecker;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;

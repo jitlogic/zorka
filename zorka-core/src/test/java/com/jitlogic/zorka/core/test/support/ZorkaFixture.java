@@ -34,8 +34,8 @@ import com.jitlogic.zorka.common.test.support.CommonTestUtil;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.spy.SpyClassLookup;
-import com.jitlogic.zorka.core.spy.lt.LTracer;
-import com.jitlogic.zorka.core.spy.lt.TraceHandler;
+import com.jitlogic.zorka.core.spy.ltracer.LTracer;
+import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.TestSpyRetransformer;
 import org.junit.After;
 import org.junit.Before;

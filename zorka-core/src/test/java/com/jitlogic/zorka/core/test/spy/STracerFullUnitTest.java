@@ -1,8 +1,7 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.spy.Tracer;
-import com.jitlogic.zorka.core.spy.lt.TraceHandler;
+import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STBeg;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STErr;
 import com.jitlogic.zorka.core.test.spy.support.cbor.STRec;

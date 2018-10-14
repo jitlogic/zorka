@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.test.spy.support;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.spy.lt.LTraceHandler;
+import com.jitlogic.zorka.core.spy.ltracer.LTraceHandler;
 import org.junit.Assert;
 
 import java.util.ArrayList;
