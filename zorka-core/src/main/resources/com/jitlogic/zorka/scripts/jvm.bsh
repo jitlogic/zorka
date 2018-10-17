@@ -120,62 +120,6 @@ __jvm() {
 
   __http_client() {
 
-    outReqHeaders = new ThreadLocal();
-
-    dtrace_req() {
-
-      dtop = tracer.dtraceOutput();
-      process(rec) {
-        conn = rec.get("THIS");
-
-        added = false;
-
-        try {
-          if (conn.getRequestProperty(tracer.DTRACE_UUID_HDR) == null) {
-            dtop.process(rec);
-            ds = rec.get("DTRACE");
-            conn.addRequestProperty(tracer.DTRACE_UUID_HDR, ds.getUuid());
-            conn.addRequestProperty(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
-            xtt = rec.get(tracer.DTRACE_XTT);
-            if (xtt != null) {
-              conn.addRequestProperty(tracer.DTRACE_XTT, xtt.toString());
-            }
-            added = true;
-          }
-        } catch (Exception e) {
-          if ("java.lang.IllegalStateException".equals(e.getClass().getName())) {
-            added = false;
-          } else {
-            zorka.logError("Error ");
-          }
-        }
-
-        if (!added) {
-        }
-
-        return rec;
-      }
-      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
-    }
-
-    proc_headers(hattr, prefix) {
-      process(rec) {
-        hdrs = rec.get(hattr);
-        if (hdrs != null) {
-          for (e : hdrs.entrySet()) {
-            k = e.getKey();
-            v = e.getValue();
-            if (v != null) {
-              tracer.newAttr(prefix+k, v.size() == 1 ? v.get(0) : ""+v);
-            }
-          }
-        }
-        return rec;
-      }
-
-      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
-    }
-
     clazzes = zorka.listCfg("jvm.httpclient.classes",
       "java.net.HttpURLConnection",
       "sun.net.www.protocol.http.HttpURLConnection",
@@ -183,41 +127,45 @@ __jvm() {
       "com.sun.net.ssl.HttpsURLConnection");
 
 
-    if (zorka.boolCfg("jvm.httpclient.trace", false)) {
-
-      if (_dtrace_enabled) {
-        sdef = spy.instrument("JAVA_NET_HTTPURLCONNECTION_DTRACE")
-          .onEnter(
-            spy.fetchArg("THIS", 0),
-            dtrace_req(),
-            spy.get("REQ_HDRS", "THIS", "requestProperties"),
-            spy.tlSet("REQ_HDRS", outReqHeaders));
-
-        for (clazz : clazzes) {
-          zorka.logInfo("HttpUrlConnection implementation: " + clazz);
-          sdef = sdef.include(spy.byMethod(clazz, "connect"));
+    debug() {
+      process(rec) {
+        t = rec.get("THIS");
+        id = System.identityHashCode(t);
+        tracer.newAttr("XXX_OBJ_ID", ""+id);
+        ctx = rec.get(".CTX");
+        if (ctx != null) {
+          zorka.logInfo("Called: " + ctx.getClassName() + "." + ctx.getMethodName() + "(): [" + ctx.getId() + "] " + id + " " + t);
         }
-
-        spy.add(sdef);
+        return rec;
       }
 
+      return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+    }
+
+
+    if (zorka.boolCfg("jvm.httpclient.trace", false)) {
+
       sdef = spy.instrument("JAVA_NET_HTTPURLCONNECTION")
-               .onEnter(spy.fetchArg("THIS", 0),
-                 tracer.begin("HTTP_CLI"))
-               .onReturn(spy.fetchRetVal("STATUS"))
-               .onSubmit(
-                 tracer.formatAttr("STATUS", "${STATUS}"),
-                 tracer.formatAttr("URL", "${THIS.URL}"),
-                 tracer.formatAttr("URI", "${THIS.URL.path}"),
-                 tracer.formatAttr("METHOD", "${THIS.requestMethod}"),
-                 spy.get("RES_HDRS", "THIS", "headerFields"),
-                 proc_headers("RES_HDRS", "HdrIn__"),
-                 spy.tlGet("REQ_HDRS", outReqHeaders),
-                 proc_headers("REQ_HDRS", "HdrOut__"));
+        .onEnter(spy.fetchArg("THIS", 0),
+          //debug(),
+          tracer.begin("HTTP_CLI"),
+          instr.jvmHttpClientEnter(),
+          tracer.procAttr(tracer.PA_MAP_OF_LISTS_1, "HdrOut__", "THIS", "requestProperties"))
+        .onReturn(spy.fetchRetVal("STATUS"),
+          tracer.formatAttr("STATUS", "${STATUS}"))
+        .onSubmit(
+          tracer.formatAttr("URL", "${THIS.URL}"),
+          tracer.formatAttr("URI", "${THIS.URL.path}"),
+          tracer.formatAttr("METHOD", "${THIS.requestMethod}"),
+          tracer.procAttr(tracer.PA_MAP_OF_LISTS_1, "HdrIn__", "THIS", "headerFields"));
 
       for (clazz : clazzes) {
         sdef = sdef.include(spy.byMethod(clazz, "getResponseCode"));
       }
+
+      //for (clazz : clazzes) {
+      //  spy.add(spy.instrument("DEBUG."+clazz).onEnter(spy.fetchArg("THIS", 0), debug()).include(spy.byMethod(0, clazz, "~.*", null)));
+      //}
 
       spy.add(sdef);
     }

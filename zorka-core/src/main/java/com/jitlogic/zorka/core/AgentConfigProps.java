@@ -25,6 +25,9 @@ public class AgentConfigProps {
     public static final String SYSLOG_PROP = "syslog";
     public static final boolean SYSLOG_DEFV = true;
 
+    public static final String TRACER_DISTRIBUTED_PROP = "tracer.distributed";
+    public static final boolean TRACER_DISTRIBUTED_DEFV = false;
+
     /** Maximum number of chunks that can be buffered by trace handler (and then sent together). */
     public static final String TRACER_CHUNK_MAX_PROP = "tracer.chunk.max";
     public static final int TRACER_CHUNK_MAX_DEFV = 16;

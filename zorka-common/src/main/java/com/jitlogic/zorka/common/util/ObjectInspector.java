@@ -87,7 +87,7 @@ public final class ObjectInspector {
      * @param key attribute identified (name, index, etc. - depending on object type)
      * @return attribute value or null if no matching attribute has been found
      */
-    private static Object getAttr(Object obj, Object key) {
+    public static Object getAttr(Object obj, Object key) {
         if (obj == null) {
             return null;
         }

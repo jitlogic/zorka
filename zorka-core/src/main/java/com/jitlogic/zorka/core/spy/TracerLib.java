@@ -60,6 +60,17 @@ public abstract class TracerLib {
     public static final int TUNING_SUM = 0x01;
     public static final int TUNING_DET = 0x02;
 
+    // Attribute processing flags
+    public static final int PA_MAP_OF_ANY     = 0x0001;
+    public static final int PA_MAP_OF_LISTS_1 = 0x0002;
+    public static final int PA_MAP_OF_LISTS_N = 0x0003;
+    public static final int PA_MAP            = 0x000f;
+
+    public static final int PA_LIST_OF_ANY    = 0x0010;
+    public static final int PA_LIST           = 0x00f0;
+
+    public static final int PA_TO_STRING      = 0x1000;
+    public static final int PA_WARN_ON_NULL   = 0x2000;
 
     protected Tracer tracer;
     protected SymbolRegistry symbolRegistry;
@@ -302,6 +313,10 @@ public abstract class TracerLib {
         tracer.getHandler().newAttr(
                 symbolRegistry.symbolId(traceName), symbolRegistry.symbolId(attrName),
                 new TaggedValue(symbolRegistry.symbolId(tag), value));
+    }
+
+    public SpyProcessor procAttr(int flags, String prefix, String src, String...path) {
+        return new ProcAttrProcessor(this, flags, prefix, src, path);
     }
 
     public SpyProcessor markError() {
