@@ -142,31 +142,23 @@ __jvm() {
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
     }
 
+    //for (clazz : clazzes) {
+    //  spy.add(spy.instrument("DEBUG."+clazz).onEnter(spy.fetchArg("THIS", 0), debug()).include(spy.byMethod(0, clazz, "~.*", null)));
+    //}
+
+    jhci = instr.jvmHttpClientInstr("JVM_HTTP_CLIENT");
 
     if (zorka.boolCfg("jvm.httpclient.trace", false)) {
 
-      sdef = spy.instrument("JAVA_NET_HTTPURLCONNECTION")
-        .onEnter(spy.fetchArg("THIS", 0),
-          //debug(),
-          tracer.begin("HTTP_CLI"),
-          instr.jvmHttpClientEnter(),
-          tracer.procAttr(tracer.PA_MAP_OF_LISTS_1, "HdrOut__", "THIS", "requestProperties"))
-        .onReturn(spy.fetchRetVal("STATUS"),
-          tracer.formatAttr("STATUS", "${STATUS}"))
-        .onSubmit(
-          tracer.formatAttr("URL", "${THIS.URL}"),
-          tracer.formatAttr("URI", "${THIS.URL.path}"),
-          tracer.formatAttr("METHOD", "${THIS.requestMethod}"),
-          tracer.procAttr(tracer.PA_MAP_OF_LISTS_1, "HdrIn__", "THIS", "headerFields"));
+      hdef = jhci[0];
+      sdef = jhci[1];
 
       for (clazz : clazzes) {
+        hdef = hdef.include(spy.byMethod(clazz, "setRequestMethod"));
         sdef = sdef.include(spy.byMethod(clazz, "getResponseCode"));
       }
 
-      //for (clazz : clazzes) {
-      //  spy.add(spy.instrument("DEBUG."+clazz).onEnter(spy.fetchArg("THIS", 0), debug()).include(spy.byMethod(0, clazz, "~.*", null)));
-      //}
-
+      spy.add(hdef);
       spy.add(sdef);
     }
 

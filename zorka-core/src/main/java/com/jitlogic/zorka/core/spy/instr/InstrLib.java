@@ -1,9 +1,10 @@
 package com.jitlogic.zorka.core.spy.instr;
 
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.core.spy.SpyDefinition;
 import com.jitlogic.zorka.core.spy.SpyLib;
-import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.TracerLib;
+
 
 /**
  * Instrumentations (intrinsics): dedicated implementations of (fragments of) request processing chains for instrumenting
@@ -17,14 +18,18 @@ public class InstrLib {
     private SpyLib spyLib;
     private TracerLib tracerLib;
 
+
     public InstrLib(ZorkaConfig config, SpyLib spyLib, TracerLib tracerLib) {
         this.config = config;
         this.spyLib = spyLib;
         this.tracerLib = tracerLib;
     }
 
-    public SpyProcessor jvmHttpClientEnter() {
-        return new JvmHttpClientEnter(config, tracerLib);
+
+    public SpyDefinition[] jvmHttpClientInstr(String name) {
+        JvmHttpClientInstrumentation inst = new JvmHttpClientInstrumentation(config, spyLib, tracerLib, name);
+        return new SpyDefinition[] { inst.preSdef(), inst.callSdef() };
     }
+
 
 }
