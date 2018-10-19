@@ -124,7 +124,9 @@ __jvm() {
       "java.net.HttpURLConnection",
       "sun.net.www.protocol.http.HttpURLConnection",
       "javax.net.ssl.HttpsURLConnection",
-      "com.sun.net.ssl.HttpsURLConnection");
+      "com.sun.net.ssl.HttpsURLConnection",
+      "weblogic.net.http.HttpURLConnection",
+      "weblogic.net.http.HttpsURLConnection");
 
 
     debug() {
@@ -146,7 +148,7 @@ __jvm() {
     //  spy.add(spy.instrument("DEBUG."+clazz).onEnter(spy.fetchArg("THIS", 0), debug()).include(spy.byMethod(0, clazz, "~.*", null)));
     //}
 
-    jhci = instr.jvmHttpClientInstr("JVM_HTTP_CLIENT");
+    jhci = instr.jvmHttpClient("JVM_HTTP_CLIENT");
 
     if (zorka.boolCfg("jvm.httpclient.trace", false)) {
 

@@ -26,7 +26,7 @@ public class InstrLib {
     }
 
 
-    public SpyDefinition[] jvmHttpClientInstr(String name) {
+    public SpyDefinition[] jvmHttpClient(String name) {
         JvmHttpClientInstrumentation inst = new JvmHttpClientInstrumentation(config, spyLib, tracerLib, name);
         return new SpyDefinition[] { inst.preSdef(), inst.callSdef() };
     }
