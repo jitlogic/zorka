@@ -51,7 +51,7 @@ public class HttpMsg {
 
     public String getBodyAsString() {
         try {
-            return new String(body, "UTF-8"); // TODO variable encodings in the future
+            return body != null ?  new String(body, "UTF-8") : null; // TODO variable encodings in the future
         } catch (UnsupportedEncodingException e) {
             return null;
         }
