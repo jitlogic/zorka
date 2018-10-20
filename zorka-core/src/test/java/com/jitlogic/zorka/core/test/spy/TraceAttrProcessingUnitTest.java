@@ -18,10 +18,17 @@ package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.tracedata.TaggedValue;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.spy.SpyLib;
+import com.jitlogic.zorka.core.spy.SpyProcessor;
+import com.jitlogic.zorka.core.spy.plugins.SpyFlagsProcessor;
 import com.jitlogic.zorka.core.spy.plugins.TraceAttrProcessor;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
 
 import org.junit.Test;
+import static org.junit.Assert.*;
+
+import java.util.Map;
+
 
 
 public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture {
@@ -54,6 +61,19 @@ public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture 
 
         traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("SQL"));
         traceBuilder.check(0, "attrVal", new TaggedValue(symbols.symbolId("SQL_QUERY"), "select * from table"));
+    }
+
+    @Test
+    public void testTraceSetErrorFlags() {
+        SpyProcessor sp1 = new SpyFlagsProcessor(true), sp2 = new SpyFlagsProcessor(false);
+
+        Map<String,Object> m = sp1.process(ZorkaUtil.<String, Object>map(".STAGES", 0));
+
+        assertEquals(1 << SpyLib.ON_ERROR, m.get(".STAGES"));
+
+        m = sp2.process(m);
+        assertEquals(1 << SpyLib.ON_RETURN, m.get(".STAGES"));
+
     }
 
 }

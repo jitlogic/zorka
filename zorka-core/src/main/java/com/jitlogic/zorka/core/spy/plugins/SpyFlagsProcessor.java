@@ -35,8 +35,8 @@ public class SpyFlagsProcessor implements SpyProcessor {
         int f = (Integer)record.get(".STAGES");
 
         record.put(".STAGES", error
-            ? ((f | SpyLib.ON_ERROR) & ~SpyLib.ON_RETURN)
-            : ((f | SpyLib.ON_RETURN) & ~SpyLib.ON_ERROR));
+            ? ((f | (1<<SpyLib.ON_ERROR)) & ~(1<<SpyLib.ON_RETURN))
+            : ((f | (1<<SpyLib.ON_RETURN)) & ~(1<<SpyLib.ON_ERROR)));
 
         return record;
     }
