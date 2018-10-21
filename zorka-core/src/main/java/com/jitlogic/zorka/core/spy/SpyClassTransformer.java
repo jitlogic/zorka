@@ -280,7 +280,15 @@ public class SpyClassTransformer implements ClassFileTransformer {
     @Override
     public byte[] transform(ClassLoader classLoader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] cbf) throws IllegalClassFormatException {
+        try {
+            return doTransform(classLoader, className, cbf);
+        } catch (Throwable e) {
+            log.error("Error transforming class: " + className, e);
+            return cbf;
+        }
+    }
 
+    private byte[] doTransform(ClassLoader classLoader, String className, byte[] cbf) {
         if (Boolean.TRUE.equals(transformLock.get())) {
             return null;
         }
@@ -366,13 +374,23 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
         if (dumpEnabled) {
             for (Pattern f : dumpFilters) {
-                if (f.matcher(clazzName).matches()) {
-                    log.debug("Dumping class: " + clazzName);
+                boolean matches = f.matcher(clazzName).matches();
+                if (log.isTraceEnabled()) {
+                    log.trace("Matching class " + clazzName + " against '" + f + "': " + matches);
+                }
+                if (matches) {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Dumping class: " + clazzName);
+                    }
                     dump(className, "in", cbf);
                     dump(className, "out", buf);
                     break;
                 }
             }
+        }
+
+        if (log.isTraceEnabled()) {
+            log.trace("Finished transforming class: " + clazzName);
         }
 
         return buf == cbf ? null : buf;
