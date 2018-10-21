@@ -139,7 +139,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
             for (String d : df) {
                 dumpFilters.add(Pattern.compile(d
                         .replace(".", "\\.")
-                        .replace("**", ".*")
+                        .replace("**", ".+")
                         .replace("*", "[^\\.]*")));
             }
             dumpDir = new File(config.getHomeDir(), "dump");
