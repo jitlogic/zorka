@@ -52,6 +52,14 @@ public class SpyClassResolver {
 
         numCalls.logCall();
 
+        if (log.isDebugEnabled()) {
+            log.debug("Looking for common superclass of " + type1 + " and " + type2);
+        }
+
+        if (OBJECT_CLAZZ.equals(type1) || OBJECT_CLAZZ.equals(type2)) {
+            return OBJECT_CLAZZ;
+        }
+
         CachedClassInfo ci1 = getClassInfo(loader, type1), ci2 = getClassInfo(loader, type2);
 
         CachedClassInfo rslt = null;
@@ -119,10 +127,10 @@ public class SpyClassResolver {
 
         CachedClassInfo i = ci;
 
-        do {
+        while (i.getSuperclassName() != null && !"java.lang.Object".equals(i.getClassName())) {
             i = getClassInfo(loader, i.getSuperclassName());
             rslt.add(i);
-        } while (!"java.lang.Object".equals(i.getClassName()));
+        }
 
         Collections.reverse(rslt);
 
@@ -133,7 +141,7 @@ public class SpyClassResolver {
     public CachedClassInfo getClassInfo(ClassLoader loader, String type) {
 
         if (log.isTraceEnabled()) {
-            log.trace("Class: " + type + ", cached: " + cache.size());
+            log.trace("Class: " + type + ", cached: " + cache.size() + ", loader=" + loader);
         }
 
         classGets.logCall(1);
@@ -149,11 +157,18 @@ public class SpyClassResolver {
 
         Class<?> clazz = SpyClassLookup.INSTANCE.findLoadedClass(loader, type);
         if (clazz != null) {
+            Class<?>[] ifcs = clazz.getInterfaces();
+            String[] interfaces = new String[ifcs != null ? ifcs.length : 0];
+            if (ifcs != null) {
+                for (int i = 0; i < interfaces.length; i++) {
+                    interfaces[i] = ifcs[i].getName();
+                }
+            }
             rslt = new CachedClassInfo(
                     clazz.isInterface() ? CachedClassInfo.IS_INTERFACE : 0,
                     clazz.getName(),
                     clazz.getSuperclass() != null ? clazz.getSuperclass().getName() : null,
-                    clazz.getInterfaces() != null ? new String[clazz.getInterfaces().length] : new String[0]);
+                    interfaces);
             setCached(type, rslt);
             residentGets.logCall();
             return rslt;
@@ -189,7 +204,7 @@ public class SpyClassResolver {
         rslt = new CachedClassInfo(
             0 != (0x00000200 & reader.getAccess()) ? CachedClassInfo.IS_INTERFACE : 0,
             reader.getClassName().replace('/', '.').intern(),
-            reader.getSuperName().replace('/', '.').intern(),
+            reader.getSuperName() != null ? reader.getSuperName().replace('/', '.').intern() : null,
             ifcs);
 
         setCached(type, rslt);

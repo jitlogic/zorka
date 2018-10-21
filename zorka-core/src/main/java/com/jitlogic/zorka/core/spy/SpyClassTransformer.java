@@ -101,7 +101,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
 
     private boolean useCustomResolver = true;
 
-    private MethodCallStatistic tracerLookups, classesProcessed, classesTransformed, spyLookups;
+    private MethodCallStatistic tracerLookups, classesProcessed, classesTransformed, spyLookups, nullsEncountered;
 
     private boolean dumpEnabled = false;
     private List<Pattern> dumpFilters = new ArrayList<Pattern>();
@@ -130,6 +130,7 @@ public class SpyClassTransformer implements ClassFileTransformer {
         this.spyLookups = statistics.getMethodCallStatistic("SpyLookups");
         this.tracerLookups = statistics.getMethodCallStatistic("TracerLookups");
         this.classesProcessed = statistics.getMethodCallStatistic("ClassesProcessed");
+        this.nullsEncountered = statistics.getMethodCallStatistic("SpyNullsEncountered");
         this.classesTransformed = statistics.getMethodCallStatistic("ClassesTransformed");
 
         List<String> df = config.listCfg("spy.dump");
@@ -280,11 +281,18 @@ public class SpyClassTransformer implements ClassFileTransformer {
     @Override
     public byte[] transform(ClassLoader classLoader, String className, Class<?> classBeingRedefined,
                             ProtectionDomain protectionDomain, byte[] cbf) throws IllegalClassFormatException {
+        if (log.isDebugEnabled()) {
+            log.debug("Transform: " + className + " (" + classLoader + ")" + " cbr=" + classBeingRedefined);
+        }
+        if (className == null) {
+            nullsEncountered.logCall(1);
+            return null;
+        }
         try {
             return doTransform(classLoader, className, cbf);
         } catch (Throwable e) {
             log.error("Error transforming class: " + className, e);
-            return cbf;
+            return null;
         }
     }
 
@@ -353,9 +361,9 @@ public class SpyClassTransformer implements ClassFileTransformer {
             boolean doComputeFrames = computeFrames && (cbf[7] >= (byte) 0x32);
 
             ClassReader cr = new ClassReader(cbf);
-            ClassWriter cw = useCustomResolver
-                ? new SpyClassWriter(cr, doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0, classLoader, resolver)
-                : new ClassWriter(cr, doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0);
+            ClassLoader cl = classLoader != null ? classLoader : ClassLoader.getSystemClassLoader().getParent();
+            int flags = doComputeFrames ? SpyClassWriter.COMPUTE_FRAMES : 0;
+            ClassWriter cw = useCustomResolver ? new SpyClassWriter(cr, flags, cl, resolver) : new ClassWriter(cr, flags);
             SpyClassVisitor scv = createVisitor(classLoader, clazzName, found, tracer, cw);
             cr.accept(scv, expandedFrames ? ClassReader.EXPAND_FRAMES : 0);
 
