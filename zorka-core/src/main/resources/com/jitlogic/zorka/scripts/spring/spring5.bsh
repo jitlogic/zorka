@@ -120,7 +120,7 @@ __spring() {
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
     }
 
-    if (zorka.boolCfg("spring.instrument.http.client", true)) {
+    if (zorka.boolCfg("spring.http.client", true)) {
       spy.add(
         spy.instrument("SPRING_WEB_HTTP_CLIENT")
           .onEnter(spy.fetchArg("REQ", 0),
@@ -150,6 +150,104 @@ __spring() {
 
   http_client = __http_client();
 
+  __amqp() {
+
+    __rabbit() {
+
+      if (zorka.boolCfg("spring.amqp.rabbit", true)) {
+
+        dtrace_send() {
+          process(rec) {
+            ds = rec.get("DTRACE");
+            hdrs = rec.get("HEADERS");
+            if (ds != null && hdrs != null) {
+              hdrs.put(tracer.DTRACE_UUID_HDR, ds.getUuid());
+              hdrs.put(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
+              xtt = rec.get(tracer.DTRACE_XTT);
+              if (xtt != null) {
+                  hdrs.put(tracer.DTRACE_XTT, xtt.toString());
+              }
+            }
+            return rec;
+          }
+          return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+        }
+
+        spy.add(
+          spy.instrument("SPRING_AMQP_RABBIT_SEND")
+            .onEnter(spy.fetchArg("CHANNEL",1),
+              spy.fetchArg("EXCH",2), spy.fetchArg("RKEY",3), spy.fetchArg("MSG",5),
+              spy.get("CONN", "CHANNEL", "connection"),
+              spy.get("PROPS", "MSG", "messageProperties"),
+              spy.get("HEADERS", "PROPS", "headers"),
+              _trace ? spy.subchain(
+                tracer.begin("AMQP_SEND"),
+                tracer.formatAttr("EXCHANGE", "${EXCH}"),
+                tracer.formatAttr("ROUTING_KEY", "${RKEY}"),
+                tracer.formatAttr("DELIVERY", "${PROPS.deliveryMode}"),
+                tracer.formatAttr("CONTENT_TYPE", "${PROPS.contentType}"),
+                tracer.formatAttr("PRIORITY", "${PROPS.priority}"),
+                tracer.formatAttr("CONN", "${CONN.address}:${CONN.port}/${CONN.id}"),
+                _dtrace_enabled ? tracer.dtraceOutput() : null,
+                tracer.procAttr(tracer.PA_MAP_OF_ANY, "HdrOut__", "HEADERS"),
+                _dtrace_enabled ? dtrace_send() : null)
+              : null)
+            .onError(tracer.flags(tracer.SUBMIT_TRACE))
+            .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "rabbit", "SEND") : null)
+            .include(spy.byMethod(spy.AC_PROTECTED,
+              "org.springframework.amqp.rabbit.core.RabbitTemplate", "sendToRabbit",
+              "void", "com.rabbitmq.client.Channel", "String", "String", "boolean",
+              "org.springframework.amqp.core.Message")));
+
+        dtrace_recv() {
+          process(rec) {
+            hdrs = rec.get("HEADERS");
+            if (hdrs != null) {
+              uuid = hdrs.get(tracer.DTRACE_UUID_HDR);
+              if (uuid != null) rec.put(tracer.DTRACE_UUID, uuid);
+              tid = hdrs.get(tracer.DTRACE_TID_HDR);
+              if (tid != null) rec.put(tracer.DTRACE_TID, tid);
+              xtt = hdrs.get(tracer.DTRACE_XTT_HDR);
+              if (xtt != null) rec.put(tracer.DTRACE_XTT, xtt);
+            }
+            return rec;
+          }
+          return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+        }
+
+        spy.add(
+          spy.instrument("SPRING_AMQP_RABBIT_RECV")
+            .onEnter(spy.fetchArg("CHANNEL",1),spy.fetchArg("MSG",2),
+              spy.get("CONN", "CHANNEL", "connection"),
+              spy.get("PROPS", "MSG", "messageProperties"),
+              spy.get("HEADERS", "PROPS", "headers"),
+              _trace ? spy.subchain(
+                tracer.begin("AMQP_RECV"),
+                tracer.formatAttr("DELIVERY", "${PROPS.deliveryMode}"),
+                tracer.formatAttr("CONTENT_TYPE", "${PROPS.contentType}"),
+                tracer.formatAttr("PRIORITY", "${PROPS.priority}"),
+                tracer.formatAttr("EXCHANGE", "${MSG.receivedExchange}"),
+                tracer.formatAttr("ROUTING_KEY", "${MSG.receivedRoutingKey}"),
+                tracer.formatAttr("CONN", "${CONN.address}:${CONN.port}/${CONN.id}"),
+                _dtrace_enabled ? dtrace_recv() : null,
+                _dtrace_enabled ? tracer.dtraceInput(zorka.longCfg("tracer.min.trace.time")) : null,
+                tracer.procAttr(tracer.PA_MAP_OF_ANY, "HdrIn__", "HEADERS"))
+              : null)
+            .onError(tracer.flags(tracer.SUBMIT_TRACE))
+            .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "rabbit", "RECV") : null)
+            .include(spy.byMethod(spy.AC_PROTECTED,
+              "org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer", "executeListener",
+              "void", "com.rabbitmq.client.Channel", "org.springframework.amqp.core.Message")));
+      }
+
+      return this;
+    }
+
+    rabbit = __rabbit();
+    return this;
+  }
+
+  amqp = __amqp();
   return this;
 }
 
