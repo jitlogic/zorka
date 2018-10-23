@@ -85,7 +85,7 @@ public class JvmHttpClientInstrumentation {
             }
 
             try {
-                if (distributed) {
+                if (distributed && conn.getRequestProperty(TracerLib.DTRACE_UUID_HDR) == null) {
                     rec = dto.process(rec);
                     DTraceState ds = (DTraceState) rec.get("DTRACE");
                     String dtraceOut = rec.get(TracerLib.DTRACE_OUT).toString();
