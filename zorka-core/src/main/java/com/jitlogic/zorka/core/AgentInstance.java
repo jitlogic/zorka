@@ -33,7 +33,6 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.normproc.NormLib;
-import com.jitlogic.zorka.core.spy.instr.InstrLib;
 import com.jitlogic.zorka.core.spy.ltracer.LTracer;
 import com.jitlogic.zorka.core.spy.ltracer.LTracerLib;
 import com.jitlogic.zorka.core.spy.stracer.STraceBufManager;
@@ -153,8 +152,6 @@ public class AgentInstance implements ZorkaService {
      */
     private PerfMonLib perfMonLib;
 
-    private InstrLib instrLib;
-
     private MethodCallStatistics stats = new MethodCallStatistics();
 
     private MetricsRegistry metricsRegistry;
@@ -214,7 +211,6 @@ public class AgentInstance implements ZorkaService {
             log.info("Enabling Zorka SPY");
             bsh.put("spy", getSpyLib());
             bsh.put("tracer", getTracerLib());
-            bsh.put("instr", getInstrLib());
         }
 
         bsh.put("perfmon", getPerfMonLib());
@@ -505,13 +501,6 @@ public class AgentInstance implements ZorkaService {
         }
 
         return tracerLib;
-    }
-
-    public synchronized InstrLib getInstrLib() {
-        if (instrLib == null) {
-            instrLib = new InstrLib(getConfig(), getSpyLib(), getTracerLib());
-        }
-        return instrLib;
     }
 
     public synchronized NagiosLib getNagiosLib() {
