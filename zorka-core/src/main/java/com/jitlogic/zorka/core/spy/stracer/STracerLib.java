@@ -35,7 +35,7 @@ public class STracerLib extends TracerLib {
     public static final Logger log = LoggerFactory.getLogger(STracerLib.class);
 
     public STracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config,
-                      SpyStateShelfSet<DTraceState> shelfSet) {
+                      SpyStateShelfSet<Integer,DTraceState> shelfSet) {
         super(symbolRegistry, metricsRegistry, tracer, config, shelfSet);
     }
 

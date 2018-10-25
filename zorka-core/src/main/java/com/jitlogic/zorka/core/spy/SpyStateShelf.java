@@ -7,34 +7,32 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class SpyStateShelf<T extends LimitedTime> {
+public class SpyStateShelf<K, T extends LimitedTime> {
 
     private static Logger log = LoggerFactory.getLogger(SpyStateShelf.class);
 
-    private Map<Integer,T> objects = new ConcurrentHashMap<Integer, T>();
+    private Map<K,T> objects = new ConcurrentHashMap<K, T>();
 
-    public synchronized void shelve(Object key, T obj) {
-        int hash = key.hashCode();
+    public synchronized void shelve(K key, T obj) {
         if (log.isDebugEnabled()) {
-            log.debug("[" + this + "] Shelving: " + key + " (hash=" + hash + "), obj=" + obj);
+            log.debug("[" + this + "] Shelving: " + key + " obj=" + obj);
         }
-        objects.put(hash, obj);
+        objects.put(key, obj);
     }
 
-    public synchronized T unshelve(Object key) {
-        int hash = key.hashCode();
-        T obj = objects.get(hash);
+    public synchronized T unshelve(K key) {
+        T obj = objects.get(key);
         if (log.isDebugEnabled()) {
-            log.debug("[" + this + "] Unshelving: " + key + " (hash=" + hash + "), obj=" + obj);
+            log.debug("[" + this + "] Unshelving: " + key + ", obj=" + obj);
         }
-        if (obj != null) objects.remove(hash);
+        if (obj != null) objects.remove(key);
         return obj;
     }
 
     public synchronized int cleanup() {
         int rslt = 0;
         long t = System.currentTimeMillis();
-        for (Map.Entry<Integer,? extends LimitedTime> e : objects.entrySet()) {
+        for (Map.Entry<K,? extends LimitedTime> e : objects.entrySet()) {
             if (e.getValue().getTimeLimit() < t) {
                 rslt++;
                 objects.remove(e.getKey());

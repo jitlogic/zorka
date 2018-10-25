@@ -53,6 +53,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
             String tid = nextTid ? ds.nextTid() : ds.lastTid();
 
             rec.put(DTRACE_STATE, ds);
+            rec.put(DTRACE_UUID, uuid);
             rec.put(DTRACE_OUT, tid);
 
             Long t1 = ((Long)rec.get("T1"));

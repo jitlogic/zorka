@@ -33,7 +33,8 @@ public class SpyLibFunctionsUnitTest extends ZorkaFixture {
 
     @Before
     public void setUp() {
-        spyLib = new SpyLib(agentInstance.getClassTransformer(), mBeanServerRegistry, agentInstance.getRetransformer());
+        spyLib = new SpyLib(agentInstance.getClassTransformer(), mBeanServerRegistry, agentInstance.getRetransformer(),
+                            agentInstance.getSpyStateShelfSet());
     }
 
 

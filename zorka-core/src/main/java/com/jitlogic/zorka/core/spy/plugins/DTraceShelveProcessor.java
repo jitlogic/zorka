@@ -16,12 +16,12 @@ public class DTraceShelveProcessor implements SpyProcessor {
 
     private static Logger log = LoggerFactory.getLogger(DTraceShelveProcessor.class);
 
-    private SpyStateShelf<DTraceState> shelf;
+    private SpyStateShelf<Integer,DTraceState> shelf;
     private String keyAttr;
     private long timeout;
     private boolean shelve;
 
-    public DTraceShelveProcessor(SpyStateShelf<DTraceState> shelf, String keyAttr, long timeout, boolean shelve) {
+    public DTraceShelveProcessor(SpyStateShelf<Integer,DTraceState> shelf, String keyAttr, long timeout, boolean shelve) {
         this.shelf = shelf;
         this.keyAttr = keyAttr;
         this.timeout = timeout;
@@ -30,7 +30,7 @@ public class DTraceShelveProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
-        Object key = rec.get(keyAttr);
+        Integer key = rec.get(keyAttr).hashCode();
 
         if (key != null) {
             if (shelve) {
