@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
@@ -73,13 +74,23 @@ public abstract class TracerLib {
     public static final int PA_WARN_ON_NULL   = 0x2000;
 
     protected Tracer tracer;
+    protected ZorkaConfig config;
     protected SymbolRegistry symbolRegistry;
+    protected MetricsRegistry metricsRegistry;
     protected int defaultTraceFlags = TraceMarker.DROP_INTERIM;
 
     protected final ThreadLocal<DTraceState> dtraceLocal = new ThreadLocal<DTraceState>();
 
-    public TracerLib(Tracer tracer) {
+    private SpyStateShelfSet<DTraceState> shelfSet;
+
+    public TracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config,
+                     SpyStateShelfSet<DTraceState> shelfSet) {
+        this.symbolRegistry = symbolRegistry;
+        this.metricsRegistry = metricsRegistry;
         this.tracer = tracer;
+        this.config = config;
+        this.shelfSet = shelfSet;
+
     }
 
     public void clearOutputs() {
@@ -376,6 +387,16 @@ public abstract class TracerLib {
 
     public SpyProcessor dtraceClean() {
         return new DTraceCleanProcessor(this, dtraceLocal);
+    }
+
+    public SpyProcessor dtraceShelve(String shelfName, String keyAttr, long timeout) {
+        SpyStateShelf<DTraceState> shelf = shelfSet.get(shelfName);
+        return new DTraceShelveProcessor(shelf, keyAttr, timeout, true);
+    }
+
+    public SpyProcessor dtraceUnshelve(String shelfName, String keyAttr) {
+        SpyStateShelf<DTraceState> shelf = shelfSet.get(shelfName);
+        return new DTraceShelveProcessor(shelf, keyAttr, 0, false);
     }
 
     /**

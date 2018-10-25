@@ -1,0 +1,54 @@
+/**
+ * Copyright 2012-2018 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
+ *
+ * ZORKA is free software. You can redistribute it and/or modify it under the
+ * terms of the GNU General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * ZORKA is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * ZORKA. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+zorka.require(
+  "tracer.bsh"
+);
+
+__hystrix() {
+
+
+
+  spy.add(spy.instrument("HYSTRIX_COMMAND_OUT")
+    .onEnter(
+      spy.fetchArg("THIS", 0),
+      _trace_enabled ? tracer.begin("HYSTRIX_OUT") : null,
+      _dtrace_enabled ? tracer.dtraceOutput() : null,
+      _dtrace_enabled ? tracer.dtraceShelve("HYSTRIX", "THIS", 120000) : null)
+    .onError(tracer.markError())
+    .onSubmit(tracer.formatAttr("COMMAND_KEY", "${THIS.commandKey}"))
+    .include(spy.byMethod("com.netflix.hystrix.HystrixCommand", "execute")));
+
+  spy.add(spy.instrument("HYSTRIX_COMMAND_IN")
+    .onEnter(
+      spy.fetchArg("THIS", 0),
+      _trace_enabled ? tracer.begin("HYSTRIX_IN") : null,
+      _dtrace_enabled ? tracer.dtraceUnshelve("HYSTRIX", "THIS") : null,
+      _dtrace_enabled ? tracer.dtraceInput(zorka.longCfg("tracer.min.trace.time")) : null)
+    .onError(tracer.markError())
+    .include(
+      spy.byMethod(0, "com.netflix.hystrix.contrib.javanica.command.GenericCommand", "run", null),
+      spy.byMethod(0, "org.springframework.cloud.openfeign.support.FallbackCommand", "run", null),
+      spy.byMethod(0, "com.netflix.hystrix.contrib.javanica.command.BatchHystrixCommand", "run", null)));
+
+
+  return this;
+
+}
+
+hystrix = __hystrix();
+

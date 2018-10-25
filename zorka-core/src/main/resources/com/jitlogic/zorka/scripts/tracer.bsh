@@ -153,6 +153,6 @@ if (zorka.boolCfg("tracer")) {
   tracer.setTraceSpyMethods(false);
 }
 
-
-_dtrace_enabled = zorka.boolCfg("tracer.distributed");
+_trace_enabled = zorka.boolCfg("tracer");
+_dtrace_enabled = _trace_enabled && zorka.boolCfg("tracer.distributed");
 

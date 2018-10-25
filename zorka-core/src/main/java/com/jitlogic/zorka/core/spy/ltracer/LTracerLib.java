@@ -38,22 +38,14 @@ public class LTracerLib extends TracerLib {
 
     public static final Logger log = LoggerFactory.getLogger(LTracerLib.class);
 
-    private MetricsRegistry metricsRegistry;
-
-    private ZorkaConfig config;
-
-
     /**
      * Creates tracer library object.
      *
      * @param tracer reference to spy instance
      */
-    public LTracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
-        super(tracer);
-        this.symbolRegistry = symbolRegistry;
-        this.metricsRegistry = metricsRegistry;
-        this.tracer = tracer;
-        this.config = config;
+    public LTracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config,
+                      SpyStateShelfSet<DTraceState> shelfSet) {
+        super(symbolRegistry, metricsRegistry, tracer, config, shelfSet);
     }
 
 

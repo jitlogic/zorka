@@ -176,6 +176,8 @@ public class AgentInstance implements ZorkaService {
 
     private STraceBufManager bufManager;
 
+    private SpyStateShelfSet<DTraceState> dtraceShelfSet;
+
     public AgentInstance(AgentConfig config, SpyRetransformer retransformer) {
         this.config = config;
         this.retransformer = retransformer;
@@ -494,9 +496,9 @@ public class AgentInstance implements ZorkaService {
 
         if (tracerLib == null) {
             if (tracer instanceof LTracer) {
-                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
+                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config, getDtraceShelfSet());
             } else {
-                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
+                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config, getDtraceShelfSet());
             }
         }
 
@@ -552,6 +554,12 @@ public class AgentInstance implements ZorkaService {
         return perfMonLib;
     }
 
+    public synchronized SpyStateShelfSet<DTraceState> getDtraceShelfSet() {
+        if (dtraceShelfSet == null) {
+            dtraceShelfSet = new SpyStateShelfSet<DTraceState>();
+        }
+        return dtraceShelfSet;
+    }
 
     /**
      * Returns reference to mbean server registry.
@@ -632,8 +640,6 @@ public class AgentInstance implements ZorkaService {
         log.info("Agent configuration scripts executed (" + l + " errors).");
         log.info("Number of matchers in tracer configuration: "
                 + tracer.getMatcherSet().getMatchers().size());
-
-
     }
 
     public void reload() {
