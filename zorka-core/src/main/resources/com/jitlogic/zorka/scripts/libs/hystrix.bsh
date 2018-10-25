@@ -28,18 +28,23 @@ __hystrix() {
       spy.fetchArg("THIS", 0),
       _trace_enabled ? tracer.begin("HYSTRIX_OUT") : null,
       _dtrace_enabled ? tracer.dtraceOutput() : null,
-      _dtrace_enabled ? tracer.dtraceShelve("HYSTRIX", "THIS", 120000) : null)
+      _dtrace_enabled ? spy.shelve("HYSTRIX", 120000, true, "THIS", "DTRACE_UUID", "DTRACE_OUT") : null)
     .onError(tracer.markError())
-    .onSubmit(tracer.formatAttr("COMMAND_KEY", "${THIS.commandKey}"))
+    .onSubmit(
+      tracer.formatAttr("GROUP", "${THIS.commandGroup}"),
+      tracer.formatAttr("CKEY", "${THIS.commandKey}"))
     .include(spy.byMethod("com.netflix.hystrix.HystrixCommand", "execute")));
 
   spy.add(spy.instrument("HYSTRIX_COMMAND_IN")
     .onEnter(
       spy.fetchArg("THIS", 0),
       _trace_enabled ? tracer.begin("HYSTRIX_IN") : null,
-      _dtrace_enabled ? tracer.dtraceUnshelve("HYSTRIX", "THIS") : null,
+      _dtrace_enabled ? spy.unshelve("HYSTRIX", true, "THIS", "DTRACE_UUID", "DTRACE_IN") : null,
       _dtrace_enabled ? tracer.dtraceInput(zorka.longCfg("tracer.min.trace.time")) : null)
     .onError(tracer.markError())
+    .onSubmit(
+      tracer.formatAttr("GROUP", "${THIS.commandGroup}"),
+      tracer.formatAttr("KEY", "${THIS.commandKey}"))
     .include(
       spy.byMethod(0, "com.netflix.hystrix.contrib.javanica.command.GenericCommand", "run", null),
       spy.byMethod(0, "org.springframework.cloud.openfeign.support.FallbackCommand", "run", null),
