@@ -81,15 +81,11 @@ public abstract class TracerLib {
 
     protected final ThreadLocal<DTraceState> dtraceLocal = new ThreadLocal<DTraceState>();
 
-    private SpyStateShelfSet<Integer,DTraceState> shelfSet;
-
-    public TracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config,
-                     SpyStateShelfSet<Integer,DTraceState> shelfSet) {
+    public TracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
         this.symbolRegistry = symbolRegistry;
         this.metricsRegistry = metricsRegistry;
         this.tracer = tracer;
         this.config = config;
-        this.shelfSet = shelfSet;
 
     }
 
@@ -387,16 +383,6 @@ public abstract class TracerLib {
 
     public SpyProcessor dtraceClean() {
         return new DTraceCleanProcessor(this, dtraceLocal);
-    }
-
-    public SpyProcessor dtraceShelve(String shelfName, String keyAttr, long timeout) {
-        SpyStateShelf<Integer,DTraceState> shelf = shelfSet.get(shelfName);
-        return new DTraceShelveProcessor(shelf, keyAttr, timeout, true);
-    }
-
-    public SpyProcessor dtraceUnshelve(String shelfName, String keyAttr) {
-        SpyStateShelf<Integer,DTraceState> shelf = shelfSet.get(shelfName);
-        return new DTraceShelveProcessor(shelf, keyAttr, 0, false);
     }
 
     /**

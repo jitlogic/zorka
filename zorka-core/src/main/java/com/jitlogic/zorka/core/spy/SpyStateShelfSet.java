@@ -1,17 +1,15 @@
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.LimitedTime;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class SpyStateShelfSet<K,T extends LimitedTime> {
+public class SpyStateShelfSet {
 
-    private Map<String,SpyStateShelf<K,T>> set = new HashMap<String, SpyStateShelf<K,T>>();
+    private Map<String,SpyStateShelf> set = new HashMap<String, SpyStateShelf>();
 
-    public synchronized SpyStateShelf<K,T> get(String name) {
+    public synchronized SpyStateShelf get(String name) {
         if (!set.containsKey(name)) {
-            set.put(name, new SpyStateShelf<K,T>());
+            set.put(name, new SpyStateShelf());
         }
         return set.get(name);
     }

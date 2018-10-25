@@ -82,7 +82,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
     @Test
     public void testTraceOutputProcessing() {
         ThreadLocal<DTraceState> tlds = (ThreadLocal<DTraceState>)util.getField(tracer, "dtraceLocal");
-        DTraceState ds = new DTraceState(tracer, UUID.randomUUID().toString(), "_1",  42L,-1, 0);
+        DTraceState ds = new DTraceState(UUID.randomUUID().toString(), "_1",  42L,-1);
         tlds.set(ds);
 
         Map<String,Object> rec = new HashMap<String, Object>();
@@ -104,7 +104,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
     @Test
     public void testTraceOutputWithThresholdData() {
         ThreadLocal<DTraceState> tlds = (ThreadLocal<DTraceState>)util.getField(tracer, "dtraceLocal");
-        DTraceState ds = new DTraceState(tracer, UUID.randomUUID().toString(), "_1",  42000000L,100, 0);
+        DTraceState ds = new DTraceState(UUID.randomUUID().toString(), "_1",  42000000L,100);
         tlds.set(ds);
 
         Map<String,Object> rec = new HashMap<String, Object>();
@@ -119,7 +119,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
     @Test
     public void testCleanupForceSubmit() {
         ThreadLocal<DTraceState> tlds = (ThreadLocal<DTraceState>)util.getField(tracer, "dtraceLocal");
-        DTraceState ds = new DTraceState(tracer, UUID.randomUUID().toString(), "_1",  42L,10, 0);
+        DTraceState ds = new DTraceState(UUID.randomUUID().toString(), "_1",  42L,10);
         tlds.set(ds);
 
         Map<String,Object> rec = new HashMap<String, Object>();

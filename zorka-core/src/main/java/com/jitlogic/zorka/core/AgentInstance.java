@@ -176,9 +176,7 @@ public class AgentInstance implements ZorkaService {
 
     private STraceBufManager bufManager;
 
-    private SpyStateShelfSet<Integer,DTraceState> dtraceShelfSet;
-
-    private SpyStateShelfSet<Object,SpyStateShelfData> spyStateShelfSet;
+    private SpyStateShelfSet spyStateShelfSet;
 
     public AgentInstance(AgentConfig config, SpyRetransformer retransformer) {
         this.config = config;
@@ -498,9 +496,9 @@ public class AgentInstance implements ZorkaService {
 
         if (tracerLib == null) {
             if (tracer instanceof LTracer) {
-                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config, getDtraceShelfSet());
+                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
             } else {
-                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config, getDtraceShelfSet());
+                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
             }
         }
 
@@ -556,16 +554,9 @@ public class AgentInstance implements ZorkaService {
         return perfMonLib;
     }
 
-    public synchronized SpyStateShelfSet<Integer,DTraceState> getDtraceShelfSet() {
-        if (dtraceShelfSet == null) {
-            dtraceShelfSet = new SpyStateShelfSet<Integer,DTraceState>();
-        }
-        return dtraceShelfSet;
-    }
-
-    public synchronized SpyStateShelfSet<Object,SpyStateShelfData> getSpyStateShelfSet() {
+    public synchronized SpyStateShelfSet getSpyStateShelfSet() {
         if (spyStateShelfSet == null) {
-            spyStateShelfSet = new SpyStateShelfSet<Object,SpyStateShelfData>();
+            spyStateShelfSet = new SpyStateShelfSet();
         }
         return spyStateShelfSet;
     }

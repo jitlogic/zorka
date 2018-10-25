@@ -31,15 +31,14 @@ public class SpyStateShelfProcessor implements SpyProcessor {
 
     private String keyAttr;
     private String[] vAttrs;
-    private SpyStateShelf<Object,SpyStateShelfData> shelf;
+    private SpyStateShelf shelf;
 
     private long timeout;
     private boolean shelve;
     private boolean useHashCode;
 
-    public SpyStateShelfProcessor(SpyStateShelf<Object, SpyStateShelfData> shelf, String keyAttr,
-                                  long timeout, boolean shelve, boolean useHashCode,
-                                  String...vAttrs) {
+    public SpyStateShelfProcessor(SpyStateShelf shelf, String keyAttr, long timeout,
+                                  boolean shelve, boolean useHashCode, String...vAttrs) {
         this.shelf = shelf;
         this.vAttrs = vAttrs;
         this.keyAttr = keyAttr;

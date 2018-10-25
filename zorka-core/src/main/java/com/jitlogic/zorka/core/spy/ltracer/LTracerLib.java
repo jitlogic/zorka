@@ -43,9 +43,8 @@ public class LTracerLib extends TracerLib {
      *
      * @param tracer reference to spy instance
      */
-    public LTracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config,
-                      SpyStateShelfSet<Integer,DTraceState> shelfSet) {
-        super(symbolRegistry, metricsRegistry, tracer, config, shelfSet);
+    public LTracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
+        super(symbolRegistry, metricsRegistry, tracer, config);
     }
 
 

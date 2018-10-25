@@ -177,7 +177,7 @@ public class SpyLib {
     private SpyRetransformer retransformer;
     private MBeanServerRegistry mbsRegistry;
 
-    private SpyStateShelfSet<Object,SpyStateShelfData> spyStateShelfSet;
+    private SpyStateShelfSet spyStateShelfSet;
 
     /**
      * Creates spy library object
@@ -185,7 +185,7 @@ public class SpyLib {
      * @param classTransformer spy transformer
      */
     public SpyLib(SpyClassTransformer classTransformer, MBeanServerRegistry mbsRegistry, SpyRetransformer retransformer,
-                  SpyStateShelfSet<Object,SpyStateShelfData> spyStateShelfSet) {
+                  SpyStateShelfSet spyStateShelfSet) {
         this.classTransformer = classTransformer;
         this.mbsRegistry = mbsRegistry;
         this.retransformer = retransformer;
@@ -1078,12 +1078,12 @@ public class SpyLib {
     }
 
     public SpyProcessor shelve(String shelfName, int timeout, boolean useHashCodes, String keyAttr, String...vAttrs) {
-        SpyStateShelf<Object,SpyStateShelfData> shelf = spyStateShelfSet.get(shelfName);
+        SpyStateShelf shelf = spyStateShelfSet.get(shelfName);
         return new SpyStateShelfProcessor(shelf, keyAttr, timeout, true, useHashCodes, vAttrs);
     }
 
     public SpyProcessor unshelve(String shelfName, boolean useHashCodes, String keyAttr, String...vAttrs) {
-        SpyStateShelf<Object,SpyStateShelfData> shelf = spyStateShelfSet.get(shelfName);
+        SpyStateShelf shelf = spyStateShelfSet.get(shelfName);
         return new SpyStateShelfProcessor(shelf, keyAttr, 0, false, useHashCodes, vAttrs);
     }
 }

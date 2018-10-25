@@ -16,24 +16,19 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.core.LimitedTime;
-
 import java.util.UUID;
 
 import static com.jitlogic.zorka.core.spy.TracerLib.DTRACE_SEP;
 
-public class DTraceState implements LimitedTime {
+public class DTraceState {
 
     private String uuid;
     private String tid;
     private int seq;
     private long tstart;
     private long threshold;
-    private TracerLib tracer;
-    private long timeout;
 
-    public DTraceState(TracerLib tracer, String uuid, String tid, long tstart, long threshold, long timeout) {
-        this.tracer = tracer;
+    public DTraceState(String uuid, String tid, long tstart, long threshold) {
         this.uuid = uuid != null ? uuid : UUID.randomUUID().toString();
         this.tid = tid != null ? tid : "";
         this.tstart = tstart;
@@ -75,13 +70,4 @@ public class DTraceState implements LimitedTime {
         return "DT(" + uuid + ", '" + tid + "', " + threshold + ")";
     }
 
-    @Override
-    public void setTimeout(long t) {
-        this.timeout = t;
-    }
-
-    @Override
-    public long getTimeLimit() {
-        return tstart + timeout;
-    }
 }

@@ -67,7 +67,7 @@ public class DTraceInputProcessor implements SpyProcessor {
             tstart = System.currentTimeMillis();
         }
 
-        DTraceState ds = new DTraceState(tracer, uuid, tid, tstart, t, 0);
+        DTraceState ds = new DTraceState(uuid, tid, tstart, t);
         rec.put(DTRACE_STATE, ds);
 
         dtraceLocal.set(ds);
