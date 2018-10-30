@@ -21,10 +21,7 @@ import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.integ.zabbix.ZabbixActiveAgent;
-import com.jitlogic.zorka.core.integ.zabbix.ZabbixAgent;
-import com.jitlogic.zorka.core.integ.zabbix.ZabbixLib;
-import com.jitlogic.zorka.core.integ.zabbix.ZabbixQueryTranslator;
+import com.jitlogic.zorka.core.integ.zabbix.*;
 import com.jitlogic.zorka.core.mbeans.AttrGetter;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfMonLib;
@@ -41,6 +38,8 @@ import com.jitlogic.zorka.core.spy.stracer.STracerLib;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import com.jitlogic.zorka.core.spy.tuner.ZtxMatcherSet;
 import com.jitlogic.zorka.core.util.DaemonThreadFactory;
+import com.jitlogic.zorka.net.TcpService;
+import com.jitlogic.zorka.net.TcpSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,10 +94,9 @@ public class AgentInstance implements ZorkaService {
      */
     private ZabbixActiveAgent zabbixActiveAgent;
     
-    /**
-     * Reference to zabbix agent object - one that handles zabbix requests and passes them to BSH agent
-     */
-    private ZabbixAgent zabbixAgent;
+    private TcpSessionFactory zabbixAgentConnectionHandler;
+
+    private TcpService zabbixAgentService;
 
     /**
      * Reference to zorka library - basic agent functions available to zorka scripts as 'zorka.*'
@@ -425,11 +423,19 @@ public class AgentInstance implements ZorkaService {
         return zabbixActiveAgent;
     }
 
-    public synchronized ZabbixAgent getZabbixAgent() {
-        if (zabbixAgent == null) {
-            zabbixAgent = new ZabbixAgent(config, getZorkaAgent(), getTranslator());
+    public synchronized TcpSessionFactory getZabbixAgentConnectionHandler() {
+        if (zabbixAgentConnectionHandler == null) {
+            zabbixAgentConnectionHandler = new ZabbixConnectionHandler(getZorkaAgent(), getTranslator());
         }
-        return zabbixAgent;
+        return zabbixAgentConnectionHandler;
+    }
+
+    public synchronized TcpService getZabbixAgentService() {
+        if (zabbixAgentService == null) {
+            zabbixAgentService = new TcpService(config, getConnExecutor(), getZabbixAgentConnectionHandler(),
+                    "zabbix", "127.0.0.1", 10055);
+        }
+        return zabbixAgentService;
     }
 
 
@@ -600,8 +606,8 @@ public class AgentInstance implements ZorkaService {
             syslogLib.shutdown();
         }
 
-        if (zabbixAgent != null) {
-            zabbixAgent.shutdown();
+        if (zabbixAgentService != null) {
+            zabbixAgentService.shutdown();
         }
         
         if (zabbixActiveAgent != null) {
@@ -622,7 +628,7 @@ public class AgentInstance implements ZorkaService {
         log.info("Agent configuration reloaded ...");
 
         if (config.boolCfg(ZABBIX_PROP, ZABBIX_DEFV)) {
-            getZabbixAgent().restart();
+            getZabbixAgentService().restart();
         }
 
         if (config.boolCfg(ZABBIX_ACTIVE_PROP, ZABBIX_ACTIVE_DEFV)) {
