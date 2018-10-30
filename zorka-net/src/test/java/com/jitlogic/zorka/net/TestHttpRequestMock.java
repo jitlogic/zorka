@@ -14,14 +14,15 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.common.test.support;
+package com.jitlogic.zorka.net;
 
-import com.jitlogic.zorka.common.http.HttpRequest;
-import com.jitlogic.zorka.common.http.HttpResponse;
 
-import java.util.Map;
+import com.jitlogic.zorka.net.http.mini.HttpRequest;
+import com.jitlogic.zorka.net.http.mini.HttpResponse;
 
 import static org.junit.Assert.*;
+
+import java.util.Map;
 
 public class TestHttpRequestMock {
 

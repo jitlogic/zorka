@@ -16,10 +16,6 @@
 
 package com.jitlogic.zorka.core.test.spy;
 
-import com.jitlogic.zorka.common.http.HttpClient;
-import com.jitlogic.zorka.common.http.HttpRequest;
-import com.jitlogic.zorka.common.http.HttpUtil;
-import com.jitlogic.zorka.common.http.MiniHttpClient;
 import com.jitlogic.zorka.common.util.JSONWriter;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
@@ -28,6 +24,10 @@ import com.jitlogic.zorka.core.spy.ltracer.LTraceHttpOutput;
 import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
+import com.jitlogic.zorka.net.http.mini.HttpClient;
+import com.jitlogic.zorka.net.http.mini.HttpRequest;
+import com.jitlogic.zorka.net.http.mini.HttpUtil;
+import com.jitlogic.zorka.net.http.mini.MiniHttpClient;
 import org.junit.Ignore;
 import org.junit.Test;
 

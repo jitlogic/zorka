@@ -16,12 +16,12 @@
 
 package com.jitlogic.zorka.core.integ;
 
-import com.jitlogic.zorka.common.http.HttpRequest;
-import com.jitlogic.zorka.common.http.HttpResponse;
-import com.jitlogic.zorka.common.http.HttpUtil;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import com.jitlogic.zorka.net.http.mini.HttpRequest;
+import com.jitlogic.zorka.net.http.mini.HttpResponse;
+import com.jitlogic.zorka.net.http.mini.HttpUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,8 +34,6 @@ import java.util.Map;
  * Generic HTTP output for text data. Accepts strings that will be
  */
 public class HttpTextOutput extends ZorkaAsyncThread<String> {
-
-    private static Logger log = LoggerFactory.getLogger(HttpTextOutput.class);
 
     private String url, fullUrl;
     private Map<String,String> urlParams;

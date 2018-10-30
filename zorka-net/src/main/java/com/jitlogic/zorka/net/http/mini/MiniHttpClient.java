@@ -26,7 +26,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.jitlogic.zorka.common.http.HttpUtil.RE_HTTP_URL;
+import static com.jitlogic.zorka.net.http.mini.HttpUtil.RE_HTTP_URL;
+
 
 /**
  * Minimal HTTP client library. It is designed to have minimum platform dependences,

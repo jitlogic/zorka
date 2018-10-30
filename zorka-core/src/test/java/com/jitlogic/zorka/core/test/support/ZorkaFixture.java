@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.test.support;
 import com.jitlogic.zorka.common.test.support.CommonFixture;
 import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.*;
@@ -37,6 +38,8 @@ import com.jitlogic.zorka.core.spy.SpyClassLookup;
 import com.jitlogic.zorka.core.spy.ltracer.LTracer;
 import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.TestSpyRetransformer;
+import com.jitlogic.zorka.net.TestHttpClient;
+import com.jitlogic.zorka.net.http.mini.HttpUtil;
 import org.junit.After;
 import org.junit.Before;
 
@@ -75,6 +78,8 @@ public class ZorkaFixture extends CommonFixture {
     protected UtilLib util;
 
     protected QueryTranslator translator;
+
+    protected TestHttpClient httpClient;
 
     protected String tmpDir;
 
@@ -141,6 +146,9 @@ public class ZorkaFixture extends CommonFixture {
         tmpDir = "/tmp" + File.separatorChar + "zorka-unit-test";
         ZorkaUtil.rmrf(tmpDir);
         assertTrue(new File(tmpDir).mkdirs());
+
+        httpClient = new TestHttpClient();
+        ObjectInspector.setField(HttpUtil.class, "client", httpClient);
 
         SpyClassLookup.INSTANCE = new SpyClassLookup();
     }

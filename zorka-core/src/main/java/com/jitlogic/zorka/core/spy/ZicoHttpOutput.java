@@ -16,14 +16,13 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import com.jitlogic.zorka.common.http.HttpRequest;
-import com.jitlogic.zorka.common.http.HttpResponse;
-import com.jitlogic.zorka.common.http.HttpUtil;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
+import com.jitlogic.zorka.net.http.mini.HttpRequest;
+import com.jitlogic.zorka.net.http.mini.HttpResponse;
+import com.jitlogic.zorka.net.http.mini.HttpUtil;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;

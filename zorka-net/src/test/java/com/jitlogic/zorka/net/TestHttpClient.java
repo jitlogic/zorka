@@ -14,11 +14,12 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.common.test.support;
+package com.jitlogic.zorka.net;
 
-import com.jitlogic.zorka.common.http.HttpClient;
-import com.jitlogic.zorka.common.http.HttpRequest;
-import com.jitlogic.zorka.common.http.HttpResponse;
+
+import com.jitlogic.zorka.net.http.mini.HttpClient;
+import com.jitlogic.zorka.net.http.mini.HttpRequest;
+import com.jitlogic.zorka.net.http.mini.HttpResponse;
 
 import java.io.IOException;
 import java.util.ArrayList;
