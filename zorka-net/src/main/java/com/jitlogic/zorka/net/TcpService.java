@@ -110,7 +110,7 @@ public class TcpService implements Runnable, ZorkaService {
 
         File keyStoreFile = new File(keyStorePath);
         if (!keyStoreFile.exists()) {
-            log.error("Cannot initialize TLS: file " + keyStorePath + " is missing. Service " + prefix + " will not start.");
+            log.error("Cannot initialize TLS for service " + prefix + ": file " + keyStorePath + " is missing. Service " + prefix + " will not start.");
             return;
         }
 
