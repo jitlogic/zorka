@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.Socket;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -939,4 +940,15 @@ public class ZorkaUtil {
             }
         }
     }
+
+    public static void close(Socket obj) {
+        if (obj != null) {
+            try {
+                obj.close();
+            } catch (IOException e) {
+                log.warn("Cannot close", e);
+            }
+        }
+    }
+
 }
