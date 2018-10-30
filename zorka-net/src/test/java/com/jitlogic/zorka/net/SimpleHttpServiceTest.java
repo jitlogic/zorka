@@ -1,7 +1,7 @@
 package com.jitlogic.zorka.net;
 
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.net.http.nano.HttpConnectionHandlerFactory;
+import com.jitlogic.zorka.net.http.nano.HttpConnectionHandler;
 import com.jitlogic.zorka.net.http.nano.IHTTPSession;
 import com.jitlogic.zorka.net.http.nano.Response;
 import com.jitlogic.zorka.net.http.nano.Status;
@@ -30,7 +30,7 @@ public class SimpleHttpServiceTest {
     public void testServeSimpleHttpReq() throws Exception {
         ZorkaLoggerFactory.getInstance().swapTrapper(new ConsoleTrapper());
         TcpService svc = new TcpService(new ZorkaConfig(), executor,
-                new HttpConnectionHandlerFactory(new TestHttpHandler()),
+                new HttpConnectionHandler(new TestHttpHandler()),
                 "test", "127.0.0.1", 10000);
         svc.restart();
         Thread.sleep(120000);
@@ -45,7 +45,7 @@ public class SimpleHttpServiceTest {
 
         ZorkaLoggerFactory.getInstance().swapTrapper(new ConsoleTrapper());
         TcpService svc = new TcpService(zc, executor,
-                new HttpConnectionHandlerFactory(new TestHttpHandler()),
+                new HttpConnectionHandler(new TestHttpHandler()),
                 "test", "127.0.0.1", 10000);
         svc.restart();
         Thread.sleep(120000);
