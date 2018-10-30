@@ -45,6 +45,7 @@
         <module>zorka-snmp</module>
         <module>zorka-slf4j</module>
         <module>zorka-common</module>
+        <module>zorka-net</module>
         <module>zorka-core</module>
         <module>zorka-agent</module>
         <module>zorka-dist</module>

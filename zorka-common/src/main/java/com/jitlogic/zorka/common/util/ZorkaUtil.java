@@ -20,10 +20,7 @@ package com.jitlogic.zorka.common.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -930,6 +927,16 @@ public class ZorkaUtil {
             Object obj = lst.get(i);
             lst.set(i, lst.get(lst.size()-i-1));
             lst.set(lst.size()-i-1, obj);
+        }
+    }
+
+    public static void close(Closeable obj) {
+        if (obj != null) {
+            try {
+                obj.close();
+            } catch (IOException e) {
+                log.warn("Cannot close", e);
+            }
         }
     }
 }
