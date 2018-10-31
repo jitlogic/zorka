@@ -19,10 +19,12 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.net.http.mini.HttpRequest;
-import com.jitlogic.zorka.net.http.mini.HttpResponse;
-import com.jitlogic.zorka.net.http.mini.HttpUtil;
+import com.jitlogic.zorka.net.TlsContextBuilder;
+import com.jitlogic.zorka.net.http.mini.*;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
@@ -44,6 +46,8 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
     protected SymbolRegistry registry;
 
     protected ZorkaConfig config;
+
+    protected HttpClient httpClient;
 
     protected abstract void resetState();
 
@@ -84,6 +88,18 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.retryTimeExp = parseInt(conf.get("http.retry.exp"), 2, "tracer.http.retry.exp");
         this.timeout = parseInt(conf.get("http.timeout"), 60000, "tracer.http.output");
         this.registry = registry;
+
+        if (config.hasCfg("tracer.net.http.tls.keystore") || config.hasCfg("tracer.net.http.tls.truststore")) {
+            SSLContext ctx = new TlsContextBuilder(config, "tracer.net.http").build();
+            if (ctx != null) {
+                this.httpClient = new MiniHttpClient(SocketFactory.getDefault(), ctx.getSocketFactory());
+            } else {
+                log.error("Cannot properly initialize keystore/truststore for ZICO HTTP output. Using default one.");
+                this.httpClient = HttpUtil.getHttpClient();
+            }
+        } else {
+            this.httpClient = HttpUtil.getHttpClient();
+        }
     }
 
     /**
@@ -103,7 +119,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         log.info("Registering agent as: name=" + hostname + " app=" + app + " env=" + env);
 
         try {
-            HttpRequest req = HttpUtil.POST(registerUrl, json)
+            HttpRequest req = HttpUtil.POST(httpClient, registerUrl, json)
                     .withHeader("Content-Type", "application/json");
             HttpResponse res = req.go();
             if (res.getStatus() == 201 || res.getStatus() == 200) {
@@ -152,7 +168,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
         try {
             log.debug("Requesting session for agent: uuid=" + agentUUID);
-            HttpRequest req = HttpUtil.POST(sessionUrl,
+            HttpRequest req = HttpUtil.POST(httpClient, sessionUrl,
                     new JSONWriter().write(ZorkaUtil.map(
                             "uuid", agentUUID,
                             "authkey", sessionKey)));
@@ -209,7 +225,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
     protected void send(InputStream bodyStream, int bodyLength, String uri, String traceUUID) {
         try {
-            HttpRequest req = HttpUtil.POST(uri, bodyStream, bodyLength);
+            HttpRequest req = HttpUtil.POST(httpClient, uri, bodyStream, bodyLength);
             req.setHeader("X-Zorka-Agent-UUID", agentUUID);
             req.setHeader("X-Zorka-Session-UUID", sessionUUID);
             req.setHeader("Content-Type", "application/zorka+cbor+v1");

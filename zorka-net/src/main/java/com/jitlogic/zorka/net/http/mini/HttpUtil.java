@@ -28,6 +28,10 @@ public class HttpUtil {
     private static HttpClient client = new MiniHttpClient();
     public static final Pattern RE_HTTP_URL = Pattern.compile("(https?)://([^/]+)(/.*)");
 
+    public static HttpClient getHttpClient() {
+        return client;
+    }
+
     public static void setHttpClient(HttpClient httpClient) {
         client = httpClient;
     }

@@ -20,6 +20,8 @@ import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 import java.io.*;
 import java.net.Socket;
 import java.util.Map;
@@ -40,6 +42,18 @@ public class MiniHttpClient implements HttpClient {
     private Pattern RE_HTTP_RSP = Pattern.compile("HTTP/1.[01] (\\d+) (.*)");
     private Pattern RE_HTTP_HDR = Pattern.compile("([^:]+): (.*)");
 
+    private SocketFactory socketFactory;
+    private SocketFactory sslSocketFactory;
+
+    public MiniHttpClient() {
+        this(SocketFactory.getDefault(), SSLSocketFactory.getDefault());
+    }
+
+    public MiniHttpClient(SocketFactory socketFactory, SocketFactory sslSocketFactory) {
+        this.socketFactory = socketFactory;
+        this.sslSocketFactory = sslSocketFactory;
+    }
+
     @Override
     public HttpResponse execute(HttpRequest req) throws IOException {
 
@@ -53,7 +67,8 @@ public class MiniHttpClient implements HttpClient {
 
         String[] hp = mu.group(2).split(":");
 
-        Socket socket = new Socket(hp[0], hp.length == 2 ? Integer.parseInt(hp[1]) : 80);
+        Socket socket = ("https".equalsIgnoreCase(mu.group(1)) ? sslSocketFactory : socketFactory)
+                .createSocket(hp[0], hp.length == 2 ? Integer.parseInt(hp[1]) : 80);
 
         try {
             OutputStream os = socket.getOutputStream();
