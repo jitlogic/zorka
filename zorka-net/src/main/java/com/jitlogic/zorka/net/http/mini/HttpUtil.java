@@ -33,6 +33,10 @@ public class HttpUtil {
     }
 
     public static HttpRequest GET(String url) throws IOException {
+        return GET(client, url);
+    }
+
+    public static HttpRequest GET(HttpClient client, String url) throws IOException {
         Matcher m = RE_HTTP_URL.matcher(url);
         if (m.matches()) {
             HttpRequest req = new HttpRequest(client, url);
@@ -45,6 +49,10 @@ public class HttpUtil {
     }
 
     public static HttpRequest POST(String url, String body) throws IOException {
+        return POST(client, url, body);
+    }
+
+    public static HttpRequest POST(HttpClient client, String url, String body) throws IOException {
         Matcher m = RE_HTTP_URL.matcher(url);
         if (m.matches()) {
             HttpRequest req = new HttpRequest(client, url);
@@ -58,6 +66,10 @@ public class HttpUtil {
     }
 
     public static HttpRequest POST(String url, InputStream bodyStream, int bodyLength) throws IOException {
+        return POST(client, url, bodyStream, bodyLength);
+    }
+
+    public static HttpRequest POST(HttpClient client, String url, InputStream bodyStream, int bodyLength) throws IOException {
         Matcher m = RE_HTTP_URL.matcher(url);
         if (m.matches()) {
             HttpRequest req = new HttpRequest(client, url);
@@ -71,6 +83,10 @@ public class HttpUtil {
     }
 
     public static HttpRequest POST(String url, byte [] body) throws IOException {
+        return POST(client, url, body);
+    }
+
+    public static HttpRequest POST(HttpClient client, String url, byte [] body) throws IOException {
         Matcher m = RE_HTTP_URL.matcher(url);
         if (m.matches()) {
             HttpRequest req = new HttpRequest(client, url);

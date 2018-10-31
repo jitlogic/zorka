@@ -16,20 +16,15 @@
 package com.jitlogic.zorka.net;
 
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.*;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.security.KeyStore;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 
 public class TcpClient {
 
@@ -71,96 +66,35 @@ public class TcpClient {
 
         if (!tlsEnabled) {
             socketFactory = SocketFactory.getDefault();
-            return;
-        }
-
-        String trustStorePath = config.stringCfg(prefix + ".tls.truststore", null);
-
-        if (trustStorePath == null) {
-            socketFactory = SSLSocketFactory.getDefault();
-            return;
-        }
-
-        File trustStoreFile = new File(trustStorePath);
-        if (!trustStoreFile.exists()) {
-            log.error("Cannot initialize TLS for client " + prefix + ": file " + trustStorePath + " is missing. Service " + prefix + " will not start.");
-            return;
-        }
-
-        String trustStorePass = config.stringCfg(prefix + ".tls.truststore.pass", "changeit");
-
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init((KeyStore)null);
-
-        X509TrustManager defaultTM = null;
-        for (TrustManager t : tmf.getTrustManagers()) {
-            if (t instanceof X509TrustManager) {
-                defaultTM = (X509TrustManager)t;
-                break;
+        } else {
+            SSLContext ctx = new TlsContextBuilder(config, prefix).build();
+            if (ctx != null) {
+                socketFactory = ctx.getSocketFactory();
+            } else {
+                log.error("Cannot initialize SSL context due to previous errors.");
             }
         }
+    }
 
-        FileInputStream is = new FileInputStream(trustStoreFile);
-        KeyStore localTS = KeyStore.getInstance(KeyStore.getDefaultType());
-        localTS.load(is, trustStorePass.toCharArray());
-        ZorkaUtil.close(is);
-
-        tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(localTS);
-
-        X509TrustManager localTM = null;
-        for (TrustManager t : tmf.getTrustManagers()) {
-            if (t instanceof X509TrustManager) {
-                localTM = (X509TrustManager)t;
-                break;
-            }
+    private void checkInitialized() {
+        if (socketFactory == null) {
+            throw new ZorkaRuntimeException("Cannot connect from client '" + prefix
+                    + "': not configured properly, see previous errors.");
         }
-
-        if (defaultTM == null || localTM == null) {
-            log.error("Cannot initialize TLS: either default or local trust manager is null.");
-            return;
-        }
-
-        final X509TrustManager dtm = defaultTM, ltm = localTM;
-
-        X509TrustManager tm = new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                try {
-                    ltm.checkServerTrusted(x509Certificates, s);
-                } catch (CertificateException e) {
-                    dtm.checkServerTrusted(x509Certificates, s);
-                }
-            }
-
-            @Override
-            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-                try {
-                    ltm.checkServerTrusted(x509Certificates, s);
-                } catch (CertificateException e) {
-                    dtm.checkServerTrusted(x509Certificates, s);
-                }
-            }
-
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                X509Certificate[] dai = dtm.getAcceptedIssuers(), lai = ltm.getAcceptedIssuers();
-                X509Certificate[] ai = new X509Certificate[dai.length+lai.length];
-
-                if (dai.length > 0) System.arraycopy(dai, 0, ai, 0, dai.length);
-                if (lai.length > 0) System.arraycopy(lai, 0, ai, dai.length, lai.length);
-
-                return ai;
-            }
-        };
-
-        SSLContext ctx = SSLContext.getInstance("TLS");
-        ctx.init(null, new TrustManager[] { tm }, null);
-        socketFactory = ctx.getSocketFactory();
     }
 
     public Socket connect() throws IOException {
+        checkInitialized();
         return socketFactory.createSocket(addr, port);
     }
-    
+
+    public Socket connect(InetAddress addr, int port) throws IOException {
+        checkInitialized();
+        return socketFactory.createSocket(addr, port);
+    }
+
+    public Socket connect(String addr, int port) throws IOException {
+        checkInitialized();
+        return socketFactory.createSocket(addr, port);
+    }
 }

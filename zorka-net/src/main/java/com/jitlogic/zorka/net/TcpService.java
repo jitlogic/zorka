@@ -20,23 +20,16 @@ package com.jitlogic.zorka.net;
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ServerSocketFactory;
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManagerFactory;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -45,7 +38,6 @@ public class TcpService implements Runnable, ZorkaService {
 
     private static final Logger log = LoggerFactory.getLogger(TcpService.class);
 
-    private boolean tlsEnabled;
     private int listenPort;
     private InetAddress listenAddr;
 
@@ -98,38 +90,13 @@ public class TcpService implements Runnable, ZorkaService {
             }
         }
 
-        tlsEnabled = config.boolCfg(prefix + ".tls", false);
-        if (tlsEnabled) setupTls();
-    }
-
-
-    private void setupTls() {
-        String keyStorePath = config.stringCfg(prefix + ".tls.keystore",
-                new File(config.getHomeDir(), "zorka.jks").getPath());
-        String keyStorePass = config.stringCfg(prefix + ".tls.keystore.pass", "changeit");
-
-        File keyStoreFile = new File(keyStorePath);
-        if (!keyStoreFile.exists()) {
-            log.error("Cannot initialize TLS for service " + prefix + ": file " + keyStorePath + " is missing. Service " + prefix + " will not start.");
-            return;
-        }
-
-        InputStream is = null;
-        try {
-            KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-            is = new FileInputStream(keyStoreFile);
-            keystore.load(is, keyStorePass.toCharArray());
-            KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-            kmf.init(keystore, keyStorePass.toCharArray());
-            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            tmf.init(keystore);
-            SSLContext ctx = SSLContext.getInstance("TLS");
-            ctx.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
-            socketFactory = ctx.getServerSocketFactory();
-        } catch (Exception e) {
-            log.error("Cannot load TLS key", e);
-        } finally {
-            ZorkaUtil.close(is);
+        if (config.boolCfg(prefix + ".tls", false)) {
+            SSLContext ctx = new TlsContextBuilder(config, prefix).build();
+            if (ctx != null) {
+                socketFactory = ctx.getServerSocketFactory();
+            } else {
+                log.warn("TLS context not created. Switching back to plain text.");
+            }
         }
     }
 

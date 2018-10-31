@@ -36,7 +36,7 @@ public class SimpleHttpServiceTest {
         Thread.sleep(120000);
     }
 
-    @Test @Ignore
+    @Test
     public void testServeSimpleHttpsReq() throws Exception {
         ZorkaConfig zc = new ZorkaConfig();
         zc.setCfg("test.tls", "yes");
