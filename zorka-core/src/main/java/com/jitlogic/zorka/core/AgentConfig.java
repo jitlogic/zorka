@@ -204,6 +204,10 @@ public class AgentConfig extends ZorkaConfig {
         }
     }
 
+    public static void setPersistent(boolean persistent) {
+        AgentConfig.persistent = persistent;
+    }
+
     @Override
     protected void markError(String msg, Throwable e) {
         super.markError(msg, e);

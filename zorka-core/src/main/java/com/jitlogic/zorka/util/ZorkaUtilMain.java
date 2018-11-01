@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.util;
 
 import com.jitlogic.zorka.util.ztx.ZtxProcCommand;
+import com.jitlogic.zorka.util.ztx.ZtxZicoCommand;
 
 import java.io.IOException;
 
@@ -25,9 +26,10 @@ import static java.lang.System.err;
 public class ZorkaUtilMain {
 
     public static void help(String msg) {
-        err.println(msg);
+        if (msg != null) err.println(msg);
         err.println("Available commands: ");
-        err.println(" ztx <options> - process and filter ZTX files");
+        err.println(" ztx <args> - process and filter ZTX files");
+        err.println(" zico <args> - ZICO collector connection handling");
     }
 
     public static void main(String[] args) throws IOException {
@@ -35,10 +37,13 @@ public class ZorkaUtilMain {
             help("Missing command.");
         } else if ("ztx".equalsIgnoreCase(args[0])) {
             ZtxProcCommand.main(args);
-        } else if ("-h".equals(args[0])) {
-            help("");
+        } else if ("zico".equalsIgnoreCase(args[0])) {
+            ZtxZicoCommand.main(args);
+        } else if ("help".equals(args[0])) {
+            help(null);
         } else {
             help("Unknown command: " + args[0]);
+            System.exit(1);
         }
     }
 

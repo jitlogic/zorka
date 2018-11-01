@@ -81,20 +81,24 @@ public class ZtxProcCommand {
         for (int i = 1; i < args.length-1; i++) {
             if ("-o".equals(args[i])) {
                 outf = new File(args[i+1]);
+                i++;
             }
             if ("-f".equals(args[i])) {
                 File f = new File(args[i+1]);
+                i++;
                 if (!f.isFile()) {
                     err.println("No such input file: " + f);
-                    return;
+                    System.exit(1);
                 }
                 inpf.add(f);
             }
             if ("-i".equals(args[i])) {
                 incls.add(pattern(args[i+1]));
+                i++;
             }
             if ("-x".equals(args[i])) {
                 excls.add(pattern(args[i+1]));
+                i++;
             }
         }
 
