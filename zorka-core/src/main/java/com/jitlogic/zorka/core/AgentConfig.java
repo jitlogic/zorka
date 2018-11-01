@@ -53,18 +53,24 @@ public class AgentConfig extends ZorkaConfig {
         reload();
     }
 
-    public void reload() {
-        loadProperties(agentHome, "zorka.properties", DEFAULT_CONF_PATH);
-        setBaseProps();
-    }
-
-
     public AgentConfig(Properties props) {
         properties = props;
         homeDir = get(ZORKA_HOME_DIR_PROP);
+        loadIncludes();
         setBaseProps();
     }
 
+    public void reload() {
+        loadProperties(agentHome, "zorka.properties", DEFAULT_CONF_PATH);
+        loadIncludes();
+        setBaseProps();
+    }
+
+    private void loadIncludes() {
+        for (String path : listCfg("include")) {
+            loadCfg(properties, path, true);
+        }
+    }
 
     private void setBaseProps() {
         if (!properties.containsKey(SCRIPTS_DIR_PROP)) {

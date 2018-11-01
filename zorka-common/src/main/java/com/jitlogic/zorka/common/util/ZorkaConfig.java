@@ -128,13 +128,7 @@ public class ZorkaConfig {
         } catch (IOException e) {
             log.error("Error loading property file", e);
         } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    log.error("Error closing property file", e);
-                }
-            }
+            ZorkaUtil.close(is);
         }
 
         return props;
@@ -149,17 +143,10 @@ public class ZorkaConfig {
             return properties;
         } catch (IOException e) {
             if (verbose) {
-                log.error("Error loading property file", e);
+                log.error("Error loading property file: " + propPath, e);
             }
         } finally {
-            if (is != null)
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    if (verbose) {
-                        log.error("Error closing property file", e);
-                    }
-                }
+            ZorkaUtil.close(is);
         }
 
         return null;
