@@ -1,3 +1,15 @@
+Zorka 1.90.5 (2018-11-05)
+-------------------------
+
+* agent registration from command line;
+* hystrix instrumentation & dtrace support;
+* spring AMQP instrumentation & dtrace support;
+* internal: intra-thread communication via SpyStateShelf;
+* internal: preliminary TLS support, http service implementation;
+* fix: NPEs in SpyClassResolver causing some classes being not instrumented;
+* fix: jvm http client now working properly;
+
+
 Zorka 1.90.4 (2018-09-24)
 -------------------------
 
