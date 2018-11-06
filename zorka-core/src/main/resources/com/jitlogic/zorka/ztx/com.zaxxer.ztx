@@ -1,0 +1,25 @@
+com.zaxxer.hikari.pool
+ HikariProxyConnection
+  prepareStatement|(Ljava/lang/String;)Ljava/sql/PreparedStatement;
+ HikariProxyResultSet
+  close|()V
+  getDate|(Ljava/lang/String;)Ljava/sql/Date;
+  getLong|(Ljava/lang/String;)J
+  getString|(Ljava/lang/String;)Ljava/lang/String;
+  getTimestamp|(Ljava/lang/String;)Ljava/sql/Timestamp;
+  next|()Z
+  wasNull|()Z
+ PoolEntry
+  compareAndSet|(II)Z
+ ProxyConnection
+  prepareStatement|(Ljava/lang/String;)Ljava/sql/PreparedStatement;
+ ProxyStatement
+  close|()V
+com.zaxxer.hikari.util
+ ClockSource
+  currentTime|()J
+ ClockSource$NanosecondClockSource
+  currentTime0|()J
+ FastList
+  add|(Ljava/lang/Object;)Z
+  remove|(Ljava/lang/Object;)Z

@@ -1,0 +1,79 @@
+io.netty.buffer
+ AbstractByteBuf
+  readableBytes|()I
+  readerIndex|()I
+  writableBytes|()I
+ AbstractReferenceCountedByteBuf
+  refCnt|()I
+  touch|(Ljava/lang/Object;)Lio/netty/buffer/ByteBuf;
+ PooledByteBuf
+  capacity|()I
+ PooledUnsafeDirectByteBuf
+  memoryAddress|()J
+  setBytes|(I[BII)Lio/netty/buffer/ByteBuf;
+io.netty.channel
+ AbstractChannel
+  eventLoop|()Lio/netty/channel/EventLoop;
+ AbstractChannelHandlerContext
+  channel|()Lio/netty/channel/Channel;
+  executor|()Lio/netty/util/concurrent/EventExecutor;
+ ChannelOutboundBuffer
+  current|()Ljava/lang/Object;
+ DefaultChannelHandlerContext
+  handler|()Lio/netty/channel/ChannelHandler;
+ DefaultChannelPipeline
+  channel|()Lio/netty/channel/Channel;
+ DefaultChannelPipeline$HeadContext
+  handler|()Lio/netty/channel/ChannelHandler;
+ DefaultChannelPromise
+  channel|()Lio/netty/channel/Channel;
+ DefaultMaxMessagesRecvByteBufAllocator$MaxMessageHandle
+  attemptedBytesRead|()I
+  lastBytesRead|()I
+ DefaultSelectStrategy
+  calculateStrategy|(Lio/netty/util/IntSupplier;Z)I
+io.netty.channel.epoll|EpollSocketChannel|config|()Lio/netty/channel/epoll/EpollSocketChannelConfig;
+io.netty.channel.unix|FileDescriptor|intValue|()I
+io.netty.util
+ ByteProcessor$IndexOfProcessor
+  process|(B)Z
+ Recycler$DefaultHandle
+  recycle|(Ljava/lang/Object;)V
+ ReferenceCountUtil
+  touch|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+io.netty.util.concurrent
+ AbstractEventExecutor
+  inEventLoop|()Z
+ FastThreadLocalThread
+  threadLocalMap|()Lio/netty/util/internal/InternalThreadLocalMap;
+ SingleThreadEventExecutor
+  inEventLoop|(Ljava/lang/Thread;)Z
+io.netty.util.internal
+ DefaultPriorityQueue
+  peek
+   ()Lio/netty/util/internal/PriorityQueueNode;
+   ()Ljava/lang/Object;
+ InternalThreadLocalMap
+  indexedVariable|(I)Ljava/lang/Object;
+ MathUtil
+  isOutOfBounds|(III)Z
+ ObjectUtil
+  checkNotNull|(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+ PlatformDependent
+  copyMemory|([BIJJ)V
+  getByte|(J)B
+  putByte|(JB)V
+ PlatformDependent$2
+  current|()Ljava/util/Random;
+io.netty.util.internal.shaded.org.jctools.queues
+ BaseMpscLinkedArrayQueue
+  poll|()Ljava/lang/Object;
+ BaseMpscLinkedArrayQueueConsumerFields
+  lvConsumerIndex|()J
+ BaseMpscLinkedArrayQueueProducerFields
+  lvProducerIndex|()J
+ CircularArrayOffsetCalculator
+  calcElementOffset|(JJ)J
+ MpscArrayQueueProducerIndexField
+  lvProducerIndex|()J
+io.netty.util.internal.shaded.org.jctools.util|UnsafeRefArrayAccess|lvElement|([Ljava/lang/Object;J)Ljava/lang/Object;

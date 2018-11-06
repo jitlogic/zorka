@@ -1,3 +1,7 @@
+org.slf4j
+ MDC
+  get|(Ljava/lang/String;)Ljava/lang/String;
+  put|(Ljava/lang/String;Ljava/lang/String;)V
 org.slf4j.helpers|MessageFormatter|arrayFormat|(Ljava/lang/String;[Ljava/lang/Object;)Lorg/slf4j/helpers/FormattingTuple;
 org.slf4j.impl
  Log4jLoggerAdapter

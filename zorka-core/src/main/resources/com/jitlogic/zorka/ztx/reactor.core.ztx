@@ -1,0 +1,15 @@
+reactor.core
+ Scannable
+  from|(Ljava/lang/Object;)Lreactor/core/Scannable;
+  scan|(Lreactor/core/Scannable$Attr;)Ljava/lang/Object;
+ Scannable$Attr
+  defaultValue|()Ljava/lang/Object;
+ Scannable$Attr$3
+  next
+   ()Ljava/lang/Object;
+   ()Lreactor/core/Scannable;
+reactor.core.publisher
+ FluxOperator
+  scanUnsafe|(Lreactor/core/Scannable$Attr;)Ljava/lang/Object;
+ MonoOperator
+  scanUnsafe|(Lreactor/core/Scannable$Attr;)Ljava/lang/Object;

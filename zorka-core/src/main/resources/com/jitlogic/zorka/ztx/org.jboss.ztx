@@ -336,6 +336,11 @@ org.jboss.kernel.plugins.dependency|AbstractKernelController|getEntry|(Ljava/lan
 org.jboss.kernel.plugins.registry|AbstractKernelRegistry|findEntry|(Ljava/lang/Object;)Lorg/jboss/kernel/spi/registry/KernelRegistryEntry;
 org.jboss.kernel.plugins.registry.basic|BasicKernelRegistryFactory|getEntry|(Ljava/lang/Object;)Lorg/jboss/kernel/spi/registry/KernelRegistryEntry;
 org.jboss.logging
+ DelegatingBasicLogger
+  tracef|(Ljava/lang/String;Ljava/lang/Object;)V
+  tracev|(Ljava/lang/String;Ljava/lang/Object;)V
+ Log4j2Logger
+  isEnabled|(Lorg/jboss/logging/Logger$Level;)Z
  Logger
   getLogger|(Ljava/lang/Class;)Lorg/jboss/logging/Logger;
   trace|(Ljava/lang/Object;)V

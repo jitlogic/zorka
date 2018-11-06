@@ -1,3 +1,5 @@
+org.springframework.amqp.rabbit.annotation|RabbitListenerAnnotationBeanPostProcessor|postProcessAfterInitialization|(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+org.springframework.aop|TrueClassFilter|matches|(Ljava/lang/Class;)Z
 org.springframework.aop.framework
  AdvisedSupport
   getInterceptorsAndDynamicInterceptionAdvice|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Ljava/util/List;
@@ -17,8 +19,18 @@ org.springframework.aop.support
   isHashCodeMethod|(Ljava/lang/reflect/Method;)Z
  DelegatingIntroductionInterceptor
   invoke|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
+org.springframework.aop.support.annotation
+ AnnotationClassFilter
+  matches|(Ljava/lang/Class;)Z
+ AnnotationMethodMatcher
+  matches|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Z
 org.springframework.aop.target|AbstractBeanFactoryBasedTargetSource|releaseTarget|(Ljava/lang/Object;)V
 org.springframework.asm
+ ByteVector
+  putByte|(I)Lorg/springframework/asm/ByteVector;
+  putInt|(I)Lorg/springframework/asm/ByteVector;
+  putShort|(I)Lorg/springframework/asm/ByteVector;
+  putUTF8|(Ljava/lang/String;)Lorg/springframework/asm/ByteVector;
  ClassReader
   readByte|(I)I
   readClass|(I[C)Ljava/lang/String;
@@ -27,6 +39,9 @@ org.springframework.asm
   readShort|(I)S
   readUTF8|(I[C)Ljava/lang/String;
   readUnsignedShort|(I)I
+ ClassWriter
+  newClass|(Ljava/lang/String;)I
+  newUTF8|(Ljava/lang/String;)I
  MethodAdapter
   visitCode|()V
   visitEnd|()V
@@ -39,6 +54,12 @@ org.springframework.asm
   visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   visitTypeInsn|(ILjava/lang/String;)V
   visitVarInsn|(II)V
+ MethodVisitor
+  visitInsn|(I)V
+  visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)V
+  visitVarInsn|(II)V
+ MethodWriter
+  visitLabel|(Lorg/springframework/asm/Label;)V
  Type
   getType|(Ljava/lang/String;)Lorg/springframework/asm/Type;
 org.springframework.asm.commons
@@ -84,6 +105,8 @@ org.springframework.beans.factory
   transformedBeanName|(Ljava/lang/String;)Ljava/lang/String;
 org.springframework.beans.factory.annotation|AutowiredAnnotationBeanPostProcessor$1|doWith|(Ljava/lang/reflect/Method;)V
 org.springframework.beans.factory.config
+ BeanPostProcessor
+  postProcessBeforeInitialization|(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
  ConstructorArgumentValues
   addArgumentValues|(Lorg/springframework/beans/factory/config/ConstructorArgumentValues;)V
  InstantiationAwareBeanPostProcessorAdapter
@@ -120,6 +143,8 @@ org.springframework.beans.factory.support
   isSingletonCurrentlyInCreation|(Ljava/lang/String;)Z
  MethodOverrides
   addOverrides|(Lorg/springframework/beans/factory/support/MethodOverrides;)V
+ RootBeanDefinition
+  isFactoryMethod|(Ljava/lang/reflect/Method;)Z
 org.springframework.beans.factory.xml
  BeanDefinitionParserDelegate
   getLocalName|(Lorg/w3c/dom/Node;)Ljava/lang/String;
@@ -128,6 +153,66 @@ org.springframework.beans.factory.xml
    (Ljava/lang/String;)Z
    (Lorg/w3c/dom/Node;)Z
   nodeNameEquals|(Lorg/w3c/dom/Node;Ljava/lang/String;)Z
+org.springframework.boot.actuate.health|HealthEndpointWebExtension|getHealth|(Lorg/springframework/boot/actuate/endpoint/SecurityContext;)Lorg/springframework/boot/actuate/endpoint/web/WebEndpointResponse;
+org.springframework.boot.context.properties.source
+ ConfigurationPropertyName
+  isAncestorOf|(Lorg/springframework/boot/context/properties/source/ConfigurationPropertyName;)Z
+ ConfigurationPropertyName$ElementValidator
+  isValidChar|(CI)Z
+ DefaultPropertyMapper$LastMapping
+  isFrom|(Ljava/lang/Object;)Z
+ PropertyMapping
+  isApplicable|(Lorg/springframework/boot/context/properties/source/ConfigurationPropertyName;)Z
+ SpringConfigurationPropertySources$SourcesIterator
+  next|()Lorg/springframework/boot/context/properties/source/ConfigurationPropertySource;
+ SpringIterableConfigurationPropertySource$CacheKey
+  get|(Lorg/springframework/core/env/EnumerablePropertySource;)Lorg/springframework/boot/context/properties/source/SpringIterableConfigurationPropertySource$CacheKey;
+org.springframework.boot.loader.data
+ RandomAccessDataFile
+  getSubsection|(JJ)Lorg/springframework/boot/loader/data/RandomAccessData;
+  read|(JJ)[B
+org.springframework.boot.loader.jar
+ AsciiBytes
+  length|()I
+  matches|(Ljava/lang/CharSequence;C)Z
+  startsWith|(Lorg/springframework/boot/loader/jar/AsciiBytes;)Z
+ Bytes
+  littleEndianValue|([BII)J
+ JarFile
+  containsEntry|(Ljava/lang/String;)Z
+ JarFileEntries
+  containsEntry|(Ljava/lang/CharSequence;)Z
+  getEntry|(Ljava/lang/CharSequence;)Lorg/springframework/boot/loader/jar/JarEntry;
+  visitFileHeader|(Lorg/springframework/boot/loader/jar/CentralDirectoryFileHeader;I)V
+ JarURLConnection$JarEntryName
+  get|(Lorg/springframework/boot/loader/jar/StringSequence;I)Lorg/springframework/boot/loader/jar/JarURLConnection$JarEntryName;
+ StringSequence
+  charAt|(I)C
+  indexOf
+   (C)I
+   (Ljava/lang/String;)I
+   (Ljava/lang/String;I)I
+  length|()I
+  startsWith|(Ljava/lang/CharSequence;I)Z
+  subSequence
+   (I)Lorg/springframework/boot/loader/jar/StringSequence;
+   (II)Lorg/springframework/boot/loader/jar/StringSequence;
+ ZipInflaterInputStream
+  close|()V
+  read|([BII)I
+org.springframework.cache.interceptor|AbstractFallbackCacheOperationSource|getCacheOperations|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Ljava/util/Collection;
+org.springframework.cglib.core
+ CodeEmitter
+  make_label|()Lorg/springframework/asm/Label;
+ TypeUtils
+  isArray|(Lorg/springframework/asm/Type;)Z
+  isStatic|(I)Z
+org.springframework.cloud.context.scope
+ GenericScope$BeanLifecycleWrapperCache
+  put|(Ljava/lang/String;Lorg/springframework/cloud/context/scope/GenericScope$BeanLifecycleWrapper;)Lorg/springframework/cloud/context/scope/GenericScope$BeanLifecycleWrapper;
+ StandardScopeCache
+  put|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+org.springframework.cloud.sleuth.annotation|SleuthAdvisorConfig$AnnotationMethodsResolver$1|doWith|(Ljava/lang/reflect/Method;)V
 org.springframework.context.event|EventListenerMethodProcessor$1|inspect|(Ljava/lang/reflect/Method;)Lorg/springframework/context/event/EventListener;
 org.springframework.context.expression|StandardBeanExpressionResolver|evaluate|(Ljava/lang/String;Lorg/springframework/beans/factory/config/BeanExpressionContext;)Ljava/lang/Object;
 org.springframework.context.i18n|LocaleContextHolder|resetLocaleContext|()V
@@ -164,6 +249,10 @@ org.springframework.core
    (Ljava/lang/Class;)Ljava/lang/Class;
  ResolvableType$1
   isAssignableFrom|(Ljava/lang/Class;)Z
+ SerializableTypeWrapper
+  forGenericInterfaces|(Ljava/lang/Class;)[Ljava/lang/reflect/Type;
+ SerializableTypeWrapper$TypeProxyInvocationHandler
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
  SimpleAliasRegistry
   canonicalName|(Ljava/lang/String;)Ljava/lang/String;
   isAlias|(Ljava/lang/String;)Z
@@ -174,9 +263,14 @@ org.springframework.core.annotation
   process
    (Ljava/lang/reflect/AnnotatedElement;Ljava/lang/annotation/Annotation;I)Ljava/lang/Boolean;
    (Ljava/lang/reflect/AnnotatedElement;Ljava/lang/annotation/Annotation;I)Ljava/lang/Object;
+ AnnotatedElementUtils$MergedAnnotationAttributesProcessor
+  aggregates|()Z
+  alwaysProcesses|()Z
  AnnotatedElementUtils$SimpleAnnotationProcessor
   aggregates|()Z
   alwaysProcesses|()Z
+ AnnotationAttributes
+  annotationType|()Ljava/lang/Class;
  AnnotationAwareOrderComparator
   sort|(Ljava/util/List;)V
  AnnotationUtils
@@ -191,6 +285,10 @@ org.springframework.core.convert.support
   convert|(Ljava/lang/Object;Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
  GenericConversionService$ConverterFactoryAdapter
   convert|(Ljava/lang/Object;Lorg/springframework/core/convert/TypeDescriptor;Lorg/springframework/core/convert/TypeDescriptor;)Ljava/lang/Object;
+ GenericConversionService$Converters
+  add|(Lorg/springframework/core/convert/converter/GenericConverter;)V
+ GenericConversionService$ConvertersForPair
+  add|(Lorg/springframework/core/convert/converter/GenericConverter;)V
  GenericConversionService$MatchableConverters
   add|(Lorg/springframework/core/convert/converter/GenericConverter;)V
  GenericConversionService$NoOpConverter
@@ -201,7 +299,11 @@ org.springframework.core.convert.support
   convert
    (Ljava/lang/Object;)Ljava/lang/Object;
    (Ljava/lang/String;)Ljava/lang/Number;
-org.springframework.core.env|AbstractPropertyResolver|resolveRequiredPlaceholders|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.core.env
+ AbstractPropertyResolver
+  resolveRequiredPlaceholders|(Ljava/lang/String;)Ljava/lang/String;
+ MapPropertySource
+  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
 org.springframework.core.type.classreading
  AnnotationAttributesReadingVisitor
   visit|(Ljava/lang/String;Ljava/lang/Object;)V
@@ -265,6 +367,14 @@ org.springframework.extensions.webscripts.json
    (Z)Lorg/springframework/extensions/webscripts/json/JSONWriter;
 org.springframework.extensions.webscripts.processor|JSScriptProcessor$PresentationWrapFactory|wrapAsJavaObject|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;Ljava/lang/Class;)Lorg/mozilla/javascript/Scriptable;
 org.springframework.flex.core|EndpointServiceMessagePointcutAdvisor|matches|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Z
+org.springframework.format.datetime.joda|DateTimeFormatterFactory|createDateTimeFormatter|(Lorg/joda/time/format/DateTimeFormatter;)Lorg/joda/time/format/DateTimeFormatter;
+org.springframework.format.datetime.standard|DateTimeFormatterFactory|createDateTimeFormatter|(Ljava/time/format/DateTimeFormatter;)Ljava/time/format/DateTimeFormatter;
+org.springframework.format.support
+ FormattingConversionService
+  addFormatterForFieldAnnotation|(Lorg/springframework/format/AnnotationFormatterFactory;)V
+  addFormatterForFieldType
+   (Ljava/lang/Class;Lorg/springframework/format/Formatter;)V
+   (Ljava/lang/Class;Lorg/springframework/format/Printer;Lorg/springframework/format/Parser;)V
 org.springframework.http
  CacheControl
   empty|()Lorg/springframework/http/CacheControl;
@@ -300,6 +410,7 @@ org.springframework.http.converter.xml
  SourceHttpMessageConverter
   supports|(Ljava/lang/Class;)Z
 org.springframework.http.server|ServletServerHttpResponse$ServletResponseHttpHeaders|getFirst|(Ljava/lang/String;)Ljava/lang/String;
+org.springframework.integration.aop|PublisherAnnotationAdvisor$MetaAnnotationMethodMatcher|matches|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Z
 org.springframework.jdbc.datasource|LazyConnectionDataSourceProxy$LazyConnectionInvocationHandler|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 org.springframework.jdbc.object|MappingSqlQueryWithParameters$RowMapperImpl|mapRow|(Ljava/sql/ResultSet;I)Ljava/lang/Object;
 org.springframework.orm.hibernate3
@@ -307,8 +418,13 @@ org.springframework.orm.hibernate3
   getSession|(Ljava/lang/Object;)Lorg/hibernate/Session;
  SpringTransactionFactory
   areCallbacksLocalToHibernateTransactions|()Z
+org.springframework.retry.annotation|RetryConfiguration$AnnotationMethodsResolver$1|doWith|(Ljava/lang/reflect/Method;)V
 org.springframework.security.access.intercept.aopalliance|MethodSecurityMetadataSourceAdvisor$MethodSecurityMetadataSourcePointcut|matches|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Z
 org.springframework.security.access.method|DelegatingMethodSecurityMetadataSource|getAttributes|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Ljava/util/Collection;
+org.springframework.security.access.prepost|PostInvocationAdviceProvider|decide|(Lorg/springframework/security/core/Authentication;Ljava/lang/Object;Ljava/util/Collection;Ljava/lang/Object;)Ljava/lang/Object;
+org.springframework.security.web.context|SecurityContextPersistenceFilter|doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V
+org.springframework.security.web.servletapi|SecurityContextHolderAwareRequestFilter|doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V
+org.springframework.session.web.http|CookieHttpSessionIdResolver|resolveSessionIds|(Ljavax/servlet/http/HttpServletRequest;)Ljava/util/List;
 org.springframework.transaction.annotation
  Ejb3TransactionAnnotationParser
   parseTransactionAnnotation|(Ljava/lang/reflect/AnnotatedElement;)Lorg/springframework/transaction/interceptor/TransactionAttribute;
@@ -366,6 +482,8 @@ org.springframework.util
   resolvePrimitiveClassName|(Ljava/lang/String;)Ljava/lang/Class;
  CollectionUtils
   isEmpty|(Ljava/util/Collection;)Z
+ CompositeIterator
+  next|()Ljava/lang/Object;
  ConcurrentReferenceHashMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  ConcurrentReferenceHashMap$ReferenceManager
@@ -375,6 +493,9 @@ org.springframework.util
   getReference|(Ljava/lang/Object;ILorg/springframework/util/ConcurrentReferenceHashMap$Restructure;)Lorg/springframework/util/ConcurrentReferenceHashMap$Reference;
  ConcurrentReferenceHashMap$Task
   hasOption|(Lorg/springframework/util/ConcurrentReferenceHashMap$TaskOption;)Z
+ LinkedMultiValueMap
+  add|(Ljava/lang/Object;Ljava/lang/Object;)V
+  get|(Ljava/lang/Object;)Ljava/util/List;
  MimeType
   getParameter|(Ljava/lang/String;)Ljava/lang/String;
   isCompatibleWith|(Lorg/springframework/util/MimeType;)Z
@@ -509,6 +630,8 @@ org.springframework.web.servlet.handler
   afterCompletion|(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/Object;Ljava/lang/Exception;)V
   postHandle|(Ljavax/servlet/http/HttpServletRequest;Ljavax/servlet/http/HttpServletResponse;Ljava/lang/Object;Lorg/springframework/web/servlet/ModelAndView;)V
 org.springframework.web.servlet.mvc.condition
+ ConsumesRequestCondition
+  getMatchingCondition|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/mvc/condition/ConsumesRequestCondition;
  HeadersRequestCondition
   getMatchingCondition|(Ljavax/servlet/http/HttpServletRequest;)Lorg/springframework/web/servlet/mvc/condition/HeadersRequestCondition;
  ParamsRequestCondition
@@ -591,5 +714,9 @@ org.springframework.web.util
  UriComponentsBuilder$PathSegmentComponentBuilder
   append|([Ljava/lang/String;)V
   build|()Lorg/springframework/web/util/HierarchicalUriComponents$PathComponent;
+ UriUtils
+  decode|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ UrlPathHelper
+  decodeRequestString|(Ljavax/servlet/http/HttpServletRequest;Ljava/lang/String;)Ljava/lang/String;
  WebUtils
   getNativeRequest|(Ljavax/servlet/ServletRequest;Ljava/lang/Class;)Ljava/lang/Object;

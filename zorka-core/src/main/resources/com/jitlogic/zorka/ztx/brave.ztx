@@ -1,0 +1,17 @@
+brave|NoopSpan|context|()Lbrave/propagation/TraceContext;
+brave.internal
+ HexCodec
+  toLowerHex|(J)Ljava/lang/String;
+  writeHexByte|([CIB)V
+  writeHexLong|([CIJ)V
+brave.internal.recorder|SpanRecord|startTimestamp|(J)V
+brave.propagation
+ CurrentTraceContext$Default
+  newScope|(Lbrave/propagation/TraceContext;)Lbrave/propagation/CurrentTraceContext$Scope;
+ CurrentTraceContext$Default$1DefaultCurrentTraceContextScope
+  close|()V
+ SamplingFlags
+  sampled|()Ljava/lang/Boolean;
+ TraceContext
+  parentId|()Ljava/lang/Long;
+  spanId|()J

@@ -1,4 +1,75 @@
 ch.qos.logback.classic
+ Level
+  isGreaterOrEqual|(Lch/qos/logback/classic/Level;)Z
+  toLevel|(ILch/qos/logback/classic/Level;)Lch/qos/logback/classic/Level;
  Logger
   isDebugEnabled|(Lorg/slf4j/Marker;)Z
   isTraceEnabled|(Lorg/slf4j/Marker;)Z
+ PatternLayout
+  doLayout
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ch.qos.logback.classic.pattern
+ DateConverter
+  convert
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ LevelConverter
+  convert
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ LineSeparatorConverter
+  convert
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ MDCConverter
+  convert
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ MessageConverter
+  convert
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ NamedConverter
+  convert
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ TargetLengthBasedClassNameAbbreviator
+  abbreviate|(Ljava/lang/String;)Ljava/lang/String;
+ ThreadConverter
+  convert
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ ThrowableProxyConverter
+  convert
+   (Lch/qos/logback/classic/spi/ILoggingEvent;)Ljava/lang/String;
+   (Ljava/lang/Object;)Ljava/lang/String;
+ch.qos.logback.classic.spi
+ LoggingEvent
+  prepareForDeferredProcessing|()V
+ TurboFilterList
+  getTurboFilterChainDecision|(Lorg/slf4j/Marker;Lch/qos/logback/classic/Logger;Lch/qos/logback/classic/Level;Ljava/lang/String;[Ljava/lang/Object;Ljava/lang/Throwable;)Lch/qos/logback/core/spi/FilterReply;
+ch.qos.logback.classic.util
+ LogbackMDCAdapter
+  get|(Ljava/lang/String;)Ljava/lang/String;
+  put|(Ljava/lang/String;Ljava/lang/String;)V
+ch.qos.logback.core
+ UnsynchronizedAppenderBase
+  doAppend|(Ljava/lang/Object;)V
+  getFilterChainDecision|(Ljava/lang/Object;)Lch/qos/logback/core/spi/FilterReply;
+ch.qos.logback.core.encoder|LayoutWrappingEncoder|encode|(Ljava/lang/Object;)[B
+ch.qos.logback.core.pattern
+ CompositeConverter
+  convert|(Ljava/lang/Object;)Ljava/lang/String;
+ Converter
+  write|(Ljava/lang/StringBuilder;Ljava/lang/Object;)V
+ FormattingConverter
+  write|(Ljava/lang/StringBuilder;Ljava/lang/Object;)V
+ LiteralConverter
+  convert|(Ljava/lang/Object;)Ljava/lang/String;
+ch.qos.logback.core.spi|FilterAttachableImpl|getFilterChainDecision|(Ljava/lang/Object;)Lch/qos/logback/core/spi/FilterReply;
+ch.qos.logback.core.util
+ COWArrayList
+  asTypedArray|()[Ljava/lang/Object;
+ CachingDateFormatter
+  format|(J)Ljava/lang/String;

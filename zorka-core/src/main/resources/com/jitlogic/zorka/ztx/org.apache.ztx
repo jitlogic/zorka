@@ -471,7 +471,9 @@ org.apache.logging.log4j.spi
   hasLogger|(Ljava/lang/String;)Z
 org.apache.logging.slf4j
  SLF4JLogger
-  isEnabled|(Lorg/apache/logging/log4j/Level;Lorg/apache/logging/log4j/Marker;Ljava/lang/Object;Ljava/lang/Throwable;)Z
+  isEnabled
+   (Lorg/apache/logging/log4j/Level;Lorg/apache/logging/log4j/Marker;Ljava/lang/Object;Ljava/lang/Throwable;)Z
+   (Lorg/apache/logging/log4j/Level;Lorg/apache/logging/log4j/Marker;Ljava/lang/String;)Z
  SLF4JLoggerContext
   getLogger|(Ljava/lang/String;)Lorg/apache/logging/log4j/spi/ExtendedLogger;
 org.apache.naming

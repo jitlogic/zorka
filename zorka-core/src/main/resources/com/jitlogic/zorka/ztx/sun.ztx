@@ -28,7 +28,16 @@ sun.misc
   write|(Ljava/io/DataOutputStream;)V
  ProxyGenerator$ConstantPool$ValueEntry
   write|(Ljava/io/DataOutputStream;)V
-sun.net|DefaultProgressMeteringPolicy|shouldMeterInput|(Ljava/net/URL;Ljava/lang/String;)Z
+sun.net
+ DefaultProgressMeteringPolicy
+  shouldMeterInput|(Ljava/net/URL;Ljava/lang/String;)Z
+ NetProperties
+  get|(Ljava/lang/String;)Ljava/lang/String;
+sun.net.spi
+ DefaultProxySelector$3
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/net/Proxy;
 sun.net.www|MeteredStream|read|([BII)I
 sun.net.www.http
  ChunkedInputStream
@@ -89,6 +98,12 @@ sun.nio.cs
   decode|([BII[C)I
  ISO_8859_1$Encoder
   encode|([CII[B)I
+ MS1250
+  newDecoder|()Ljava/nio/charset/CharsetDecoder;
+ SingleByte$Decoder
+  decode
+   (I)C
+   ([BII[C)I
  Surrogate
   is|(I)Z
  ThreadLocalCoders
@@ -111,6 +126,15 @@ sun.security.provider
   identities|()Ljava/util/Enumeration;
  PolicyFile$8
   run|()Ljava/lang/Object;
+sun.security.ssl
+ AppInputStream
+  read|([BII)I
+ AppOutputStream
+  write|([BII)V
+ HandshakeInStream
+  read|()I
+ OutputRecord
+  reset|()V
 sun.security.util
  DerInputStream
   available|()I
@@ -171,6 +195,7 @@ sun.util
   nextElement
    ()Ljava/lang/Object;
    ()Ljava/lang/String;
+sun.util.calendar|JulianCalendar|getFixedDate|(IIILsun/util/calendar/BaseCalendar$Date;)J
 sun.util.logging
  LoggingSupport
   isLoggable|(Ljava/lang/Object;Ljava/lang/Object;)Z

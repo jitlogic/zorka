@@ -3,7 +3,9 @@ javax.crypto
   doFinal
    ()[B
    ([BI)V
-  update|([B)V
+  update
+   ([B)V
+   ([BII)V
 javax.el
  ArrayELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -83,9 +85,13 @@ javax.servlet.http
  HttpServlet
   service|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
  HttpServletRequestWrapper
+  getHeader|(Ljava/lang/String;)Ljava/lang/String;
+  getHeaders|(Ljava/lang/String;)Ljava/util/Enumeration;
   getSession|(Z)Ljavax/servlet/http/HttpSession;
  HttpServletResponseWrapper
   encodeURL|(Ljava/lang/String;)Ljava/lang/String;
+  getHeader|(Ljava/lang/String;)Ljava/lang/String;
+  getHeaders|(Ljava/lang/String;)Ljava/util/Collection;
 javax.servlet.jsp.el
  ImplicitObjectELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
@@ -94,6 +100,13 @@ javax.servlet.jsp.el
  ScopedAttributeELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 javax.servlet.jsp.tagext|TagSupport|release|()V
+javax.xml.bind
+ DatatypeConverterImpl
+  _printBase64Binary
+   ([B)Ljava/lang/String;
+   ([BII)Ljava/lang/String;
+   ([BII[CI)I
+  encode|(I)C
 javax.xml.parsers
  FactoryFinder$1
   run|()Ljava/lang/Object;
