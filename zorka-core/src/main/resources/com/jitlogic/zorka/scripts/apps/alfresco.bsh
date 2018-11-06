@@ -17,7 +17,7 @@
 
 zorka.require(
   "tracer.bsh",
-  "jms.bsh",
+  "javax/jms.bsh",
   "spring.bsh",
   "apache/cxf.bsh",
   "apache/camel.bsh",
@@ -62,6 +62,18 @@ __alfresco() {
          .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
          .onSubmit(spy.zorkaStats("java", _mbean, "stats", "AF_IMPORT"))
          .include(spy.byMethod(0, "org.alfresco.repo.bulkimport.impl.AbstractNodeImporter", "importImportableItemFile", null)));
+    }
+
+    if (_trace_enabled) {
+      spy.add(spy.instrument("ALFRESCO_WEBSURF_CALL")
+        .onEnter(spy.fetchArg("URI", 1))
+        .onReturn(spy.fetchRetVal("RSLT"))
+        .onSubmit(
+          tracer.formatAttr("URI", "${URI}"),
+          tracer.formatAttr("STATUS", "${RSLT.status.code}"))
+        .include(
+          spy.byMethod(0, "org.springframework.extensions.webscripts.connector.HttpConnector", "call",
+            "org.springframework.extensions.webscripts.connector.Response", "String")));
     }
 
     return this;
