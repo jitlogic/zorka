@@ -64,6 +64,12 @@ public class SpyClassResolver {
 
         CachedClassInfo rslt = null;
 
+        if (ci1 == null || ci2 == null) {
+            log.warn("Either class was not loaded nor visible in classloader path. Returning 'java.lang.Object' as common supertype: " +
+                    type1 + ", " + type2);
+            return OBJECT_CLAZZ;
+        }
+
         if (!ci1.isInterface() && !ci2.isInterface()) {
             // Both are classes
 
