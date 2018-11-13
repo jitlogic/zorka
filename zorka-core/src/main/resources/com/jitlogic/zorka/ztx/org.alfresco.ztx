@@ -6,21 +6,64 @@ org.alfresco.opencmis
    ([BII)I
  CMISUtils$CopyOutputStream
   write|([BII)V
+org.alfresco.opencmis.dictionary
+ AbstractTypeDefinitionWrapper
+  getTypeDefinition|(Z)Lorg/apache/chemistry/opencmis/commons/definitions/TypeDefinition;
+ CMISDictionaryRegistryImpl
+  getTypeDefByQName|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/opencmis/dictionary/TypeDefinitionWrapper;
+ FilteredDictionaryComponent
+  getAspect|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AspectDefinition;
+ QNameFilterImpl
+  isExcluded|(Lorg/alfresco/service/namespace/QName;)Z
 org.alfresco.opencmis.mapping
  CMISMapping
+  buildPrefixEncodedString|(Lorg/alfresco/service/namespace/QName;)Ljava/lang/String;
+  getAlfrescoClass|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/namespace/QName;
+  getCmisType|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/namespace/QName;
+  getCmisTypeId|(Lorg/apache/chemistry/opencmis/commons/enums/BaseTypeId;Lorg/alfresco/service/namespace/QName;)Ljava/lang/String;
   getDataType
    (Lorg/alfresco/service/cmr/dictionary/DataTypeDefinition;)Lorg/apache/chemistry/opencmis/commons/enums/PropertyType;
    (Lorg/alfresco/service/namespace/QName;)Lorg/apache/chemistry/opencmis/commons/enums/PropertyType;
+  isExcluded|(Lorg/alfresco/service/namespace/QName;)Z
+ RuntimePropertyAccessorMapping
+  createDirectPropertyAccessor|(Ljava/lang/String;Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/opencmis/dictionary/CMISPropertyAccessor;
+  getPropertyAccessor|(Ljava/lang/String;)Lorg/alfresco/opencmis/dictionary/CMISPropertyAccessor;
+ RuntimePropertyLuceneBuilderMapping
+  createDirectPropertyLuceneBuilder|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/opencmis/dictionary/CMISPropertyLuceneBuilder;
+  getPropertyLuceneBuilder|(Ljava/lang/String;)Lorg/alfresco/opencmis/dictionary/CMISPropertyLuceneBuilder;
+org.alfresco.repo.audit
+ AuditComponentImpl
+  areAuditValuesRequired|()Z
+  recordAuditValues|(Ljava/lang/String;Ljava/util/Map;)Ljava/util/Map;
+  recordAuditValuesWithUserFilter|(Ljava/lang/String;Ljava/util/Map;Z)Ljava/util/Map;
+ PropertyAuditFilter
+  accept|(Ljava/lang/String;Ljava/util/Map;)Z
+ UserAuditFilter
+  acceptUser|(Ljava/lang/String;)Z
+org.alfresco.repo.audit.model
+ AuditApplication
+  buildPath|([Ljava/lang/String;)Ljava/lang/String;
+  checkPathFormat|(Ljava/lang/String;)V
+ AuditModelRegistryImpl$AuditModelRegistryState
+  getProperty|(Ljava/lang/String;)Ljava/lang/String;
+org.alfresco.repo.batch|BatchProcessor$WorkProviderIterator|next|()Ljava/lang/Object;
 org.alfresco.repo.cache
  DefaultSimpleCache
   get|(Ljava/io/Serializable;)Ljava/lang/Object;
  TransactionStats
   getTimings|(Lorg/alfresco/repo/cache/TransactionStats$OpType;)Lorg/apache/commons/math3/stat/descriptive/SummaryStatistics;
   record|(JJLorg/alfresco/repo/cache/TransactionStats$OpType;)V
+ TransactionalCache
+  get|(Ljava/io/Serializable;)Ljava/lang/Object;
+  getSharedCacheValue|(Lorg/alfresco/repo/cache/SimpleCache;Ljava/io/Serializable;Lorg/alfresco/repo/cache/TransactionStats;)Ljava/lang/Object;
+ TransactionalCache$ReadCacheBucket
+  doPostCommit|(Lorg/alfresco/repo/cache/SimpleCache;Ljava/io/Serializable;ZZZLorg/alfresco/repo/cache/TransactionStats;)V
+  doPreCommit|(Lorg/alfresco/repo/cache/SimpleCache;Ljava/io/Serializable;ZZZ)V
 org.alfresco.repo.cache.lookup
  EntityLookupCache
   getByKey|(Ljava/io/Serializable;)Lorg/alfresco/util/Pair;
   getByValue|(Ljava/lang/Object;)Lorg/alfresco/util/Pair;
+  getOrCreateByValue|(Ljava/lang/Object;)Lorg/alfresco/util/Pair;
 org.alfresco.repo.content
  AbstractContentAccessor$CallbackFileChannel
   read|(Ljava/nio/ByteBuffer;)I
@@ -29,6 +72,7 @@ org.alfresco.repo.content
   read|()I
  MimetypeMap
   getExtension|(Ljava/lang/String;)Ljava/lang/String;
+  getMimetype|(Ljava/lang/String;)Ljava/lang/String;
 org.alfresco.repo.content.metadata
  MediaTypeDisablingDocumentSelector
   select|(Lorg/apache/tika/metadata/Metadata;)Z
@@ -37,40 +81,180 @@ org.alfresco.repo.content.metadata
   endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   ignorableWhitespace|([CII)V
   startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+org.alfresco.repo.content.transform
+ AbstractContentTransformerLimits
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+  isTransformableSize|(Ljava/lang/String;JLjava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ AppleIWorksContentTransformer
+  isTransformable|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ BinaryPassThroughContentTransformer
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ ContentTransformerHelper
+  isSupportedTransformation|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ DoubleMap
+  get|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  getNoWildcards|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ EMLTransformer
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ HtmlParserContentTransformer
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ MediaWikiContentTransformer
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ OOXMLThumbnailContentTransformer
+  isTransformable|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ OOoContentTransformerHelper
+  isTransformable|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ PoiHssfContentTransformer
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ ProxyContentTransformer
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ StringExtractingContentTransformer
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ TikaPoweredContentTransformer
+  isTransformableMimetype|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ TransformerConfigImpl
+  getPriority|(Lorg/alfresco/repo/content/transform/ContentTransformer;Ljava/lang/String;Ljava/lang/String;)I
+  getStatistics|(Lorg/alfresco/repo/content/transform/ContentTransformer;Ljava/lang/String;Ljava/lang/String;Z)Lorg/alfresco/repo/content/transform/TransformerStatistics;
+  getThresholdCount|(Lorg/alfresco/repo/content/transform/ContentTransformer;Ljava/lang/String;Ljava/lang/String;)I
+  isSupportedTransformation|(Lorg/alfresco/repo/content/transform/ContentTransformer;Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ TransformerConfigProperty
+  getInt|(Lorg/alfresco/repo/content/transform/ContentTransformer;Ljava/lang/String;Ljava/lang/String;)I
+ TransformerConfigStatistics
+  getStatistics|(Lorg/alfresco/repo/content/transform/ContentTransformer;Ljava/lang/String;Ljava/lang/String;Z)Lorg/alfresco/repo/content/transform/TransformerStatistics;
+ TransformerConfigSupported
+  isSupportedTransformation|(Lorg/alfresco/repo/content/transform/ContentTransformer;Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
+ TransformerDebug
+  ms|(J)Ljava/lang/String;
+  pushAvailable|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)V
+  setDebugOutput|(Z)Z
+ TransformerDebug$ThreadInfo
+  setDebugOutput|(Z)Z
+ TransformerLog
+  debug|(Ljava/lang/Object;Ljava/lang/Throwable;)V
+ TransformerLogger
+  debug|(Ljava/lang/Object;Ljava/lang/Throwable;)V
+org.alfresco.repo.content.transform.magick
+ AbstractImageMagickContentTransformerWorker
+  isSupported|(Ljava/lang/String;)Z
+  isTransformable|(Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/cmr/repository/TransformationOptions;)Z
 org.alfresco.repo.dictionary
  AbstractDictionaryRegistry
   getAspect|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AspectDefinition;
   getClass|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/ClassDefinition;
   getModelsForUri|(Ljava/lang/String;)Ljava/util/List;
+  getNamespaceURI|(Ljava/lang/String;)Ljava/lang/String;
   getPrefixes|(Ljava/lang/String;)Ljava/util/Collection;
   getProperty|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
   getType|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/TypeDefinition;
  CompiledModel
   getAspect|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AspectDefinition;
+  getAssociation|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AssociationDefinition;
   getClass|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/ClassDefinition;
   getDataType|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/DataTypeDefinition;
   getProperty|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
   getType|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/TypeDefinition;
  DictionaryComponent
+  getAllAssociations|(Z)Ljava/util/Collection;
   getAspect|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AspectDefinition;
+  getAssociations|(Lorg/alfresco/service/namespace/QName;)Ljava/util/Collection;
   getClass|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/ClassDefinition;
-  getProperty|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
+  getMessage|(Ljava/lang/String;Ljava/util/Locale;)Ljava/lang/String;
+  getProperty
+   (Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
+   (Lorg/alfresco/service/namespace/QName;Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
+  getType|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/TypeDefinition;
   isSubClass|(Lorg/alfresco/service/namespace/QName;Lorg/alfresco/service/namespace/QName;)Z
  DictionaryDAOImpl
   getAspect|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AspectDefinition;
   getClass|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/ClassDefinition;
+  getConstraints|(Lorg/alfresco/service/namespace/QName;Z)Ljava/util/Collection;
   getDictionaryRegistry|(Ljava/lang/String;)Lorg/alfresco/repo/dictionary/DictionaryRegistry;
+  getNamespaceURI|(Ljava/lang/String;)Ljava/lang/String;
+  getPrefixes|(Ljava/lang/String;)Ljava/util/Collection;
   getProperty|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
+  getType|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/TypeDefinition;
+  putModelIgnoringConstraints|(Lorg/alfresco/repo/dictionary/M2Model;)Lorg/alfresco/service/namespace/QName;
+ DictionaryNamespaceComponent
+  getNamespaceURI|(Ljava/lang/String;)Ljava/lang/String;
+  getPrefixes|(Ljava/lang/String;)Ljava/util/Collection;
+  registerNamespace|(Ljava/lang/String;Ljava/lang/String;)V
+ IndexTokenisationMode
+  serializer|(Lorg/alfresco/repo/dictionary/IndexTokenisationMode;)Ljava/lang/String;
+ JiBX_defaultM2Aspect_access
+  marshal|(Ljava/lang/Object;Lorg/jibx/runtime/IMarshallingContext;)V
+ JiBX_defaultM2Constraint_access
+  marshal|(Ljava/lang/Object;Lorg/jibx/runtime/IMarshallingContext;)V
  JiBX_defaultM2Property_access
+  isPresent|(Lorg/jibx/runtime/IUnmarshallingContext;)Z
+  marshal|(Ljava/lang/Object;Lorg/jibx/runtime/IMarshallingContext;)V
+ JiBX_defaultM2Type_access
   marshal|(Ljava/lang/Object;Lorg/jibx/runtime/IMarshallingContext;)V
  JiBX_defaultMungeAdapter
+  JiBX_default_marshalAttr_1_10|(Lorg/alfresco/repo/dictionary/M2Namespace;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshalAttr_1_22|(Lorg/alfresco/repo/dictionary/M2Class;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshalAttr_1_27|(Lorg/alfresco/repo/dictionary/M2Type;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshalAttr_1_28|(Lorg/alfresco/repo/dictionary/M2Aspect;Lorg/jibx/runtime/impl/MarshallingContext;)V
   JiBX_default_marshalAttr_1_30|(Lorg/alfresco/repo/dictionary/M2Property;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshalAttr_1_35|(Lorg/alfresco/repo/dictionary/M2Constraint;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshalAttr_1_36|(Lorg/alfresco/repo/dictionary/M2NamedValue;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_14|(Ljava/util/List;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_22|(Ljava/util/List;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_23|(Ljava/util/List;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_25|(Ljava/util/List;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_26|(Ljava/util/List;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_27|(Lorg/alfresco/repo/dictionary/M2Class;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_28|(Lorg/alfresco/repo/dictionary/M2Type;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_29|(Lorg/alfresco/repo/dictionary/M2Aspect;Lorg/jibx/runtime/impl/MarshallingContext;)V
   JiBX_default_marshal_1_30|(Lorg/alfresco/repo/dictionary/M2Property;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_37|(Lorg/alfresco/repo/dictionary/M2NamedValue;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_marshal_1_39|(Lorg/alfresco/repo/dictionary/M2Constraint;Lorg/jibx/runtime/impl/MarshallingContext;)V
+  JiBX_default_test_1_18|(Lorg/jibx/runtime/impl/UnmarshallingContext;)Z
+  JiBX_default_unmarshalAttr_1_18|(Lorg/alfresco/repo/dictionary/M2PropertyOverride;Lorg/jibx/runtime/impl/UnmarshallingContext;)Lorg/alfresco/repo/dictionary/M2PropertyOverride;
+  JiBX_default_unmarshal_1_19|(Lorg/alfresco/repo/dictionary/M2PropertyOverride;Lorg/jibx/runtime/impl/UnmarshallingContext;)Lorg/alfresco/repo/dictionary/M2PropertyOverride;
+  JiBX_default_unmarshal_1_22|(Lorg/alfresco/repo/dictionary/M2Class;Lorg/jibx/runtime/impl/UnmarshallingContext;)Lorg/alfresco/repo/dictionary/M2Class;
  M2Class
+  JiBX_access_load_analyserResourceBundleName_1_0|()Ljava/lang/String;
+  JiBX_access_load_archive_1_0|()Ljava/lang/Boolean;
+  JiBX_access_load_associations_1_0|()Ljava/util/List;
+  JiBX_access_load_description_1_0|()Ljava/lang/String;
+  JiBX_access_load_includedInSuperTypeQuery_1_0|()Ljava/lang/Boolean;
+  JiBX_access_load_mandatoryAspects_1_0|()Ljava/util/List;
+  JiBX_access_load_name_1_0|()Ljava/lang/String;
   JiBX_access_load_parentName_1_0|()Ljava/lang/String;
+  JiBX_access_load_properties_1_0|()Ljava/util/List;
+  JiBX_access_load_propertyOverrides_1_0|()Ljava/util/List;
   JiBX_access_load_title_1_0|()Ljava/lang/String;
+  JiBX_access_store_associations_1_0|(Ljava/util/List;)V
+  JiBX_access_store_includedInSuperTypeQuery_1_0|(Ljava/lang/Boolean;)V
+  JiBX_access_store_parentName_1_0|(Ljava/lang/String;)V
+  JiBX_access_store_propertyOverrides_1_0|(Ljava/util/List;)V
+  JiBX_access_store_title_1_0|(Ljava/lang/String;)V
+ M2ClassAssociation
+  JiBX_access_load_isSourceMandatory_1_0|()Ljava/lang/Boolean;
+  JiBX_access_load_isSourceMany_1_0|()Ljava/lang/Boolean;
+  JiBX_access_load_isTargetMany_1_0|()Ljava/lang/Boolean;
+ M2Constraint
+  JiBX_access_load_description_1_0|()Ljava/lang/String;
+  JiBX_access_load_name_1_0|()Ljava/lang/String;
+  JiBX_access_load_parameters_1_0|()Ljava/util/List;
+  JiBX_access_load_ref_1_0|()Ljava/lang/String;
+  JiBX_access_load_title_1_0|()Ljava/lang/String;
+  JiBX_access_load_type_1_0|()Ljava/lang/String;
+  JiBX_access_store_title_1_0|(Ljava/lang/String;)V
+ M2Label
+  getLabel
+   (Ljava/util/Locale;Lorg/alfresco/service/cmr/dictionary/ModelDefinition;Lorg/alfresco/service/cmr/i18n/MessageLookup;Ljava/lang/String;Lorg/alfresco/service/namespace/QName;Ljava/lang/String;)Ljava/lang/String;
+   (Lorg/alfresco/service/cmr/dictionary/ModelDefinition;Lorg/alfresco/service/cmr/i18n/MessageLookup;Ljava/lang/String;Lorg/alfresco/service/namespace/QName;Ljava/lang/String;)Ljava/lang/String;
  M2Model$1
   write|(I)V
+ M2ModelDefinition
+  isNamespaceDefined|(Ljava/lang/String;)Z
+ M2NamedValue
+  JiBX_access_load_name_1_0|()Ljava/lang/String;
+  JiBX_access_load_simpleValue_1_0|()Ljava/lang/String;
+ M2Namespace
+  JiBX_access_load_prefix_1_0|()Ljava/lang/String;
+  JiBX_access_load_uri_1_0|()Ljava/lang/String;
  M2Property
   JiBX_access_load_analyserResourceBundleName_1_0|()Ljava/lang/String;
   JiBX_access_load_defaultValue_1_0|()Ljava/lang/String;
@@ -89,16 +273,37 @@ org.alfresco.repo.dictionary
   JiBX_access_load_title_1_0|()Ljava/lang/String;
  M2XML
   serialiseBoolean|(Ljava/lang/Boolean;)Ljava/lang/String;
+org.alfresco.repo.domain.locale
+ AbstractLocaleDAOImpl$LocaleEntityCallbackDAO
+  getValueKey
+   (Ljava/lang/Object;)Ljava/io/Serializable;
+   (Ljava/lang/String;)Ljava/lang/String;
 org.alfresco.repo.domain.node
+ AbstractNodeDAOImpl
+  getNodePair|(Lorg/alfresco/service/cmr/repository/NodeRef;)Lorg/alfresco/util/Pair;
+  hasNodeAspect|(Ljava/lang/Long;Lorg/alfresco/service/namespace/QName;)Z
  AbstractNodeDAOImpl$NodesCacheCallbackDAO
   getValueKey
    (Ljava/lang/Object;)Ljava/io/Serializable;
    (Lorg/alfresco/repo/domain/node/Node;)Lorg/alfresco/service/cmr/repository/NodeRef;
+ ChildAssocEntity
+  getRef|(Lorg/alfresco/repo/domain/qname/QNameDAO;)Lorg/alfresco/service/cmr/repository/ChildAssociationRef;
  NodeEntity
   getDeleted|(Lorg/alfresco/repo/domain/qname/QNameDAO;)Z
+ NodePropertyHelper
+  makeNodePropertyValue|(Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;Ljava/io/Serializable;)Lorg/alfresco/repo/domain/node/NodePropertyValue;
+  makeSerializableValue|(Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;Lorg/alfresco/repo/domain/node/NodePropertyValue;)Ljava/io/Serializable;
+ NodePropertyKey
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/alfresco/repo/domain/node/NodePropertyKey;)I
+ NodePropertyValue
+  getValue|(Lorg/alfresco/service/namespace/QName;)Ljava/io/Serializable;
 org.alfresco.repo.domain.permissions|AbstractAclCrudDAOImpl|getAcl|(Ljava/lang/Long;)Lorg/alfresco/repo/domain/permissions/Acl;
 org.alfresco.repo.domain.qname
  AbstractQNameDAOImpl
+  getNamespace|(Ljava/lang/Long;)Lorg/alfresco/util/Pair;
+  getOrCreateQName|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/util/Pair;
   getQName
    (Ljava/lang/Long;)Lorg/alfresco/util/Pair;
    (Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/util/Pair;
@@ -106,12 +311,35 @@ org.alfresco.repo.domain.qname
   getValueKey
    (Ljava/lang/Object;)Ljava/io/Serializable;
    (Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/namespace/QName;
+org.alfresco.repo.domain.query.ibatis|CannedQueryDAOImpl$ResultHandlerTranslator|handleResult|(Lorg/apache/ibatis/session/ResultContext;)V
+org.alfresco.repo.domain.schema|SchemaBootstrap|trimStringForTextFields|(Ljava/lang/String;)Ljava/lang/String;
+org.alfresco.repo.i18n
+ MessageServiceImpl
+  getMessage|(Ljava/lang/String;Ljava/util/Locale;)Ljava/lang/String;
+ StaticMessageLookup
+  getMessage|(Ljava/lang/String;Ljava/util/Locale;[Ljava/lang/Object;)Ljava/lang/String;
+org.alfresco.repo.jscript
+ ContentAwareScriptableQNameMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ScriptNode$NodeValueConverter
+  convertValueForRepo|(Ljava/io/Serializable;)Ljava/io/Serializable;
+  convertValueForScript
+   (Lorg/alfresco/service/ServiceRegistry;Lorg/mozilla/javascript/Scriptable;Lorg/alfresco/service/namespace/QName;Ljava/io/Serializable;)Ljava/io/Serializable;
+   (Lorg/alfresco/service/namespace/QName;Ljava/io/Serializable;)Ljava/io/Serializable;
+ ValueConverter
+  convertValueForJava|(Ljava/lang/Object;)Ljava/lang/Object;
+  convertValueForRepo|(Ljava/io/Serializable;)Ljava/io/Serializable;
+  convertValueForScript|(Lorg/alfresco/service/ServiceRegistry;Lorg/mozilla/javascript/Scriptable;Lorg/alfresco/service/namespace/QName;Ljava/io/Serializable;)Ljava/io/Serializable;
 org.alfresco.repo.lock.mem
  AbstractLockStore
   get|(Lorg/alfresco/service/cmr/repository/NodeRef;)Lorg/alfresco/repo/lock/mem/LockState;
  LockableAspectInterceptor
   invoke|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
+ LockableAspectInterceptor$AjcClosure1
+  run|([Ljava/lang/Object;)Ljava/lang/Object;
 org.alfresco.repo.management.subsystems
+ AbstractPropertyBackedBean
+  getProperty|(Ljava/lang/String;)Ljava/lang/String;
  ChildApplicationContextFactory$ApplicationContextState
   getApplicationContext|(Z)Lorg/springframework/context/ApplicationContext;
   start|()V
@@ -126,8 +354,14 @@ org.alfresco.repo.node.db
  DbNodeServiceImpl
   exists|(Lorg/alfresco/service/cmr/repository/NodeRef;)Z
   hasAspect|(Lorg/alfresco/service/cmr/repository/NodeRef;Lorg/alfresco/service/namespace/QName;)Z
+ DbNodeServiceImpl$AjcClosure39
+  run|([Ljava/lang/Object;)Ljava/lang/Object;
 org.alfresco.repo.node.getchildren|GetChildrenCannedQuery$FilterSortNode|getVal|(Lorg/alfresco/service/namespace/QName;)Ljava/io/Serializable;
-org.alfresco.repo.policy|JavaBehaviour$JavaMethodInvocationHandler|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+org.alfresco.repo.policy
+ JavaBehaviour$JavaMethodInvocationHandler
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+ PolicyFactory$NOOPHandler
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 org.alfresco.repo.search.impl.lucene.analysis
  MLAnalayser$MLTokenizer
   incrementToken|()Z
@@ -148,13 +382,28 @@ org.alfresco.repo.security.authority
    (Ljava/lang/Object;)Z
    (Ljava/lang/String;)Z
   contains|(Ljava/lang/Object;)Z
+ GetAuthoritiesCannedQuery$1
+  handle|(Lorg/alfresco/repo/security/authority/AuthorityInfo;)Z
+ GetAuthoritiesCannedQuery$ResultHandler
+  handleResult
+   (Ljava/lang/Object;)Z
+   (Lorg/alfresco/repo/security/authority/AuthorityInfoEntity;)Z
 org.alfresco.repo.security.permissions|ACLType|getACLTypeFromId|(I)Lorg/alfresco/repo/security/permissions/ACLType;
 org.alfresco.repo.security.permissions.impl|PermissionServiceImpl|getPermissionReference|(Ljava/lang/String;)Lorg/alfresco/repo/security/permissions/PermissionReference;
 org.alfresco.repo.security.permissions.impl.model
+ PermissionModel
+  getRequiredPermissions|(Lorg/alfresco/repo/security/permissions/PermissionReference;Lorg/alfresco/service/namespace/QName;Ljava/util/Set;Lorg/alfresco/repo/security/permissions/impl/RequiredPermission$On;)Ljava/util/Set;
  PermissionModel$MutableState
   checkPermission|(Lorg/alfresco/repo/security/permissions/PermissionReference;)Z
   getPermissionReference|(Lorg/alfresco/service/namespace/QName;Ljava/lang/String;)Lorg/alfresco/repo/security/permissions/PermissionReference;
+ PermissionModel$RequiredKey
+  getRequiredKey|(Lorg/alfresco/repo/security/permissions/PermissionReference;Lorg/alfresco/service/namespace/QName;Ljava/util/Set;Lorg/alfresco/repo/security/permissions/impl/RequiredPermission$On;)Lorg/alfresco/repo/security/permissions/impl/model/PermissionModel$RequiredKey;
 org.alfresco.repo.security.person|UserNameMatcherImpl|matches|(Ljava/lang/String;Ljava/lang/String;)Z
+org.alfresco.repo.security.sync.ldap
+ LDAPUserRegistry$PersonCollection$PersonIterator
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/alfresco/repo/security/sync/NodeDescription;
 org.alfresco.repo.service
  ServiceDescriptorRegistry
   getService|(Lorg/alfresco/service/namespace/QName;)Ljava/lang/Object;
@@ -169,36 +418,115 @@ org.alfresco.repo.template
  QNameAwareObjectWrapper$1$1
   wrap|(Ljava/lang/Object;)Lfreemarker/template/TemplateModel;
 org.alfresco.repo.tenant
+ MultiTNodeServiceInterceptor
+  invoke|(Lorg/aopalliance/intercept/MethodInvocation;)Ljava/lang/Object;
  MultiTServiceImpl
+  getBaseName
+   (Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Z)Ljava/lang/String;
   getBaseNameUser|(Ljava/lang/String;)Ljava/lang/String;
   getName
    (Ljava/lang/String;)Ljava/lang/String;
    (Lorg/alfresco/service/cmr/repository/NodeRef;)Lorg/alfresco/service/cmr/repository/NodeRef;
+org.alfresco.repo.transaction
+ TransactionalResourceHelper
+  getCount|(Ljava/lang/Object;)I
+  getMap|(Ljava/lang/Object;)Ljava/util/Map;
+org.alfresco.service.cmr.repository
+ Path$ChildAssocElement
+  getPrefixedString|(Lorg/alfresco/service/namespace/NamespacePrefixResolver;)Ljava/lang/String;
+ TransformationOptionLimits
+  defaultTo|(Lorg/alfresco/service/cmr/repository/TransformationOptionLimits;)V
+ TransformationOptionPair
+  combine|(Lorg/alfresco/service/cmr/repository/TransformationOptionPair;)Lorg/alfresco/service/cmr/repository/TransformationOptionPair;
+  defaultTo|(Lorg/alfresco/service/cmr/repository/TransformationOptionPair;)V
+org.alfresco.service.cmr.repository.datatype
+ TypeConverter
+  convert|(Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
+  getConverter
+   (Ljava/lang/Class;Ljava/lang/Class;)Lorg/alfresco/service/cmr/repository/datatype/TypeConverter$Converter;
+   (Ljava/lang/Object;Ljava/lang/Class;)Lorg/alfresco/service/cmr/repository/datatype/TypeConverter$Converter;
+org.alfresco.service.cmr.security|AuthorityType|getAuthorityType|(Ljava/lang/String;)Lorg/alfresco/service/cmr/security/AuthorityType;
 org.alfresco.service.namespace
+ DynamicNamespacePrefixResolver
+  getNamespaceURI|(Ljava/lang/String;)Ljava/lang/String;
  QName
+  createQName
+   (Ljava/lang/String;)Lorg/alfresco/service/namespace/QName;
+   (Ljava/lang/String;Ljava/lang/String;)Lorg/alfresco/service/namespace/QName;
+   (Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/namespace/NamespacePrefixResolver;)Lorg/alfresco/service/namespace/QName;
+   (Ljava/lang/String;Lorg/alfresco/service/namespace/NamespacePrefixResolver;)Lorg/alfresco/service/namespace/QName;
+  createValidLocalName|(Ljava/lang/String;)Ljava/lang/String;
   resolveToQNameString|(Lorg/alfresco/service/namespace/NamespacePrefixResolver;Ljava/lang/String;)Ljava/lang/String;
-  toPrefixString|()Ljava/lang/String;
+  toPrefixString
+   ()Ljava/lang/String;
+   (Lorg/alfresco/service/namespace/NamespacePrefixResolver;)Ljava/lang/String;
  QNameMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
   put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+org.alfresco.solr|InformationServer|reindexNodeByQuery|(Ljava/lang/String;)V
 org.alfresco.solr.query
+ AbstractAuthoritySetQuery$AllAccessCollector
+  collect|(I)V
  AbstractSolrCachingScorer
   docID|()I
+  freq|()I
+ AbstractStructuredFieldPosition
+  linkSelf|()Z
+  matchesAll|()Z
  AnyStructuredFieldPosition
   matches|(III)I
  CachingTermPositions
+  advance|(I)I
   docID|()I
   freq|()I
   nextDoc|()I
+  nextPosition|()I
   reset|()V
+ DocValuesCache$IntValues
+  get|(I)J
+ HybridBitSet
+  get|(J)Z
  RelativeStructuredFieldPosition
   matches|(III)I
+ SelfAxisStructuredFieldPosition
+  linkSelf|()Z
+  matches|(III)I
+ SolrAuthoritySetQuery$BitsFilterCollector
+  collect|(I)V
+ SolrContainerScorer
+  advance|(I)I
+  docID|()I
+  next|()Z
+  nextDoc|()I
+  score|()F
+ SolrPathQuery$StructuredFieldWeight
+  explain|(Lorg/apache/lucene/index/AtomicReaderContext;I)Lorg/apache/lucene/search/Explanation;
+ SolrPathScorer
+  advance|(I)I
+  nextDoc|()I
+  score|()F
+org.alfresco.traitextender
+ ExtenderImpl
+  getExtension|(Lorg/alfresco/traitextender/Extensible;Lorg/alfresco/traitextender/ExtensionPoint;)Ljava/lang/Object;
+ RouteExtensions
+  aspectOf|()Lorg/alfresco/traitextender/RouteExtensions;
+  intercept|(Lorg/aspectj/lang/ProceedingJoinPoint;Lorg/alfresco/traitextender/Extend;)Ljava/lang/Object;
 org.alfresco.util
  EqualsHelper
+  getMapComparison|(Ljava/util/Map;Ljava/util/Map;)Ljava/util/Map;
   nullSafeEquals|(Ljava/lang/Object;Ljava/lang/Object;)Z
  ISO9075
   encodeSQL|(Ljava/lang/String;)Ljava/lang/String;
+ LockHelper
+  tryLock|(Ljava/util/concurrent/locks/Lock;JLjava/lang/String;)V
+ LogTee
+  debug|(Ljava/lang/Object;Ljava/lang/Throwable;)V
  ParameterCheck
   mandatory|(Ljava/lang/String;Ljava/lang/Object;)V
+ PathMapper
+  convertMap|(Ljava/util/Map;)Ljava/util/Map;
+  getMappedPaths|(Ljava/lang/String;)Ljava/util/Set;
  ValueProtectingMap
   get
    (Ljava/lang/Object;)Ljava/io/Serializable;
@@ -210,4 +538,16 @@ org.alfresco.util.log
  NDC
   push|(Ljava/lang/String;)V
   remove|()V
-org.alfresco.util.transaction|TransactionSupportUtil|getResource|(Ljava/lang/Object;)Ljava/lang/Object;
+org.alfresco.util.transaction
+ TransactionSupportUtil
+  bindResource|(Ljava/lang/Object;Ljava/lang/Object;)V
+  getResource|(Ljava/lang/Object;)Ljava/lang/Object;
+ TransactionSupportUtil$1
+  compare
+   (Ljava/lang/Integer;Ljava/lang/Integer;)I
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+ TransactionSupportUtil$2
+  compare
+   (Ljava/lang/Integer;Ljava/lang/Integer;)I
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+org.alfresco.web.config.forms|NodeMetadataBasedEvaluator|applies|(Ljava/lang/Object;Ljava/lang/String;)Z

@@ -44,10 +44,23 @@ org.codehaus.groovy.util
   hash|(I)I
  FastArray
   size|()I
-org.codehaus.jackson|JsonStreamContext|inObject|()Z
+org.codehaus.jackson
+ JsonParser
+  configure|(Lorg/codehaus/jackson/JsonParser$Feature;Z)Lorg/codehaus/jackson/JsonParser;
+  nextValue|()Lorg/codehaus/jackson/JsonToken;
+ JsonStreamContext
+  inObject|()Z
+  inRoot|()Z
+ ObjectCodec
+  createObjectNode|()Lorg/codehaus/jackson/JsonNode;
+  treeToValue|(Lorg/codehaus/jackson/JsonNode;Ljava/lang/Class;)Ljava/lang/Object;
+  writeTree|(Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/JsonNode;)V
 org.codehaus.jackson.impl
  JsonGeneratorBase
   isEnabled|(Lorg/codehaus/jackson/JsonGenerator$Feature;)Z
+ JsonReadContext
+  createChildObjectContext|(II)Lorg/codehaus/jackson/impl/JsonReadContext;
+  expectComma|()Z
  JsonWriteContext
   createChildObjectContext|()Lorg/codehaus/jackson/impl/JsonWriteContext;
   writeFieldName|(Ljava/lang/String;)I
@@ -64,6 +77,8 @@ org.codehaus.jackson.impl
   writeStartObject|()V
   writeString|(Ljava/lang/String;)V
 org.codehaus.jackson.io
+ NumberInput
+  parseInt|([CII)I
  NumberOutput
   outputInt|(I[BI)I
   outputLong|(J[BI)I
@@ -111,3 +126,14 @@ org.codehaus.jackson.map.ser.std
   serialize
    (Ljava/lang/Object;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
    (Ljava/lang/String;Lorg/codehaus/jackson/JsonGenerator;Lorg/codehaus/jackson/map/SerializerProvider;)V
+org.codehaus.jackson.sym
+ CharsToNameCanonicalizer
+  _hashToIndex|(I)I
+  findSymbol|([CIII)Ljava/lang/String;
+  release|()V
+  size|()I
+org.codehaus.jackson.util
+ BufferRecycler
+  releaseByteBuffer|(Lorg/codehaus/jackson/util/BufferRecycler$ByteBufferType;[B)V
+ TextBuffer
+  resetWithShared|([CII)V

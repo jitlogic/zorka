@@ -1,4 +1,6 @@
 javax.crypto
+ Cipher
+  update|([BII[BI)I
  Mac
   doFinal
    ()[B
@@ -53,6 +55,8 @@ javax.management.modelmbean|DescriptorSupport|getFieldValue|(Ljava/lang/String;)
 javax.management.openmbean
  ArrayType
   isValue|(Ljava/lang/Object;)Z
+ CompositeDataSupport
+  get|(Ljava/lang/String;)Ljava/lang/Object;
  CompositeType
   getType|(Ljava/lang/String;)Ljavax/management/openmbean/OpenType;
   keySet|()Ljava/util/Set;
@@ -76,11 +80,39 @@ javax.naming
   size|()I
  NameImplEnumerator
   nextElement|()Ljava/lang/String;
+javax.naming.directory
+ BasicAttribute
+  get|(I)Ljava/lang/Object;
+  size|()I
+ BasicAttribute$ValuesEnumImpl
+  next|()Ljava/lang/Object;
+ BasicAttributes
+  get|(Ljava/lang/String;)Ljavax/naming/directory/Attribute;
+  put
+   (Ljava/lang/String;Ljava/lang/Object;)Ljavax/naming/directory/Attribute;
+   (Ljavax/naming/directory/Attribute;)Ljavax/naming/directory/Attribute;
+ BasicAttributes$AttrEnumImpl
+  next
+   ()Ljava/lang/Object;
+   ()Ljavax/naming/directory/Attribute;
+  nextElement|()Ljavax/naming/directory/Attribute;
+javax.naming.ldap
+ LdapName
+  getRdn|(I)Ljavax/naming/ldap/Rdn;
+  getSuffix|(I)Ljavax/naming/Name;
+  size|()I
+  startsWith|(Ljavax/naming/Name;)Z
+ Rdn
+  escapeValue|(Ljava/lang/Object;)Ljava/lang/String;
+  size|()I
+  toAttributes|()Ljavax/naming/directory/Attributes;
+  unescapeValue|(Ljava/lang/String;)Ljava/lang/Object;
 javax.security.auth|Subject$SecureSet|iterator|()Ljava/util/Iterator;
 javax.servlet
  ServletRequestWrapper
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
   getParameter|(Ljava/lang/String;)Ljava/lang/String;
+  getParameterValues|(Ljava/lang/String;)[Ljava/lang/String;
 javax.servlet.http
  HttpServlet
   service|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V
@@ -100,6 +132,10 @@ javax.servlet.jsp.el
  ScopedAttributeELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 javax.servlet.jsp.tagext|TagSupport|release|()V
+javax.websocket
+ Endpoint
+  onError|(Ljavax/websocket/Session;Ljava/lang/Throwable;)V
+  onOpen|(Ljavax/websocket/Session;Ljavax/websocket/EndpointConfig;)V
 javax.xml.bind
  DatatypeConverterImpl
   _printBase64Binary

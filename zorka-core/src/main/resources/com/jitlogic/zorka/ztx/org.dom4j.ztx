@@ -8,10 +8,15 @@ org.dom4j
   createNamespace|(Ljava/lang/String;Ljava/lang/String;)Lorg/dom4j/Namespace;
   createQName|(Ljava/lang/String;Lorg/dom4j/Namespace;)Lorg/dom4j/QName;
   createText|(Ljava/lang/String;)Lorg/dom4j/Text;
+  createXPath|(Ljava/lang/String;)Lorg/dom4j/XPath;
  DocumentHelper
   parseText|(Ljava/lang/String;)Lorg/dom4j/Document;
  Namespace
   get|(Ljava/lang/String;Ljava/lang/String;)Lorg/dom4j/Namespace;
+ QName
+  get
+   (Ljava/lang/String;)Lorg/dom4j/QName;
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/dom4j/QName;
  VisitorSupport
   visit|(Lorg/dom4j/Text;)V
 org.dom4j.io
@@ -46,6 +51,8 @@ org.dom4j.tree
   add|(Lorg/dom4j/Element;)V
   addText|(Ljava/lang/String;)Lorg/dom4j/Element;
   attributeValue|(Ljava/lang/String;)Ljava/lang/String;
+  elementIterator|(Lorg/dom4j/QName;)Ljava/util/Iterator;
+  elements|(Lorg/dom4j/QName;)Ljava/util/List;
  AbstractNode
   createXPath|(Ljava/lang/String;)Lorg/dom4j/XPath;
  AbstractText
@@ -55,11 +62,14 @@ org.dom4j.tree
  ConcurrentReaderHashMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  DefaultElement
+  add|(Lorg/dom4j/Attribute;)V
   attribute|(Ljava/lang/String;)Lorg/dom4j/Attribute;
   attributeCount|()I
+  attributeIterator|()Ljava/util/Iterator;
   element|(Ljava/lang/String;)Lorg/dom4j/Element;
   node|(I)Lorg/dom4j/Node;
   nodeCount|()I
+  nodeIterator|()Ljava/util/Iterator;
  NamespaceCache
   get|(Ljava/lang/String;Ljava/lang/String;)Lorg/dom4j/Namespace;
  NamespaceStack
@@ -69,6 +79,8 @@ org.dom4j.tree
   getQName|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lorg/dom4j/QName;
   size|()I
  QNameCache
-  get|(Ljava/lang/String;Lorg/dom4j/Namespace;)Lorg/dom4j/QName;
+  get
+   (Ljava/lang/String;)Lorg/dom4j/QName;
+   (Ljava/lang/String;Lorg/dom4j/Namespace;)Lorg/dom4j/QName;
 org.dom4j.util|SimpleSingleton|instance|()Ljava/lang/Object;
 org.dom4j.xpath|DefaultNamespaceContext|create|(Ljava/lang/Object;)Lorg/dom4j/xpath/DefaultNamespaceContext;

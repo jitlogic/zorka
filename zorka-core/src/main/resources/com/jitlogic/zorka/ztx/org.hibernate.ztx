@@ -46,6 +46,8 @@ org.hibernate.dialect
  Oracle8iDialect
   supportsLimit|()Z
 org.hibernate.engine
+ ActionQueue
+  afterTransactionCompletion|(Z)V
  BatchFetchQueue
   addBatchLoadableEntityKey|(Lorg/hibernate/engine/EntityKey;)V
  Cascade
@@ -97,6 +99,7 @@ org.hibernate.engine
   getLHSTableName|(Lorg/hibernate/type/AssociationType;ILorg/hibernate/persister/entity/OuterJoinLoadable;)Ljava/lang/String;
  StatefulPersistenceContext
   addEntry|(Ljava/lang/Object;Lorg/hibernate/engine/Status;[Ljava/lang/Object;Ljava/lang/Object;Ljava/io/Serializable;Ljava/lang/Object;Lorg/hibernate/LockMode;ZLorg/hibernate/persister/entity/EntityPersister;ZZ)Lorg/hibernate/engine/EntityEntry;
+  afterTransactionCompletion|()V
   containsEntity|(Lorg/hibernate/engine/EntityKey;)Z
   decrementCascadeLevel|()I
   getCollectionEntry|(Lorg/hibernate/collection/PersistentCollection;)Lorg/hibernate/engine/CollectionEntry;
@@ -174,6 +177,8 @@ org.hibernate.impl
   getEntityPersister|(Ljava/lang/String;)Lorg/hibernate/persister/entity/EntityPersister;
   getIdentifierType|(Ljava/lang/String;)Lorg/hibernate/type/Type;
  SessionImpl
+  afterTransactionCompletion|(ZLorg/hibernate/Transaction;)V
+  connection|()Ljava/sql/Connection;
   getContextEntityIdentifier|(Ljava/lang/Object;)Ljava/io/Serializable;
   getEntityUsingInterceptor|(Lorg/hibernate/engine/EntityKey;)Ljava/lang/Object;
   internalLoad|(Ljava/lang/String;Ljava/io/Serializable;ZZ)Ljava/lang/Object;
@@ -191,7 +196,18 @@ org.hibernate.internal
  SessionImpl
   getEntityUsingInterceptor|(Lorg/hibernate/engine/spi/EntityKey;)Ljava/lang/Object;
 org.hibernate.internal.util.collections|ArrayHelper|slice|([Ljava/lang/String;II)[Ljava/lang/String;
-org.hibernate.jdbc|JDBCContext|registerSynchronizationIfPossible|()Z
+org.hibernate.jdbc
+ AbstractBatcher
+  unsetTransactionTimeout|()V
+ BorrowedConnectionProxy
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+ ConnectionManager
+  afterTransaction|()V
+  borrowConnection|()Ljava/sql/Connection;
+ JDBCContext
+  afterTransactionCompletion|(ZLorg/hibernate/Transaction;)V
+  borrowConnection|()Ljava/sql/Connection;
+  registerSynchronizationIfPossible|()Z
 org.hibernate.loader|PropertyPath|append|(Ljava/lang/String;)Lorg/hibernate/loader/PropertyPath;
 org.hibernate.loader.criteria
  CriteriaQueryTranslator
@@ -496,7 +512,9 @@ org.hibernate.util
   entries|(Ljava/util/Map;)Ljava/util/List;
   entryList|()Ljava/util/List;
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+  instantiateSequenced|(I)Ljava/util/Map;
   put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  values|()Ljava/util/Collection;
  JoinedIterator
   next|()Ljava/lang/Object;
  PropertiesHelper

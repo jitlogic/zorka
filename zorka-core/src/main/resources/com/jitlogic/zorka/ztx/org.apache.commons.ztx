@@ -37,11 +37,15 @@ org.apache.commons.collections
  ReferenceMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  SequencedHashMap
+  clear|()V
   containsKey|(Ljava/lang/Object;)Z
   entrySet|()Ljava/util/Set;
   get|(Ljava/lang/Object;)Ljava/lang/Object;
   put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
   size|()I
+  values|()Ljava/util/Collection;
+ SequencedHashMap$2
+  iterator|()Ljava/util/Iterator;
  SequencedHashMap$3
   iterator|()Ljava/util/Iterator;
  SequencedHashMap$OrderedIterator
@@ -80,12 +84,33 @@ org.apache.commons.configuration
   interpolate|(Ljava/lang/Object;Lorg/apache/commons/configuration/AbstractConfiguration;)Ljava/lang/Object;
 org.apache.commons.configuration.reloading|InvariantReloadingStrategy|reloadingRequired|()Z
 org.apache.commons.dbcp
+ DelegatingConnection
+  clearWarnings|()V
+  createStatement|()Ljava/sql/Statement;
+  prepareStatement|(Ljava/lang/String;)Ljava/sql/PreparedStatement;
+ DelegatingDatabaseMetaData
+  supportsMultipleResultSets|()Z
+ DelegatingPreparedStatement
+  clearParameters|()V
  DelegatingResultSet
+  close|()V
   getInt|(Ljava/lang/String;)I
   getLong|(Ljava/lang/String;)J
+  getObject|(I)Ljava/lang/Object;
   getString|(Ljava/lang/String;)Ljava/lang/String;
   next|()Z
   wasNull|()Z
+  wrapResultSet|(Ljava/sql/Statement;Ljava/sql/ResultSet;)Ljava/sql/ResultSet;
+ DelegatingStatement
+  close|()V
+ PoolablePreparedStatement
+  close|()V
+ PoolingConnection
+  activateObject|(Ljava/lang/Object;Ljava/lang/Object;)V
+  passivateObject|(Ljava/lang/Object;Ljava/lang/Object;)V
+  prepareStatement|(Ljava/lang/String;)Ljava/sql/PreparedStatement;
+ PoolingDataSource$PoolGuardConnectionWrapper
+  prepareStatement|(Ljava/lang/String;)Ljava/sql/PreparedStatement;
 org.apache.commons.dbcp2
  DelegatingResultSet
   getInt|(I)I
@@ -101,7 +126,16 @@ org.apache.commons.fileupload
  MultipartStream$ItemInputStream
   available|()I
   read|([BII)I
+org.apache.commons.httpclient|Wire|enabled|()Z
+org.apache.commons.httpclient.auth|AuthChallengeProcessor|processChallenge|(Lorg/apache/commons/httpclient/auth/AuthState;Ljava/util/Map;)Lorg/apache/commons/httpclient/auth/AuthScheme;
 org.apache.commons.httpclient.params|DefaultHttpParams|getParameter|(Ljava/lang/String;)Ljava/lang/Object;
+org.apache.commons.httpclient.util
+ EncodingUtil
+  getAsciiString
+   ([B)Ljava/lang/String;
+   ([BII)Ljava/lang/String;
+  getBytes|(Ljava/lang/String;Ljava/lang/String;)[B
+  getString|([BIILjava/lang/String;)Ljava/lang/String;
 org.apache.commons.io
  IOUtils
   copy|(Ljava/io/InputStream;Ljava/io/OutputStream;)I
@@ -171,7 +205,9 @@ org.apache.commons.logging
   createLog|(Ljava/lang/String;)Lorg/apache/commons/logging/Log;
 org.apache.commons.logging.impl
  Log4JLogger
-  debug|(Ljava/lang/Object;)V
+  debug
+   (Ljava/lang/Object;)V
+   (Ljava/lang/Object;Ljava/lang/Throwable;)V
   trace|(Ljava/lang/Object;)V
  Log4jProxy
   trace|(Ljava/lang/Object;)V
@@ -199,3 +235,11 @@ org.apache.commons.math3.stat.descriptive.summary
  SumOfSquares
   increment|(D)V
 org.apache.commons.math3.util|FastMath|log|(D)D
+org.apache.commons.pool.impl
+ CursorableLinkedList
+  addFirst|(Ljava/lang/Object;)Z
+  removeFirst|()Ljava/lang/Object;
+  size|()I
+ GenericKeyedObjectPool
+  borrowObject|(Ljava/lang/Object;)Ljava/lang/Object;
+  returnObject|(Ljava/lang/Object;Ljava/lang/Object;)V

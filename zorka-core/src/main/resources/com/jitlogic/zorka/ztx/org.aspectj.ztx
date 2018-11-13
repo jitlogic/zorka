@@ -1,5 +1,19 @@
 org.aspectj.apache.bcel.classfile|ConstantPool|getConstant|(I)Lorg/aspectj/apache/bcel/classfile/Constant;
 org.aspectj.lang.reflect|AjTypeSystem|getAjType|(Ljava/lang/Class;)Lorg/aspectj/lang/reflect/AjType;
+org.aspectj.runtime.internal
+ AroundClosure
+  linkClosureAndJoinPoint|(I)Lorg/aspectj/lang/ProceedingJoinPoint;
+ Conversions
+  booleanObject|(Z)Ljava/lang/Object;
+  booleanValue|(Ljava/lang/Object;)Z
+org.aspectj.runtime.reflect
+ Factory
+  makeJP
+   (Lorg/aspectj/lang/JoinPoint$StaticPart;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Lorg/aspectj/lang/JoinPoint;
+   (Lorg/aspectj/lang/JoinPoint$StaticPart;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Lorg/aspectj/lang/JoinPoint;
+   (Lorg/aspectj/lang/JoinPoint$StaticPart;Ljava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;)Lorg/aspectj/lang/JoinPoint;
+ JoinPointImpl
+  proceed|()Ljava/lang/Object;
 org.aspectj.util
  FuzzyBoolean
   fromBoolean|(Z)Lorg/aspectj/util/FuzzyBoolean;

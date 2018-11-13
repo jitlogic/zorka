@@ -2,6 +2,7 @@ org.apache.xerces.dom
  AttrImpl
   cloneNode|(Z)Lorg/w3c/dom/Node;
  AttributeMap
+  cloneMap|(Lorg/apache/xerces/dom/NodeImpl;)Lorg/apache/xerces/dom/NamedNodeMapImpl;
   setNamedItem|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
  ChildNode
   cloneNode|(Z)Lorg/w3c/dom/Node;

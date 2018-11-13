@@ -1,1 +1,10 @@
-org.antlr.runtime|ANTLRStringStream|LA|(I)I
+org.antlr.runtime
+ ANTLRStringStream
+  LA|(I)I
+ BitSet
+  lengthInLongWords|()I
+ BufferedTokenStream
+  LA|(I)I
+  reset|()V
+ CommonTokenStream
+  LT|(I)Lorg/antlr/runtime/Token;

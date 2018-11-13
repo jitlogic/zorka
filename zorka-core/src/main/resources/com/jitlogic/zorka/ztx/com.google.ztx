@@ -55,6 +55,10 @@ com.google.common.base
  Ticker$1
   read|()J
 com.google.common.cache
+ AbstractCache$SimpleStatsCounter
+  recordEviction|()V
+  recordHits|(I)V
+  recordMisses|(I)V
  CacheBuilder$1
   recordHits|(I)V
  CacheBuilder$3
@@ -64,12 +68,14 @@ com.google.common.cache
  LocalCache$2
   poll|()Ljava/lang/Object;
  LocalCache$AccessQueue
+  contains|(Ljava/lang/Object;)Z
   offer
    (Lcom/google/common/cache/LocalCache$ReferenceEntry;)Z
    (Ljava/lang/Object;)Z
   peek
    ()Lcom/google/common/cache/LocalCache$ReferenceEntry;
    ()Ljava/lang/Object;
+  remove|(Ljava/lang/Object;)Z
  LocalCache$LoadingValueReference
   set|(Ljava/lang/Object;)Z
  LocalCache$LocalLoadingCache
@@ -81,6 +87,7 @@ com.google.common.cache
   peek
    ()Lcom/google/common/cache/LocalCache$ReferenceEntry;
    ()Ljava/lang/Object;
+  remove|(Ljava/lang/Object;)Z
 com.google.common.collect
  AbstractIndexedListIterator
   next|()Ljava/lang/Object;

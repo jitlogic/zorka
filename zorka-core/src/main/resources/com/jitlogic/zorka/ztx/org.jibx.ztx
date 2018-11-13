@@ -1,8 +1,12 @@
 org.jibx.runtime|Utility|serializeBoolean|(Z)Ljava/lang/String;
 org.jibx.runtime.impl
+ BindingFactoryBase
+  getMarshallerClass|(I)Ljava/lang/Class;
+  loadClass|(Ljava/lang/String;)Ljava/lang/Class;
  MarshallingContext
   attribute|(ILjava/lang/String;Ljava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
   closeStartContent|()Lorg/jibx/runtime/impl/MarshallingContext;
+  closeStartEmpty|()Lorg/jibx/runtime/impl/MarshallingContext;
   element|(ILjava/lang/String;Ljava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
   endTag|(ILjava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
   getMarshaller|(Ljava/lang/String;)Lorg/jibx/runtime/IMarshaller;
@@ -16,20 +20,40 @@ org.jibx.runtime.impl
   writeContent|(Ljava/lang/String;)Lorg/jibx/runtime/impl/MarshallingContext;
  StreamWriterBase
   indent|(I)V
+  popExtensionNamespaces|()V
  StringIntHashMap
   get|(Ljava/lang/String;)I
  UTF8StreamWriter
   writeTextContent|(Ljava/lang/String;)V
  UnmarshallingContext
+  accumulateText|()Ljava/lang/String;
+  attributeText|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  getUnmarshaller|(Ljava/lang/String;)Lorg/jibx/runtime/IUnmarshaller;
+  hasAnyAttribute|([Ljava/lang/String;[Ljava/lang/String;)Z
   isAt|(Ljava/lang/String;Ljava/lang/String;)Z
+  parseContentText|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  parseElementBoolean|(Ljava/lang/String;Ljava/lang/String;Z)Z
+  parseElementText
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  parseIfStartTag|(Ljava/lang/String;Ljava/lang/String;)Z
+  parsePastCurrentEndTag|(Ljava/lang/String;Ljava/lang/String;)V
+  parsePastEndTag|(Ljava/lang/String;Ljava/lang/String;)V
   parsePastStartTag|(Ljava/lang/String;Ljava/lang/String;)V
+  parseToStartTag|(Ljava/lang/String;Ljava/lang/String;)V
   popObject|()V
   pushObject|(Ljava/lang/Object;)V
+  pushTrackedObject|(Ljava/lang/Object;)V
+  toStart|()Ljava/lang/String;
   toTag|()I
+  trackObject|(Ljava/lang/Object;)V
  XMLPullReaderFactory$XMLPullReader
+  getAttributeValue|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  next|()I
   nextToken|()I
  XMLWriterBase
   addAttribute|(ILjava/lang/String;Ljava/lang/String;)V
+  closeEmptyTag|()V
   closeStartTag|()V
   endTag|(ILjava/lang/String;)V
   startTagClosed|(ILjava/lang/String;)V

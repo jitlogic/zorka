@@ -3,6 +3,22 @@ freemarker.core
   getGlobalVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
   getLocalVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
   getVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+ FMParser
+  AddSubExpression|(Lfreemarker/core/Expression;)Lfreemarker/core/Expression;
+  AdditiveExpression|()Lfreemarker/core/Expression;
+  AndExpression|()Lfreemarker/core/Expression;
+  EqualityExpression|()Lfreemarker/core/Expression;
+  Expression|()Lfreemarker/core/Expression;
+  Identifier|()Lfreemarker/core/Identifier;
+  MultiplicativeExpression|()Lfreemarker/core/Expression;
+  OrExpression|()Lfreemarker/core/Expression;
+  PCData|()Lfreemarker/core/TextBlock;
+  PrimaryExpression|()Lfreemarker/core/Expression;
+  RangeExpression|()Lfreemarker/core/Expression;
+  RelationalExpression|()Lfreemarker/core/Expression;
+  UnaryExpression|()Lfreemarker/core/Expression;
+ FMParserTokenManager
+  SwitchTo|(I)V
  IteratorBlock$Context
   getLocalVariable|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
  Macro$Context
@@ -10,6 +26,7 @@ freemarker.core
  SimpleCharStream
   BeginToken|()C
   GetImage|()Ljava/lang/String;
+  GetSuffix|(I)[C
   backup|(I)V
   readChar|()C
  TextBlock
@@ -19,6 +36,7 @@ freemarker.core
 freemarker.ext.beans
  BeanModel
   get|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+  getAdaptedObject|(Ljava/lang/Class;)Ljava/lang/Object;
  BeansWrapper
   coerceBigDecimals|([Ljava/lang/Class;[Ljava/lang/Object;)V
   wrap|(Ljava/lang/Object;)Lfreemarker/template/TemplateModel;
@@ -34,6 +52,9 @@ freemarker.template
   wrap|(Ljava/lang/Object;)Lfreemarker/template/TemplateModel;
  SimpleHash
   get|(Ljava/lang/String;)Lfreemarker/template/TemplateModel;
+  put|(Ljava/lang/String;Ljava/lang/Object;)V
+ SimpleSequence
+  get|(I)Lfreemarker/template/TemplateModel;
 freemarker.template.utility
  Collections12
   singletonList|(Ljava/lang/Object;)Ljava/util/List;

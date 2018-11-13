@@ -1,9 +1,21 @@
 org.json
+ JSONArray
+  join|(Ljava/lang/String;)Ljava/lang/String;
+  length|()I
+  put|(Ljava/lang/Object;)Lorg/json/JSONArray;
  JSONObject
-  put|(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+  keys|()Ljava/util/Iterator;
+  numberToString|(Ljava/lang/Number;)Ljava/lang/String;
+  opt|(Ljava/lang/String;)Ljava/lang/Object;
+  put
+   (Ljava/lang/String;I)Lorg/json/JSONObject;
+   (Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
+   (Ljava/lang/String;Z)Lorg/json/JSONObject;
+  putOnce|(Ljava/lang/String;Ljava/lang/Object;)Lorg/json/JSONObject;
   quote
    (Ljava/lang/String;)Ljava/lang/String;
    (Ljava/lang/String;Ljava/io/Writer;)Ljava/io/Writer;
+  stringToValue|(Ljava/lang/String;)Ljava/lang/Object;
   testValidity|(Ljava/lang/Object;)V
  JSONTokener
   back|()V

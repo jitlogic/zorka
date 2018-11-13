@@ -63,7 +63,13 @@ org.mozilla.javascript
    (ILjava/lang/String;)Lorg/mozilla/javascript/Node;
    (Ljava/lang/String;)Lorg/mozilla/javascript/Node;
   putIntProp|(II)V
+  putProp|(ILjava/lang/Object;)V
+  removeProp|(I)V
   setType|(I)Lorg/mozilla/javascript/Node;
+ Node$NodeIterator
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/mozilla/javascript/Node;
  ObjArray
   add|(Ljava/lang/Object;)V
   pop|()Ljava/lang/Object;
@@ -73,6 +79,10 @@ org.mozilla.javascript
   get|(Ljava/lang/Object;I)I
   intern|(Ljava/lang/Object;)Ljava/lang/Object;
   put|(Ljava/lang/Object;I)V
+  size|()I
+ ObjToIntMap$Iterator
+  done|()Z
+  next|()V
  ScriptRuntime
   add|(Ljava/lang/Object;Ljava/lang/Object;Lorg/mozilla/javascript/Context;)Ljava/lang/Object;
   bind|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Ljava/lang/String;)Lorg/mozilla/javascript/Scriptable;
@@ -175,7 +185,16 @@ org.mozilla.javascript
  WrapFactory
   wrap|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
   wrapAsJavaObject|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;Ljava/lang/Class;)Lorg/mozilla/javascript/Scriptable;
-org.mozilla.javascript.ast|Scope|getDefiningScope|(Ljava/lang/String;)Lorg/mozilla/javascript/ast/Scope;
+org.mozilla.javascript.ast
+ AstNode
+  addChild|(Lorg/mozilla/javascript/ast/AstNode;)V
+ ObjectLiteral
+  addElement|(Lorg/mozilla/javascript/ast/ObjectProperty;)V
+ Scope
+  getDefiningScope|(Ljava/lang/String;)Lorg/mozilla/javascript/ast/Scope;
+  getSymbol|(Ljava/lang/String;)Lorg/mozilla/javascript/ast/Symbol;
+ ScriptNode
+  getIndexForNameNode|(Lorg/mozilla/javascript/Node;)I
 org.mozilla.javascript.gen
  _js_less_less_patches_js_2
   call|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
