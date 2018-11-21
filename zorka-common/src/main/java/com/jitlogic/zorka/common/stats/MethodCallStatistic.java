@@ -18,7 +18,6 @@
 package com.jitlogic.zorka.common.stats;
 
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Represents statistics of calls to a single method.
@@ -58,11 +57,6 @@ public class MethodCallStatistic implements ZorkaStat {
     private AtomicLong throughput, maxThroughput;
 
     /**
-     * SLA monitoring.
-     */
-    private AtomicReference<MethodSlaStatistics> sla;
-
-    /**
      * Standard constructor.
      *
      * @param name statistic name
@@ -79,8 +73,6 @@ public class MethodCallStatistic implements ZorkaStat {
 
         this.throughput = new AtomicLong(0);
         this.maxThroughput = new AtomicLong(0);
-
-        this.sla = new AtomicReference<MethodSlaStatistics>(null);
     }
 
 
@@ -220,17 +212,6 @@ public class MethodCallStatistic implements ZorkaStat {
         return getMaxCLR(maxTime);
     }
 
-    public MethodSlaStatistics getSla() {
-        MethodSlaStatistics rslt = this.sla.get();
-
-        if (rslt == null) {
-            this.sla.compareAndSet(null, new MethodSlaStatistics());
-            rslt = this.sla.get();
-        }
-
-        return rslt;
-    }
-
     /**
      * Returns current value of a counter and zeroes it in one (atomic) operation.
      *
@@ -362,7 +343,6 @@ public class MethodCallStatistic implements ZorkaStat {
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
         this.setMax(maxTime, time);
-        getSla().logCall(time);
     }
 
 
@@ -391,7 +371,6 @@ public class MethodCallStatistic implements ZorkaStat {
         this.calls.incrementAndGet();
         this.time.addAndGet(time);
         this.setMax(maxTime, time);
-        getSla().logError(time);
     }
 
 
