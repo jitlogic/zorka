@@ -9,18 +9,14 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>zorka-net</artifactId>
+    <artifactId>zorka-netkit</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-slf4j</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-common</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.clojure</groupId>
+            <artifactId>clojure</artifactId>
+            <version>${clojure.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
