@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
+import com.jitlogic.netkit.http.UrlEndpoint;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
@@ -149,6 +150,9 @@ public class PerfMonLib {
         return httpOutput;
     }
 
+    public UrlEndpoint httpTextEndpoint(String uri) {
+        return new HttpTextEndpoint(uri);
+    }
 
     public InfluxPushOutput influxPushOutput(
             Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
@@ -178,4 +182,5 @@ public class PerfMonLib {
             PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
         return new PrometheusPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
     }
+
 }

@@ -616,6 +616,11 @@ public abstract class NetEngine implements Runnable, BufHandler {
     }
 
     protected void processNew() {
+
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 
     protected void closeConnections() {

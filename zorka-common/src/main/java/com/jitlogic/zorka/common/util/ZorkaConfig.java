@@ -343,6 +343,23 @@ public class ZorkaConfig {
         }
     }
 
+    public static boolean parseBool(String val, Boolean defVal, String msg) {
+
+        if (val != null) {
+          if ("yes".equalsIgnoreCase(val) || "true".equals(val)) {
+              return true;
+          } else if ("no".equalsIgnoreCase(val) || "false".equals(val)) {
+              return false;
+          } else {
+              throw new ZorkaConfigException(msg, null);
+          }
+        } else if (defVal != null) {
+            return defVal;
+        } else {
+            throw new ZorkaConfigException(msg, null);
+        }
+    }
+
     /**
      * Sets agent home directory and load zorka.properties file from it.
      *

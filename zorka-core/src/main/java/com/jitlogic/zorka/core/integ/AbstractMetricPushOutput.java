@@ -84,7 +84,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
             if (ps.matches("\\d+")) {
                 chunkSize = Integer.parseInt(ps);
             } else {
-                log.error("Invalid value of opentsdb.chunk.size: '" + ps + "' (should be integer)");
+                log.error("Invalid value of *.chunk.size: '" + ps + "' (should be integer)");
             }
         }
 

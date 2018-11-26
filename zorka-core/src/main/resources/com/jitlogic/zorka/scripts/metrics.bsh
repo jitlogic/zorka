@@ -104,6 +104,20 @@ __metrics() {
     tracer.output(promPushOutput);
   }
 
+  // Configure Prometheus standard gateway
+  if (zorka.boolCfg("prometheus")) {
+    zorka.logInfo("Enabling Prometheus Scrapping Gateway.");
+    _httpService = zorka.getAgentInstance().getHttpService();
+    if (_httpService != null) {
+      zorka.logInfo("Publishing Prometheus URI via HTTP: /metrics");
+      _promCfg = zorka.mapCfg("prometheus");
+      promHttpEndpoint = perfmon.httpTextEndpoint("/metrics");
+      _httpService.addEndpoint(promHttpEndpoint);
+      promPushOutput = perfmon.prometheusPushOutput(_promCfg, _constAttrs, _attrFilter, _sampleFilter, promHttpEndpoint);
+      tracer.output(promPushOutput);
+    }
+  }
+
   return this;
 }
 
@@ -117,6 +131,7 @@ zorka.defCfg("metrics",
   zorka.boolCfg("influxdb") ||
   zorka.boolCfg("opentsdb") ||
   zorka.boolCfg("graphite") ||
+  zorka.boolCfg("prometheus") ||
   zorka.boolCfg("prometheus.push"));
 
 metrics = zorka.boolCfg("metrics") ? __metrics() : null;

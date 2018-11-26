@@ -43,6 +43,7 @@ if (zorka.boolCfg("nagios")) {
 if (zorka.boolCfg("influxdb") ||
     zorka.boolCfg("opentsdb") ||
     zorka.boolCfg("graphite") ||
+    zorka.boolCfg("prometheus") ||
     zorka.boolCfg("prometheus.push")) {
   zorka.require("metrics.bsh");
 }

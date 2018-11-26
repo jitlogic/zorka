@@ -24,7 +24,6 @@ import com.jitlogic.zorka.net.http.mini.*;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;

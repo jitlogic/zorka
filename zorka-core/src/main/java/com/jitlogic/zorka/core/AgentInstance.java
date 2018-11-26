@@ -176,6 +176,10 @@ public class AgentInstance implements ZorkaService {
 
     private SpyStateShelfSet spyStateShelfSet;
 
+    private HttpService httpService;
+
+    private HttpService httpsService;
+
     public AgentInstance(AgentConfig config, SpyRetransformer retransformer) {
         this.config = config;
         this.retransformer = retransformer;
@@ -572,7 +576,7 @@ public class AgentInstance implements ZorkaService {
      *
      * @return mbean server registry reference of null (if not yet initialized)
      */
-    public MBeanServerRegistry getMBeanServerRegistry() {
+    public synchronized MBeanServerRegistry getMBeanServerRegistry() {
 
         if (mBeanServerRegistry == null) {
             mBeanServerRegistry = new MBeanServerRegistry();
@@ -581,9 +585,34 @@ public class AgentInstance implements ZorkaService {
         return mBeanServerRegistry;
     }
 
+    /**
+     * Returns built-in HTTP server. If zorka.http = no, will always return null.
+     *
+     */
+    public synchronized HttpService getHttpService() {
+        if (httpService == null && config.boolCfg("zorka.http", false)) {
+            httpService = new HttpService("http",
+                    config.mapCfg("zorka.http", "tls", "no"));
+            httpService.start();
+        }
+        return httpService;
+    }
+
+    /**
+     * Returns built-in HTTPS server. If zorka.http = no, will always return null.
+     */
+    public synchronized HttpService getHttpsService() {
+        if (httpsService == null && config.boolCfg("zorka.https", false)) {
+            httpsService = new HttpService("https",
+                    config.mapCfg("zorka.https", "tls", "yes"));
+            httpsService.start();
+        }
+        return httpsService;
+    }
+
 
     @Override
-    public void shutdown() {
+    public synchronized void shutdown() {
 
         log.info("Shutting down agent ...");
 
@@ -616,6 +645,14 @@ public class AgentInstance implements ZorkaService {
 
         if (nagiosAgent != null) {
             nagiosAgent.shutdown();
+        }
+
+        if (httpService != null) {
+            httpService.shutdown();
+        }
+
+        if (httpsService != null) {
+            httpsService.shutdown();
         }
     }
 
