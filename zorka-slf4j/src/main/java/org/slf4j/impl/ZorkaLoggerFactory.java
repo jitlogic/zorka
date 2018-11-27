@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.slf4j.spi.LocationAwareLogger.*;
 
@@ -28,6 +29,9 @@ public class ZorkaLoggerFactory implements ILoggerFactory {
 
     private ConcurrentMap<String, ZorkaTrapperLogger> loggerMap = new ConcurrentHashMap<String, ZorkaTrapperLogger>();
     private ZorkaTrapper trapper = new MemoryTrapper();
+
+    /** Additional inputs (from external APIs integrations, eg. netkit). */
+    private List<ZorkaLoggerInput> inputs = new CopyOnWriteArrayList<ZorkaLoggerInput>();
 
     /** Predefined log level names */
     private static final Map<String,Integer> LOG_LEVEL_NAMES;
@@ -124,6 +128,26 @@ public class ZorkaLoggerFactory implements ILoggerFactory {
         }
     }
 
+    public synchronized void swapInput(ZorkaLoggerInput input) {
+
+        input.setLogLevel(5-logLevel);
+        input.setTrapper(trapper);
+
+        boolean found = false;
+
+        for (int i = 0; i < inputs.size(); i++) {
+            ZorkaLoggerInput inp = inputs.get(i);
+            if (input.getName().equals(inp.getName())) {
+                inputs.set(i, input);
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            inputs.add(input);
+        }
+    }
 
     private int logLevel(String className) {
 

@@ -23,10 +23,7 @@ import com.jitlogic.zorka.core.integ.SyslogLib;
 import com.jitlogic.zorka.core.integ.SyslogTrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.ConsoleTrapper;
-import org.slf4j.impl.ZorkaLogLevel;
-import org.slf4j.impl.ZorkaLoggerFactory;
-import org.slf4j.impl.ZorkaTrapper;
+import org.slf4j.impl.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -107,10 +104,34 @@ public class AgentConfig extends ZorkaConfig {
             initConsoleTrapper();
         }
 
-        // TODO configure logger here
+        // Finish main logger configuration
         ZorkaLoggerFactory.getInstance().configure(this.getProperties());
 
+        initNetkitLogger();
+
         log.info("Starting ZORKA agent " + get("zorka.version"));
+    }
+
+
+    private void initNetkitLogger() {
+
+        Properties props = this.getProperties();
+
+        // Configure netkit logging
+        NetkitTrapperLoggerOutput netkitLogger = new NetkitTrapperLoggerOutput();
+        StaticLoggerBinder.getSingleton().getLoggerFactory().swapInput(netkitLogger);
+
+        List<String> levels = com.jitlogic.netkit.log.LoggerFactory.LEVELS;
+        String level = props.getProperty("log.com.jitlogic.netkit", "INFO");
+
+        for (int i = 0; i < levels.size(); i++) {
+            if (levels.get(i).equals(level)) {
+                com.jitlogic.netkit.log.LoggerFactory.setLevel(i);
+                break;
+            }
+        }
+
+        com.jitlogic.netkit.log.LoggerFactory.setOutput(netkitLogger);
     }
 
 

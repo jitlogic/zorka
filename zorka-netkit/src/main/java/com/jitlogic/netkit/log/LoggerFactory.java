@@ -21,7 +21,7 @@ public class LoggerFactory {
     public static final int ERROR_LEVEL = 1;
     public static final int FATAL_LEVEL = 0;
 
-    static final List<String> LEVELS = Collections.unmodifiableList(
+    public static final List<String> LEVELS = Collections.unmodifiableList(
             Arrays.asList("FATAL", "ERROR", "WARN", "INFO", "DEBUG", "TRACE"));
 
     private static volatile int level = INFO_LEVEL;

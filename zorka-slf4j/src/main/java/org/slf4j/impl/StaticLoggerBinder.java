@@ -15,7 +15,6 @@
  */
 package org.slf4j.impl;
 
-import org.slf4j.ILoggerFactory;
 import org.slf4j.spi.LoggerFactoryBinder;
 
 public class StaticLoggerBinder implements LoggerFactoryBinder {
@@ -31,7 +30,7 @@ public class StaticLoggerBinder implements LoggerFactoryBinder {
     private static final String LOGGER_FACTORY_CLASS_NAME = ZorkaLoggerFactory.class.getName();
 
     @Override
-    public ILoggerFactory getLoggerFactory() {
+    public ZorkaLoggerFactory getLoggerFactory() {
         return ZorkaLoggerFactory.getInstance();
     }
 

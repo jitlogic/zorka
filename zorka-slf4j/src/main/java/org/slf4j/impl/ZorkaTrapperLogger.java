@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 import static org.slf4j.spi.LocationAwareLogger.*;
 
-public class ZorkaTrapperLogger extends MarkerIgnoringBase {
+public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLoggerInput {
 
     private volatile int logLevel;
     private volatile ZorkaTrapper trapper;
@@ -38,10 +38,12 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase {
         return logLevel;
     }
 
+    @Override
     public synchronized void setLogLevel(int logLevel) {
         this.logLevel = logLevel;
     }
 
+    @Override
     public synchronized void setTrapper(ZorkaTrapper trapper) {
         this.trapper = trapper;
     }
