@@ -125,6 +125,7 @@ __metrics() {
 zorka.defCfg("influxdb", "no");
 zorka.defCfg("opentsdb", "no");
 zorka.defCfg("graphite", "no");
+zorka.defCfg("prometheus", "no");
 zorka.defCfg("prometheus.push", "no");
 
 zorka.defCfg("metrics",
