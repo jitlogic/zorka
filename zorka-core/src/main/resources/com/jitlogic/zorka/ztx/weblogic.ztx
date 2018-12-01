@@ -2,39 +2,179 @@ weblogic.application.descriptor|ReaderEventInfo$Namespaces|getNamespaceURI|(Ljav
 weblogic.application.io
  DescriptorFinder
   getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
  ManifestFinder
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
-weblogic.application.utils|CompositeWebAppFinder|getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+weblogic.application.utils
+ CompositeWebAppFinder
+  getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+weblogic.cluster
+ AlternateLivelinessChecker
+  reachable|(Lweblogic/rmi/spi/HostID;)V
+ LastSeqNumHBI
+  readExternal|(Ljava/io/ObjectInput;)V
+ MemberManager
+  theOne|()Lweblogic/cluster/MemberManager;
+ MulticastReceiver$GroupMessageStat
+  start|()V
+ MulticastReplacer
+  replaceObject|(Ljava/lang/Object;)Ljava/lang/Object;
+  resolveObject|(Ljava/lang/Object;)Ljava/lang/Object;
+ UpgradeUtils$PeerInfoComparator
+  compare|(Ljava/lang/Object;Ljava/lang/Object;)I
+weblogic.cluster.messaging.internal|GroupImpl|getConfigInformation|(Ljava/lang/String;)Lweblogic/cluster/messaging/internal/ServerConfigurationInformation;
+weblogic.common.internal
+ PeerInfo
+  getPeerInfo|(Ljava/lang/String;)Lweblogic/common/internal/PeerInfo;
+ WLObjectInputStream
+  readUTF|()Ljava/lang/String;
+ WLObjectOutputStream
+  writeUTF|(Ljava/lang/String;)V
+weblogic.common.resourcepool|ResourcePoolImpl|zeroResetFailCount|()V
+weblogic.connector.deploy|TransportableJNDIHandler|getObjectInstance|(Ljava/lang/Object;Ljavax/naming/Name;Ljavax/naming/Context;Ljava/util/Hashtable;)Ljava/lang/Object;
 weblogic.deploy.internal|DeploymentType|isInstance|(Ljava/lang/Object;)Z
+weblogic.diagnostics.context
+ DiagnosticContextFactory
+  findOrCreateDiagnosticContext|(Z)Lweblogic/diagnostics/context/DiagnosticContext;
+ DiagnosticContextManager
+  incrementJFREventCounter|()V
+  timerExpired|(Lweblogic/timers/Timer;)V
+ DiagnosticContextManager$WLSDiagnosticContextFactoryImpl
+  findOrCreateDiagnosticContext|(Z)Lweblogic/diagnostics/context/DiagnosticContext;
+weblogic.diagnostics.flightrecorder.event
+ JDBCBaseTimedEvent
+  populateExtensions|(Ljava/lang/Object;[Ljava/lang/Object;Lweblogic/diagnostics/instrumentation/DynamicJoinPoint;Z)V
+ JDBCEventInfoHelper
+  populateExtensions|(Ljava/lang/Object;[Ljava/lang/Object;Lweblogic/diagnostics/flightrecorder/event/JDBCEventInfo;)V
+weblogic.diagnostics.instrumentation
+ InstrumentationSupport
+  createDynamicJoinPoint|(Lweblogic/diagnostics/instrumentation/JoinPoint;[Ljava/lang/Object;Ljava/lang/Object;)Lweblogic/diagnostics/instrumentation/DynamicJoinPoint;
+  isSensitiveArray|([Ljava/lang/Object;)Z
+  postProcess|(Lweblogic/diagnostics/instrumentation/JoinPoint;Lweblogic/diagnostics/instrumentation/DiagnosticMonitor;[Lweblogic/diagnostics/instrumentation/DiagnosticAction;[Lweblogic/diagnostics/instrumentation/DiagnosticActionState;)V
+  preProcess|(Lweblogic/diagnostics/instrumentation/JoinPoint;Lweblogic/diagnostics/instrumentation/DiagnosticMonitor;[Lweblogic/diagnostics/instrumentation/DiagnosticAction;[Lweblogic/diagnostics/instrumentation/DiagnosticActionState;)V
+ InstrumentationSupport$SensitiveArrayHandler
+  isHandledSensitiveArray|([Ljava/lang/Object;)Z
+ InstrumentationSupportBase
+  getActionStates|([Lweblogic/diagnostics/instrumentation/DiagnosticAction;)[Lweblogic/diagnostics/instrumentation/DiagnosticActionState;
+ JoinPointImpl
+  getGatheredArguments|(Ljava/lang/String;)[Lweblogic/diagnostics/instrumentation/GatheredArgument;
+ ValueRenderingManager
+  renderArgumentValues|(Ljava/lang/String;Z[Ljava/lang/Object;Ljava/util/Map;)[Ljava/lang/Object;
+  renderValue|(Ljava/lang/Object;Lweblogic/diagnostics/instrumentation/ValueHandlingInfo;)Ljava/lang/Object;
+weblogic.diagnostics.instrumentation.action
+ FlightRecorderAroundAction
+  createState|()Lweblogic/diagnostics/instrumentation/DiagnosticActionState;
+  postProcess|(Lweblogic/diagnostics/instrumentation/JoinPoint;Lweblogic/diagnostics/instrumentation/DiagnosticActionState;)V
+  preProcess|(Lweblogic/diagnostics/instrumentation/JoinPoint;Lweblogic/diagnostics/instrumentation/DiagnosticActionState;)V
+weblogic.diagnostics.instrumentation.engine.base|PointcutSpecification|isEligibleCallsite|(Lweblogic/diagnostics/instrumentation/engine/base/ClassInstrumentor;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lweblogic/diagnostics/instrumentation/engine/base/MatchInfo;
+weblogic.diagnostics.instrumentation.gathering
+ FlightRecorderEventHelper
+  getTimedEvent|(Lweblogic/diagnostics/instrumentation/DiagnosticMonitor;Lweblogic/diagnostics/instrumentation/JoinPoint;)Lcom/oracle/jrockit/jfr/TimedEvent;
+  recordTimedEvent|(Lweblogic/diagnostics/instrumentation/DiagnosticMonitor;Lweblogic/diagnostics/instrumentation/JoinPoint;Lcom/oracle/jrockit/jfr/TimedEvent;)V
+ JDBCStatementRenderer
+  render|(Ljava/lang/Object;)Ljava/lang/Object;
+weblogic.diagnostics.instrumentation.rtsupport
+ InstrumentationSupportImpl
+  createDynamicJoinPoint|(Lweblogic/diagnostics/instrumentation/JoinPoint;[Ljava/lang/Object;Ljava/lang/Object;)Lweblogic/diagnostics/instrumentation/DynamicJoinPoint;
+  postProcess|(Lweblogic/diagnostics/instrumentation/JoinPoint;Lweblogic/diagnostics/instrumentation/DiagnosticMonitor;[Lweblogic/diagnostics/instrumentation/DiagnosticAction;[Lweblogic/diagnostics/instrumentation/DiagnosticActionState;)V
+  preProcess|(Lweblogic/diagnostics/instrumentation/JoinPoint;Lweblogic/diagnostics/instrumentation/DiagnosticMonitor;[Lweblogic/diagnostics/instrumentation/DiagnosticAction;[Lweblogic/diagnostics/instrumentation/DiagnosticActionState;)V
 weblogic.j2ee
  ApplicationManager
   loadClass
    (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/ClassLoader;Z)Ljava/lang/Class;
    (Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/Class;
-weblogic.jdbc.common.internal|JdbcDebug|isEnabled|(Lweblogic/jdbc/jta/DataSource;I)Z
+weblogic.jdbc.common.internal
+ ConnectionEnv
+  checkIfEnabled|()V
+  getCachedStatement
+   (ZLjava/lang/String;)Ljava/lang/Object;
+   (ZLjava/lang/String;II)Ljava/lang/Object;
+   (ZLjava/lang/String;IIII[I[Ljava/lang/String;)Ljava/lang/Object;
+  returnCachedStatement|(Lweblogic/jdbc/common/internal/StatementHolder;)V
+  supportStatementPoolable|()Z
+ JdbcDebug
+  isEnabled|(Lweblogic/jdbc/jta/DataSource;I)Z
+ StatementHolder
+  clearInUse|()V
+  incrementHitCount|()V
+  toBeClosed|()Z
 weblogic.jdbc.wrapper
  JDBCWrapperFactory
   getWrapper|(ILjava/lang/Object;Z)Ljava/lang/Object;
  ResultSet
   checkResultSet|()V
+  close|()V
+  init|(Ljava/sql/ResultSet;Lweblogic/jdbc/wrapper/Connection;Lweblogic/jdbc/wrapper/Statement;)V
+  internalClose|(Z)V
+  makeResultSet|(Ljava/sql/ResultSet;Lweblogic/jdbc/wrapper/Connection;Lweblogic/jdbc/wrapper/Statement;)Ljava/sql/ResultSet;
   postInvocationHandler|(Ljava/lang/String;[Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
   preInvocationHandler|(Ljava/lang/String;[Ljava/lang/Object;)V
  ResultSet_oracle_jdbc_driver_OracleResultSetImpl
   getBoolean|(Ljava/lang/String;)Z
+  getDate|(Ljava/lang/String;)Ljava/sql/Date;
+  getDouble|(Ljava/lang/String;)D
   getInt|(Ljava/lang/String;)I
   getString|(Ljava/lang/String;)Ljava/lang/String;
   getTimestamp|(Ljava/lang/String;)Ljava/sql/Timestamp;
   next|()Z
   wasNull|()Z
+ ResultSet_oracle_jdbc_driver_ScrollableResultSet
+  getString|(Ljava/lang/String;)Ljava/lang/String;
+weblogic.jndi
+ Environment
+  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
+  getPropertyFromEnv|(Ljava/lang/String;)Ljava/lang/Object;
+  getString|(Ljava/lang/String;)Ljava/lang/String;
+weblogic.jndi.factories.java
+ javaURLContextFactory
+  popContext|()V
+  pushContext|(Ljavax/naming/Context;)V
+weblogic.jndi.internal
+ BasicNamingNode
+  getNameInNamespace|(Ljava/lang/String;)Ljava/lang/String;
+ BuiltinTransportableObjectFactory
+  getObjectInstance|(Ljava/lang/Object;Ljavax/naming/Name;Ljavax/naming/Context;Ljava/util/Hashtable;)Ljava/lang/Object;
+  isAlreadyTransportable|(Ljava/lang/Object;)Z
+ WLNamingManager
+  getTransportableInstance|(Ljava/lang/Object;Ljavax/naming/Name;Ljavax/naming/Context;Ljava/util/Hashtable;)Ljava/lang/Object;
 weblogic.jsp.internal.jsp.utils|JspRuntimeUtils|convertType|(Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/Object;
 weblogic.kernel
  FinalThreadLocal$FinalThreadStorage
   get|(I)Ljava/lang/Object;
+  reset|()V
  ResettableThreadLocal$ThreadStorage
   get|(I)Ljava/lang/Object;
-weblogic.management.jmx.mbeanserver|WLSMBeanServerInterceptorBase|getAttribute|(Ljavax/management/ObjectName;Ljava/lang/String;)Ljava/lang/Object;
-weblogic.management.mbeanservers.internal|WLSObjectNameManager|isClassMapped|(Ljava/lang/Class;)Z
+ ThreadLocalStack
+  peek|()Ljava/lang/Object;
+  pop|()Ljava/lang/Object;
+  popAndPeek|()Ljava/lang/Object;
+  push|(Ljava/lang/Object;)V
+weblogic.management.internal
+ SecurityHelper
+  assertIfNotKernel|(Lweblogic/security/acl/internal/AuthenticatedSubject;)V
+  isAccessAllowed|(Ljavax/management/ObjectName;Lweblogic/security/service/MBeanResource$ActionType;Ljava/lang/String;Ljava/lang/String;Ljava/beans/BeanDescriptor;Ljava/beans/PropertyDescriptor;)V
+weblogic.management.jmx.mbeanserver
+ WLSMBeanServerInterceptorBase
+  getAttribute|(Ljavax/management/ObjectName;Ljava/lang/String;)Ljava/lang/Object;
+ WLSMBeanServerInterceptorBase$9
+  run|()Ljava/lang/Object;
+weblogic.management.mbeanservers.internal
+ JMXContextInterceptor
+  getAttribute|(Ljavax/management/ObjectName;Ljava/lang/String;)Ljava/lang/Object;
+ WLSObjectNameManager
+  isClassMapped|(Ljava/lang/Class;)Z
+weblogic.management.provider|ManagementService|getRuntimeAccess|(Lweblogic/security/acl/internal/AuthenticatedSubject;)Lweblogic/management/provider/RuntimeAccess;
 weblogic.net.http|HttpOutputStream|write|(I)V
+weblogic.protocol
+ ProtocolImpl
+  isSatisfactoryQOS|(B)Z
+  toByte|()B
+weblogic.rjvm
+ JVMID
+  localID|()Lweblogic/rjvm/JVMID;
+ RJVMManager
+  find|(Lweblogic/rjvm/JVMID;)Lweblogic/rjvm/RJVM;
 weblogic.rmi.extensions.server
  CBVInputStream
   readObjectSpecial|()Ljava/lang/Object;
@@ -46,39 +186,141 @@ weblogic.rmi.internal.wls
  WLSCBVOutput
   writeUTF|(Ljava/lang/String;)V
 weblogic.rmi.utils.io
- RemoteObjectReplacer
+ InteropObjectReplacer
   replaceObject|(Ljava/lang/Object;)Ljava/lang/Object;
   resolveObject|(Ljava/lang/Object;)Ljava/lang/Object;
+ RemoteObjectReplacer
+  getReplacer|(Lweblogic/common/internal/PeerInfo;)Lweblogic/utils/io/Replacer;
+  replaceObject|(Ljava/lang/Object;)Ljava/lang/Object;
+  resolveObject|(Ljava/lang/Object;)Ljava/lang/Object;
+weblogic.security
+ SubjectUtils
+  checkSubjectNonNull|(Ljava/lang/Object;)V
+  isUserAnonymous|(Lweblogic/security/acl/internal/AuthenticatedSubject;)Z
+weblogic.security.acl.internal|AuthenticatedSubject$SealableSet|size|()I
+weblogic.security.notshared|LoggerAdapterImpl|isDebugEnabled|(Ljava/lang/Object;)Z
 weblogic.security.provider|JavaMD5|update|(B)V
+weblogic.security.providers.authorization|DefaultAdjudicator|adjudicate|([Lweblogic/security/spi/Result;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;)Z
+weblogic.security.providers.xacml
+ AccessDecisionHelper
+  isAccessAllowed|(Ljavax/security/auth/Subject;Ljava/util/Map;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;Lweblogic/security/spi/Direction;)Lweblogic/security/spi/Result;
+ RoleMapperHelper
+  getRoles|(Ljavax/security/auth/Subject;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;)Ljava/util/Map;
+ SubjectConverterFactory
+  getConverter|(Ljavax/security/auth/Subject;)Lcom/bea/security/providers/xacml/SubjectConverter;
+weblogic.security.providers.xacml.authorization
+ XACMLAuthorizationProviderImpl
+  isAccessAllowed|(Ljavax/security/auth/Subject;Ljava/util/Map;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;Lweblogic/security/spi/Direction;)Lweblogic/security/spi/Result;
+ XACMLRoleMapperProviderImpl
+  getRoles|(Ljavax/security/auth/Subject;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;)Ljava/util/Map;
 weblogic.security.service
+ AuthorizationManager
+  isAccessAllowed
+   (Lweblogic/security/acl/internal/AuthenticatedSubject;Ljava/util/Map;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;Lweblogic/security/spi/Direction;)Z
+   (Lweblogic/security/acl/internal/AuthenticatedSubject;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;)Z
+ IdentityUtility
+  authenticatedSubjectToIdentity|(Lweblogic/security/acl/internal/AuthenticatedSubject;)Lcom/bea/common/security/service/Identity;
+  identityToAuthenticatedSubject|(Lcom/bea/common/security/service/Identity;)Lweblogic/security/acl/internal/AuthenticatedSubject;
+ JNDIResource
+  initialize|(Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;)V
+ RoleManager
+  getRoles|(Lweblogic/security/acl/internal/AuthenticatedSubject;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;)Ljava/util/Map;
+ SecurityManager
+  getCurrentSubject|(Lweblogic/security/acl/internal/AuthenticatedSubject;)Lweblogic/security/acl/internal/AuthenticatedSubject;
+ SecurityServiceManager
+  isKernelIdentity|(Lweblogic/security/acl/internal/AuthenticatedSubject;)Z
+  seal|(Lweblogic/security/acl/internal/AuthenticatedSubject;Lweblogic/security/acl/internal/AuthenticatedSubject;)Lweblogic/security/acl/internal/AuthenticatedSubject;
  SubjectManagerImpl
   checkKernelIdentity|(Lweblogic/security/subject/AbstractSubject;)V
+  getCurrentSubject|(Lweblogic/security/subject/AbstractSubject;)Lweblogic/security/subject/AbstractSubject;
   isKernelIdentity|(Lweblogic/security/subject/AbstractSubject;)Z
+  popSubject|(Lweblogic/security/subject/AbstractSubject;)V
+  pushSubject|(Lweblogic/security/subject/AbstractSubject;Lweblogic/security/subject/AbstractSubject;)V
+ WLSAuthorizationServiceWrapper
+  isAccessAllowed|(Lcom/bea/common/security/service/Identity;Ljava/util/Map;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;Lweblogic/security/spi/Direction;)Z
+weblogic.security.subject
+ DelegatingSubjectStack
+  getCurrentSubject|(Lweblogic/security/subject/AbstractSubject;)Lweblogic/security/subject/AbstractSubject;
+  popSubject|(Lweblogic/security/subject/AbstractSubject;)V
+  pushSubject|(Lweblogic/security/subject/AbstractSubject;Lweblogic/security/subject/AbstractSubject;)V
 weblogic.servlet.internal
  CharChunkOutput
   print|(Ljava/lang/String;)V
+ ChunkOutput
+  clearBuffer|()V
+  flush|()V
  ChunkOutput$2
   checkForFlush|()V
   checkOverflow|(I)V
  ChunkOutputWrapper
+  flush|()V
   print|(Ljava/lang/String;)V
   write|([BII)V
+ ContextVersionManager
+  getServletContexts|(Z)Ljava/util/Iterator;
+ ContextVersionManager$AdminModeAwareIterator
+  next|()Ljava/lang/Object;
+ HttpServer$SessionLogin
+  getCookieId|(Ljava/lang/String;)Ljava/lang/String;
+  getUser|(Ljava/lang/String;)Lweblogic/security/acl/internal/AuthenticatedSubject;
+ MuxableSocketHTTP
+  incrementBufferOffset|(I)V
  PostInputStream
-  read|()I
+  read
+   ()I
+   ([BII)I
+ RequestHeaders
+  getHeader|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ ServerHelper
+  useExtendedSessionFormat|()Z
  ServletInputStreamImpl
-  read|()I
+  read
+   ()I
+   ([BII)I
+ ServletOutputStreamImpl
+  commit|()V
+  flush|()V
  ServletRequestImpl
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  getHeader|(Ljava/lang/String;)Ljava/lang/String;
+  getOriginalRequest|(Ljavax/servlet/ServletRequest;)Lweblogic/servlet/internal/ServletRequestImpl;
   getParameter|(Ljava/lang/String;)Ljava/lang/String;
   getSession|(Z)Ljavax/servlet/http/HttpSession;
   removeAttribute|(Ljava/lang/String;)V
+ ServletRequestImpl$RequestInputHelper
+  getRequestURI|(Ljava/lang/String;)Ljava/lang/String;
+ ServletRequestImpl$RequestParameters
+  getQueryString|(Ljava/lang/String;)Ljava/lang/String;
  ServletRequestImpl$SessionHelper
   getSession|(Z)Ljavax/servlet/http/HttpSession;
+ ServletResponseImpl
+  encodeURL|(Ljava/lang/String;)Ljava/lang/String;
+ WebAppConfigManager
+  useDefaultEncoding|()Z
+ WebAppServletContext
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  popEnvironment|(Ljava/lang/Thread;Ljava/lang/ClassLoader;)V
+  pushEnvironment|(Ljava/lang/Thread;)Ljava/lang/ClassLoader;
  WebComponentContributor
   inject|(Ljava/lang/Object;)V
   notifyPostConstruct|(Ljava/lang/Object;)V
   notifyPreDestroy|(Ljava/lang/Object;)V
-weblogic.servlet.internal.session|SessionData|getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+ WebService
+  defaultHttpServer|()Lweblogic/servlet/internal/HttpServer;
+  getVirtualHost
+   (Ljava/lang/String;)Lweblogic/servlet/internal/HttpServer;
+   (Lweblogic/protocol/ServerChannel;)Lweblogic/servlet/internal/HttpServer;
+weblogic.servlet.internal.session
+ MemorySessionContext
+  getSessionInternal|(Ljava/lang/String;Lweblogic/servlet/internal/ServletRequestImpl;Lweblogic/servlet/internal/ServletResponseImpl;)Lweblogic/servlet/internal/session/SessionData;
+ RSID
+  getID|(Ljava/lang/String;)Ljava/lang/String;
+ SessionContext
+  getOpenSession|(Ljava/lang/String;)Ljava/lang/Object;
+  hasSession|(Ljava/lang/String;)Z
+ SessionData
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  getInternalAttribute|(Ljava/lang/String;)Ljava/lang/Object;
 weblogic.servlet.jsp
  BodyContentImpl
   print|(Ljava/lang/String;)V
@@ -95,6 +337,25 @@ weblogic.servlet.jsp
   getAttribute
    (Ljava/lang/String;)Ljava/lang/Object;
    (Ljava/lang/String;I)Ljava/lang/Object;
+weblogic.servlet.logging
+ FormatStringBuffer
+  append
+   (B)Lweblogic/servlet/logging/FormatStringBuffer;
+   (C)Lweblogic/servlet/logging/FormatStringBuffer;
+   (Ljava/lang/String;)Lweblogic/servlet/logging/FormatStringBuffer;
+   ([B)Lweblogic/servlet/logging/FormatStringBuffer;
+   ([BII)Lweblogic/servlet/logging/FormatStringBuffer;
+  appendValueOrDash|(Ljava/lang/String;)Lweblogic/servlet/logging/FormatStringBuffer;
+  size|()I
+weblogic.servlet.security|Utils|encodeXSS|(Ljava/lang/String;)Ljava/lang/String;
+weblogic.servlet.security.internal
+ SecurityModule
+  getCurrentUser
+   (Lweblogic/servlet/internal/HttpServer;Ljavax/servlet/http/HttpServletRequest;)Lweblogic/security/acl/internal/AuthenticatedSubject;
+   (Lweblogic/servlet/internal/HttpServer;Ljavax/servlet/http/HttpServletRequest;Lweblogic/servlet/internal/session/SessionInternal;)Lweblogic/security/acl/internal/AuthenticatedSubject;
+  getWLSAuthCookieName|(Lweblogic/servlet/internal/session/SessionInternal;)Ljava/lang/String;
+ SecurityModule$SessionRetrievalAction
+  run|()Ljava/lang/Object;
 weblogic.store
  StoreWritePolicy
   genuineMemoryMap|()Z
@@ -102,12 +363,30 @@ weblogic.store
   usesCacheFile|()Z
 weblogic.store.io.file|StoreDir|get|(I)Lweblogic/store/io/file/StoreFile;
 weblogic.store.io.file.direct|DirectIOManager|nativeCodeAvailable|()Z
-weblogic.timers.internal|TimerImpl|compareTo|(Ljava/lang/Object;)I
+weblogic.timers.internal
+ J2EETimerContextImpl
+  pop|()V
+  push|()V
+ TimerImpl
+  compareTo|(Ljava/lang/Object;)I
+  run|()V
+ TimerManagerFactoryImpl$WorkManagerExecutor
+  execute|(Ljava/lang/Runnable;)V
 weblogic.utils
  Debug
-  assertion|(ZLjava/lang/String;)V
+  assertion
+   (Z)V
+   (ZLjava/lang/String;)V
  StringUtils
-  getString|([CII)Ljava/lang/String;
+  getBytes|(Ljava/lang/String;II[BI)V
+  getString
+   ([B)Ljava/lang/String;
+   ([BII)Ljava/lang/String;
+   ([CII)Ljava/lang/String;
+  getUTFLength|(Ljava/lang/String;)I
+  indexOfIgnoreCase
+   (Ljava/lang/String;Ljava/lang/String;)I
+   (Ljava/lang/String;Ljava/lang/String;I)I
   splitCompletely|(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;
   startsWith|(Ljava/lang/String;C)Z
  StringUtils$ReflectedStringMaker
@@ -115,6 +394,7 @@ weblogic.utils
  StringUtils$StringMaker
   getString|([CII)Ljava/lang/String;
  UnsyncCircularQueue
+  empty|()Z
   put|(Ljava/lang/Object;)V
   size|()I
  UnsyncStringBuffer
@@ -152,12 +432,16 @@ weblogic.utils.classloaders
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
  CodeGenClassFinder
   getClassSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
+  getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
  DirectoryClassFinder
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
  FilteringClassLoader
   loadClass|(Ljava/lang/String;Z)Ljava/lang/Class;
  GenericClassLoader
+  getResource|(Ljava/lang/String;)Ljava/net/URL;
   loadClass|(Ljava/lang/String;)Ljava/lang/Class;
+ GenericClassLoader$GetClassLoaderParentAction
+  run|()Ljava/lang/Object;
  JarClassFinder
   getSource|(Ljava/lang/String;)Lweblogic/utils/classloaders/Source;
   getSources|(Ljava/lang/String;)Ljava/util/Enumeration;
@@ -171,17 +455,34 @@ weblogic.utils.classloaders
 weblogic.utils.collections
  ArrayMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  remove|(Ljava/lang/Object;)Ljava/lang/Object;
  ArraySet
   contains|(Ljava/lang/Object;)Z
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ConcurrentCircularQueue
+  add|(Ljava/lang/Object;)Z
+  remove|()Ljava/lang/Object;
+  size|()I
  ConcurrentHashMap
+  containsKey|(Ljava/lang/Object;)Z
   get|(Ljava/lang/Object;)Ljava/lang/Object;
   put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ConcurrentProperties
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
  CopyOnWriteArrayList
   iterator|()Ljava/util/Iterator;
  CopyOnWriteArrayList$COWIterator
   next|()Ljava/lang/Object;
+ MatchMap
+  match|(Ljava/lang/String;)Ljava/util/Map$Entry;
+ MatchMap$EntryIterator
+  next|()Ljava/lang/Object;
+ PartitionedConcurrentPool
+  add|(Ljava/lang/Object;)Z
+  remove|()Ljava/lang/Object;
  SecondChanceCacheMap
+  containsKey|(Ljava/lang/Object;)Z
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  Stack
   clear|()V
@@ -189,14 +490,22 @@ weblogic.utils.collections
   pop|()Ljava/lang/Object;
   push|(Ljava/lang/Object;)V
   size|()I
-weblogic.utils.enumerations|SequencingEnumerator|addEnumeration|(Ljava/util/Enumeration;)V
+weblogic.utils.enumerations
+ IteratorEnumerator
+  nextElement|()Ljava/lang/Object;
+ SequencingEnumerator
+  addEnumeration|(Ljava/util/Enumeration;)V
 weblogic.utils.http
  BytesToString
   is8BitUnicodeSubset|(Ljava/lang/String;)Z
+  newNonAsciiString|([BIILjava/lang/String;)Ljava/lang/String;
  HttpChunkInputStream
   read|()I
  HttpParsing
+  ensureStartingSlash|(Ljava/lang/String;)Ljava/lang/String;
   isNetscapeSpecial|(C)Z
+  isWS|(C)Z
+  unescape|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  QueryParams
   getValue|(Ljava/lang/Object;)Ljava/lang/String;
   getValues|(Ljava/lang/Object;)[Ljava/lang/String;
@@ -205,14 +514,29 @@ weblogic.utils.io
   read|([BII)I
  ByteBufferOutputStream
   write|([BII)V
+ Chunk
+  releaseChunk|(Lweblogic/utils/io/Chunk;)V
+  releaseChunks|(Lweblogic/utils/io/Chunk;)V
+  tail|(Lweblogic/utils/io/Chunk;)Lweblogic/utils/io/Chunk;
+ ChunkedDataOutputStream
+  writeBytes|(Ljava/lang/String;)V
+  writeLength|(I)V
  ChunkedInputStream
+  read
+   ()I
+   ([BII)I
+ ChunkedObjectInputStream
   read
    ()I
    ([BII)I
  ChunkedOutputStream
   write|([BII)V
  DataIO
+  readUTF|(Ljava/io/InputStream;)Ljava/lang/String;
   readUnsignedByte|(Ljava/io/InputStream;)I
+  readUnsignedShort|(Ljava/io/InputStream;)I
+  writeBytes|(Ljava/io/OutputStream;Ljava/lang/String;)V
+  writeUTF|(Ljava/io/OutputStream;Ljava/lang/String;)V
  DelegatingOutputStream
   flush|()V
   write|([BII)V
@@ -220,20 +544,51 @@ weblogic.utils.io
   getSafeFile|(Ljava/lang/String;Ljava/lang/String;)Ljava/io/File;
   resolveRelativeURIPath|(Ljava/lang/String;Z)Ljava/lang/String;
  UnsyncByteArrayInputStream
-  read|()I
+  read
+   ()I
+   ([BII)I
  UnsyncByteArrayOutputStream
   write
    (I)V
    ([BII)V
+weblogic.utils.string|CachingDateFormat|getDate|(J)Ljava/lang/String;
 weblogic.utils.time|JDK15NanoTimer|timestamp|()J
 weblogic.utils.wrapper|WrapperFactory|createWrapper|(Ljava/lang/Class;Ljava/lang/Object;Z)Ljava/lang/Object;
+weblogic.utils.zip
+ Handler
+  openConnection|(Ljava/net/URL;)Ljava/net/URLConnection;
+ SafeZipFileInputStream
+  close|()V
+ ZipURLConnection
+  connect|()V
 weblogic.work
+ CalendarQueue
+  pop|()Ljava/lang/Object;
+  size|()I
+ FairShareRequestClass
+  timeElapsed|(JLweblogic/work/ServiceClassesStats;)V
+ RequestManager
+  executeIt|(Lweblogic/work/WorkAdapter;)Z
+ SelfTuningWorkManagerImpl
+  debugEnabled|()Z
+  schedule|(Ljava/lang/Runnable;)V
+ SelfTuningWorkManagerImpl$WorkAdapterImpl
+  run|()V
  ServerWorkManagerImpl$1
   debugEnabled|()Z
+ ServiceClassSupport
+  queueEmptied|(JF)V
  ServiceClassesStats
   adjustFairShare|(D)J
+ WorkManagerLifecycleImpl
+  workAccepted|()V
+  workStarted|()V
+weblogic.wsee.jaxws.spi|WLSProvider$ReferenceCleaner$CleanerTimer|timerExpired|(Lweblogic/timers/Timer;)V
 weblogic.xml.babel.baseparser
  BaseParser
+  accept
+   ()V
+   (I)V
   compare|(I)Z
  SymbolTable
   withinElement|()Z
@@ -246,6 +601,8 @@ weblogic.xml.babel.reader
   isNameChar|(C)Z
   isSpace|(C)Z
 weblogic.xml.babel.scanner
+ Name
+  isNameBegin|(C)Z
  Scanner
   scan|()Lweblogic/xml/babel/scanner/Token;
  ScannerState

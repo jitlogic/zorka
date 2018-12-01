@@ -1,0 +1,7 @@
+org.openxmlformats.schemas.spreadsheetml.x2006.main.impl
+ CTColsImpl
+  getColArray|(I)Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTCol;
+  sizeOfColArray|()I
+ CTMergeCellsImpl
+  getMergeCellArray|(I)Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTMergeCell;
+  sizeOfMergeCellArray|()I

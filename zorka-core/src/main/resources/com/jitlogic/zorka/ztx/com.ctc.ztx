@@ -8,6 +8,7 @@ com.ctc.wstx.sr
   reset|()V
   resolveNamespaces|(Lcom/ctc/wstx/sr/InputProblemReporter;Lcom/ctc/wstx/util/StringVector;)I
  BasicStreamReader
+  getTextCharacters|(I[CII)I
   next|()I
   nextTag|()I
  Element
@@ -18,10 +19,20 @@ com.ctc.wstx.sr
   push|(Ljava/lang/String;Ljava/lang/String;)V
   resolveAndValidateElement|()I
   validateEndElement|()I
+ NsAttributeCollector
+  reset|()V
+  resolveNamespaces|(Lcom/ctc/wstx/sr/InputProblemReporter;Lcom/ctc/wstx/util/StringVector;)I
+ NsInputElementStack
+  pop|()Z
+  push|(Ljava/lang/String;Ljava/lang/String;)V
+  resolveAndValidateElement|()I
+  validateEndElement|()I
 com.ctc.wstx.util
  PrefixedName
   reset|(Ljava/lang/String;Ljava/lang/String;)Lcom/ctc/wstx/util/PrefixedName;
  StringVector
+  clear|(Z)V
+  findLastFromMap|(Ljava/lang/String;)Ljava/lang/String;
   size|()I
  SymbolTable
   findSymbol|([CIII)Ljava/lang/String;
@@ -29,7 +40,11 @@ com.ctc.wstx.util
   find|([CII)Ljava/lang/String;
  TextBuffer
   contentsAsString|()Ljava/lang/String;
+  contentsToArray|(I[CII)I
   resetWithIndentation|(IC)V
   resetWithShared|([CII)V
   size|()I
   unshare|(I)V
+ TextBuilder
+  reset|()V
+  size|()I

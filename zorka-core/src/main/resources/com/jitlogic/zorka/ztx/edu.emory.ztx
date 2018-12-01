@@ -1,0 +1,15 @@
+edu.emory.mathcs.backport.java.util|Arrays|copyOf|([Ljava/lang/Object;ILjava/lang/Class;)[Ljava/lang/Object;
+edu.emory.mathcs.backport.java.util.concurrent
+ ConcurrentHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  remove|(Ljava/lang/Object;)Ljava/lang/Object;
+ CopyOnWriteArrayList
+  addIfAbsent|(Ljava/lang/Object;)Z
+  toArray|()[Ljava/lang/Object;
+edu.emory.mathcs.backport.java.util.concurrent.locks
+ ReentrantLock
+  lock|()V
+  unlock|()V
+ ReentrantLock$NonfairSync
+  lock|()V
+  unlock|()V

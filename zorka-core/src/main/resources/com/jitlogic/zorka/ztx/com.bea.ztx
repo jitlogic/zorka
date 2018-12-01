@@ -1,6 +1,19 @@
 com.bea.common.ldap.escaping|WLSEscaping|escapeString|(Ljava/lang/String;)Ljava/lang/String;
+com.bea.common.security.internal.service
+ AccessDecisionServiceImpl
+  isAccessAllowed|(Lcom/bea/common/security/service/Identity;Ljava/util/Map;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;Lweblogic/security/spi/Direction;)[Lweblogic/security/spi/Result;
+ AdjudicationServiceImpl
+  adjudicate|([Lweblogic/security/spi/Result;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;)Z
+ AuthorizationServiceImpl
+  isAccessAllowed|(Lcom/bea/common/security/service/Identity;Ljava/util/Map;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;Lweblogic/security/spi/Direction;)Z
+ RoleMappingServiceImpl
+  getRoles|(Lcom/bea/common/security/service/Identity;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;)Ljava/util/Map;
 com.bea.common.security.internal.utils|Delegator$ProxyInvocationHandler|invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 com.bea.common.security.utils|JavaMD5|update|(B)V
+com.bea.common.security.xacml.attr
+ GenericBag
+  add|(Lcom/bea/common/security/xacml/attr/AttributeValue;)Z
+  contains|(Ljava/lang/Object;)Z
 com.bea.netuix.nf
  ControlLifecycle$1
   postVisit|(Lcom/bea/netuix/nf/UIControl;Ljava/lang/Object;)V
@@ -135,6 +148,45 @@ com.bea.objectweb.asm
  ClassReader
   readUTF8|(I[C)Ljava/lang/String;
   readUnsignedShort|(I)I
+com.bea.security.providers.xacml
+ AuthorizationPolicyDecisionPoint
+  evaluate|(Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/security/xacml/PolicyDecision;
+ EvaluationCtxFactory
+  create|(Ljavax/security/auth/Subject;Ljava/util/Map;Lweblogic/security/spi/Resource;Lweblogic/security/service/ContextHandler;Lweblogic/security/spi/Direction;)Lcom/bea/security/xacml/EvaluationCtx;
+ RoleAssignmentPolicyDecisionPoint
+  getRoles|(Lcom/bea/security/xacml/EvaluationCtx;)Ljava/util/Map;
+ SubjectAttributeDesignatorFactory
+  getSubjectConverter|(Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/security/providers/xacml/SubjectConverter;
+ SubjectAttributeDesignatorFactory$4$2
+  evaluateToBag|(Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/common/security/xacml/attr/Bag;
+ SubjectConverterRegistry
+  getConverter|(Ljavax/security/auth/Subject;)Lcom/bea/security/providers/xacml/SubjectConverter;
+com.bea.security.providers.xacml.store
+ AuthorizationPolicyRegistry
+  findAuthorizationPolicy|(Lcom/bea/security/xacml/EvaluationCtx;)Ljava/util/Set;
+ AuthorizationPolicyStore
+  findAuthorizationPolicy|(Lcom/bea/security/xacml/EvaluationCtx;)Ljava/util/Set;
+ RoleAssignmentPolicyRegistry
+  findRoleAssignmentPolicy|(Lcom/bea/security/xacml/EvaluationCtx;)Ljava/util/Map;
+ RoleAssignmentPolicyStore
+  findRoleAssignmentPolicy|(Lcom/bea/security/xacml/EvaluationCtx;)Ljava/util/Map;
+ RoleAssignmentPolicyStore$EMap
+  containsKey|(Ljava/lang/Object;)Z
+ SingleAuthorizationPolicyRegistryProxy
+  findAuthorizationPolicy|(Lcom/bea/security/xacml/EvaluationCtx;)Ljava/util/Set;
+ SingleRoleAssignmentPolicyRegistryProxy
+  findRoleAssignmentPolicy|(Lcom/bea/security/xacml/EvaluationCtx;)Ljava/util/Map;
+com.bea.security.xacml.attr.evaluator|Constant|evaluate|(Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/common/security/xacml/attr/AttributeValue;
+com.bea.security.xacml.cache|PolicyEvaluatorCache|getEvaluator|(Lcom/bea/security/xacml/store/Record;)Lcom/bea/security/xacml/PolicyEvaluator;
+com.bea.security.xacml.combinator.standard|StandardRuleCombinerLibrary$3$1|evaluate|(Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/security/xacml/RuleDecision;
+com.bea.security.xacml.function.standard
+ BagFunctionLibrary$3$1
+  evaluate
+   (Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/common/security/xacml/attr/AttributeValue;
+   (Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/common/security/xacml/attr/BooleanAttribute;
+com.bea.security.xacml.policy|StandardPolicyEvaluatorFactory$2|evaluate|(Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/security/xacml/PolicyDecision;
+com.bea.security.xacml.rule|StandardRuleEvaluatorFactory$3|evaluate|(Lcom/bea/security/xacml/EvaluationCtx;)Lcom/bea/security/xacml/RuleDecision;
+com.bea.security.xacml.store|Record|getEvaluator|(Ljava/lang/Object;)Lcom/bea/security/xacml/PolicyEvaluator;
 com.bea.xbean.common|XmlWhitespace|isSpace|(C)Z
 com.bea.xbean.schema
  SchemaParticleImpl

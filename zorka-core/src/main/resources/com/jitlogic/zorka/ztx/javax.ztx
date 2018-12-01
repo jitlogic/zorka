@@ -107,12 +107,17 @@ javax.naming.ldap
   size|()I
   toAttributes|()Ljavax/naming/directory/Attributes;
   unescapeValue|(Ljava/lang/String;)Ljava/lang/Object;
-javax.security.auth|Subject$SecureSet|iterator|()Ljava/util/Iterator;
+javax.security.auth
+ Subject$SecureSet
+  iterator|()Ljava/util/Iterator;
+ Subject$SecureSet$1
+  next|()Ljava/lang/Object;
 javax.servlet
  ServletRequestWrapper
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
   getParameter|(Ljava/lang/String;)Ljava/lang/String;
   getParameterValues|(Ljava/lang/String;)[Ljava/lang/String;
+  removeAttribute|(Ljava/lang/String;)V
 javax.servlet.http
  HttpServlet
   service|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V

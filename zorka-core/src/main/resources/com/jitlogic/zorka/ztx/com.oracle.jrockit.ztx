@@ -1,0 +1,9 @@
+com.oracle.jrockit.jfr
+ DurationEvent
+  begin|()V
+  end|()V
+ InstantEvent
+  commit|()V
+  shouldWrite|()Z
+ TimedEvent
+  shouldWrite|()Z

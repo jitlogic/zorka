@@ -3,4 +3,16 @@ oracle.jrockit.jfr
   asConstant|(Ljava/lang/String;)I
  VMJFR
   counterTime|()J
-oracle.jrockit.jfr.events|EventHandlerImpl|counterTime|()J
+ VMJFR$ThreadBuffer
+  acquire|()V
+  ensure|(I)Ljava/nio/ByteBuffer;
+  finish|(Ljava/nio/ByteBuffer;Z)V
+  release|()V
+oracle.jrockit.jfr.events
+ Bits
+  length|(Ljava/lang/String;)I
+  write|(Ljava/nio/ByteBuffer;Ljava/lang/String;)V
+ EventHandlerImpl
+  counterTime|()J
+ GeneratedEventHandler4125
+  write|(Ljava/lang/Object;JJ)V

@@ -10,6 +10,7 @@ net.sf.cglib.asm
   putShort|(I)Lnet/sf/cglib/asm/ByteVector;
   putUTF8|(Ljava/lang/String;)Lnet/sf/cglib/asm/ByteVector;
  ClassReader
+  readInt|(I)I
   readUnsignedShort|(I)I
  ClassWriter
   newClass|(Ljava/lang/String;)I
@@ -22,6 +23,7 @@ net.sf.cglib.asm
   visitJumpInsn|(ILnet/sf/cglib/asm/Label;)V
   visitLabel|(Lnet/sf/cglib/asm/Label;)V
   visitLdcInsn|(Ljava/lang/Object;)V
+  visitMaxs|(II)V
   visitMethodInsn|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   visitTryCatchBlock|(Lnet/sf/cglib/asm/Label;Lnet/sf/cglib/asm/Label;Lnet/sf/cglib/asm/Label;Ljava/lang/String;)V
   visitTypeInsn|(ILjava/lang/String;)V
@@ -44,8 +46,10 @@ net.sf.cglib.asm
 net.sf.cglib.core
  CodeEmitter
   catch_exception|(Lnet/sf/cglib/core/Block;Lnet/sf/cglib/asm/Type;)V
+  dup|()V
   getfield|(Ljava/lang/String;)V
   invoke_static|(Lnet/sf/cglib/asm/Type;Lnet/sf/cglib/core/Signature;)V
+  load_args|(II)V
   load_this|()V
   make_label
    ()Lnet/sf/cglib/asm/Label;
@@ -53,7 +57,10 @@ net.sf.cglib.core
   push
    (I)V
    (Ljava/lang/String;)V
+  putfield|(Ljava/lang/String;)V
   return_value|()V
+ DuplicatesPredicate
+  evaluate|(Ljava/lang/Object;)Z
  EmitUtils$5
   transform|(Ljava/lang/Object;)Ljava/lang/Object;
  EmitUtils$6
@@ -78,7 +85,14 @@ net.sf.cglib.core
    (Lnet/sf/cglib/asm/Type;)Z
    (Lorg/objectweb/asm/Type;)Z
   isStatic|(I)Z
-net.sf.cglib.proxy|MethodProxy|find|(Ljava/lang/Class;Lnet/sf/cglib/core/Signature;)Lnet/sf/cglib/proxy/MethodProxy;
+  toInternalNames|([Lnet/sf/cglib/asm/Type;)[Ljava/lang/String;
+ VisibilityPredicate
+  evaluate|(Ljava/lang/Object;)Z
+net.sf.cglib.proxy
+ Enhancer$6
+  getImplSignature|(Lnet/sf/cglib/core/MethodInfo;)Lnet/sf/cglib/core/Signature;
+ MethodProxy
+  find|(Ljava/lang/Class;Lnet/sf/cglib/core/Signature;)Lnet/sf/cglib/proxy/MethodProxy;
 net.sf.jasperreports.data.cache
  BlockColumnStore
   addValue|(Ljava/lang/Object;)V

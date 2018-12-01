@@ -203,8 +203,10 @@ com.sun.org.apache.xerces.internal.dom
  NamedNodeMapImpl
   getNamedItem|(Ljava/lang/String;)Lorg/w3c/dom/Node;
  NodeImpl
+  appendChild|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
   needsSyncChildren|(Z)V
  ParentNode
+  insertBefore|(Lorg/w3c/dom/Node;Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
   item|(I)Lorg/w3c/dom/Node;
 com.sun.org.apache.xerces.internal.impl
  XMLDTDScannerImpl
@@ -319,6 +321,9 @@ com.sun.org.apache.xerces.internal.impl.validation
   addValidationState|(Lcom/sun/org/apache/xerces/internal/impl/validation/ValidationState;)V
   reset|()V
  ValidationState
+  needExtraChecking|()Z
+  needFacetChecking|()Z
+  needToNormalize|()Z
   resetIDTables|()V
 com.sun.org.apache.xerces.internal.impl.xs
  SchemaGrammar
@@ -381,6 +386,7 @@ com.sun.org.apache.xerces.internal.util
   removeAllItems|()V
  AugmentationsImpl$SmallContainer
   clear|()V
+  getItem|(Ljava/lang/Object;)Ljava/lang/Object;
  DOMUtil
   getAttrs|(Lorg/w3c/dom/Element;)[Lorg/w3c/dom/Attr;
   getFirstChildElement|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Element;
@@ -407,18 +413,22 @@ com.sun.org.apache.xerces.internal.util
  SymbolHash
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  SymbolTable
-  addSymbol|([CII)Ljava/lang/String;
+  addSymbol
+   (Ljava/lang/String;)Ljava/lang/String;
+   ([CII)Ljava/lang/String;
   hash
    (Ljava/lang/String;)I
    ([CII)I
  XMLAttributesImpl
   addAttributeNS|(Lcom/sun/org/apache/xerces/internal/xni/QName;Ljava/lang/String;Ljava/lang/String;)V
   checkDuplicatesNS|()Lcom/sun/org/apache/xerces/internal/xni/QName;
+  getAugmentations|(I)Lcom/sun/org/apache/xerces/internal/xni/Augmentations;
   getIndex
    (Ljava/lang/String;)I
    (Ljava/lang/String;Ljava/lang/String;)I
   getLocalName|(I)Ljava/lang/String;
   getName|(ILcom/sun/org/apache/xerces/internal/xni/QName;)V
+  getPrefix|(I)Ljava/lang/String;
   getQName|(I)Ljava/lang/String;
   getURI|(I)Ljava/lang/String;
   getValue
@@ -432,9 +442,11 @@ com.sun.org.apache.xerces.internal.util
   isContent|(I)Z
   isInvalid|(I)Z
   isNCName|(I)Z
+  isNCNameStart|(I)Z
   isNameStart|(I)Z
   isSpace|(I)Z
   isValid|(I)Z
+  isValidNCName|(Ljava/lang/String;)Z
  XMLResourceIdentifierImpl
   clear|()V
  XMLStringBuffer
@@ -490,14 +502,52 @@ com.sun.org.apache.xerces.internal.xni
   clear|()V
 com.sun.org.apache.xml.internal.dtm.ref|DTMDefaultBaseTraversers$AllFromRootTraverser|first|(I)I
 com.sun.org.apache.xml.internal.dtm.ref.sax2dtm|SAX2DTM2|_exptype2|(I)I
-com.sun.org.apache.xml.internal.serializer|WriterToUTF8Buffered|write|(I)V
+com.sun.org.apache.xml.internal.serializer
+ EncodingInfo$EncodingImpl
+  isInEncoding|(C)Z
+ ToStream
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+  startPrefixMapping|(Ljava/lang/String;Ljava/lang/String;Z)Z
+ ToStream$BoolStack
+  peekOrFalse|()Z
+ ToUnknownStream
+  characters
+   (Ljava/lang/String;)V
+   ([CII)V
+  endElement|(Ljava/lang/String;)V
+  namespaceAfterStartElement|(Ljava/lang/String;Ljava/lang/String;)V
+  startElement
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+  startPrefixMapping|(Ljava/lang/String;Ljava/lang/String;Z)Z
+ ToXMLStream
+  endElement|(Ljava/lang/String;)V
+ WriterToUTF8Buffered
+  write
+   (I)V
+   (Ljava/lang/String;)V
+   ([CII)V
 com.sun.org.apache.xml.internal.utils
  SuballocatedIntVector
   elementAt|(I)I
+  size|()I
  XMLCharacterRecognizer
   isWhiteSpace|(C)Z
 com.sun.org.apache.xpath.internal.compiler|OpMapVector|elementAt|(I)I
-com.sun.xml.bind|WhiteSpaceProcessor|isWhiteSpace|(C)Z
+com.sun.xml.bind
+ WhiteSpaceProcessor
+  isWhiteSpace
+   (C)Z
+   (Ljava/lang/CharSequence;)Z
+com.sun.xml.bind.marshaller
+ SAX2DOMEx
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+com.sun.xml.bind.unmarshaller|DOMScanner|visit|(Lorg/w3c/dom/Element;)V
+com.sun.xml.bind.v2|ClassFactory|create0|(Ljava/lang/Class;)Ljava/lang/Object;
 com.sun.xml.bind.v2.bytecode
  ClassTailor
   toVMClassName|(Ljava/lang/Class;)Ljava/lang/String;
@@ -527,9 +577,14 @@ com.sun.xml.bind.v2.model.impl
   readAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
  PropertyInfoImpl
   id|()Lcom/sun/xml/bind/v2/model/core/ID;
+ RuntimeBuiltinLeafInfoImpl$1
+  parse
+   (Ljava/lang/CharSequence;)Ljava/lang/Object;
+   (Ljava/lang/CharSequence;)Ljava/lang/String;
 com.sun.xml.bind.v2.model.nav
  ReflectionNavigator
   asDecl|(Ljava/lang/Class;)Ljava/lang/Class;
+  erasure|(Ljava/lang/reflect/Type;)Ljava/lang/Class;
   getFieldName
    (Ljava/lang/Object;)Ljava/lang/String;
    (Ljava/lang/reflect/Field;)Ljava/lang/String;
@@ -545,7 +600,52 @@ com.sun.xml.bind.v2.model.nav
    (Ljava/lang/Class;Ljava/lang/Void;)Ljava/lang/Class;
  TypeVisitor
   visit|(Ljava/lang/reflect/Type;Ljava/lang/Object;)Ljava/lang/Object;
-com.sun.xml.bind.v2.runtime.unmarshaller|ValidatingUnmarshaller|expectText|()Z
+com.sun.xml.bind.v2.runtime
+ ClassBeanInfoImpl
+  createInstance|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext;)Ljava/lang/Object;
+ JaxBeanInfo
+  lookForLifecycleMethods|()Z
+com.sun.xml.bind.v2.runtime.property|ArrayERProperty$ReceiverImpl|receive|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Ljava/lang/Object;)V
+com.sun.xml.bind.v2.runtime.reflect
+ Lister$CollectionLister
+  addToPack
+   (Ljava/lang/Object;Ljava/lang/Object;)V
+   (Ljava/util/Collection;Ljava/lang/Object;)V
+ TransducedAccessor$CompositeTransducedAccessorImpl
+  parse|(Ljava/lang/Object;Ljava/lang/CharSequence;)V
+com.sun.xml.bind.v2.runtime.unmarshaller
+ InterningXmlVisitor
+  endElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+  startElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+  text|(Ljava/lang/CharSequence;)V
+ LeafPropertyLoader
+  text|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Ljava/lang/CharSequence;)V
+ Loader
+  leaveElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+  startElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+ SAXConnector
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+ Scope
+  add|(Lcom/sun/xml/bind/v2/runtime/reflect/Accessor;Lcom/sun/xml/bind/v2/runtime/reflect/Lister;Ljava/lang/Object;)V
+ StructureLoader
+  childElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+  leaveElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+  startElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+  text|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Ljava/lang/CharSequence;)V
+ UnmarshallingContext
+  createInstance|(Lcom/sun/xml/bind/v2/runtime/JaxBeanInfo;)Ljava/lang/Object;
+  endElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+  endScope|(I)V
+  expectText|()Z
+  getScope|(I)Lcom/sun/xml/bind/v2/runtime/unmarshaller/Scope;
+  recordInnerPeer|(Ljava/lang/Object;)V
+  startElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
+  startScope|(I)V
+  text|(Ljava/lang/CharSequence;)V
+ ValidatingUnmarshaller
+  expectText|()Z
 com.sun.xml.bind.v2.util
  QNameMap
   get|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
@@ -580,6 +680,28 @@ com.sun.xml.internal.bind.v2.runtime.unmarshaller
   characters|([CII)V
   endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+com.sun.xml.internal.messaging.saaj.soap
+ SOAPDocumentImpl
+  createElementNS|(Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Element;
+  createTextNode|(Ljava/lang/String;)Lorg/w3c/dom/Text;
+ SOAPPartImpl
+  createElementNS|(Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Element;
+  createTextNode|(Ljava/lang/String;)Lorg/w3c/dom/Text;
+com.sun.xml.internal.messaging.saaj.soap.impl
+ ElementFactory
+  createElement|(Lcom/sun/xml/internal/messaging/saaj/soap/SOAPDocumentImpl;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/soap/SOAPElement;
+  createNamedElement|(Lcom/sun/xml/internal/messaging/saaj/soap/SOAPDocumentImpl;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/soap/SOAPElement;
+ ElementImpl
+  getLocalPart|(Ljava/lang/String;)Ljava/lang/String;
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+com.sun.xml.internal.messaging.saaj.soap.name
+ NameImpl
+  createQName|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  getLocalNameFromQualifiedName|(Ljava/lang/String;)Ljava/lang/String;
+  getLocalNameFromTagName|(Ljava/lang/String;)Ljava/lang/String;
+  getPrefixFromQualifiedName|(Ljava/lang/String;)Ljava/lang/String;
+  getPrefixFromTagName|(Ljava/lang/String;)Ljava/lang/String;
+  isQualified|(Ljava/lang/String;)Z
 com.sun.xml.internal.stream
  Entity
   clear|()V
@@ -603,4 +725,13 @@ com.sun.xml.txw2
  StartTag
   addNamespaceDecl|(Ljava/lang/String;Ljava/lang/String;Z)Lcom/sun/xml/txw2/NamespaceDecl;
 com.sun.xml.txw2.output|SaxSerializer|writeAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/StringBuilder;)V
+com.sun.xml.ws.message
+ SAX2DOMWriterEx
+  writeCharacters|([CII)V
+  writeEndElement|()V
+  writeStartElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
 com.sun.xml.ws.streaming|XMLStreamReaderUtil|next|(Ljavax/xml/stream/XMLStreamReader;)I
+com.sun.xml.ws.util.xml
+ XMLStreamReaderFilter
+  getTextCharacters|(I[CII)I
+  next|()I

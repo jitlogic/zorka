@@ -1,0 +1,8 @@
+oracle.net.ns
+ NetInputStream
+  available|()I
+  read|([BII)I
+ NetOutputStream
+  available|()I
+  flush|()V
+  write|([BII)V

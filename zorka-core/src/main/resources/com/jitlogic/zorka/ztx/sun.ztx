@@ -20,6 +20,8 @@ sun.misc
   multByPow52|(II)Lsun/misc/FDBigInteger;
   rightInplaceSub|(Lsun/misc/FDBigInteger;)Lsun/misc/FDBigInteger;
   valueOfMulPow52|(JII)Lsun/misc/FDBigInteger;
+ FormattedFloatingDecimal
+  getChars|([C)I
  FpUtils
   getExponent|(D)I
  ProxyGenerator$ConstantPool
@@ -78,6 +80,8 @@ sun.nio.ch
  EPollSelectorImpl
   putEventOps|(Lsun/nio/ch/SelectionKeyImpl;I)V
   wakeup|()Ljava/nio/channels/Selector;
+ EPollSelectorProvider
+  openSelector|()Ljava/nio/channels/spi/AbstractSelector;
  FileChannelImpl
   read|(Ljava/nio/ByteBuffer;)I
   write|(Ljava/nio/ByteBuffer;)I
@@ -94,6 +98,24 @@ sun.nio.ch
  SelectorImpl
   select|(J)I
   selectedKeys|()Ljava/util/Set;
+ SelectorProviderImpl
+  openSocketChannel|()Ljava/nio/channels/SocketChannel;
+ SocketAdaptor
+  create|(Lsun/nio/ch/SocketChannelImpl;)Ljava/net/Socket;
+ SocketChannelImpl
+  connect|(Ljava/net/SocketAddress;)Z
+  finishConnect|()Z
+  kill|()V
+  options|()Lsun/nio/ch/SocketOpts;
+  socket|()Ljava/net/Socket;
+ SocketOptsImpl
+  keepAlive|(Z)Lsun/nio/ch/SocketOpts;
+  receiveBufferSize|(I)Lsun/nio/ch/SocketOpts;
+  sendBufferSize
+   ()I
+   (I)Lsun/nio/ch/SocketOpts;
+ SocketOptsImpl$IP$TCP
+  noDelay|(Z)Lsun/nio/ch/SocketOpts$IP$TCP;
  Util
   getTemporaryDirectBuffer|(I)Ljava/nio/ByteBuffer;
   releaseTemporaryDirectBuffer|(Ljava/nio/ByteBuffer;)V

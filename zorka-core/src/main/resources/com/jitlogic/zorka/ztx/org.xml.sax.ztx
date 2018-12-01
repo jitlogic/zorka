@@ -1,8 +1,10 @@
 org.xml.sax.helpers
  AttributesImpl
   addAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  clear|()V
   getLocalName|(I)Ljava/lang/String;
   getQName|(I)Ljava/lang/String;
+  getURI|(I)Ljava/lang/String;
   getValue
    (I)Ljava/lang/String;
    (Ljava/lang/String;)Ljava/lang/String;

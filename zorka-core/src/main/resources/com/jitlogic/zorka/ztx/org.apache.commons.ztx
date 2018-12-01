@@ -1,4 +1,9 @@
 org.apache.commons.beanutils
+ ConvertUtils
+  convert|(Ljava/lang/Object;)Ljava/lang/String;
+ ConvertUtilsBean
+  convert|(Ljava/lang/Object;)Ljava/lang/String;
+  lookup|(Ljava/lang/Class;)Lorg/apache/commons/beanutils/Converter;
  MethodUtils
   getAccessibleMethod|(Ljava/lang/Class;Ljava/lang/reflect/Method;)Ljava/lang/reflect/Method;
  PropertyUtilsBean
@@ -8,21 +13,62 @@ org.apache.commons.beanutils
    (Ljava/lang/Object;)[Ljava/beans/PropertyDescriptor;
  WeakFastHashMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+org.apache.commons.beanutils.converters
+ AbstractConverter
+  convert|(Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
+ ConverterFacade
+  convert|(Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.commons.beanutils.expression
  DefaultResolver
   getProperty|(Ljava/lang/String;)Ljava/lang/String;
   isIndexed|(Ljava/lang/String;)Z
   isMapped|(Ljava/lang/String;)Z
   next|(Ljava/lang/String;)Ljava/lang/String;
-org.apache.commons.betwixt|XMLUtils|isNameChar|(I)Z
+org.apache.commons.betwixt
+ IntrospectionConfiguration
+  useBeanInfoSearchPath|()Z
+ Options
+  addOptions|(Lorg/apache/commons/betwixt/Options;)V
+  getValue|(Ljava/lang/String;)Ljava/lang/String;
+ XMLIntrospector
+  introspect
+   (Ljava/lang/Class;)Lorg/apache/commons/betwixt/XMLBeanInfo;
+   (Ljava/lang/Object;)Lorg/apache/commons/betwixt/XMLBeanInfo;
+ XMLUtils
+  escapeBodyValue|(Ljava/lang/Object;)Ljava/lang/String;
+  isNameChar|(I)Z
 org.apache.commons.betwixt.expression
  Context
+  newContext|(Ljava/lang/Object;)Lorg/apache/commons/betwixt/expression/Context;
   popOptions|()V
   pushOptions|(Lorg/apache/commons/betwixt/Options;)V
+ IteratorExpression
+  evaluate|(Lorg/apache/commons/betwixt/expression/Context;)Ljava/lang/Object;
  MethodExpression
   evaluate|(Lorg/apache/commons/betwixt/expression/Context;)Ljava/lang/Object;
+org.apache.commons.betwixt.io.id
+ AbstractIDGenerator
+  nextId|()Ljava/lang/String;
+ SequentialIDGenerator
+  nextIdImpl|()Ljava/lang/String;
+org.apache.commons.betwixt.registry|DefaultXMLBeanInfoRegistry|get|(Ljava/lang/Class;)Lorg/apache/commons/betwixt/XMLBeanInfo;
+org.apache.commons.betwixt.strategy
+ BaseMixedContentEncodingStrategy
+  encode|(Ljava/lang/String;Lorg/apache/commons/betwixt/ElementDescriptor;)Ljava/lang/String;
+ ClassNormalizer
+  getNormalizedClass|(Ljava/lang/Object;)Ljava/lang/Class;
+  normalize|(Ljava/lang/Class;)Ljava/lang/Class;
+ ConvertUtilsObjectStringConverter
+  objectToString|(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;Lorg/apache/commons/betwixt/expression/Context;)Ljava/lang/String;
+ DefaultObjectStringConverter
+  objectToString|(Ljava/lang/Object;Ljava/lang/Class;Ljava/lang/String;Lorg/apache/commons/betwixt/expression/Context;)Ljava/lang/String;
+ ObjectStringConverter
+  objectToString|(Ljava/lang/Object;Ljava/lang/Class;Lorg/apache/commons/betwixt/expression/Context;)Ljava/lang/String;
+ ValueSuppressionStrategy
+  suppressElement|(Lorg/apache/commons/betwixt/ElementDescriptor;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)Z
 org.apache.commons.collections
  ArrayStack
+  peek|()Ljava/lang/Object;
   pop|()Ljava/lang/Object;
   push|(Ljava/lang/Object;)Ljava/lang/Object;
  CollectionUtils
@@ -48,6 +94,8 @@ org.apache.commons.collections
   iterator|()Ljava/util/Iterator;
  SequencedHashMap$3
   iterator|()Ljava/util/Iterator;
+ SequencedHashMap$Entry
+  setValue|(Ljava/lang/Object;)Ljava/lang/Object;
  SequencedHashMap$OrderedIterator
   next|()Ljava/lang/Object;
 org.apache.commons.collections.map

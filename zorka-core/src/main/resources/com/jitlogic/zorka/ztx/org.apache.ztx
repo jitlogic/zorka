@@ -8,6 +8,52 @@ org.apache.abdera.i18n.text
  CodepointIterator
   position|()I
   remaining|()I
+org.apache.axis
+ Constants
+  getValue
+   (Lorg/xml/sax/Attributes;[Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+   (Lorg/xml/sax/Attributes;[Ljavax/xml/namespace/QName;)Ljava/lang/String;
+  isSOAP_ENC|(Ljava/lang/String;)Z
+org.apache.axis.encoding
+ DeserializationContext
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  isNil|(Lorg/xml/sax/Attributes;)Z
+  popElementHandler|()Lorg/apache/axis/message/SOAPHandler;
+  pushElementHandler|(Lorg/apache/axis/message/SOAPHandler;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+ DeserializerImpl
+  componentsReady|()Z
+  registerValueTarget|(Lorg/apache/axis/encoding/Target;)V
+ TypeMappingDelegate
+  getClassForQName
+   (Ljavax/xml/namespace/QName;)Ljava/lang/Class;
+   (Ljavax/xml/namespace/QName;Ljava/lang/Class;)Ljava/lang/Class;
+  isRegistered|(Ljava/lang/Class;Ljavax/xml/namespace/QName;)Z
+ TypeMappingImpl
+  getClassForQName|(Ljavax/xml/namespace/QName;Ljava/lang/Class;Lorg/apache/axis/encoding/TypeMappingDelegate;)Ljava/lang/Class;
+  isRegistered|(Ljava/lang/Class;Ljavax/xml/namespace/QName;)Z
+ TypeMappingRegistryImpl
+  getTypeMapping|(Ljava/lang/String;)Ljavax/xml/rpc/encoding/TypeMapping;
+org.apache.axis.message
+ NullAttributes
+  getValue|(Ljava/lang/String;)Ljava/lang/String;
+ SAX2EventRecorder$objArrayVector
+  add|(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)I
+  get|(II)Ljava/lang/Object;
+ SOAPHandler
+  endElement|(Ljava/lang/String;Ljava/lang/String;Lorg/apache/axis/encoding/DeserializationContext;)V
+  onEndChild|(Ljava/lang/String;Ljava/lang/String;Lorg/apache/axis/encoding/DeserializationContext;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;Lorg/apache/axis/encoding/DeserializationContext;)V
+org.apache.axis.utils
+ JavaUtils
+  isBasic|(Ljava/lang/Class;)Z
+  isTrueExplicitly|(Ljava/lang/Object;Z)Z
+ LockableHashtable
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ NSStack
+  getPrefix|(Ljava/lang/String;Z)Ljava/lang/String;
+  pop|()V
+  push|()V
 org.apache.beehive.netui.pageflow.scoping
  ScopedServletUtils
   getOuterRequest|(Ljavax/servlet/http/HttpServletRequest;)Ljavax/servlet/http/HttpServletRequest;
@@ -694,6 +740,87 @@ org.apache.openjpa.meta
 org.apache.openjpa.persistence|AnnotationPersistenceMetaDataParser$MethodComparator|compare|(Ljava/lang/Object;Ljava/lang/Object;)I
 org.apache.oro.util|CacheLRU|getElement|(Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.pluto.util|StringUtils|replace|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+org.apache.poi.openxml4j.opc
+ PackagePartName
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/apache/poi/openxml4j/opc/PackagePartName;)I
+org.apache.poi.ss.formula
+ FormulaParser$SimpleRangePart$Type
+  get|(ZZ)Lorg/apache/poi/ss/formula/FormulaParser$SimpleRangePart$Type;
+ ParseNode$TokenCollector
+  add|(Lorg/apache/poi/ss/formula/ptg/Ptg;)V
+org.apache.poi.ss.formula.function
+ FunctionMetadataRegistry
+  getFunctionByIndex|(I)Lorg/apache/poi/ss/formula/function/FunctionMetadata;
+  getFunctionByName|(Ljava/lang/String;)Lorg/apache/poi/ss/formula/function/FunctionMetadata;
+  lookupIndexByName|(Ljava/lang/String;)S
+org.apache.poi.ss.formula.ptg
+ AbstractFunctionPtg
+  getParameterClass|(I)B
+  isBuiltInFunctionName|(Ljava/lang/String;)Z
+ FuncPtg
+  create|(I)Lorg/apache/poi/ss/formula/ptg/FuncPtg;
+ IntPtg
+  isInRange|(I)Z
+org.apache.poi.ss.usermodel
+ HorizontalAlignment
+  values|()[Lorg/apache/poi/ss/usermodel/HorizontalAlignment;
+ VerticalAlignment
+  values|()[Lorg/apache/poi/ss/usermodel/VerticalAlignment;
+org.apache.poi.ss.util
+ CellReference
+  cellReferenceIsWithinRange|(Ljava/lang/String;Ljava/lang/String;Lorg/apache/poi/ss/SpreadsheetVersion;)Z
+  classifyCellReference|(Ljava/lang/String;Lorg/apache/poi/ss/SpreadsheetVersion;)Lorg/apache/poi/ss/util/CellReference$NameType;
+  convertColStringToIndex|(Ljava/lang/String;)I
+  convertNumToColString|(I)Ljava/lang/String;
+  formatAsString|()Ljava/lang/String;
+  isColumnWithnRange|(Ljava/lang/String;Lorg/apache/poi/ss/SpreadsheetVersion;)Z
+  isRowWithnRange|(Ljava/lang/String;Lorg/apache/poi/ss/SpreadsheetVersion;)Z
+org.apache.poi.util
+ BitField
+  clear|(I)I
+  getRawValue|(I)I
+  getValue|(I)I
+  isSet|(I)Z
+  set|(I)I
+  setBoolean|(IZ)I
+  setValue|(II)I
+ StringUtil
+  hasMultibyte|(Ljava/lang/String;)Z
+org.apache.poi.xssf.model
+ CalculationChain
+  removeItem|(ILjava/lang/String;)V
+ StylesTable
+  getBorderAt|(I)Lorg/apache/poi/xssf/usermodel/extensions/XSSFCellBorder;
+  getCellStyleXfAt|(I)Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTXf;
+  getCellXfAt|(I)Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTXf;
+  getFillAt|(I)Lorg/apache/poi/xssf/usermodel/extensions/XSSFCellFill;
+  getStyleAt|(I)Lorg/apache/poi/xssf/usermodel/XSSFCellStyle;
+ ThemesTable
+  inheritFromThemeAsRequired|(Lorg/apache/poi/xssf/usermodel/XSSFColor;)V
+org.apache.poi.xssf.usermodel
+ XSSFRow
+  getCell
+   (I)Lorg/apache/poi/ss/usermodel/Cell;
+   (I)Lorg/apache/poi/xssf/usermodel/XSSFCell;
+   (ILorg/apache/poi/ss/usermodel/Row$MissingCellPolicy;)Lorg/apache/poi/xssf/usermodel/XSSFCell;
+ XSSFSheet
+  getRow|(I)Lorg/apache/poi/xssf/usermodel/XSSFRow;
+ XSSFWorkbook
+  getCellStyleAt
+   (S)Lorg/apache/poi/ss/usermodel/CellStyle;
+   (S)Lorg/apache/poi/xssf/usermodel/XSSFCellStyle;
+  getNameAt|(I)Lorg/apache/poi/xssf/usermodel/XSSFName;
+org.apache.poi.xssf.usermodel.extensions|XSSFCellBorder|getBorderColor|(Lorg/apache/poi/xssf/usermodel/extensions/XSSFCellBorder$BorderSide;)Lorg/apache/poi/xssf/usermodel/XSSFColor;
+org.apache.poi.xssf.util
+ CTColComparator
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTCol;Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTCol;)I
+ NumericRanges
+  getOverlappingRange|([J[J)[J
+  getOverlappingType|([J[J)I
 org.apache.solr.common.util
  FastInputStream
   readByte|()B
@@ -1071,30 +1198,159 @@ org.apache.xml.utils
   isWhiteSpace
    (C)Z
    (Ljava/lang/String;)Z
-org.apache.xmlbeans|QNameCache|getName|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/namespace/QName;
-org.apache.xmlbeans.impl.piccolo.util|CharStringConverter|convert|([CII)Ljava/lang/String;
+org.apache.xmlbeans
+ QNameCache
+  getName|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/namespace/QName;
+ StringEnumAbstractBase
+  intValue|()I
+ XmlOptions
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  hasOption|(Ljava/lang/Object;)Z
+  maskNull|(Lorg/apache/xmlbeans/XmlOptions;)Lorg/apache/xmlbeans/XmlOptions;
+  put
+   (Ljava/lang/Object;)V
+   (Ljava/lang/Object;Ljava/lang/Object;)V
+org.apache.xmlbeans.impl.common
+ QNameHelper
+  suggestPrefix|(Ljava/lang/String;)Ljava/lang/String;
+ XMLChar
+  isNCName|(I)Z
+  isNCNameStart|(I)Z
+ XmlWhitespace
+  collapse|(Ljava/lang/String;I)Ljava/lang/String;
+org.apache.xmlbeans.impl.piccolo.util
+ CharStringConverter
+  convert|([CII)Ljava/lang/String;
+ IntStack
+  pop|()I
+  push|(I)V
+ StringStack
+  clear|()V
+  pop|()Ljava/lang/String;
+  push|(Ljava/lang/String;)V
+  size|()I
 org.apache.xmlbeans.impl.piccolo.xml
  AttributesHolder
+  addAndCheckAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  addAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  clear|()V
+  getQName|(I)Ljava/lang/String;
   getURI|(I)Ljava/lang/String;
+  getValue|(I)Ljava/lang/String;
+ FastNamespaceSupport
+  declarePrefix|(Ljava/lang/String;Ljava/lang/String;)V
+  getContextPrefix|(I)Ljava/lang/String;
+  getURI|(Ljava/lang/String;)Ljava/lang/String;
+  popContext|()V
+  pushContext|()V
  PiccoloLexer
   yybegin|(I)V
+  yylex|()I
+  yynextAction|()V
   yynextChar|()I
   yystate|()I
+org.apache.xmlbeans.impl.schema
+ SchemaAttributeModelImpl
+  getAttribute|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/SchemaLocalAttribute;
+ SchemaTypeImpl
+  createAttributeType|(Ljavax/xml/namespace/QName;Lorg/apache/xmlbeans/SchemaTypeLoader;)Lorg/apache/xmlbeans/XmlObject;
+  createElementType|(Ljavax/xml/namespace/QName;Ljavax/xml/namespace/QName;Lorg/apache/xmlbeans/SchemaTypeLoader;)Lorg/apache/xmlbeans/XmlObject;
+  createTypeStoreUser|()Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  getAttributeProperty|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/SchemaProperty;
+ SchemaTypeLoaderImpl$SchemaTypeLoaderCache
+  getFromTypeLoaderCache|(Ljava/lang/ClassLoader;)Lorg/apache/xmlbeans/SchemaTypeLoader;
 org.apache.xmlbeans.impl.store
  CharUtil
+  getChars|([CILjava/lang/Object;II)V
   getString|(Ljava/lang/Object;II)Ljava/lang/String;
+  insertChars|(ILjava/lang/Object;IILjava/lang/Object;II)Ljava/lang/Object;
+  removeChars|(IILjava/lang/Object;II)Ljava/lang/Object;
+  saveChars|(Ljava/lang/Object;IILjava/lang/Object;II)Ljava/lang/Object;
+ Cursor
+  _dispose|()V
+  _getObject|()Lorg/apache/xmlbeans/XmlObject;
+  _toParent|()Z
+  _xmlText|(Lorg/apache/xmlbeans/XmlOptions;)Ljava/lang/String;
+  dispose|()V
+  toParent|()Z
+  xmlText|(Lorg/apache/xmlbeans/XmlOptions;)Ljava/lang/String;
  Locale
   enter|()V
   exit|()V
   noSync|()Z
+ Locale$DefaultQNameFactory
+  getQName
+   (Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/namespace/QName;
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/namespace/QName;
+ Locale$DocProps
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ Locale$SaxHandler
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  endPrefixMapping|(Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+  startPrefixMapping|(Ljava/lang/String;Ljava/lang/String;)V
+ Saver
+  getNamespaceForPrefix|(Ljava/lang/String;)Ljava/lang/String;
+ Saver$TextSaver
+  saveToString|()Ljava/lang/String;
  Xobj
+  add_attribute_user|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  add_element_user|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  change_type|(Lorg/apache/xmlbeans/SchemaType;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  compute_flags|()I
+  copy|(Lorg/apache/xmlbeans/SchemaTypeLoader;Lorg/apache/xmlbeans/SchemaType;Lorg/apache/xmlbeans/XmlOptions;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  copy_contents_from|(Lorg/apache/xmlbeans/impl/values/TypeStore;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  count_elements|(Ljavax/xml/namespace/QName;)I
+  fetch_text|(I)Ljava/lang/String;
+  find_all_element_users|(Ljavax/xml/namespace/QName;Ljava/util/List;)V
   find_attribute_user|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  find_element_user|(Ljavax/xml/namespace/QName;I)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  find_nil|()Z
+  invalidate_nil|()V
+  invalidate_text|()V
+  locale|()Lorg/apache/xmlbeans/impl/store/Locale;
+  new_cursor|()Lorg/apache/xmlbeans/XmlCursor;
+  remove_element|(Ljavax/xml/namespace/QName;I)V
+  store_text|(Ljava/lang/String;)V
+  tempCur|()Lorg/apache/xmlbeans/impl/store/Cur;
+  validate_on_set|()Z
+org.apache.xmlbeans.impl.util|XsTypeConverter|lexLong|(Ljava/lang/CharSequence;)J
 org.apache.xmlbeans.impl.values
+ JavaBooleanHolder
+  booleanValue|()Z
+ JavaIntHolder
+  intValue|()I
  JavaLongHolder
   longValue|()J
+ JavaStringEnumerationHolderEx
+  enumValue|()Lorg/apache/xmlbeans/StringEnumAbstractBase;
+ JavaStringHolder
+  compute_text|(Lorg/apache/xmlbeans/impl/values/NamespaceManager;)Ljava/lang/String;
+ JavaStringHolderEx
+  schemaType|()Lorg/apache/xmlbeans/SchemaType;
+ NamespaceContext
+  pop|()V
+  push|(Lorg/apache/xmlbeans/impl/values/NamespaceContext;)V
+ XmlComplexContentImpl
+  schemaType|()Lorg/apache/xmlbeans/SchemaType;
  XmlObjectBase
+  attach_store|(Lorg/apache/xmlbeans/impl/values/TypeStore;)V
+  build_text|(Lorg/apache/xmlbeans/impl/values/NamespaceManager;)Ljava/lang/String;
   check_dated|()V
+  copy|()Lorg/apache/xmlbeans/XmlObject;
+  create_attribute_user|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  create_element_user|(Ljavax/xml/namespace/QName;Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
+  disconnect_store|()V
+  get_attributeflags|(Ljavax/xml/namespace/QName;)I
+  init_flags|(Lorg/apache/xmlbeans/SchemaProperty;)V
+  invalidate_value|()V
   monitor|()Ljava/lang/Object;
+  newCursor|()Lorg/apache/xmlbeans/XmlCursor;
+  newCursorForce|()Lorg/apache/xmlbeans/XmlCursor;
+  set|(Lorg/apache/xmlbeans/XmlObject;)Lorg/apache/xmlbeans/XmlObject;
+  stringValue|()Ljava/lang/String;
+  xmlText|(Lorg/apache/xmlbeans/XmlOptions;)Ljava/lang/String;
 org.apache.xpath
  XPathContext
   getDTM|(I)Lorg/apache/xml/dtm/DTM;

@@ -1,7 +1,36 @@
+flex.messaging
+ FlexSession
+  invalidate|()V
+  useSmallMessages|()Z
+ HttpFlexSession
+  getFlexSession|(Ljavax/servlet/http/HttpServletRequest;)Lflex/messaging/HttpFlexSession;
+  invalidate
+   ()V
+   (Z)V
+ MessageException
+  createErrorMessage|()Lflex/messaging/messages/ErrorMessage;
+  logAtHingePoint|(Lflex/messaging/messages/Message;Lflex/messaging/messages/ErrorMessage;Ljava/lang/String;)V
+flex.messaging.client
+ FlexClient
+  registerFlexSession|(Lflex/messaging/FlexSession;)V
+ FlexClientManager
+  getFlexClient|(Ljava/lang/String;)Lflex/messaging/client/FlexClient;
+flex.messaging.endpoints
+ AMFEndpoint$$EnhancerByCGLIB$$1d331bcd
+  getParsedUrl|(Ljava/lang/String;)Ljava/lang/String;
+ AbstractEndpoint
+  getParsedUrl|(Ljava/lang/String;)Ljava/lang/String;
+  setupFlexClient|(Ljava/lang/String;)Lflex/messaging/client/FlexClient;
 flex.messaging.io
  AbstractProxy
   clone|()Ljava/lang/Object;
+  createInstance|(Ljava/lang/String;)Ljava/lang/Object;
+  createInstanceFromClassName|(Ljava/lang/String;)Ljava/lang/Object;
+  getClassFromClassName
+   (Ljava/lang/String;)Ljava/lang/Class;
+   (Ljava/lang/String;Z)Ljava/lang/Class;
   getInstanceToSerialize|(Ljava/lang/Object;)Ljava/lang/Object;
+  instanceComplete|(Ljava/lang/Object;)Ljava/lang/Object;
   isExternalizable|(Ljava/lang/Object;)Z
  ArrayCollection
   writeExternal|(Ljava/io/ObjectOutput;)V
@@ -14,6 +43,10 @@ flex.messaging.io
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  ClassAliasRegistry
   getClassName|(Ljava/lang/String;)Ljava/lang/String;
+ Java15TypeMarshaller
+  convert|(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+ MapProxy
+  getPropertyNames|(Ljava/lang/Object;)Ljava/util/List;
  PropertyProxyRegistry
   getProxy
    (Ljava/lang/Class;)Lflex/messaging/io/PropertyProxy;
@@ -22,12 +55,77 @@ flex.messaging.io
   getProxyAndRegister
    (Ljava/lang/Class;)Lflex/messaging/io/PropertyProxy;
    (Ljava/lang/Object;)Lflex/messaging/io/PropertyProxy;
+ TypeMarshallingContext
+  clearThreadLocalObjects|()V
+  reset|()V
 flex.messaging.io.amf
+ AbstractAmfInput
+  readInt|()I
+  readUTF|()Ljava/lang/String;
+  readUnsignedShort|()I
+ AbstractAmfOutput
+  writeInt|(I)V
+  writeShort|(I)V
+  writeUTF|(Ljava/lang/String;)V
+ ActionContext
+  incrementMessageNumber|()V
+ ActionMessage
+  addBody|(Lflex/messaging/io/amf/MessageBody;)V
+  getBody|(I)Lflex/messaging/io/amf/MessageBody;
+ Amf0Input
+  readObject|()Ljava/lang/Object;
+  reset|()V
+ Amf0Output
+  reset|()V
+  writeObject|(Ljava/lang/Object;)V
+ Amf3Input
+  readObject|()Ljava/lang/Object;
+  reset|()V
  Amf3Output
+  reset|()V
   writeAMFUTF|(Ljava/lang/String;)V
   writeObject|(Ljava/lang/Object;)V
   writeObjectEnd|()V
   writeObjectProperty|(Ljava/lang/String;Ljava/lang/Object;)V
   writeObjectTraits|(Lflex/messaging/io/amf/TraitsInfo;)V
+ AmfIO
+  reset|()V
+ AmfMessageDeserializer
+  readBody|(Lflex/messaging/io/amf/MessageBody;I)V
+  readObject|()Ljava/lang/Object;
+ AmfMessageSerializer
+  writeBody|(Lflex/messaging/io/amf/MessageBody;)V
+  writeObject|(Ljava/lang/Object;)V
+ Java15Amf0Output
+  writeObject|(Ljava/lang/Object;)V
  Java15Amf3Output
   writeObject|(Ljava/lang/Object;)V
+ TraitsInfo
+  addProperty|(Ljava/lang/String;)V
+  getProperty|(I)Ljava/lang/String;
+flex.messaging.io.amf.translator|ASTranslator|convert|(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+flex.messaging.io.amf.translator.decoder
+ ActionScriptDecoder
+  decodeObject|(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+ BooleanDecoder
+  decodeObject|(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+ DecoderFactory
+  getDecoder|(Ljava/lang/Object;Ljava/lang/Class;)Lflex/messaging/io/amf/translator/decoder/ActionScriptDecoder;
+  isBoolean|(Ljava/lang/Class;)Z
+  isNumber|(Ljava/lang/Class;)Z
+ NativeDecoder
+  decodeObject|(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+flex.messaging.log
+ Logger
+  log
+   (SLjava/lang/String;[Ljava/lang/Object;Ljava/lang/Throwable;)V
+   (SLjava/lang/String;[Ljava/lang/Object;Ljava/lang/Throwable;Z)V
+  warn|(Ljava/lang/String;)V
+flex.messaging.util
+ ClassUtil
+  createClass|(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/Class;
+  createDefaultInstance|(Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/Object;
+ TimeoutAbstractObject
+  updateLastUse|()V
+ UUIDUtils
+  createUUID|(Z)Ljava/lang/String;
