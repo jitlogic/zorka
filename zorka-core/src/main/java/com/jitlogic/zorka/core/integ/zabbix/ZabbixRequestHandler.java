@@ -80,7 +80,7 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     /**
      * Zabbix protocol header magic number
      */
-    private static final byte[] header = {0x5a, 0x42, 0x58, 0x44, 0x01};
+    private static final byte[] HEADER = {0x5a, 0x42, 0x58, 0x44, 0x01};
 
 
     /**
@@ -106,62 +106,43 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
         byte[] buf = new byte[MAX_REQUEST_LENGTH + HDR_LEN];
         int pos = 0;
 
+        long len = 0;
+
+        boolean hasHdr = true;
 
         for (int b = in.read(); b != -1 && pos < buf.length; b = in.read()) {
             buf[pos++] = (byte) b;
             if (b == 0x0a) {
                 break;
             }
-        }
-
-        boolean hasHdr = true;
-
-        if (buf.length > 5) {
-            for (int i = 0; i < header.length; i++) {
-                if (buf[i] != header[i]) {
-                    hasHdr = false;
+            if (pos == 5) {
+                for (int i = 0; i < HEADER.length; i++) {
+                    if (buf[i] != HEADER[i]) {
+                        hasHdr = false;
+                    }
                 }
-            }
-        }
 
-        if (hasHdr) {
-            while (pos < HDR_LEN) {
-                int b = in.read();
-                if (b == -1) {
-                    return null;
-                }
-                buf[pos++] = (byte) b;
-            }
+                if (hasHdr) {
+                    pos = 0;
+                    for (int i = 0; i < 8; i++) {
+                        len |= ((long) in.read()) << (i * 8);
+                    }
+                    if (len > MAX_REQUEST_LENGTH) return null;
+                    while (pos < len) {
+                        int x = in.read(buf, pos, (int)(len-pos));
+                        if (x > 0) {
+                            pos += x;
+                        } else {
+                            return null;
+                        }
+                    }
+                    break;
+                } // hasHdr
+            } // pos == 5
+        } // for
 
-            long len = 0;
-
-            for (int i = 0; i < 8; i++) {
-                len |= ((long) buf[i + 5]) << (i * 8);
-            }
-
-            if (len > MAX_REQUEST_LENGTH) {
-                return null;
-            }
-
-            while (pos < len + HDR_LEN) {
-                int b = in.read();
-                if (b == -1) {
-                    return null;
-                }
-                buf[pos++] = (byte) b;
-            }
-        }
-
-        if (buf[pos - 1] == 0x0a) {
-            pos--;
-        }
-
-        StringBuffer sb = new StringBuffer(pos);
-
-        for (int i = hasHdr ? 13 : 0; i < pos; i++) {
-            sb.append((char) buf[i]);
-        }
-
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < pos; i++) sb.append((char)buf[i]);
         return sb.toString();
     }
 
@@ -169,49 +150,6 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
      * TODO remove either this or above header constant
      */
     private static final byte[] zbx_hdr = {(byte) 'Z', (byte) 'B', (byte) 'X', (byte) 'D', 0x01};
-
-
-    /**
-     * Translates zabbix query to beanshell call
-     *
-     * @param query zabbix query
-     *
-     * @return query ready to be passed to bsh agent
-     */
-//	public static String translate(String query) {
-//		StringBuilder sb = new StringBuilder(query.length());
-//		int pos = 0;
-//
-//		while (pos < query.length() && query.charAt(pos) != '[') {
-//			pos++;
-//		}
-//
-//		sb.append(query.substring(0, pos).replace("__", "."));
-//
-//		if (pos >= query.length()) {
-//			return sb.toString();
-//		}
-//
-//		sb.append('(');
-//        pos++;
-//
-//		while (pos < query.length() && query.charAt(pos) != ']') {
-//			if (query.charAt(pos) == '"') {
-//				int pstart = pos++;
-//				while (pos < query.length() && query.charAt(pos) != '"') {
-//					pos++;
-//				}
-//				sb.append(query.substring(pstart, pos+1));
-//			} else {
-//				sb.append(query.charAt(pos));
-//			}
-//			pos++;
-//		}
-//
-//		sb.append(')');
-//
-//		return sb.toString();
-//	}
 
 
     /**
