@@ -9,7 +9,6 @@ import com.jitlogic.netkit.log.LoggerFactory;
 import com.jitlogic.netkit.util.NetkitUtil;
 
 import java.nio.channels.SelectionKey;
-import java.util.Map;
 
 import static com.jitlogic.netkit.integ.ring.RingProtocol.*;
 import static com.jitlogic.netkit.util.TextUtil.camelCase;
