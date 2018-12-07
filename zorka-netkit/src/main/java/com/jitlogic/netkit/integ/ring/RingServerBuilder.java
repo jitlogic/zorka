@@ -24,7 +24,7 @@ public class RingServerBuilder {
 
     public static final Keyword IP                   = Keyword.intern("ip");
     public static final Keyword PORT                 = Keyword.intern("port");
-    public static final Keyword THREAD               = Keyword.intern("thread");
+    public static final Keyword WORKER_THREADS       = Keyword.intern("worker-threads");
     public static final Keyword IOTHREAD_NAME_PREFIX = Keyword.intern("iothread-name-prefix");
     public static final Keyword WORKER_NAME_PREFIX   = Keyword.intern("worker-name-prefix");
     public static final Keyword QUEUE_SIZE           = Keyword.intern("queue-size");
@@ -40,7 +40,7 @@ public class RingServerBuilder {
     public static NetServer server(IPersistentMap config) throws IOException {
         String ip = coerceStr(config.valAt(IP, "0.0.0.0"), HttpProtocol.RE_IPV4_ADDR);
         int port = coerceInt(config.valAt(PORT, 8090));
-        int nthreads = coerceInt(config.valAt(THREAD, 4));
+        int nthreads = coerceInt(config.valAt(WORKER_THREADS, 4));
 
         String iothread = coerceStr(config.valAt(IOTHREAD_NAME_PREFIX, "netkit-io"), null);
 
