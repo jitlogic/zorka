@@ -23,10 +23,6 @@ zorka.defCfg("nagios", "no");
 zorka.defCfg("zabbix", "yes");
 zorka.defCfg("zabbix.active", "yes");
 
-zorka.defCfg("influxdb", "no");
-zorka.defCfg("opentsdb", "no");
-zorka.defCfg("graphite", "no");
-zorka.defCfg("prometheus.push", "no");
 
 if (zorka.boolCfg("zabbix") || zorka.boolCfg("zabbix.active")) {
   zorka.require("zabbix.bsh");
