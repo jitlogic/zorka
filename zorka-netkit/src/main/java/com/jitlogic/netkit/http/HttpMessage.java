@@ -1,9 +1,16 @@
 package com.jitlogic.netkit.http;
 
+import com.jitlogic.netkit.util.NetkitUtil;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.jitlogic.netkit.http.HttpMethod.GET;
 
 /**
  * HTTP message represents either request or reply. This class along with
@@ -11,6 +18,14 @@ import java.util.Map;
  * prefers convenience over performance.
  */
 public class HttpMessage {
+
+    public static HttpMessage GET(String uri, String...headers) {
+        HttpMessage msg = new HttpMessage(false).setUri(uri).setMethod(GET);
+        for (int i = 1; i < headers.length; i+=2) {
+            msg.header(headers[i-1], headers[i]);
+        }
+        return msg;
+    }
 
     public static HttpMessage RESP(int status) {
         return new HttpMessage(true).setStatus(status);
@@ -49,8 +64,9 @@ public class HttpMessage {
         return method;
     }
 
-    public void setMethod(HttpMethod method) {
+    public HttpMessage setMethod(HttpMethod method) {
         this.method = method;
+        return this;
     }
 
     public int getStatus() {
@@ -92,19 +108,34 @@ public class HttpMessage {
         return bodyParts;
     }
 
+    public String getBodyAsString() {
+        if (bodyParts.isEmpty()) {
+            return null;
+        } else {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            for (Object o : bodyParts) {
+                ByteBuffer bb = NetkitUtil.toByteBuffer(o);
+                bos.write(bb.array(), bb.position(), bb.limit());
+            }
+            return new String(bos.toByteArray());
+        }
+    }
+
     public String getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public HttpMessage setVersion(String version) {
         this.version = version;
+        return this;
     }
 
     public String getQuery() {
         return query;
     }
 
-    public void setQuery(String query) {
+    public HttpMessage setQuery(String query) {
         this.query = query;
+        return this;
     }
 }

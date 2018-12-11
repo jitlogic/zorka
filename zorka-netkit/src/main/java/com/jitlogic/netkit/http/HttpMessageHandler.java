@@ -70,7 +70,10 @@ public class HttpMessageHandler implements HttpListener, HttpMessageListener {
 
     @Override
     public void submit(SelectionKey key, HttpMessage msg) {
-        HttpEncoder encoder = new HttpEncoder(config);
+        submit(new HttpEncoder(config), key, msg);
+    }
+
+    public void submit(HttpEncoder encoder, SelectionKey key, HttpMessage msg) {
         if (msg.isResponse()) {
             encoder.response(key, msg.getVersion(), msg.getStatus(), "");
         } else {
