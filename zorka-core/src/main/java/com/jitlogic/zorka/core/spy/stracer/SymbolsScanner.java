@@ -24,7 +24,6 @@ import com.jitlogic.zorka.common.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.DatatypeConverter;
 import java.util.List;
 import java.util.Map;
 
@@ -59,14 +58,6 @@ public class SymbolsScanner implements TagProcessor {
 
     public void clear() {
         writer.reset();
-    }
-
-    public String getData() {
-        if (log.isDebugEnabled()) {
-            log.debug("GetData: position=" + writer.position());
-        }
-        byte[] b = ZorkaUtil.clipArray(writer.getBuf(), writer.position());
-        return writer.position() > 0 ? DatatypeConverter.printBase64Binary(b) : null;
     }
 
     private long unpackLong(byte[] buf, int offs) {
