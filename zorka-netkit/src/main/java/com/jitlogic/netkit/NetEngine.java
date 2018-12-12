@@ -10,10 +10,7 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.ClosedSelectorException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
+import java.nio.channels.*;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -217,6 +214,11 @@ public abstract class NetEngine implements Runnable, BufHandler {
                             handshakeStatus = engine.getHandshakeStatus();
                             break;
                         }
+                    } catch (ClosedChannelException e) {
+                        clientClose(key);
+                        tctx.setSslState(CLOSED);
+                        log.traceNio(key, "sslHandshake()->unwrap()", "CLOSED");
+                        return;
                     } catch (IOException e) {
                         log.error("at sslHandshake", e);
                         clientClose(key);

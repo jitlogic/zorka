@@ -2,6 +2,7 @@ package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.netkit.*;
 import com.jitlogic.netkit.http.*;
+import com.jitlogic.netkit.tls.TlsContextBuilder;
 import com.jitlogic.zorka.common.ZorkaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class HttpService implements ZorkaService {
                     prefix + ".keystore should point to .jks file with SSL keystore.");
             String keypass = parseStr(config.get("keystore.pass"), null, "changeit",
                     prefix + ".keypass should contain proper password to keystore.");
-            sslContext = TlsUtils.svrContext(keystore, keypass);
+            sslContext = TlsContextBuilder.svrContext(keystore, keypass);
         }
 
         log.info( (tlsEnabled ? "HTTPS" : "HTTP") + " service listening on port: " + listenPort);

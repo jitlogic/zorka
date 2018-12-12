@@ -163,4 +163,14 @@ public class NetkitUtil {
         }
     };
 
+    public static void close(Closeable obj) {
+        if (obj != null) {
+            try {
+                obj.close();
+            } catch (IOException e) {
+                // Nothing here
+            }
+        }
+    }
+
 }

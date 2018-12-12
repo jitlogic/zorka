@@ -6,7 +6,7 @@ import clojure.lang.Keyword;
 import com.jitlogic.netkit.BufHandler;
 import com.jitlogic.netkit.BufHandlerFactory;
 import com.jitlogic.netkit.NetServer;
-import com.jitlogic.netkit.TlsUtils;
+import com.jitlogic.netkit.tls.TlsContextBuilder;
 import com.jitlogic.netkit.http.HttpConfig;
 import com.jitlogic.netkit.http.HttpProtocol;
 import com.jitlogic.netkit.http.HttpProtocolHandler;
@@ -58,7 +58,7 @@ public class RingServerBuilder {
         SSLContext sslctx = null;
 
         if (coerceBool(config.valAt(TLS, false))) {
-            sslctx = TlsUtils.svrContext(
+            sslctx = TlsContextBuilder.svrContext(
                     coerceStr(config.valAt(KEYSTORE, "ssl.jks"), null),
                     coerceStr(config.valAt(KEYSTORE_PASS, "changeit"), null));
         }

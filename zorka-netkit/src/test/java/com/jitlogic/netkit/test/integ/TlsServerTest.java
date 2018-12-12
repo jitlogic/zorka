@@ -3,8 +3,7 @@ package com.jitlogic.netkit.test.integ;
 import com.jitlogic.netkit.BufHandler;
 import com.jitlogic.netkit.BufHandlerFactory;
 import com.jitlogic.netkit.NetServer;
-import com.jitlogic.netkit.TlsUtils;
-import com.jitlogic.netkit.log.Logger;
+import com.jitlogic.netkit.tls.TlsContextBuilder;
 import com.jitlogic.netkit.log.LoggerFactory;
 import com.jitlogic.netkit.test.support.EchoHandler;
 import org.junit.AfterClass;
@@ -30,7 +29,7 @@ public class TlsServerTest {
     public static void startServer() throws Exception {
         LoggerFactory.setLevel(LoggerFactory.TRACE_LEVEL);
         //System.setProperty("javax.net.debug", "all");
-        sslctx = TlsUtils.svrContext("src/test/resources/tls/localhost.jks", "changeit");
+        sslctx = TlsContextBuilder.svrContext("src/test/resources/tls/localhost.jks", "changeit");
         server = new NetServer("test-server", "127.0.0.1", 19007, new BufHandlerFactory() {
             @Override
             public BufHandler create(SocketChannel ch) {

@@ -3,7 +3,7 @@ package com.jitlogic.netkit.test.integ;
 import com.jitlogic.netkit.BufHandler;
 import com.jitlogic.netkit.BufHandlerFactory;
 import com.jitlogic.netkit.NetServer;
-import com.jitlogic.netkit.TlsUtils;
+import com.jitlogic.netkit.tls.TlsContextBuilder;
 import com.jitlogic.netkit.http.HttpConfig;
 import com.jitlogic.netkit.http.HttpMessage;
 import com.jitlogic.netkit.http.HttpProtocolHandler;
@@ -40,7 +40,7 @@ public class HttpsServerTest {
         ringFn.add(TestRingFn.resp(201, "BLAM"));
         ringFn.add(TestRingFn.resp(202, "BLAG"));
 
-        sslctx = TlsUtils.svrContext("src/test/resources/tls/localhost.jks", "changeit");
+        sslctx = TlsContextBuilder.svrContext("src/test/resources/tls/localhost.jks", "changeit");
 
         SSLContext.setDefault(sslctx);
 
