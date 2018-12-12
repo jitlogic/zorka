@@ -1,7 +1,10 @@
 package com.jitlogic.netkit.http;
 
 import com.jitlogic.netkit.NetException;
+import com.jitlogic.netkit.log.EventSink;
+import com.jitlogic.netkit.log.LoggerFactory;
 import com.jitlogic.netkit.util.BufStreamOutput;
+import com.jitlogic.netkit.util.NetkitUtil;
 
 import javax.net.SocketFactory;
 import java.io.IOException;
@@ -14,7 +17,7 @@ import java.util.regex.Matcher;
 /**
  * HTTP client using traditional
  */
-public class HttpStreamClient implements HttpMessageListener {
+public class HttpStreamClient implements HttpMessageListener, HttpMessageClient {
 
     private int port;
     private boolean tls;
@@ -26,11 +29,14 @@ public class HttpStreamClient implements HttpMessageListener {
 
     private SocketFactory socketFactory;
 
-    private BufStreamOutput streamOutput;
+    private BufStreamOutput stream;
     private HttpMessageHandler output;
     private HttpStreamInput input;
 
     private HttpMessage result;
+
+    private static EventSink evtConnects = LoggerFactory.getSink("http.client.connects");
+    private static EventSink evtCalls = LoggerFactory.getSink("http.client.connects");
 
     public HttpStreamClient(HttpConfig config, String baseUrl) {
         this.config = config;
@@ -51,29 +57,54 @@ public class HttpStreamClient implements HttpMessageListener {
         if (!tls) {
             socketFactory = SocketFactory.getDefault();
         } else {
-            throw new NetException("TLS not implemented (yet).");
+            socketFactory = config.getSslContext().getSocketFactory();
         }
     }
 
+    @Override
     public HttpMessage exec(HttpMessage in) {
 
         if (socket == null || !socket.isConnected()) {
             connect();
         }
 
-        output.submit(new HttpEncoder(config, streamOutput), null, in);
-        input.run();
+        Exception e = null;
 
-        return result;
+        for (int i = 0; i < config.getMaxRetries(); i++) {
+            try {
+                output.submit(new HttpEncoder(config, stream), null, in);
+                input.run();
+                evtCalls.call();
+                return result;
+            } catch (Exception e1) {
+                e = e1;
+                reconnect();
+            }
+        }
+
+        throw new NetException("Error executing HTTP call", e);
+    }
+
+    private void reconnect() {
+        if (socket != null) {
+            NetkitUtil.close(socket);
+            socket = null;
+            input = null;
+            stream = null;
+            output = null;
+        }
+        connect();
     }
 
     private void connect() {
         try {
             socket = socketFactory.createSocket(host, port);
             input = new HttpStreamInput(config, this, HttpDecoderState.READ_RESP_LINE, socket.getInputStream());
-            streamOutput = new BufStreamOutput(socket.getOutputStream());
+            stream = new BufStreamOutput(socket.getOutputStream());
             output = new HttpMessageHandler(config, null);
+            evtConnects.call();
         } catch (IOException e) {
+            evtConnects.error();
             throw new NetException("Cannot connect to " + host + ":" + port, e);
         }
     }
