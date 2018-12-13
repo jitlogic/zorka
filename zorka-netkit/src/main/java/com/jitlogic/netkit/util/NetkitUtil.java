@@ -61,6 +61,33 @@ public class NetkitUtil {
         return ByteBuffer.wrap(os.toByteArray());
     }
 
+    public static byte[] toByteArray(Object obj) {
+        if (obj instanceof byte[])
+            return (byte[])obj;
+
+        if (obj instanceof String)
+            return ((String)obj).getBytes();
+
+        if (obj instanceof ByteBuffer) {
+            ByteBuffer bb = (ByteBuffer)obj;
+            byte[] rslt = new byte[bb.remaining()];
+            System.arraycopy(bb.array(), bb.position(), rslt, 0, bb.remaining());
+            return rslt;
+        }
+
+        if (obj instanceof InputStream) {
+            return toByteArray(getByteBuffer((InputStream)obj));
+        }
+        if (obj  instanceof File) {
+            try {
+                return toByteArray(getByteBuffer(new FileInputStream((File)obj)));
+            } catch (IOException e) {
+
+            }
+        }
+
+        return null;
+    }
 
     public static DynamicBytes readAll(InputStream is) throws IOException {
         DynamicBytes bytes = new DynamicBytes(32768); // init 32k
