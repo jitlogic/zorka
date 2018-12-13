@@ -27,7 +27,6 @@ import static com.jitlogic.zorka.cbor.TraceDataTags.*;
 import static com.jitlogic.zorka.cbor.TraceRecordFlags.*;
 import static com.jitlogic.zorka.cbor.TextIndexTypeMarkers.*;
 
-import java.io.ByteArrayInputStream;
 import java.util.*;
 
 /**
@@ -230,13 +229,13 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
                     }
 
                     if (awriter.position() > 0) {
-                        byte[] data = ZorkaUtil.clipArray(awriter.getBuf(), awriter.position());
-                        send(new ByteArrayInputStream(data), data.length, submitAgentUrl, null);
+                        byte[] data = ZorkaUtil.clipArray(awriter.getBuf(), awriter.position()); // TODO get rid of this allocation
+                        send(data, data.length, submitAgentUrl, null);
                     }
 
                     if (twriter.position() > 0) {
-                        byte[] data = ZorkaUtil.clipArray(twriter.getBuf(), twriter.position());
-                        send(new ByteArrayInputStream(data), data.length, submitTraceUrl, UUID.randomUUID().toString());
+                        byte[] data = ZorkaUtil.clipArray(twriter.getBuf(), twriter.position()); // TODO get rid of this allocation
+                        send(data, data.length, submitTraceUrl, UUID.randomUUID().toString());
                     }
 
                     break;

@@ -2,6 +2,6 @@ package com.jitlogic.netkit.http;
 
 public interface HttpMessageClient {
 
-    HttpMessage exec(HttpMessage msg);
+    HttpMessage exec(HttpMessage req);
 
 }

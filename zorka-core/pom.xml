@@ -71,6 +71,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.jitlogic.zorka</groupId>
+            <artifactId>zorka-netkit</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
             <version>${asm.version}</version>

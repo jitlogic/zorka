@@ -59,7 +59,6 @@ public class STraceHttpOutput extends ZicoHttpOutput {
             long rt = retryTime;
             for (int i = 0; i < retries+1; i++) {
                 STraceBufChunk chunk = (STraceBufChunk) sr;
-                Base64FormattingStream bs = null;
                 try {
                     synchronized (scanner) {
                         scanner.clear();
@@ -68,14 +67,12 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                         CborDataReader rdr = new CborDataReader(input, scanner, svr);
                         while (!input.eof()) rdr.read();
                         if (scanner.getPosition() > 0) {
-                            bs = new Base64FormattingStream(new ByteArrayCborInput(scanner.getBuf(), 0, scanner.getPosition()));
-                            send(bs, bs.available(), submitAgentUrl, null);
+                            send(scanner.getBuf(), scanner.getPosition(), submitAgentUrl, null);
                         }
                     }
 
-                    bs = new Base64FormattingStream(new ChunkedCborInput(chunk));
                     UUID uuid = new UUID(chunk.getUuidH(), chunk.getUuidL());
-                    send(bs, bs.available(), submitTraceUrl, uuid.toString());
+                    send(chunk.getBuffer(), chunk.getPosition(), submitTraceUrl, uuid.toString());
                     break;
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");
@@ -83,14 +80,6 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                 } catch (Exception e) {
                     log.error("Error sending trace record: " + e + ". Resetting connection.", e);
                     newSession();
-                } finally {
-                    if (bs != null) {
-                        try {
-                            bs.close();
-                        } catch (Exception e) {
-                            log.warn("Cannot close BIS:", e);
-                        }
-                    }
                 }
 
                 try {

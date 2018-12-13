@@ -24,50 +24,36 @@ import com.jitlogic.zorka.core.spy.ltracer.LTraceHttpOutput;
 import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
-import com.jitlogic.zorka.net.http.mini.HttpClient;
-import com.jitlogic.zorka.net.http.mini.HttpRequest;
-import com.jitlogic.zorka.net.http.mini.HttpUtil;
-import com.jitlogic.zorka.net.http.mini.MiniHttpClient;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
-
 import static org.junit.Assert.*;
 
+import static com.jitlogic.netkit.http.HttpMessage.*;
+
 public class TraceCborOutputUnitTest extends ZorkaFixture {
-
-    private HttpRequest GET(String url) throws IOException {
-        return HttpUtil.GET(url).withHeader("Host", "zorka.io");
-    }
-
-    private HttpRequest POST(String url, String body) throws IOException {
-        return HttpUtil.POST(url, "");
-    }
 
     private String map2json(Object...args) {
         return new JSONWriter().write(ZorkaUtil.constMap(args));
     }
 
     @Test
-    public void testRegisterNewAgent() throws Exception {
+    public void testRegisterNewAgent() {
         LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                         "http.url", "http://zorka.io/",
                         "auth.key", "secret",
                         "hostname", "zorka.myapp",
                         "app.name", "myapp",
-                        "env.name", "TST"
-                        //"attrs.location", "DC1",
-                        //"attrs.room", "1A",
-                        //"attrs.rack", "12"
-                ));
+                        "env.name", "TST"));
+        ObjectInspector.setField(output, "httpClient", httpClient);
         httpClient.expect(
-                POST("http://zorka.io/agent/register",
+                POST("/agent/register",
                     map2json("rkey", "secret",
-                        "name", "zorka.myapp", "app", "myapp", "env", "TST"))
-                    .withHeader("Content-Type", "application/json"))
-        .response(201, map2json("uuid", "123", "authkey", "secret"));
+                        "name", "zorka.myapp", "app", "myapp", "env", "TST"),
+                        "Content-Type", "application/json"))
+                .setResponse(
+                        RESP(201, map2json("uuid", "123", "authkey", "secret")));
 
         output.register();
 
@@ -76,40 +62,26 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
                 output.getAgentUUID().length() > 0);
     }
 
-    //@Test
-    public void testRegisterNewAgentWithAttrs() throws Exception {
-        // TODO
-    }
-
     @Test(expected = ZorkaRuntimeException.class)
-    public void testRegisterAgentWithBadAuthKey() throws Exception {
+    public void testRegisterAgentWithBadAuthKey() {
         LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
             ZorkaUtil.<String,String>constMap(
                 "http.url", "http://zorka.io/",
                 "auth.key", "bad",
                 "hostname", "zorka.myapp",
                 "app.name", "myapp",
-                "env.name", "TST"
-                //"attrs.location", "DC1",
-                //"attrs.room", "1A",
-                //"attrs.rack", "12"
-            ));
+                "env.name", "TST"));
+        ObjectInspector.setField(output, "httpClient", httpClient);
         httpClient.expect(
-                POST("http://zorka.io/agent/register",
+                POST("/agent/register",
                         map2json("rkey", "bad", "name", "zorka.myapp",
-                                "app", "myapp", "env", "TST"))
-                        .withHeader("Content-Type", "application/json"))
-                .response(401, map2json("error", "Permission denied."));
+                                "app", "myapp", "env", "TST"),
+                        "Content-Type", "application/json"))
+                .setResponse(RESP(401, map2json("error", "Permission denied.")));
 
         output.register();
-    }
 
-    public void testRegisterAgentWithAlreadyExistingKey() throws Exception {
-        // TODO
-    }
-
-    public void testRegisterNewAndReregisterAgainWithObtainedKey() throws Exception {
-        // TODO
+        httpClient.verify();
     }
 
     @Test @Ignore
@@ -126,8 +98,8 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
 
         httpClient.expect(
                 POST("http://zorka.io/agent/session",
-                        map2json("uuid", "123", "authkey", "secret"))
-                ).response(200, map2json("session", "someUUID"));
+                        map2json("uuid", "123", "authkey", "secret")))
+                .setResponse(RESP(200, map2json("session", "someUUID")));
 
 
         output.openSession();
@@ -138,27 +110,8 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
         httpClient.verify();
     }
 
-    @Test @Ignore("This requires working ZICO 2.x collector.")
-    public void testOutputAuthManual() {
-        HttpClient miniClient = new MiniHttpClient();
-        ObjectInspector.setField(HttpUtil.class, "client", miniClient);
-
-        LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
-                ZorkaUtil.<String,String>constMap(
-                        "http.url", "http://127.0.0.1:8640/",
-                        "agent.uuid", "21c00000-0201-0000-0015-deadbeef1003",
-                        "auth.key", "deadbeefdadacafe",
-                        "hostname", "myapp.local",
-                        "app.name", "MYAPP2",
-                        "env.name", "PRD"));
-
-        output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
-
-        output.runCycle();
-    }
-
     @Test @Ignore
-    public void testPostSimpleTrace() throws Exception {
+    public void testPostSimpleTrace() {
         LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                         "http.url", "http://zorka.io",
@@ -168,9 +121,12 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
                         "app.name", "myapp",
                         "env.name", "TST"));
 
-        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
-        httpClient.expect(GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
-        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/auth"))
+                .setResponse(RESP(200, "someUUID"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/agd"))
+                .setResponse(RESP(202, "OK"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc"))
+                .setResponse(RESP(202, "OK"));
 
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
         output.runCycle();
@@ -179,7 +135,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
     }
 
     @Test @Ignore
-    public void testPostTwoTracesOneAgd() throws Exception {
+    public void testPostTwoTracesOneAgd() {
         LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                 "http.url", "http://zorka.io/",
@@ -189,10 +145,14 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
                         "app.name", "myapp",
                         "env.name", "TST"));
 
-        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
-        httpClient.expect(GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
-        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
-        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/auth"))
+                .setResponse(RESP(200, "someUUID"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/agd"))
+                .setResponse(RESP(202, "OK"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc"))
+                .setResponse(RESP(202, "OK"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc"))
+                .setResponse(RESP(202, "OK"));
 
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
@@ -212,13 +172,20 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
                         "app.name", "myapp",
                         "env.name", "TST"));
 
-        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
-        httpClient.expect(GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
-        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
-        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(412, "OK");
-        httpClient.expect(GET("http://zorka.io/agent/auth")).response(200, "someUUID");
-        httpClient.expect(GET("http://zorka.io/agent/submit/agd")).response(202, "OK");
-        httpClient.expect(GET("http://zorka.io/agent/submit/trc")).response(202, "OK");
+        httpClient.expect(GET("http://zorka.io/agent/auth"))
+                .setResponse(RESP(200, "someUUID"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/agd"))
+                .setResponse(RESP(202, "OK"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc"))
+                .setResponse(RESP(202, "OK"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc"))
+                .setResponse(RESP(412, "OK"));
+        httpClient.expect(GET("http://zorka.io/agent/auth"))
+                .setResponse(RESP(200, "someUUID"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/agd"))
+                .setResponse(RESP(202, "OK"));
+        httpClient.expect(GET("http://zorka.io/agent/submit/trc"))
+                .setResponse(RESP(202, "OK"));
 
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));
         output.submit(tr("some.class", "someMethod", "()V", 1, 0, 0, 100));

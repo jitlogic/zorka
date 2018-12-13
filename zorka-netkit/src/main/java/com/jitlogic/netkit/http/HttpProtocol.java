@@ -60,6 +60,12 @@ public class HttpProtocol {
             + "(:" + URI_PORT + ")?(" + URI_PATH + ")?(" + URI_QSTR + ")?";
     public static final Pattern RE_URL = Pattern.compile(URL);
 
+    public static int REG_URL_PROTO = 1;
+    public static int REG_URL_ADDR  = 2;
+    public static int REG_URL_PORT  = 3;
+    public static int REG_URL_PATH  = 4;
+    public static int REG_URL_QSTR  = 5;
+
     // rfc2616 3.5 - Content Codings
     public static final String ENCODING  = "gzip|compress|deflate|identity";
 

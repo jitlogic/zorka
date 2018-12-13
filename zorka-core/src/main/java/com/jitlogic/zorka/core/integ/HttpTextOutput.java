@@ -16,26 +16,31 @@
 
 package com.jitlogic.zorka.core.integ;
 
+import com.jitlogic.netkit.http.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
-import com.jitlogic.zorka.net.http.mini.HttpRequest;
-import com.jitlogic.zorka.net.http.mini.HttpResponse;
-import com.jitlogic.zorka.net.http.mini.HttpUtil;
-
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+
+import static com.jitlogic.netkit.http.HttpProtocol.REG_URL_PATH;
+import static com.jitlogic.netkit.http.HttpProtocol.REG_URL_QSTR;
+
 
 /**
  * Generic HTTP output for text data. Accepts strings that will be
  */
 public class HttpTextOutput extends ZorkaAsyncThread<String> {
 
-    private String url, fullUrl;
+    private String url;
+    private String uri;
     private Map<String,String> urlParams;
-    private Map<String,String> headers;
+    private String[] headers;
+
+    private HttpMessageClient client;
 
     public HttpTextOutput(String name, Map<String,String> conf, Map<String,String> urlParams, Map<String,String> headers) {
         super(name);
@@ -43,27 +48,53 @@ public class HttpTextOutput extends ZorkaAsyncThread<String> {
         this.url = conf.get("url");
 
         this.urlParams = urlParams != null ? urlParams : new HashMap<String, String>();
-        this.headers = headers != null ? headers : new HashMap<String, String>();
 
-        makeFullUrl();
+        if (headers != null) {
+            this.headers = new String[headers.size()*2];
+            int i = 0;
+            for (Map.Entry<String,String> e : headers.entrySet()) {
+                this.headers[i] = e.getKey();
+                this.headers[i+1] = e.getValue();
+                i += 2;
+            }
+        } else {
+            this.headers = new String[0];
+        }
+
+        this.client = new HttpStreamClient(new HttpConfig(), this.url);
+
+        parseUrl();
     }
 
 
-    private void makeFullUrl() {
+    private void parseUrl() {
         StringBuilder sb = new StringBuilder();
-        sb.append(url);
 
-        if (urlParams.size() > 0) {
-            int n = 0;
-            for (Map.Entry<String,String> e : urlParams.entrySet()) {
-                sb.append(n == 0 ? '?' : '&'); n++;
-                sb.append(ZorkaUtil.urlEncode(e.getKey()));
-                sb.append('=');
-                sb.append(ZorkaUtil.urlEncode(e.getValue()));
-            }
+        Matcher m = HttpProtocol.RE_URL.matcher(url);
+
+        if (!m.matches()) {
+            throw new ZorkaRuntimeException("Invalid URL: " + url);
         }
 
-        this.fullUrl = sb.toString();
+        String path = m.group(REG_URL_PATH);
+        String qstr = m.group(REG_URL_QSTR);
+
+        if (path == null) {
+            path = "/";
+        }
+
+        if (qstr != null) {
+            sb.append(qstr);
+        }
+
+        for (Map.Entry<String,String> e : urlParams.entrySet()) {
+            sb.append(sb.length() == 0 ? '?' : '&');
+            sb.append(ZorkaUtil.urlEncode(e.getKey()));
+            sb.append('=');
+            sb.append(ZorkaUtil.urlEncode(e.getValue()));
+        }
+
+        this.uri = path + sb.toString();
     }
 
 
@@ -71,23 +102,20 @@ public class HttpTextOutput extends ZorkaAsyncThread<String> {
     protected void process(List<String> msgs) {
         for (String msg : msgs) {
             try {
-                HttpRequest req = HttpUtil.POST(fullUrl, msg);
-                if (headers != null) {
-                    req.getHeaders().putAll(headers);
-                }
-                HttpResponse res = req.go();
+                HttpMessage req = HttpMessage.POST(uri, msg, headers);
+                HttpMessage res = client.exec(req);
 
                 // TODO what about 302 ?
                 if (res.getStatus() >= 400) {
-                    log.warn(url + ": error " + res.getStatus() + ": " + res.getStatusMsg());
+                    log.warn(url + ": error " + res.getStatus());
                     if (log.isDebugEnabled()) {
                         log.debug(url + ": request: '" + req.getBodyAsString() + "'");
                         log.debug(url + ": response: '" + res.getBodyAsString() + "'");
                     }
                 } else if (log.isDebugEnabled()) {
-                    log.debug("HTTP: " + fullUrl + " -> " + res.getStatus() + " " + res.getStatusMsg());
+                    log.debug("HTTP: " + url + " -> " + res.getStatus());
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("Error sending HTTP request", e);
             }
         }

@@ -28,7 +28,7 @@ public class HttpRequestHandlerUnitTest {
 
     @Test
     public void testSingleGetReq() {
-        svrListener.addReplies(HttpMessage.RESP(200).headers("X-Foo", "bar"));
+        svrListener.addReplies(HttpMessage.RESP(200, null).headers("X-Foo", "bar"));
         exchange.submit(new HttpRequest(config, cliHandler, "http://localhost", HttpMethod.GET));
         assertEquals(1, svrListener.getReqs().size());
         assertEquals(1, cliListener.getReqs().size());

@@ -3,7 +3,6 @@ package com.jitlogic.netkit.http;
 import com.jitlogic.netkit.util.NetkitUtil;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.jitlogic.netkit.http.HttpMethod.GET;
+import static com.jitlogic.netkit.http.HttpMethod.POST;
 
 /**
  * HTTP message represents either request or reply. This class along with
@@ -19,16 +19,34 @@ import static com.jitlogic.netkit.http.HttpMethod.GET;
  */
 public class HttpMessage {
 
+    private static void hdrs(HttpMessage msg, String[] headers) {
+        for (int i = 1; i < headers.length; i += 2) {
+            msg.header(headers[i - 1], headers[i]);
+        }
+    }
+
     public static HttpMessage GET(String uri, String...headers) {
         HttpMessage msg = new HttpMessage(false).setUri(uri).setMethod(GET);
-        for (int i = 1; i < headers.length; i+=2) {
-            msg.header(headers[i-1], headers[i]);
-        }
+        hdrs(msg, headers);
+        return msg;
+    }
+
+    public static HttpMessage POST(String uri, Object body, String...headers) {
+        HttpMessage msg = new HttpMessage(false).setUri(uri).setMethod(POST);
+        msg.getBodyParts().add(body);
+        hdrs(msg, headers);
         return msg;
     }
 
     public static HttpMessage RESP(int status) {
-        return new HttpMessage(true).setStatus(status);
+        return RESP(status, null);
+    }
+
+    public static HttpMessage RESP(int status, Object body, String...headers) {
+        HttpMessage msg = new HttpMessage(true).setStatus(status);
+        if (body != null) msg.getBodyParts().add(body);
+        hdrs(msg, headers);
+        return msg;
     }
 
     private boolean isResponse;
@@ -93,10 +111,12 @@ public class HttpMessage {
         return this;
     }
 
+    public String getHeader(String key) {
+        return headers.containsKey(key) ? headers.get(key).get(0) : null;
+    }
+
     public HttpMessage headers(String...keyvals) {
-        for (int i = 1; i < keyvals.length; i += 2) {
-            header(keyvals[i-1], keyvals[i]);
-        }
+        hdrs(HttpMessage.this, keyvals);
         return this;
     }
 

@@ -62,7 +62,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
     }
 
     @Override
-    public HttpMessage exec(HttpMessage in) {
+    public HttpMessage exec(HttpMessage req) {
 
         if (socket == null || !socket.isConnected()) {
             connect();
@@ -72,7 +72,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
 
         for (int i = 0; i < config.getMaxRetries(); i++) {
             try {
-                output.submit(new HttpEncoder(config, stream), null, in);
+                output.submit(new HttpEncoder(config, stream), null, req);
                 input.run();
                 evtCalls.call();
                 return result;

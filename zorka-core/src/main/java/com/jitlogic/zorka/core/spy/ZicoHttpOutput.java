@@ -16,16 +16,14 @@
 
 package com.jitlogic.zorka.core.spy;
 
+import com.jitlogic.netkit.http.HttpConfig;
+import com.jitlogic.netkit.http.HttpMessage;
+import com.jitlogic.netkit.http.HttpMessageClient;
+import com.jitlogic.netkit.http.HttpStreamClient;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.net.TlsContextBuilder;
-import com.jitlogic.zorka.net.http.mini.*;
-
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLContext;
-import java.io.IOException;
-import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.Map;
 
 import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
@@ -46,7 +44,8 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
     protected ZorkaConfig config;
 
-    protected HttpClient httpClient;
+    protected HttpConfig httpConfig;
+    protected HttpMessageClient httpClient;
 
     protected abstract void resetState();
 
@@ -70,11 +69,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.authKey = conf.get("auth.key");
         this.sessionKey = conf.get("sessn.key");
 
-        String url = parseStr(conf.get("http.url"), null, null,
-                "CborTraceOutput: missing mandatory parameter: tracer.http.url");
-
-        if (!url.endsWith("/")) url = url + "/";
-        url += "agent/";
+        String url = "/agent/";
 
         this.submitAgentUrl = url + "submit/agd";
         this.submitTraceUrl = url + "submit/trc";
@@ -88,17 +83,14 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.timeout = parseInt(conf.get("http.timeout"), 60000, "tracer.http.output");
         this.registry = registry;
 
-        if (config.hasCfg("tracer.net.http.tls.keystore") || config.hasCfg("tracer.net.http.tls.truststore")) {
-            SSLContext ctx = new TlsContextBuilder(config, "tracer.net.http").build();
-            if (ctx != null) {
-                this.httpClient = new MiniHttpClient(SocketFactory.getDefault(), ctx.getSocketFactory());
-            } else {
-                log.error("Cannot properly initialize keystore/truststore for ZICO HTTP output. Using default one.");
-                this.httpClient = HttpUtil.getHttpClient();
-            }
-        } else {
-            this.httpClient = HttpUtil.getHttpClient();
-        }
+        this.httpConfig = new HttpConfig();
+        httpConfig.setKeepAliveTimeout(timeout);
+
+        // TODO SSL context here
+
+        this.httpClient = new HttpStreamClient(httpConfig,
+                parseStr(conf.get("http.url"), null, null,
+                        "CborTraceOutput: missing mandatory parameter: tracer.http.url"));
     }
 
     /**
@@ -117,10 +109,9 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
         log.info("Registering agent as: name=" + hostname + " app=" + app + " env=" + env);
 
-        try {
-            HttpRequest req = HttpUtil.POST(httpClient, registerUrl, json)
-                    .withHeader("Content-Type", "application/json");
-            HttpResponse res = req.go();
+            HttpMessage req = HttpMessage.POST(registerUrl, json.getBytes(),
+                            "Content-Type", "application/json");
+            HttpMessage res = httpClient.exec(req);
             if (res.getStatus() == 201 || res.getStatus() == 200) {
                 Object rslt = new JSONReader().read(res.getBodyAsString());
                 if (rslt instanceof Map) {
@@ -140,11 +131,8 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
                 }
             } else {
                 throw new ZorkaRuntimeException("Invalid registration response from collector: "
-                        + res.getStatus() + ": " + res.getStatusMsg());
+                        + res.getStatus());
             }
-        } catch (IOException e) {
-            throw new ZorkaRuntimeException("I/O error occured while registering agent", e);
-        }
     }
 
     public String getAgentUUID() {
@@ -165,34 +153,32 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
             throw e;
         }
 
-        try {
-            log.debug("Requesting session for agent: uuid=" + agentUUID);
-            HttpRequest req = HttpUtil.POST(httpClient, sessionUrl,
-                    new JSONWriter().write(ZorkaUtil.map(
-                            "uuid", agentUUID,
-                            "authkey", sessionKey)));
-            HttpResponse res = req.go();
-            if (res.getStatus() == 200) {
-                Object rslt = new JSONReader().read(res.getBodyAsString());
-                if (rslt instanceof Map) {
-                    Map m = (Map)rslt;
-                    Object s = m.get("session");
-                    if (s instanceof String) {
-                        sessionUUID = (String)s;
-                        log.debug("Obtained session: uuid=" + sessionUUID);
-                    } else {
-                        throw new ZorkaRuntimeException("Invalid session response: '" + res.getBodyAsString() + "'");
-                    }
+        log.debug("Requesting session for agent: uuid=" + agentUUID);
+
+        HttpMessage req = HttpMessage.POST(sessionUrl,
+                new JSONWriter().write(ZorkaUtil.map(
+                        "uuid", agentUUID,
+                        "authkey", sessionKey)).getBytes(),
+                "Content-Type", "application/json");
+        HttpMessage res = httpClient.exec(req);
+        if (res.getStatus() == 200) {
+            Object rslt = new JSONReader().read(res.getBodyAsString());
+            if (rslt instanceof Map) {
+                Map m = (Map)rslt;
+                Object s = m.get("session");
+                if (s instanceof String) {
+                    sessionUUID = (String)s;
+                    log.debug("Obtained session: uuid=" + sessionUUID);
                 } else {
                     throw new ZorkaRuntimeException("Invalid session response: '" + res.getBodyAsString() + "'");
                 }
-            } else if (res.getStatus() == 401) {
-                throw new ZorkaRuntimeException("Not authorized. Check trapper.cbor.auth-key property.");
             } else {
-                throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatusMsg());
+                throw new ZorkaRuntimeException("Invalid session response: '" + res.getBodyAsString() + "'");
             }
-        } catch (IOException e) {
-            throw new ZorkaRuntimeException("I/O exception: " + e.getMessage(), e);
+        } else if (res.getStatus() == 401) {
+            throw new ZorkaRuntimeException("Not authorized. Check trapper.cbor.auth-key property.");
+        } else {
+            throw new ZorkaRuntimeException("Server error: " + res.getStatus());
         }
     }
 
@@ -222,25 +208,20 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         }
     }
 
-    protected void send(InputStream bodyStream, int bodyLength, String uri, String traceUUID) {
-        try {
-            HttpRequest req = HttpUtil.POST(httpClient, uri, bodyStream, bodyLength);
-            req.setHeader("X-Zorka-Agent-UUID", agentUUID);
-            req.setHeader("X-Zorka-Session-UUID", sessionUUID);
-            req.setHeader("Content-Type", "application/zorka+cbor+v1");
-            if (traceUUID != null) req.setHeader("X-Zorka-Trace-UUID", traceUUID);
-            HttpResponse res = req.go();
-            if (res.getStatus() < 300) {
-                log.trace("Submitted: " + uri + " : " + traceUUID);
-            } else if (res.getStatus() == 412) {
-                throw new ZorkaRuntimeException("Resend.");
-            } else {
-                throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatus());
-            }
-        } catch (IOException e) {
-            throw new ZorkaRuntimeException("I/O exception: " + e.getMessage());
+    protected void send(byte[] body, int bodyLength, String uri, String traceUUID) {
+        HttpMessage req = HttpMessage.POST(uri, ByteBuffer.wrap(body, 0, bodyLength),
+                "X-Zorka-Agent-UUID", agentUUID,
+                "X-Zorka-Session-UUID", sessionUUID,
+                "Content-Type", "application/zorka+cbor+v1");
+        if (traceUUID != null) req.header("X-Zorka-Trace-UUID", traceUUID);
+        HttpMessage res = httpClient.exec(req);
+        if (res.getStatus() < 300) {
+            log.trace("Submitted: " + uri + " : " + traceUUID);
+        } else if (res.getStatus() == 412) {
+            throw new ZorkaRuntimeException("Resend.");
+        } else {
+            throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatus());
         }
-
     }
 
 }

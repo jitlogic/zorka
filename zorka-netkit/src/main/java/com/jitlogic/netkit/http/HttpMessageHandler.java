@@ -1,6 +1,7 @@
 package com.jitlogic.netkit.http;
 
 import com.jitlogic.netkit.ProtocolException;
+import com.jitlogic.netkit.util.NetkitUtil;
 
 import java.nio.channels.SelectionKey;
 import java.util.ArrayList;
@@ -87,7 +88,11 @@ public class HttpMessageHandler implements HttpListener, HttpMessageListener {
         }
 
         if (msg.getBodyParts().size() > 0) {
-            encoder.body(key, msg.getBodyParts().toArray());
+            Object[] parts = new Object[msg.getBodyParts().size()];
+            for (int i = 0; i < parts.length; i++) {
+                parts[i] = NetkitUtil.toByteBuffer(msg.getBodyParts().get(i));
+            }
+            encoder.body(key, parts);
         }
 
         encoder.finish(key);
