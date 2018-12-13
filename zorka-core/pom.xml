@@ -26,11 +26,6 @@
         </dependency>
         <dependency>
             <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-net</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-netkit</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -54,13 +49,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-net</artifactId>
-            <version>${project.version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>

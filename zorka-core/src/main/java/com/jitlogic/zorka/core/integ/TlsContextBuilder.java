@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.net;
+package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;

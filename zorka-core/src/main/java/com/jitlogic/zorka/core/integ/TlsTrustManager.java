@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.net;
+package com.jitlogic.zorka.core.integ;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.CertificateException;

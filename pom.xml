@@ -47,7 +47,6 @@
         <module>zorka-slf4j</module>
         <module>zorka-cbor</module>
         <module>zorka-common</module>
-        <module>zorka-net</module>
         <module>zorka-core</module>
         <module>zorka-netkit</module>
         <module>zorka-agent</module>

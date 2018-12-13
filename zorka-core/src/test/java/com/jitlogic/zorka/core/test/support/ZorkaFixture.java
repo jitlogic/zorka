@@ -39,7 +39,6 @@ import com.jitlogic.zorka.core.spy.SpyClassLookup;
 import com.jitlogic.zorka.core.spy.ltracer.LTracer;
 import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.test.spy.support.TestSpyRetransformer;
-import com.jitlogic.zorka.net.http.mini.HttpUtil;
 import org.junit.After;
 import org.junit.Before;
 
@@ -148,7 +147,6 @@ public class ZorkaFixture extends CommonFixture {
         assertTrue(new File(tmpDir).mkdirs());
 
         httpClient = new TestHttpMessageClient();
-        ObjectInspector.setField(HttpUtil.class, "client", httpClient);
 
         SpyClassLookup.INSTANCE = new SpyClassLookup();
     }

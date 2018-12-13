@@ -38,8 +38,8 @@ import com.jitlogic.zorka.core.spy.stracer.STracerLib;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import com.jitlogic.zorka.core.spy.tuner.ZtxMatcherSet;
 import com.jitlogic.zorka.core.util.DaemonThreadFactory;
-import com.jitlogic.zorka.net.TcpService;
-import com.jitlogic.zorka.net.TcpSessionFactory;
+import com.jitlogic.zorka.core.integ.TcpService;
+import com.jitlogic.zorka.core.integ.TcpSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

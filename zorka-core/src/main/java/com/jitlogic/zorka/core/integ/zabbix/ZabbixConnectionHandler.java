@@ -20,7 +20,7 @@ package com.jitlogic.zorka.core.integ.zabbix;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.ZorkaBshAgent;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
-import com.jitlogic.zorka.net.TcpSessionFactory;
+import com.jitlogic.zorka.core.integ.TcpSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

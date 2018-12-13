@@ -3,6 +3,7 @@ package com.jitlogic.netkit.util;
 import com.jitlogic.netkit.ArgumentException;
 
 import java.io.*;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SelectionKey;
@@ -164,6 +165,16 @@ public class NetkitUtil {
     };
 
     public static void close(Closeable obj) {
+        if (obj != null) {
+            try {
+                obj.close();
+            } catch (IOException e) {
+                // Nothing here
+            }
+        }
+    }
+
+    public static void close(Socket obj) {
         if (obj != null) {
             try {
                 obj.close();
