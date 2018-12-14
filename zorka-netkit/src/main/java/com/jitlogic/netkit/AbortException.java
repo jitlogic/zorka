@@ -1,7 +1,5 @@
 package com.jitlogic.netkit;
 
-import com.jitlogic.netkit.NetException;
-
 public class AbortException extends NetException {
 
     public AbortException(String msg) {

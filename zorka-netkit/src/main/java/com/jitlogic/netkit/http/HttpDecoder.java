@@ -1,3 +1,5 @@
+/* Derived from httpkit (http://http-kit.org) under Apache License. See LICENSE.txt for more details.  */
+
 package com.jitlogic.netkit.http;
 
 import java.nio.ByteBuffer;

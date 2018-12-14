@@ -1,5 +1,22 @@
+/*
+ * Copyright (c) 2012-2018 Rafał Lewczuk All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.jitlogic.netkit.http;
 
+import com.jitlogic.netkit.ArgumentException;
 import com.jitlogic.netkit.NetException;
 import com.jitlogic.netkit.log.EventSink;
 import com.jitlogic.netkit.log.LoggerFactory;
@@ -38,6 +55,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
     private static EventSink evtConnects = LoggerFactory.getSink("http.client.connects");
     private static EventSink evtCalls = LoggerFactory.getSink("http.client.connects");
 
+
     public HttpStreamClient(HttpConfig config, String baseUrl) {
         this.config = config;
 
@@ -60,6 +78,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
             socketFactory = config.getSslContext().getSocketFactory();
         }
     }
+
 
     @Override
     public HttpMessage exec(HttpMessage req) {
@@ -85,6 +104,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
         throw new NetException("Error executing HTTP call", e);
     }
 
+
     private void reconnect() {
         if (socket != null) {
             NetkitUtil.close(socket);
@@ -95,6 +115,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
         }
         connect();
     }
+
 
     private void connect() {
         try {
