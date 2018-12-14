@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.util.Map;
 import java.util.Properties;
 
 public class TlsContextBuilder {
@@ -164,4 +165,15 @@ public class TlsContextBuilder {
         return ctx("keystore", keystorePath, "keystore.pass", keystorePass);
     }
 
+    public static SSLContext fromMap(String prefix, Map<String,String> conf) {
+        if (conf.containsKey(prefix + "keystore")) {
+            Properties props = new Properties();
+            props.setProperty("keystore", conf.get(prefix + "keystore"));
+            if (conf.containsKey(prefix + "keystore.pass"))
+                props.setProperty("keystore.pass", conf.get(prefix + "keystore.pass"));
+            return new TlsContextBuilder(props).get();
+        } else {
+            return null;
+        }
+    }
 }

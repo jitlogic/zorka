@@ -24,6 +24,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
@@ -86,11 +87,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.httpConfig = new HttpConfig();
         httpConfig.setKeepAliveTimeout(timeout);
 
-        // TODO SSL context here
-
-        this.httpClient = new HttpStreamClient(httpConfig,
-                parseStr(conf.get("http.url"), null, null,
-                        "CborTraceOutput: missing mandatory parameter: tracer.http.url"));
+        this.httpClient = HttpStreamClient.fromMap(conf);
     }
 
     /**
@@ -220,6 +217,10 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         } else if (res.getStatus() == 412) {
             throw new ZorkaRuntimeException("Resend.");
         } else {
+            if (log.isTraceEnabled()) {
+                log.trace("ERROR at send(): uri=" + uri + ", status=" + res.getStatus() + ", data=" + ZorkaUtil.hex(body, bodyLength)
+                    + ": " + new String(body, 0, bodyLength, Charset.defaultCharset()));
+            }
             throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatus());
         }
     }

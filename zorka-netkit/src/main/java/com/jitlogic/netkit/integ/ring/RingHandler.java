@@ -122,6 +122,7 @@ public class RingHandler implements HttpListener {
             }
             // TODO implement streaming
             request = request.assoc(BODY_DATA, new ByteArrayInputStream(body));
+            bodyParts.clear();
         }
 
         request = request.assoc(REQ_HEADERS, headers.persistent());

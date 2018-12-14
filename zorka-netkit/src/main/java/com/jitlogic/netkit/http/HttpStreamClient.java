@@ -20,6 +20,7 @@ import com.jitlogic.netkit.ArgumentException;
 import com.jitlogic.netkit.NetException;
 import com.jitlogic.netkit.log.EventSink;
 import com.jitlogic.netkit.log.LoggerFactory;
+import com.jitlogic.netkit.tls.TlsContextBuilder;
 import com.jitlogic.netkit.util.BufStreamOutput;
 import com.jitlogic.netkit.util.NetkitUtil;
 
@@ -29,7 +30,11 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.channels.SelectionKey;
+import java.util.Map;
 import java.util.regex.Matcher;
+
+import static com.jitlogic.netkit.http.HttpProtocol.REG_URL_PROTO;
+import static com.jitlogic.netkit.http.HttpProtocol.RE_URL;
 
 /**
  * HTTP client using traditional
@@ -59,7 +64,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
     public HttpStreamClient(HttpConfig config, String baseUrl) {
         this.config = config;
 
-        Matcher m = HttpProtocol.RE_URL.matcher(baseUrl);
+        Matcher m = RE_URL.matcher(baseUrl);
         if (!m.matches()) throw new NetException("Invalid URL: " + baseUrl);
 
         this.tls = "https".equalsIgnoreCase(m.group(1));
@@ -130,8 +135,29 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
         }
     }
 
+
     @Override
     public void submit(SelectionKey key, HttpMessage message) {
         this.result = message;
     }
+
+
+    public static HttpStreamClient fromMap(Map<String,String> conf) {
+        String url = conf.get("http.url");
+
+        Matcher m = RE_URL.matcher(url);
+
+        if (!m.matches()) {
+            throw new ArgumentException("Invalid URL: " + url);
+        }
+
+        HttpConfig httpConfig = new HttpConfig();
+
+        if ("https".equalsIgnoreCase(m.group(REG_URL_PROTO))) {
+            httpConfig.setSslContext(TlsContextBuilder.fromMap("http.", conf));
+        }
+
+        return new HttpStreamClient(httpConfig, url);
+    }
+
 }
