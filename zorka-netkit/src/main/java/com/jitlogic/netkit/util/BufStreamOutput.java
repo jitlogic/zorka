@@ -1,6 +1,7 @@
 package com.jitlogic.netkit.util;
 
 import com.jitlogic.netkit.BufHandler;
+import com.jitlogic.netkit.NetCtx;
 import com.jitlogic.netkit.NetException;
 
 import java.io.IOException;
@@ -20,8 +21,14 @@ public class BufStreamOutput implements BufHandler {
     public boolean submit(SelectionKey key, boolean copyOnSchedule, ByteBuffer... buffers) {
         try {
             for (ByteBuffer buf : buffers) {
-                os.write(buf.array(), buf.position(), buf.limit());
-                buf.clear();
+                if (buf == NetCtx.FLUSH) {
+                    os.flush();
+                } else if (buf == NetCtx.CLOSE) {
+                    os.close();
+                } else if (buf != NetCtx.NULL) {
+                    os.write(buf.array(), buf.position(), buf.limit());
+                    buf.clear();
+                }
             }
         } catch (IOException e) {
             throw new NetException("I/O error when writing bufs to output stream", e);

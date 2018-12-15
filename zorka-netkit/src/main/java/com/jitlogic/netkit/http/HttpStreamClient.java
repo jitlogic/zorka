@@ -97,6 +97,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
         for (int i = 0; i < config.getMaxRetries(); i++) {
             try {
                 output.submit(new HttpEncoder(config, stream), null, req);
+                socket.getOutputStream().flush();
                 input.run();
                 evtCalls.call();
                 return result;

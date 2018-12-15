@@ -27,6 +27,7 @@ public class HttpEncoder implements HttpListener {
     private static final int DATE_SENT           = 0x0400;
     private static final int USER_AGENT_SENT     = 0x0800;
     private static final int CONNECTION_SENT     = 0x1000;
+    private static final int CONNECTION_CLOSE    = 0x2000;
 
     private int state = 0;
     private DynamicBytes buf = new DynamicBytes(256);
@@ -93,6 +94,11 @@ public class HttpEncoder implements HttpListener {
         chkh(H_SERVER, name, SERVER_NAME_SENT);
         chkh(H_USER_AGENT, name, USER_AGENT_SENT);
         chkh(H_CONNECTION, name, CONNECTION_SENT);
+
+        if (H_CONNECTION.equalsIgnoreCase(name) && "close".equalsIgnoreCase(value)) {
+            state |= CONNECTION_CLOSE;
+        }
+
         return this;
     }
 
@@ -147,7 +153,7 @@ public class HttpEncoder implements HttpListener {
 
     private boolean keepAlive() {
         // TODO check if client requested Connection: close, also keepalive disabled by default for HTTP/1.0
-        return gsf(REQ_LINE_SENT) && config.getKeepAliveTimeout() > 0;
+        return !gsf(CONNECTION_CLOSE) && gsf(REQ_LINE_SENT|RESP_LINE_SENT) && config.getKeepAliveTimeout() > 0;
     }
 
     @Override
@@ -155,11 +161,7 @@ public class HttpEncoder implements HttpListener {
         finishHeaders(key);
         ByteBuffer bb = ByteBuffer.wrap(buf.get(), 0, buf.length());
         BufHandler out = output != null ? output : NetCtx.fromKey(key).getOutput();
-        if (keepAlive()) {
-            out.submit(key, true, bb, body);
-        } else {
-            out.submit(key, true, bb, body, NetCtx.CLOSE);
-        }
+        out.submit(key, true, bb, body, keepAlive() ? NetCtx.FLUSH : NetCtx.CLOSE);
         state |= FINISHED;
         return this;
     }

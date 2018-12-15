@@ -404,6 +404,8 @@ public abstract class NetEngine implements Runnable, BufHandler {
         NetCtx atta = (NetCtx)key.attachment();
         TlsContext tctx = atta.getTlsContext();
         LinkedList<ByteBuffer> obufs = new LinkedList<ByteBuffer>();
+
+
         try {
             synchronized (atta) {
                 while (remaining(ibufs) > 0) {
@@ -438,6 +440,11 @@ public abstract class NetEngine implements Runnable, BufHandler {
                     }
                 } // while
             }
+
+            for (ByteBuffer b : ibufs) {
+                if (b == NetCtx.FLUSH || b == NetCtx.CLOSE) obufs.add(b);
+            }
+
         } catch (IOException e) {
             log.error("at sslEncode()", e);
             clientClose(key);
@@ -454,18 +461,18 @@ public abstract class NetEngine implements Runnable, BufHandler {
 
         synchronized (atta) {
 
-            if (tctx != null && tctx.getSslState() == DATA) {
-                LinkedList<ByteBuffer> sbufs = sslEncode(key, bufs);
-                atta.addWrites(sbufs);
-                // TODO this breaks single-write optimization in SSL mode
-                bufs = sbufs.toArray(new ByteBuffer[0]);
-            }
-
             boolean hasClose = false;
 
             for (int i = 0; i < buffers.length; i++) {
                 // TODO if no writes and there is something before CLOSE mark, write everything up to
                 if (buffers[i] == NetCtx.CLOSE) hasClose = true;
+            }
+
+            if (tctx != null && tctx.getSslState() == DATA) {
+                LinkedList<ByteBuffer> sbufs = sslEncode(key, bufs);
+                atta.addWrites(sbufs);
+                // TODO this breaks single-write optimization in SSL mode
+                bufs = sbufs.toArray(new ByteBuffer[0]);
             }
 
             if (!atta.hasWrites() && !hasClose) {

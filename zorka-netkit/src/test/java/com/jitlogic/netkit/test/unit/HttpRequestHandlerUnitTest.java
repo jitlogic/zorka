@@ -34,7 +34,7 @@ public class HttpRequestHandlerUnitTest {
         assertEquals(1, cliListener.getReqs().size());
 
         assertEquals(0, serverConn.getNumCloses());
-        assertEquals(1, clientConn.getNumCloses());
+        assertEquals(0, clientConn.getNumCloses());
     }
 
     @Test

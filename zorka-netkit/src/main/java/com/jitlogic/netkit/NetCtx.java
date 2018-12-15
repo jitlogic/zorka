@@ -19,6 +19,9 @@ public class NetCtx {
     /** Sentinel object that will close connection. */
     public static final ByteBuffer CLOSE = ByteBuffer.wrap(new byte[0]);
 
+    /** Sentinel object that will force connection flush. */
+    public static final ByteBuffer FLUSH = ByteBuffer.wrap(new byte[0]);
+
     private LinkedList<ByteBuffer> writes = null;
 
     private SocketChannel channel;
