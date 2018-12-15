@@ -117,11 +117,14 @@ public abstract class NetEngine implements Runnable, BufHandler {
 
         if (tctx.getSslNetBuf() == null) {
             tctx.setSslNetBuf(ByteBuffer.allocate(tctx.getSslEngine().getSession().getPacketBufferSize()));
-            tctx.getSslNetBuf().clear();
         }
 
         try {
             tctx.getSslNetBuf().clear(); // clear for read
+            if (tctx.getSslReadChunk() != null) {
+                tctx.getSslNetBuf().put(tctx.getSslReadChunk());
+                tctx.setSslReadChunk(null);
+            }
             int read = ch.read(tctx.getSslNetBuf());
             if (read > 0) {
                 tctx.getSslNetBuf().flip();
@@ -141,7 +144,7 @@ public abstract class NetEngine implements Runnable, BufHandler {
                             tctx.setSslState(ERROR);
                             return;
                         case BUFFER_UNDERFLOW:
-                            tctx.setSslNetBuf(extendBuf(tctx.getSslNetBuf(), tctx.getSslEngine().getSession().getPacketBufferSize(), 1024, true));
+                            saveNetBuf(tctx);
                             return;
                         case CLOSED:
                             clientClose(key);
@@ -167,6 +170,18 @@ public abstract class NetEngine implements Runnable, BufHandler {
             clientClose(key);
         }
 
+    }
+
+    private void saveNetBuf(TlsContext tctx) {
+        int rem = tctx.getSslNetBuf().remaining();
+        byte[] b = new byte[rem];
+        tctx.getSslNetBuf().get(b);
+        tctx.setSslReadChunk(b);
+
+        if (rem == tctx.getSslNetBuf().capacity()) {
+            // Did not consume anything; extend buffer by 1kB
+            tctx.setSslNetBuf(ByteBuffer.allocate(tctx.getSslNetBuf().capacity() + 1024));
+        }
     }
 
 
@@ -235,10 +250,11 @@ public abstract class NetEngine implements Runnable, BufHandler {
                             tctx.setSslAppBuf(extendBuf(tctx.getSslAppBuf(), engine.getSession().getApplicationBufferSize(), 0, false));
                             log.traceNio(key, "sslHandshake()->unwrap()", "OVERFLOW");
                             break;
-                        case BUFFER_UNDERFLOW:
+                        case BUFFER_UNDERFLOW: {
                             tctx.setSslNetBuf(extendBuf(tctx.getSslNetBuf(), engine.getSession().getPacketBufferSize(), 0, true));
                             log.traceNio(key, "sslHandshake->unwrap()", "UNDERFLOW");
                             return;
+                        }
                         case CLOSED: {
                             if (engine.isOutboundDone()) {
                                 log.error("SSL engine unexpectedly closed.");
@@ -507,8 +523,8 @@ public abstract class NetEngine implements Runnable, BufHandler {
         ByteBuffer bb = (orig.capacity() < minimumSize) ? ByteBuffer.allocate(minimumSize) :
                 (delta > 0 && orig.capacity() == minimumSize) ? ByteBuffer.allocate(orig.capacity() + delta) : orig;
         if (copy && bb != orig) {
-            orig.flip();
             bb.put(orig);
+            bb.flip();
         }
         return bb;
     }

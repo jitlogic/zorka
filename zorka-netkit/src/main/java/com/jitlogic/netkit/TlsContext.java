@@ -20,6 +20,8 @@ public class TlsContext {
 
     private ByteBuffer sslNetBuf;
 
+    private byte[] sslReadChunk;
+
     public SSLEngine getSslEngine() {
         return sslEngine;
     }
@@ -52,4 +54,11 @@ public class TlsContext {
         this.sslNetBuf = sslNetBuf;
     }
 
+    public byte[] getSslReadChunk() {
+        return sslReadChunk;
+    }
+
+    public void setSslReadChunk(byte[] sslReadChunk) {
+        this.sslReadChunk = sslReadChunk;
+    }
 }

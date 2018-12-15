@@ -58,7 +58,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
     private HttpMessage result;
 
     private static EventSink evtConnects = LoggerFactory.getSink("http.client.connects");
-    private static EventSink evtCalls = LoggerFactory.getSink("http.client.connects");
+    private static EventSink evtCalls = LoggerFactory.getSink("http.client.calls");
 
 
     public HttpStreamClient(HttpConfig config, String baseUrl) {
