@@ -25,6 +25,7 @@ import com.jitlogic.netkit.util.BufStreamOutput;
 import com.jitlogic.netkit.util.NetkitUtil;
 
 import javax.net.SocketFactory;
+import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -39,7 +40,7 @@ import static com.jitlogic.netkit.http.HttpProtocol.RE_URL;
 /**
  * HTTP client using traditional
  */
-public class HttpStreamClient implements HttpMessageListener, HttpMessageClient {
+public class HttpStreamClient implements HttpMessageListener, HttpMessageClient, Closeable {
 
     private int port;
     private boolean tls;
@@ -112,6 +113,13 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
 
 
     private void reconnect() {
+        close();
+        connect();
+    }
+
+
+    @Override
+    public void close() {
         if (socket != null) {
             NetkitUtil.close(socket);
             socket = null;
@@ -119,7 +127,6 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient 
             stream = null;
             output = null;
         }
-        connect();
     }
 
 
