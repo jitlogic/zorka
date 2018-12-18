@@ -471,8 +471,12 @@ public abstract class NetEngine implements Runnable, BufHandler {
             if (tctx != null && tctx.getSslState() == DATA) {
                 LinkedList<ByteBuffer> sbufs = sslEncode(key, bufs);
                 atta.addWrites(sbufs);
+                if (hasClose) atta.addWrite(NetCtx.CLOSE);
                 // TODO this breaks single-write optimization in SSL mode
-                bufs = sbufs.toArray(new ByteBuffer[0]);
+                //bufs = sbufs.toArray(new ByteBuffer[0]);
+                pending.add(new PendingKey(key, PendingKey.OP_WRITE));
+                selector.wakeup();
+                return false;
             }
 
             if (!atta.hasWrites() && !hasClose) {
