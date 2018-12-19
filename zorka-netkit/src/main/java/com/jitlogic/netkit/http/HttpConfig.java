@@ -33,6 +33,8 @@ public class HttpConfig {
     private int maxBodySize = MAX_BODY_SIZE;
     private int maxRetries = MAX_RETRIES;
 
+    private String host;
+
     private SSLContext sslContext;
 
     private String keepAliveString = "timeout=" + keepAliveTimeout;
@@ -83,5 +85,13 @@ public class HttpConfig {
 
     public void setMaxRetries(int maxRetries) {
         this.maxRetries = maxRetries;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
     }
 }

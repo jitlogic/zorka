@@ -44,10 +44,12 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient,
 
     private int port;
     private boolean tls;
-    private InetAddress host;
+    private InetAddress addr;
+    private String host;
 
     private Socket socket;
     private String baseUri;
+
     private HttpConfig config;
 
     private SocketFactory socketFactory;
@@ -68,10 +70,13 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient,
         Matcher m = RE_URL.matcher(baseUrl);
         if (!m.matches()) throw new NetException("Invalid URL: " + baseUrl);
 
-        this.tls = "https".equalsIgnoreCase(m.group(1));
-        this.port = (m.group(3) != null) ? Integer.parseInt(m.group(3).substring(1)) : tls ? 443 : 80;
+        this.tls = "https".equalsIgnoreCase(m.group(REG_URL_PROTO));
+        String pstr = m.group(HttpProtocol.REG_URL_PORT);
+        this.port = (pstr != null) ? Integer.parseInt(pstr.substring(1)) : tls ? 443 : 80;
         try {
-            this.host = InetAddress.getByName(m.group(2));
+            this.host = m.group(HttpProtocol.REG_URL_ADDR);
+            this.addr = InetAddress.getByName(this.host);
+            this.config.setHost(this.host);
         } catch (UnknownHostException e) {
             throw new NetException("Error resolving host: " + m.group(2));
         }
@@ -132,14 +137,14 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient,
 
     private void connect() {
         try {
-            socket = socketFactory.createSocket(host, port);
+            socket = socketFactory.createSocket(addr, port);
             input = new HttpStreamInput(config, this, HttpDecoderState.READ_RESP_LINE, socket.getInputStream());
             stream = new BufStreamOutput(socket.getOutputStream());
             output = new HttpMessageHandler(config, null);
             evtConnects.call();
         } catch (IOException e) {
             evtConnects.error();
-            throw new NetException("Cannot connect to " + host + ":" + port, e);
+            throw new NetException("Cannot connect to " + addr + ":" + port, e);
         }
     }
 

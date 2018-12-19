@@ -28,6 +28,7 @@ public class HttpEncoder implements HttpListener {
     private static final int USER_AGENT_SENT     = 0x0800;
     private static final int CONNECTION_SENT     = 0x1000;
     private static final int CONNECTION_CLOSE    = 0x2000;
+    private static final int HOST_SENT           = 0x4000;
 
     private int state = 0;
     private DynamicBytes buf = new DynamicBytes(256);
@@ -94,6 +95,7 @@ public class HttpEncoder implements HttpListener {
         chkh(H_SERVER, name, SERVER_NAME_SENT);
         chkh(H_USER_AGENT, name, USER_AGENT_SENT);
         chkh(H_CONNECTION, name, CONNECTION_SENT);
+        chkh(H_HOST, name, HOST_SENT);
 
         if (H_CONNECTION.equalsIgnoreCase(name) && "close".equalsIgnoreCase(value)) {
             state |= CONNECTION_CLOSE;
@@ -145,6 +147,9 @@ public class HttpEncoder implements HttpListener {
                 } else {
                     header(key, H_CONNECTION, "close");
                 }
+            }
+            if (config.getHost() != null && 0 == (state & HOST_SENT)) {
+                header(key, H_HOST, config.getHost());
             }
             buf.append(CRLF);
             state |= HEADERS_SENT;
