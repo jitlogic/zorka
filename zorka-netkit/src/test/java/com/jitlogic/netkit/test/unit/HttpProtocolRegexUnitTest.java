@@ -35,7 +35,8 @@ public class HttpProtocolRegexUnitTest {
     public void testReqMatcher() {
         are(RE_REQ_LINE, "GET / HTTP/1.1", "GET", "/", null, "HTTP/1.1");
         are(RE_REQ_LINE, "GET /css/zico.css HTTP/1.1", "GET", "/css/zico.css", null, "HTTP/1.1");
-
+        are(RE_REQ_LINE, "GET /view/mon/trace/list?text=SQL%20bromba HTTP/1.1", "GET", "/view/mon/trace/list",
+                "?text=SQL%20bromba", "HTTP/1.1");
     }
 
 }

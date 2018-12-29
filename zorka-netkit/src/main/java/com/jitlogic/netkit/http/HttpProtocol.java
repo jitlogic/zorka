@@ -54,7 +54,7 @@ public class HttpProtocol {
     public static final String URI_HSEG  = "(?:[0-9A-Za-z_!~*`\\-]|" + URI_ESC + ")+";
     public static final String URI_HOST  = URI_HSEG + "(?:\\."+ URI_HSEG +")*";
     public static final String URI_PATH  = "/(?:[0-9A-Za-z_!~*`/#:^$\\-.]|" + URI_ESC + ")*";
-    public static final String URI_QSTR  = "\\?[0-9A-Za-z_!~*`/\\-&=\\[\\]]*";
+    public static final String URI_QSTR  = "\\?[0-9A-Za-z_!~*`/\\-&=\\[\\]%]*";
 
     public static final String URL = "(" + URI_PROTO + ")://(" + IPV4_ADDR + "|" + URI_HOST + "|" + ")"
             + "(:" + URI_PORT + ")?(" + URI_PATH + ")?(" + URI_QSTR + ")?";
