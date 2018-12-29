@@ -53,7 +53,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
                         "name", "zorka.myapp", "app", "myapp", "env", "TST"),
                         "Content-Type", "application/json"))
                 .setResponse(
-                        RESP(201, map2json("uuid", "123", "authkey", "secret")));
+                        RESP(201, map2json("id", "123", "authkey", "secret")));
 
         output.register();
 
@@ -89,7 +89,7 @@ public class TraceCborOutputUnitTest extends ZorkaFixture {
         LTraceHttpOutput output = (LTraceHttpOutput) tracer.toCbor(
                 ZorkaUtil.<String,String>constMap(
                         "http.url", "http://zorka.io/",
-                        "agent.uuid", "123",
+                        "agent.id", "123",
                         "sessn.key", "secret",
                         "hostname", "zorka.myapp",
                         "app.name", "myapp",

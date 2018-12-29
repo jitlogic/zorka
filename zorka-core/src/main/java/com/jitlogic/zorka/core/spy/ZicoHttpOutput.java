@@ -32,7 +32,7 @@ import static com.jitlogic.zorka.common.util.ZorkaConfig.parseStr;
 
 public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
-    protected String agentUUID, authKey;
+    protected String agentID, authKey;
     protected String app, env, hostname;
     protected String sessionUUID, sessionKey;
 
@@ -56,7 +56,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
         this.config = config;
 
-        this.agentUUID = conf.get("agent.uuid");
+        this.agentID = conf.get("agent.id");
 
         this.hostname = parseStr(conf.get("hostname"), null, null,
                 "CborTraceOutput: missing mandatory parameter: tracer.hostname");
@@ -113,13 +113,13 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
                 Object rslt = new JSONReader().read(res.getBodyAsString());
                 if (rslt instanceof Map) {
                     Map m = (Map)rslt;
-                    Object u = m.get("uuid");
-                    if (u instanceof String) {
-                        agentUUID = (String) m.get("uuid");
+                    Object u = m.get("id");
+                    if (u instanceof Number || u instanceof String) {
+                        agentID = m.get("id").toString();
                         sessionKey = (String) m.get("authkey");
-                        config.writeCfg("tracer.net.agent.uuid", agentUUID);
+                        config.writeCfg("tracer.net.agent.id", agentID);
                         config.writeCfg("tracer.net.sessn.key", sessionKey);
-                        log.info("Successfully registered agent with uuid=" + agentUUID);
+                        log.info("Successfully registered agent with id=" + agentID);
                     } else {
                         throw new ZorkaRuntimeException("Invalid registration response from collector: missing or bad UUID '" + res.getBodyAsString() + "'");
                     }
@@ -133,7 +133,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
     }
 
     public String getAgentUUID() {
-        return agentUUID;
+        return agentID;
     }
 
 
@@ -141,7 +141,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         resetState();
 
         try {
-            if (agentUUID == null) {
+            if (agentID == null) {
                 log.info("Agent not registered (yet). Registering ...");
                 register();
             }
@@ -150,11 +150,11 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
             throw e;
         }
 
-        log.debug("Requesting session for agent: uuid=" + agentUUID);
+        log.debug("Requesting session for agent: uuid=" + agentID);
 
         HttpMessage req = HttpMessage.POST(sessionUrl,
                 new JSONWriter().write(ZorkaUtil.map(
-                        "uuid", agentUUID,
+                        "id", agentID,
                         "authkey", sessionKey)).getBytes(),
                 "Content-Type", "application/json");
         HttpMessage res = httpClient.exec(req);
@@ -207,7 +207,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
     protected void send(byte[] body, int bodyLength, String uri, String traceUUID) {
         HttpMessage req = HttpMessage.POST(uri, ByteBuffer.wrap(body, 0, bodyLength),
-                "X-Zorka-Agent-UUID", agentUUID,
+                "X-Zorka-Agent-ID", agentID,
                 "X-Zorka-Session-UUID", sessionUUID,
                 "Content-Type", "application/zorka+cbor+v1");
         if (traceUUID != null) req.header("X-Zorka-Trace-UUID", traceUUID);
