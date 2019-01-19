@@ -1,3 +1,16 @@
+Zorka 1.90.6 (2019-01-19)
+-------------------------
+
+* fix bugs causing some classes to be skipped by instrumentation engine;
+* SLA calculation code removed from ZorkaStats;
+* new NIO based network server (based on http-kit);
+* Prometheus scrapping mode - rudimentary implementation;
+* fix: request parsing for Zabbix 4.0;
+* zico2: switched to binary agent-collector protcol (no base64 anymore);
+* zico2: optional TLS encryption between agent and server;
+* new HTTP client code with TLS support and keep-alive;
+ 
+
 Zorka 1.90.5 (2018-11-05)
 -------------------------
 
