@@ -27,7 +27,6 @@ import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.util.FileTrapper;
-import com.jitlogic.zorka.core.integ.HttpService;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
@@ -740,7 +739,7 @@ public class ZorkaLib implements ZorkaService {
     /**
      * Thread rank lister (if it has been created)
      */
-    private ThreadRankLister threadRankLister;
+    private volatile ThreadRankLister threadRankLister;
 
 
     /**
@@ -752,7 +751,7 @@ public class ZorkaLib implements ZorkaService {
     public synchronized ThreadRankLister threadRankLister() {
         if (threadRankLister == null) {
             threadRankLister = new ThreadRankLister(mbsRegistry);
-            scheduler.schedule(threadRankLister, 15000, 0);
+            scheduler.schedule(threadRankLister, 10000, 0);
         }
 
         return threadRankLister;
@@ -773,6 +772,21 @@ public class ZorkaLib implements ZorkaService {
         return lister;
     }
 
+    /**
+     * Creates a rank list. Rank list presents a view of given rank lister that is suitable to
+     * present to a monitoring system (eg. zabbix).
+     *
+     * @param lister rank lister presented
+     * @param maxSize maximum number of items shown in ranking
+     * @param metric metric used as rank criterium
+     * @param average average that will be used as rank criterium
+     * @param rerankTime how often list should be recalculated
+     * @return rank list object
+     */
+    public <T extends Rankable<?>> RankList<T> rankList(RankLister<T> lister, int maxSize, int metric,
+                                                        int average, long rerankTime) {
+        return new RankList<T>(lister, maxSize, metric, average, rerankTime);
+    }
 
     /**
      * Looks for file trapper and returns if trapper exists.

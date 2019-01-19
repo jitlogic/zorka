@@ -164,6 +164,23 @@ __jvm() {
     //      before sending POST data;
   }
 
+  __threads() {
+
+    //lister = zorka.threadRankLister();
+
+    cpu_count(pct, nitems, stackSize) {
+
+    }
+
+    cpu_log(pct, nitems, stackSize) {
+
+    }
+
+    return this;
+  }
+
+  threads = __threads();
+
   if (zorka.boolCfg("zorka.mbs.autoregister", false)) {
     autoregister();
   }

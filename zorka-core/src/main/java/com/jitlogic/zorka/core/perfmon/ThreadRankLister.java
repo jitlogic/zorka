@@ -36,7 +36,6 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
     private ThreadMXBean threadMXBean;
 
     /** Map of tracked threads. */
-    // TODO use AtomicReference for all such volatile fields
     private volatile Map<Long,ThreadRankItem> threads = new HashMap<Long, ThreadRankItem>();
 
     /**
@@ -49,9 +48,10 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
 
     @Override
     public List<ThreadRankItem> list() {
-        List<ThreadRankItem> lst = new ArrayList<ThreadRankItem>(threads.size()+2)     ;
+        Map<Long,ThreadRankItem> t = this.threads;
+        List<ThreadRankItem> lst = new ArrayList<ThreadRankItem>(t.size()+2);
 
-        for (Map.Entry<Long,ThreadRankItem> e : threads.entrySet()) {
+        for (Map.Entry<Long,ThreadRankItem> e : t.entrySet()) {
             lst.add(e.getValue());
         }
 
@@ -98,12 +98,11 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
         Map<Long,ThreadRankItem> newThreads = new HashMap<Long, ThreadRankItem>(sz*2+10, 0.5f);
 
         synchronized (this) {
+
             for (ThreadRankInfo threadInfo : raw) {
                 if (threadInfo == null) {
                     continue;
                 }
-
-                long tid = threadInfo.getId();
 
                 ThreadRankItem threadItem = threads.get(threadInfo.getId());
                 if (threadItem == null) {
