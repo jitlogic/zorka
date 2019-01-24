@@ -21,7 +21,7 @@
         <source.plugin.version>2.1.2</source.plugin.version>
         <surefire.plugin.version>2.12</surefire.plugin.version>
 
-        <asm.version>6.2.1</asm.version>
+        <asm.version>7.0</asm.version>
         <clojure.version>1.9.0</clojure.version>
         <fressian.version>0.6.5</fressian.version>
         <junit.version>4.11</junit.version>
