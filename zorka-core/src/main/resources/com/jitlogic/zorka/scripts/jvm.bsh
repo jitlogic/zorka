@@ -164,22 +164,62 @@ __jvm() {
     //      before sending POST data;
   }
 
-  __threads() {
+  __thread() {
 
-    //lister = zorka.threadRankLister();
+    zorka.logInfo("Enabling Zorka thread monitoring.");
 
-    cpu_count(pct, nitems, stackSize) {
+    __cpu() {
 
+      lister = perfmon.threadRankLister();
+      list1  = perfmon.rankList(lister, 64, 0, 1, 55000);
+      list5  = perfmon.rankList(lister, 64, 0, 2, 55000);
+      list15 = perfmon.rankList(lister, 64, 0, 3, 55000);
+
+      util1(nth) {
+        itm = list1.get(nth);
+        if (itm == null) return 0.0;
+        return itm.getAverage(System.currentTimeMillis(), 0, 1);
+      }
+
+      util5(nth) {
+        itm = list2.get(nth);
+        if (itm == null) return 0.0;
+        return itm.getAverage(System.currentTimeMillis(), 0, 2);
+      }
+
+      util15(nth) {
+        itm = list3.get(nth);
+        if (itm == null) return 0.0;
+        return itm.getAverage(System.currentTimeMillis(), 0, 3);
+      }
+
+      name1(nth) {
+        itm = list1.get(nth);
+        if (itm == null) return "";
+        return itm.getName();
+      }
+
+      name5(nth) {
+        itm = list2.get(nth);
+        if (itm == null) return "";
+        return itm.getName();
+      }
+
+      name15(nth) {
+        itm = list3.get(nth);
+        if (itm == null) return "";
+        return itm.getName();
+      }
+
+      return this;
     }
 
-    cpu_log(pct, nitems, stackSize) {
-
-    }
+    cpu = __cpu();
 
     return this;
   }
 
-  threads = __threads();
+  thread = zorka.boolCfg("jvm.thread.monitor", false) ? __thread() : null;
 
   if (zorka.boolCfg("zorka.mbs.autoregister", false)) {
     autoregister();

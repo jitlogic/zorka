@@ -558,7 +558,8 @@ public class AgentInstance implements ZorkaService {
     public synchronized PerfMonLib getPerfMonLib() {
 
         if (perfMonLib == null) {
-            perfMonLib = new PerfMonLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), getMBeanServerRegistry());
+            perfMonLib = new PerfMonLib(getSymbolRegistry(), getMetricsRegistry(),
+                    getTracer(), getMBeanServerRegistry(), getZorkaLib());
         }
 
         return perfMonLib;

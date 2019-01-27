@@ -55,7 +55,7 @@ public class ThreadRankLister implements Runnable, RankLister<ThreadRankItem> {
             lst.add(e.getValue());
         }
 
-        return Collections.unmodifiableList(lst);
+        return lst;
     }
 
 

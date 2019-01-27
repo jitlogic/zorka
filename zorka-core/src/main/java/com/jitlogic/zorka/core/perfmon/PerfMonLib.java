@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.netkit.http.UrlEndpoint;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.core.ZorkaLib;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
@@ -39,13 +40,17 @@ public class PerfMonLib {
 
     private Tracer tracer;
 
+    private ZorkaLib zorkaLib;
+
     private MBeanServerRegistry mbsRegistry;
 
-    public PerfMonLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, MBeanServerRegistry mbsRegistry) {
+    public PerfMonLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer,
+                      MBeanServerRegistry mbsRegistry, ZorkaLib zorkaLib) {
         this.tracer = tracer;
         this.mbsRegistry = mbsRegistry;
         this.symbolRegistry = symbolRegistry;
         this.metricsRegistry = metricsRegistry;
+        this.zorkaLib = zorkaLib;
     }
 
 
@@ -183,4 +188,70 @@ public class PerfMonLib {
         return new PrometheusPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
     }
 
+    /**
+     * Creates JMX lister object that can be used to create rankings
+     *
+     * @param mbsName mbean server name
+     * @param onMask  object name (or mask)
+     * @param <T>     wrapped object type (if any)
+     * @return JMX rank lister object
+     */
+    public <T extends Rankable<?>> RankLister<T> jmxLister(String mbsName, String onMask) {
+        JmxAggregatingLister<T> lister = new JmxAggregatingLister<T>(mbsRegistry, mbsName, onMask);
+        return lister;
+    }
+
+
+    /**
+     * Thread rank lister (if it has been created)
+     */
+    private volatile ThreadRankLister threadRankLister;
+
+
+    /**
+     * Returns thread rank lister. Creates and starts a new one if none has been creater (yet).
+     * As thread lister causes some stress on JVM, it is a singleton object and it is created in lazy manner.
+     *
+     * @return thread rank lister object
+     */
+    public synchronized ThreadRankLister threadRankLister() {
+        if (threadRankLister == null) {
+            threadRankLister = new ThreadRankLister(mbsRegistry);
+            zorkaLib.schedule(threadRankLister, 10000, 0);
+        }
+
+        return threadRankLister;
+    }
+
+
+    /**
+     * Creates EJB rank lister object that can be used to create rankings.
+     * It will list EJB statistics from selected mbeans.
+     *
+     * @param mbsName  mbean server name
+     * @param objNames object names
+     * @param attr     attribute name
+     * @return EJB rank lister object
+     */
+    public EjbRankLister ejbRankLister(String mbsName, String objNames, String attr) {
+        EjbRankLister lister = new EjbRankLister(mbsRegistry, mbsName, objNames, attr);
+        zorkaLib.schedule(lister, 15000, 0);
+        return lister;
+    }
+
+    /**
+     * Creates a rank list. Rank list presents a view of given rank lister that is suitable to
+     * present to a monitoring system (eg. zabbix).
+     *
+     * @param lister rank lister presented
+     * @param maxSize maximum number of items shown in ranking
+     * @param metric metric used as rank criterium
+     * @param average average that will be used as rank criterium
+     * @param rerankTime how often list should be recalculated
+     * @return rank list object
+     */
+    public <T extends Rankable<?>> RankList<T> rankList(RankLister<T> lister, int maxSize, int metric,
+                                                        int average, long rerankTime) {
+        return new RankList<T>(lister, maxSize, metric, average, rerankTime);
+    }
 }

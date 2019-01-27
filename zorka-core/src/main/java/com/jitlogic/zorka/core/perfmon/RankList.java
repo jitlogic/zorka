@@ -147,7 +147,7 @@ public class RankList<T extends Rankable<?>> implements RankLister<T> {
      *
      * @param tstamp current time
      */
-    private void rerank(final long tstamp) {
+    private synchronized void rerank(final long tstamp) {
 
         List<T> lst;
 
