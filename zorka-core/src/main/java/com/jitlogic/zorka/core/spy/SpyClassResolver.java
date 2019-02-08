@@ -52,6 +52,10 @@ public class SpyClassResolver {
 
         numCalls.logCall();
 
+        if (OBJECT_CLAZZ.equals(type1) || OBJECT_CLAZZ.equals(type2)) {
+            return OBJECT_CLAZZ;
+        }
+
         ClassInfo ci1 = getClassInfo(loader, type1), ci2 = getClassInfo(loader, type2);
 
         ClassInfo rslt = null;
@@ -201,7 +205,7 @@ public class SpyClassResolver {
         rslt = new CachedClassInfo(
             0 != (0x00000200 & reader.getAccess()) ? CachedClassInfo.IS_INTERFACE : 0,
             reader.getClassName().replace('/', '.').intern(),
-            reader.getSuperName().replace('/', '.').intern(),
+            reader.getSuperName() != null ? reader.getSuperName().replace('/', '.').intern() : null,
             ifcs);
 
         setCached(type, rslt);
