@@ -6,3 +6,4 @@ target
 .idea
 /leiame.txt
 pom.xml.versionsBackup
+*.orig
