@@ -70,24 +70,6 @@ if (zorka.boolCfg("tracer")) {
       zorka.intCfg("tracer.net.timeout", 60000)));
   }
 
-  if (zorka.boolCfg("tracer.net") && "cbor".equalsIgnoreCase(zorka.stringCfg("tracer.net.protocol").trim())) {
-    zorka.logInfo("Configuring CBOR output for tracer ...");
-    output = tracer.toCbor(
-      zorka.stringCfg("tracer.net.url", "http://127.0.0.1:8640/"),
-      zorka.stringCfg("zorka.agent.uuid"),
-      zorka.stringCfg("tracer.net.authkey"),
-      zorka.stringCfg("zorka.agent.hostname", zorka.getHostname()),
-      zorka.stringCfg("zorka.agent.app", "MYAPP"),
-      zorka.stringCfg("zorka.agent.env", "DEV"),
-      zorka.intCfg("tracer.net.qlen", 64),
-      zorka.intCfg("tracer.net.retries", 10),
-      zorka.intCfg("tracer.net.retry.time", 125L),
-      zorka.intCfg("tracer.net.retry.exp", 2L),
-      zorka.intCfg("tracer.net.timeout", 60000));
-    output.start();
-    tracer.output(output);
-  }
-
   if (zorka.boolCfg("tracer.zabbix")) {
     tracer.output(tracer.toZabbix(
       zorka.stringCfg("tracer.zabbix.addr", "127.0.0.1"),

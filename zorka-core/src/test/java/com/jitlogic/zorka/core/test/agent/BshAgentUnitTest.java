@@ -28,6 +28,7 @@ import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import com.jitlogic.zorka.core.util.ObjectDumper;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixLib;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -52,7 +53,7 @@ public class BshAgentUnitTest extends ZorkaFixture {
 
     @Test
     public void testJmxCalls() throws Exception {
-        assertTrue("1.0", zorkaAgent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")").startsWith("1."));
+        assertTrue("1.0", zorkaAgent.query("zorka.jmx(\"java\",\"java.lang:type=Runtime\",\"SpecVersion\")").startsWith("1"));
     }
 
 

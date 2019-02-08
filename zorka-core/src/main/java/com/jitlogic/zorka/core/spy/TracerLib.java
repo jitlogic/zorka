@@ -28,7 +28,6 @@ import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaLog;
 import com.jitlogic.zorka.common.util.ZorkaLogger;
-import com.jitlogic.zorka.common.zico.CborTraceOutput;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixTraceOutput;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.spy.plugins.*;
@@ -455,33 +454,6 @@ public class TracerLib {
                 retries, retryTime, retryTimeExp, timeout);
         output.start();
         return output;
-    }
-
-    public ZorkaAsyncThread<SymbolicRecord> toCbor(String url, String agentUUID, String agentKey,
-                                                   String hostname, String app, String env) {
-        return toCbor(url, agentUUID, agentKey, hostname, app, env, 64, 10, 125, 2, 60000);
-    }
-
-    /**
-     * Creates trace network sender using HTTP protocol and CBOR representation.
-     *
-     * @param url ZICO collector URL
-     * @param agentUUID agent UUID (as registered in collector)
-     * @param agentKey agent auth key (used to authenticate agent registrations)
-     * @param hostname agent name (passed as parameter to agent registration)
-     * @param app application name (passed as parameter to agent registration)
-     * @param env environment name (passed as parameter to agent registration)
-     * @return Submitter object (can be registered later on via tracer.output())
-     */
-    public ZorkaAsyncThread<SymbolicRecord> toCbor(String url, String agentUUID, String agentKey,
-                                                   String hostname, String app, String env,
-                                                   int qlen, int retries, long retryTime,
-                                                   long retryTimeExp, int timeout) {
-
-        return new CborTraceOutput(
-            url, agentUUID, agentKey, hostname, app, env,
-            symbolRegistry, traceTypes,
-            qlen, retries, retryTime, retryTimeExp, timeout);
     }
 
     /**
