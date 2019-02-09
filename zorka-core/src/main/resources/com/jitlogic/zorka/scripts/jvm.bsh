@@ -174,13 +174,6 @@ __jvm() {
         zorka.intCfg("jvm.cpu.contention.log.num", 4),
         zorka.kiloCfg("jvm.cpu.contention.log.size", 4*1024*1024),
         false);
-
-      sampler = perfmon.threadRankSampler(trapper, perfmon.threadRankList(1));
-
-      zorka.schedule(sampler,
-        zorka.longCfg("jvm.cpu.contention.interval", 60000),
-        zorka.lognCfg("jvm.cpu.contention.delay", 60000));
-
     }
 
     return this;
