@@ -166,15 +166,33 @@ __jvm() {
 
   __thread() {
 
-    zorka.logInfo("Enabling Zorka thread monitoring.");
+    zorka.logInfo("Enabling thread monitoring.");
 
-    if (zorka.boolCfg("jvm.cpu.contention", false)) {
+    dumper = null;
+
+    if (zorka.boolCfg("jvm.thread.dumper", false)) {
+
+      zorka.logInfo("Enabling thread contention dumper.");
+
       trapper = zorka.rollingFileTrapper("threads", "INFO",
-        zorka.stringCfg("jvm.cpu.contention.log.path", util.path("${zorka.log.dir}", "cpu-contention.log")),
-        zorka.intCfg("jvm.cpu.contention.log.num", 4),
-        zorka.kiloCfg("jvm.cpu.contention.log.size", 4*1024*1024),
+        zorka.stringCfg("jvm.thread.dumper.log.path", util.path("${zorka.log.dir}", "thread-dumps.log")),
+        zorka.intCfg("jvm.thread.dumper.log.num", 4),
+        zorka.kiloCfg("jvm.thread.dumper.log.size", 4*1024*1024),
         false);
+
+      dumper = perfmon.threadDumper(trapper,
+          zorka.intCfg("jvm.thread.dumper.thr.max", 4),
+          zorka.intCfg("jvm.thread.dumper.thread.cpu.min", 30),
+          zorka.intCfg("jvm.thread.dumper.total.cpu.min", 100),
+          zorka.intCfg("jvm.thread.dumper.stack.depth", 8));
+
+      _dumper_interval = zorka.longCfg("jvm.thread.dumper.interval", 60000);
+      zorka.schedule(dumper, _dumper_interval, _dumper_interval);
     }
+
+    monitor = perfmon.threadMonitor();
+    _monitor_interval = zorka.longCfg("jvm.thread.monitor.interval", 10000);
+    zorka.schedule(monitor, _monitor_interval, _monitor_interval);
 
     return this;
   }

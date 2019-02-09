@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.netkit.http.UrlEndpoint;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.ZorkaLib;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
@@ -186,6 +187,45 @@ public class PerfMonLib {
             Map<String,String> constAttrs, PerfAttrFilter attrFilter,
             PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
         return new PrometheusPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
+    }
+
+    private ThreadMonitor threadMonitor = null;
+
+    public synchronized ThreadMonitor threadMonitor() {
+        if (threadMonitor == null) {
+            threadMonitor = new ThreadMonitor(mbsRegistry);
+        }
+        return threadMonitor;
+    }
+
+    public ThreadMonitorDumper threadDumper(ZorkaSubmitter<String> output, int maxThreads, int minCpuThread,
+                                            int minCpuTotal, int stackDepth) {
+        return new ThreadMonitorDumper(
+                mbsRegistry, threadMonitor(), output,
+                maxThreads, minCpuThread, minCpuTotal, stackDepth);
+    }
+
+    private List<ThreadMonitorRankItem> avgList(int avg) {
+        switch (avg) {
+            case 1:
+                return threadMonitor().getRavg1();
+            case 5:
+                return threadMonitor().getRavg5();
+            case 15:
+                return threadMonitor().getRavg15();
+            default:
+                throw new ZorkaRuntimeException("Invalid average type: " + avg);
+        }
+    }
+
+    public double threadRankCpu(int avg, int nth) {
+        List<ThreadMonitorRankItem> lst = avgList(avg);
+        return nth < lst.size() ? lst.get(nth).getAvg() : 0.0;
+    }
+
+    public String threadRankName(int avg, int nth) {
+        List<ThreadMonitorRankItem> lst = avgList(avg);
+        return nth < lst.size() ? lst.get(nth).getName() : "<N/A>";
     }
 
 }

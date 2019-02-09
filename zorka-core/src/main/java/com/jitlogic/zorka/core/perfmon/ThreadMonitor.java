@@ -2,6 +2,8 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.util.KVSortingHeap;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
@@ -12,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 public class ThreadMonitor implements Runnable {
+
+    private final static Logger log = LoggerFactory.getLogger(ThreadMonitor.class);
 
     // Thread IDs are intentionally kept as integers, so it will fit into KVSortingHeap.
     // Possible collisions are (mostly) harmless and should be very rare.
@@ -31,6 +35,10 @@ public class ThreadMonitor implements Runnable {
     private volatile List<ThreadMonitorRankItem> ravg1 = new ArrayList<ThreadMonitorRankItem>();
     private volatile List<ThreadMonitorRankItem> ravg5 = new ArrayList<ThreadMonitorRankItem>();
     private volatile List<ThreadMonitorRankItem> ravg15 = new ArrayList<ThreadMonitorRankItem>();
+
+    private volatile int avi1;
+    private volatile int avi5;
+    private volatile int avi15;
 
     public ThreadMonitor(MBeanServerRegistry registry) {
         this.mBeanServerRegistry = registry;
@@ -70,6 +78,9 @@ public class ThreadMonitor implements Runnable {
             int tid = KVSortingHeap.id(kv);
             int avi = KVSortingHeap.val(kv);
             ThreadMonitorItem itm = oth.get(tid);
+            if (log.isTraceEnabled()) {
+                log.trace("h2r: id=" + tid + ", avi=" + avi + " itm=" + itm);
+            }
             if (itm != null) rslt.add(new ThreadMonitorRankItem(tid, itm.getName(), avi / 100.0));
         }
         return rslt;
@@ -79,20 +90,42 @@ public class ThreadMonitor implements Runnable {
     private void genRanks() {
         Map<Integer,ThreadMonitorItem> oth = this.threads;
 
-        KVSortingHeap kvh1  = new KVSortingHeap(rankLimit, true);
-        KVSortingHeap kvh5  = new KVSortingHeap(rankLimit, true);
-        KVSortingHeap kvh15 = new KVSortingHeap(rankLimit, true);
+        KVSortingHeap kvh1  = new KVSortingHeap(rankLimit, false);
+        KVSortingHeap kvh5  = new KVSortingHeap(rankLimit, false);
+        KVSortingHeap kvh15 = new KVSortingHeap(rankLimit, false);
+
+        int avl1 = 0;
+        int avl5 = 0;
+        int avl15 = 0;
 
         for (Map.Entry<Integer,ThreadMonitorItem> e : oth.entrySet()) {
-            kvh1.add(e.getKey(), e.getValue().avi(AVG1));
-            kvh5.add(e.getKey(), e.getValue().avi(AVG5));
-            kvh15.add(e.getKey(), e.getValue().avi(AVG15));
+            int xavi1 = e.getValue().avi(AVG1);
+            avl1 += xavi1; kvh1.add(e.getKey(), xavi1);
+            int xavi5 = e.getValue().avi(AVG5);
+            avl5 += xavi5; kvh5.add(e.getKey(), xavi5);
+            int xavi15 = e.getValue().avi(AVG15);
+            avl15 += xavi15; kvh15.add(e.getKey(), xavi15);
+            if (log.isTraceEnabled()) {
+                log.trace("genRank: id=" + e.getValue().getId() + " " + e.getValue().getName()
+                        + " avi1=" + xavi1 + ", avi5=" + xavi5 + ", avi15=" + avi15);
+            }
+
         }
 
+        log.debug("Generating h2r(avg1) rank ...");
+        List<ThreadMonitorRankItem> xxravg1 = h2r(oth, kvh1);
+        log.debug("Generating h2r(avg5) rank ...");
+        List<ThreadMonitorRankItem> xxravg5 = h2r(oth, kvh5);
+        log.debug("Generating h2r(avg15) rank ...");
+        List<ThreadMonitorRankItem> xxravg15 = h2r(oth, kvh15);
+
         synchronized (this) {
-            ravg1 = h2r(oth, kvh1);
-            ravg5 = h2r(oth, kvh5);
-            ravg15 = h2r(oth, kvh15);
+            this.ravg1 = xxravg1;
+            this.ravg5 = xxravg5;
+            this.ravg15 = xxravg15;
+            avi1 = avl1;
+            avi5 = avl5;
+            avi15 = avl15;
         }
     } // getRank()
 
@@ -110,8 +143,17 @@ public class ThreadMonitor implements Runnable {
             }
         }
 
-        scanThreads(System.nanoTime());
-        genRanks();
+        try {
+            scanThreads(System.nanoTime());
+        } catch (Exception e) {
+            log.error("Error scanning threads", e);
+        }
+
+        try {
+            genRanks();
+        } catch (Exception e) {
+            log.error("Error generating thread ranking", e);
+        }
     } // run()
 
     public List<ThreadMonitorRankItem> getRavg1() {
@@ -124,5 +166,29 @@ public class ThreadMonitor implements Runnable {
 
     public List<ThreadMonitorRankItem> getRavg15() {
         return ravg15;
+    }
+
+    public int getAvi1() {
+        return avi1;
+    }
+
+    public double getAvg1() {
+        return avi1 / 100.0;
+    }
+
+    public int getAvi5() {
+        return avi5;
+    }
+
+    public double getAvg5() {
+        return avi5 / 100.0;
+    }
+
+    public int getAvi15() {
+        return avi15;
+    }
+
+    public double getAvg15() {
+        return avi15 / 100.0;
     }
 }
