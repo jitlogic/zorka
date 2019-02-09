@@ -38,11 +38,16 @@ public class KVSortingHeap {
 
 
     public int next() {
+        long rslt = nextkv();
+        return rslt != -1 ? id(rslt) : -1;
+    }
+
+    public long nextkv() {
         if (size > 0) {
 
             if (!heapified) heapify();
 
-            int rslt = id(data[1]);
+            long rslt = data[1];
 
             data[1] = data[size];
             data[size] = -1;
@@ -52,10 +57,9 @@ public class KVSortingHeap {
 
             return rslt;
         } else {
-            return -1;
+            return -1L;
         }
     }
-
 
     public void invert() {
         inv = !inv;
@@ -147,12 +151,12 @@ public class KVSortingHeap {
     }
 
 
-    private static int id(long l) {
+    public static int id(long l) {
         return (int)(l >>> 32);
     }
 
 
-    private static int val(long l) {
+    public static int val(long l) {
         return (int)l;
     }
 
