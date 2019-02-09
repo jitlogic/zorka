@@ -168,53 +168,20 @@ __jvm() {
 
     zorka.logInfo("Enabling Zorka thread monitoring.");
 
-    __cpu() {
+    if (zorka.boolCfg("jvm.cpu.contention", false)) {
+      trapper = zorka.rollingFileTrapper("threads", "INFO",
+        zorka.stringCfg("jvm.cpu.contention.log.path", util.path("${zorka.log.dir}", "cpu-contention.log")),
+        zorka.intCfg("jvm.cpu.contention.log.num", 4),
+        zorka.kiloCfg("jvm.cpu.contention.log.size", 4*1024*1024),
+        false);
 
-      lister = perfmon.threadRankLister();
-      list1  = perfmon.rankList(lister, 64, 0, 1, 55000);
-      list5  = perfmon.rankList(lister, 64, 0, 2, 55000);
-      list15 = perfmon.rankList(lister, 64, 0, 3, 55000);
+      sampler = perfmon.threadRankSampler(trapper, perfmon.threadRankList(1));
 
-      util1(nth) {
-        itm = list1.get(nth);
-        if (itm == null) return 0.0;
-        return itm.getAverage(System.currentTimeMillis(), 0, 1);
-      }
+      zorka.schedule(sampler,
+        zorka.longCfg("jvm.cpu.contention.interval", 60000),
+        zorka.lognCfg("jvm.cpu.contention.delay", 60000));
 
-      util5(nth) {
-        itm = list2.get(nth);
-        if (itm == null) return 0.0;
-        return itm.getAverage(System.currentTimeMillis(), 0, 2);
-      }
-
-      util15(nth) {
-        itm = list3.get(nth);
-        if (itm == null) return 0.0;
-        return itm.getAverage(System.currentTimeMillis(), 0, 3);
-      }
-
-      name1(nth) {
-        itm = list1.get(nth);
-        if (itm == null) return "";
-        return itm.getName();
-      }
-
-      name5(nth) {
-        itm = list2.get(nth);
-        if (itm == null) return "";
-        return itm.getName();
-      }
-
-      name15(nth) {
-        itm = list3.get(nth);
-        if (itm == null) return "";
-        return itm.getName();
-      }
-
-      return this;
     }
-
-    cpu = __cpu();
 
     return this;
   }

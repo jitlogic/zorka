@@ -92,6 +92,10 @@ public class ThreadRankItem implements Rankable<ThreadRankInfo> {
         return threadInfo.getName();
     }
 
+    public long getId() {
+        return threadInfo.getId();
+    }
+
 
     /**
      * This method is used by thread rank lister to update information about tracked thread.

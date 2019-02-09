@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.netkit.http.UrlEndpoint;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.core.ZorkaLib;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
@@ -223,6 +224,35 @@ public class PerfMonLib {
         return threadRankLister;
     }
 
+    private RankList<ThreadRankItem> thrLists[] = new RankList[3];
+
+    public synchronized RankList<ThreadRankItem> threadRankList(int avg) {
+        if (thrLists[avg] == null) {
+            thrLists[avg] = rankList(threadRankLister(), 64, 0, avg, 55000);
+        }
+
+        return thrLists[avg];
+    }
+
+    public synchronized String threadRankName(int avg, int nth) {
+        ThreadRankItem ti = threadRankList(avg).get(nth);
+        return ti != null ? ti.getName() : "N/A";
+    }
+
+    public synchronized double threadRankCpuUtil(int avg, int nth) {
+        ThreadRankItem ti = threadRankList(avg).get(nth);
+        return ti != null ? ti.getAverage(System.currentTimeMillis(), 0, avg) : 0.0;
+    }
+
+    /**
+     *
+     */
+    public synchronized ThreadCpuContentionMonitor threadRankSampler(
+            ZorkaAsyncThread<String> output, RankList<ThreadRankItem> rankList,
+            int maxThreads, int minCpuThread, int minCpuTotal, int stackDepth) {
+        return new ThreadCpuContentionMonitor(output, rankList, mbsRegistry,
+                maxThreads, minCpuThread, minCpuTotal, stackDepth);
+    }
 
     /**
      * Creates EJB rank lister object that can be used to create rankings.
