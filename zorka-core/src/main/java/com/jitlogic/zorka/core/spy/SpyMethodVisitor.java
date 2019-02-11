@@ -280,7 +280,7 @@ public class SpyMethodVisitor extends MethodVisitor {
             }
             SpyContext ctx = ctxs.get(i);
             SpyDefinition sdef = ctx.getSpyDefinition();
-            if (sdef.getProbes(ON_ENTER).size() > 0 || sdef.getProcessors(ON_ENTER).size() > 0) {
+            if (!sdef.getProbes(ON_ENTER).isEmpty() || !sdef.getProcessors(ON_ENTER).isEmpty()) {
                 stackDelta = max(stackDelta, emitProbes(ON_ENTER, ctx));
             }
         }
@@ -319,7 +319,7 @@ public class SpyMethodVisitor extends MethodVisitor {
             SpyContext ctx = ctxs.get(i);
             SpyDefinition sdef = ctx.getSpyDefinition();
             if (getSubmitFlags(ctx.getSpyDefinition(), ON_ENTER) == SF_NONE ||
-                    sdef.getProbes(stage).size() > 0 || sdef.getProcessors(stage).size() > 0) {
+                    !sdef.getProbes(stage).isEmpty() || !sdef.getProcessors(stage).isEmpty()) {
                 stackDelta = max(stackDelta, emitProbes(stage, ctx));
             }
         }
@@ -384,14 +384,14 @@ public class SpyMethodVisitor extends MethodVisitor {
     public static int getSubmitFlags(SpyDefinition sdef, int stage) {
 
         if (stage == ON_ENTER) {
-            return (sdef.getProbes(ON_RETURN).size() == 0
-                    && sdef.getProcessors(ON_RETURN).size() == 0
-                    && sdef.getProbes(ON_ERROR).size() == 0
-                    && sdef.getProcessors(ON_ERROR).size() == 0)
+            return (sdef.getProbes(ON_RETURN).isEmpty()
+                    && sdef.getProcessors(ON_RETURN).isEmpty()
+                    && sdef.getProbes(ON_ERROR).isEmpty()
+                    && sdef.getProcessors(ON_ERROR).isEmpty())
                     ? SF_IMMEDIATE : SF_NONE;
         } else {
-            return (sdef.getProbes(ON_ENTER).size() == 0
-                    && sdef.getProcessors(ON_ENTER).size() == 0)
+            return (sdef.getProbes(ON_ENTER).isEmpty()
+                    && sdef.getProcessors(ON_ENTER).isEmpty())
                     ? SF_IMMEDIATE : SF_FLUSH;
         }
     }
@@ -496,11 +496,10 @@ public class SpyMethodVisitor extends MethodVisitor {
         int sd = 3;
 
         // Create an array with fetched data (or push null)
-        if (probeElements.size() > 0) {
+        if (!probeElements.isEmpty()) {
             emitLoadInt(probeElements.size());
             mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
             for (int i = 0; i < probeElements.size(); i++) {
-                SpyProbe element = probeElements.get(i);
                 mv.visitInsn(DUP);
                 emitLoadInt(i);
                 sd = max(sd, probeElements.get(i).emit(this, stage, 0) + 6);
