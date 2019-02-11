@@ -152,6 +152,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
     private boolean streamingTracer = false;
 
+    private int nProbes = 0;
+
     /**
      * Standard constructor.
      *
@@ -184,6 +186,13 @@ public class SpyMethodVisitor extends MethodVisitor {
         returnType = Type.getReturnType(methodSignature);
 
         checkReturnVals();
+
+        for (SpyContext ctx : ctxs) {
+            List<SpyProbe> ep = ctx.getSpyDefinition().getProbes(ON_ENTER);
+            List<SpyProbe> rp = ctx.getSpyDefinition().getProbes(ON_RETURN);
+            List<SpyProbe> xp = ctx.getSpyDefinition().getProbes(ON_ERROR);
+            nProbes += (ep != null ? ep.size() : 0) + (rp != null ? rp.size() : 0) + (xp != null ? xp.size() : 0);
+        }
     }
 
 
@@ -352,7 +361,8 @@ public class SpyMethodVisitor extends MethodVisitor {
 
         mv.visitInsn(ATHROW);
         mv.visitTryCatchBlock(lTryFrom, lTryTo, lTryHandler, null);
-        mv.visitMaxs(maxStack + stackDelta, max(maxLocals, retValProbeSlot + 1));
+
+        mv.visitMaxs(maxStack + stackDelta + nProbes, max(maxLocals, retValProbeSlot + 1));
 
         if (spyProbesEmitted > 0 || tracerProbesEmitted > 0) {
             AgentDiagnostics.inc(AgentDiagnostics.METHODS_INSTRUMENTED);
