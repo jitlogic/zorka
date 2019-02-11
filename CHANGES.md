@@ -1,11 +1,11 @@
-Zorka 1.0.18 (2019-02-09)
+Zorka 1.0.18 (2019-02-11)
 -------------------------
 
 * Update: ASM 7.0;
 * Fix: NPEs in bytecode instrumentation engine (backports);
 * Removed CBOR tracer output (use zorka 1.90.x instead);
 * Get rid of old SLA calculation aggregates;
-* Fix: zabbix 4.0 request parsing; 
+* Fix: zabbix 4.0 request parsing;
 
 
 Zorka 1.0.17 (2018-06-14)
