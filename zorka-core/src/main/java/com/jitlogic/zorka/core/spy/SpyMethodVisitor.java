@@ -291,17 +291,7 @@ public class SpyMethodVisitor extends MethodVisitor {
                 returnProbe.emitFetchRetVal(this, returnType);
             }
 
-            for (int i = ctxs.size() - 1; i >= 0; i--) {
-                if (!ctxMatches.get(i)) {
-                    continue;
-                }
-                SpyContext ctx = ctxs.get(i);
-                SpyDefinition sdef = ctx.getSpyDefinition();
-                if (getSubmitFlags(ctx.getSpyDefinition(), ON_ENTER) == SF_NONE ||
-                        sdef.getProbes(ON_RETURN).size() > 0 || sdef.getProcessors(ON_RETURN).size() > 0) {
-                    stackDelta = max(stackDelta, emitProbes(ON_RETURN, ctx));
-                }
-            }
+            emitProbes(ON_RETURN);
 
             // Emit trace probe at the end
             if (symbolRegistry != null) {
@@ -310,6 +300,20 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         mv.visitInsn(opcode);
+    }
+
+    private void emitProbes(int stage) {
+        for (int i = ctxs.size() - 1; i >= 0; i--) {
+            if (!ctxMatches.get(i)) {
+                continue;
+            }
+            SpyContext ctx = ctxs.get(i);
+            SpyDefinition sdef = ctx.getSpyDefinition();
+            if (getSubmitFlags(ctx.getSpyDefinition(), ON_ENTER) == SF_NONE ||
+                    sdef.getProbes(stage).size() > 0 || sdef.getProcessors(stage).size() > 0) {
+                stackDelta = max(stackDelta, emitProbes(stage, ctx));
+            }
+        }
     }
 
     public void visitMethodInsn(int opcode, String owner, String name, String descriptor) {
@@ -339,17 +343,7 @@ public class SpyMethodVisitor extends MethodVisitor {
         }
 
         // Emit spy error probes here
-        for (int i = ctxs.size() - 1; i >= 0; i--) {
-            if (!ctxMatches.get(i)) {
-                continue;
-            }
-            SpyContext ctx = ctxs.get(i);
-            SpyDefinition sdef = ctx.getSpyDefinition();
-            if (getSubmitFlags(ctx.getSpyDefinition(), ON_ENTER) == SF_NONE ||
-                    sdef.getProbes(ON_ERROR).size() > 0 || sdef.getProcessors(ON_ERROR).size() > 0) {
-                stackDelta = max(stackDelta, emitProbes(ON_ERROR, ctx));
-            }
-        }
+        emitProbes(ON_ERROR);
 
         // Emit trace probe at the end
         if (symbolRegistry != null) {
