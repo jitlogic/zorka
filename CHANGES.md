@@ -4,6 +4,7 @@ Zorka 1.90.7 (2019-??-??)
 * update: ASM 7.0 (code compiled by JDK11 compiler now works);
 * thread monitoring: ranking with cpu utilization;
 * thread monitoring: thread contention log;
+* generic servlet container instrumentation;
 
 
 Zorka 1.90.6 (2019-01-19)
