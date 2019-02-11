@@ -105,6 +105,7 @@ __catalina() {
         return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
     }
 
+  if (zorka.boolCfg("http.instrument.catalina", true))
   spy.add(spy.instrument("CATALINA_HTTP")
     .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
       spy.format("URI", "${REQ.request.requestURI}"),

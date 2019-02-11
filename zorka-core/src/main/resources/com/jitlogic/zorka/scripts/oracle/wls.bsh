@@ -26,6 +26,7 @@ zorka.require(
 __wls() {
 
 
+  if (zorka.boolCfg("http.instrument.wls", true))
   spy.add(spy.instrument("WLS_HTTP")
     .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
       spy.format("URI", "${REQ.requestURI}"),

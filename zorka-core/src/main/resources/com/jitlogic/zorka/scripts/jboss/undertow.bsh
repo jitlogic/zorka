@@ -168,6 +168,7 @@ __undertow() {
   }
 
 
+  if (zorka.boolCfg("http.instrument.undertow", true))
   spy.add(spy.instrument("UNDERTOW_HTTP_2")
       .onEnter(spy.fetchArg("EXCH", 1),
         spy.format("URI", "${EXCH.requestURI}"),

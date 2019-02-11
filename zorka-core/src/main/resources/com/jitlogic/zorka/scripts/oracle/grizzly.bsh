@@ -19,6 +19,7 @@ zorka.require("http.bsh");
 
 __grizzly() {
 
+  if (zorka.boolCfg("http.instrument.grizzly", true))
     spy.add(spy.instrument("GRIZZLY_HTTP")
       .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
         spy.format("URI", "${REQ.request.requestURI}"),

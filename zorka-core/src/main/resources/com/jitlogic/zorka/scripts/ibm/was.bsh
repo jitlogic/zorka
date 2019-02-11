@@ -168,6 +168,7 @@ __was() {
   // HTTP Request class: com.ibm.ws.webcontainer.srt.SRTServletRequest
   // HTTP Response class: com.ibm.ws.webcontainer.srt.SRTServletResponse
 
+  if (zorka.boolCfg("http.instrument.was", true))
   spy.add(spy.instrument("WAS_HTTP")
     .onEnter(spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2), spy.tlGet("IREQ", _ireq),
       spy.format("URI", "${IREQ.requestURI}"),

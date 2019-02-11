@@ -22,6 +22,7 @@ zorka.require(
 
 __jetty() {
 
+  if (zorka.boolCfg("http.instrument.jetty", true))
   spy.add(spy.instrument("JETTY_HTTP")
     .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 4),
       spy.format("URI", "${REQ.requestURI}"),
