@@ -300,6 +300,57 @@ __http() {
       }
   }
 
+  if (zorka.boolCfg("http.instrument.servlet", false)) {
+    zorka.logInfo("Instrumenting generic HTTP servlets enabled.");
+    spy.add(
+      spy.instrument("SERVLET_HTTP")
+        .onEnter(
+          spy.fetchArg("THIS", 0), spy.fetchArg("REQ", 1), spy.fetchArg("RESP", 2),
+          spy.format("URI", "${REQ.requestURI}"),
+          _trace ? spy.subchain(
+            _uriQualifier,
+            tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
+            tracer.attr("URI", "URI"),
+            tracer.formatAttr("SERVLET_INFO", "${THIS.servletInfo}"),
+            _headers ? headers_processor(true, false) : null,
+            (_dtrace_enabled && _headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
+          ) : null,
+        _congestion ? spy.zorkaStats("java", _mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
+        .onReturn(spy.put("ERR", ""))
+        .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
+          _trace ? spy.subchain(
+            _uriQualifier,
+            _error_chain,
+            tracer.flags(tracer.SUBMIT_TRACE),
+            tracer.attr("ERR", "ERR")
+            ) : null)
+        .onSubmit(
+          spy.strTime("TIME"),
+          spy.format("STATUS", "${RESP.status}"),
+          spy.get("USER", "REQ", "remoteUser"),
+          _trace ? spy.subchain(
+            _uriQualifier,
+            tracer.attr("STATUS", "STATUS"),
+            tracer.formatAttr("METHOD", "${REQ.method}"),
+            tracer.filterBy("STATUS", null, _errors, null, null),
+            tracer.attr("USER", "USER"),
+            _cookies ? cookies_processor(true, true) : spy.put("COOKIES", ""),
+            _headers ? headers_processor(false, true) : null,
+            _params ? param_processor() : spy.put("PARAMS", "")
+          ) : null,
+          _dtrace_enabled ? tracer.dtraceClean() : null,
+          _slow_chain,
+          spy.subchain(
+            spy.valSetFilter("STATUS", _errors),
+            spy.markError(), tracer.markError(),
+            _error_chain),
+          _redirQualifier,
+          _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL", "T", null, _action) : null,
+          _tags_chain)
+          .include(
+            spy.byInterfaceAndMethod(0, "javax.servlet.Servlet", "service", "void",
+              "javax.servlet.ServletRequest", "javax.servlet.ServletResponse")));
+  } // http.instrument.servlet
 
   // Nagios commands for zorka stats
   if (zorka.boolCfg("nagios", false)) {
