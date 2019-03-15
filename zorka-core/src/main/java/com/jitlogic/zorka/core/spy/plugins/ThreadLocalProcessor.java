@@ -21,6 +21,7 @@ import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Allows using ThreadLocal objects to transfer data across instrumented methods.
@@ -65,6 +66,11 @@ public class ThreadLocalProcessor implements SpyProcessor {
     private ThreadLocal<Object> threadLocal;
 
     /**
+     * Condition (if any).
+     */
+    private Object cond;
+
+    /**
      * Constructs thread local processor.
      *
      * @param field       record field that will be accessed
@@ -72,28 +78,43 @@ public class ThreadLocalProcessor implements SpyProcessor {
      * @param threadLocal thread local object
      * @param path        attribute chain
      */
-    public ThreadLocalProcessor(String field, int operation, ThreadLocal<Object> threadLocal, Object... path) {
+    public ThreadLocalProcessor(String field, int operation, ThreadLocal<Object> threadLocal, Object cond, Object... path) {
         this.field = field;
         this.operation = operation;
         this.threadLocal = threadLocal;
+        this.cond = cond;
         this.path = ZorkaUtil.copyArray(path);
     }
 
+    private boolean condMet(Map<String,Object> record) {
+        if (cond == null) return true;
+        Object o = null;
+        if (cond instanceof ThreadLocal) {
+            o = ((ThreadLocal)cond).get();
+        } else if (cond instanceof AtomicReference) {
+            o = ((AtomicReference)cond).get();
+        } else if (cond instanceof String) {
+            o = record.get(cond);
+        }
+        return o != null && !Boolean.FALSE.equals(o);
+    }
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        switch (operation) {
-            case GET:
-                record.put(field, ObjectInspector.get(threadLocal.get(), path));
-                break;
-            case SET:
-                threadLocal.set(record.get(field));
-                break;
-            case REMOVE:
-                threadLocal.remove();
-                break;
+        if (condMet(record)) {
+            switch (operation) {
+                case GET:
+                    record.put(field, ObjectInspector.get(threadLocal.get(), path));
+                    break;
+                case SET:
+                    threadLocal.set(record.get(field));
+                    break;
+                case REMOVE:
+                    threadLocal.remove();
+                    break;
+                default: return record;
+            }
         }
-
         return record;
     }
 }

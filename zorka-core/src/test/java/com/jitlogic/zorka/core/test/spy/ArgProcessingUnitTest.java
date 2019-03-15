@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
 
@@ -295,18 +296,57 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     @Test
     public void testThreadLocalSet() {
         ThreadLocal tl = new ThreadLocal();
-        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.SET, tl);
+        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.SET, tl, null);
         Map<String, Object> rec = ZorkaUtil.map("S", "abc");
         assertEquals("processor should pass record without changes", rec, tp.process(rec));
         assertEquals("abc", tl.get());
     }
 
+    @Test
+    public void testThreadLocalSetCondTL() {
+        ThreadLocal<Object> tl = new ThreadLocal<Object>(), tc = new ThreadLocal<Object>();
+        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.SET, tl, tc);
+        Map<String,Object> rec = ZorkaUtil.map("S", "abc");
+        tp.process(rec);
+        assertNull(tl.get());
+        tc.set(false);
+        tp.process(rec);
+        assertNull(tl.get());
+        tc.set(true);
+        tp.process(rec);
+        assertEquals("abc", tl.get());
+    }
+
+    @Test
+    public void testThreadLocalSetCondAR() {
+        ThreadLocal<Object> tl = new ThreadLocal<Object>();
+        AtomicReference<Object> tc = new AtomicReference<Object>();
+        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.SET, tl, tc);
+        Map<String,Object> rec = ZorkaUtil.map("S", "abc");
+        tp.process(rec);
+        assertNull(tl.get());
+        tc.set(true);
+        tp.process(rec);
+        assertEquals("abc", tl.get());
+    }
+
+    @Test
+    public void testThreadLocalSetCondF() {
+        ThreadLocal<Object> tl = new ThreadLocal<Object>();
+        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.SET, tl, "C");
+        Map<String,Object> rec = ZorkaUtil.map("S", "abc");
+        tp.process(rec);
+        assertNull(tl.get());
+        rec.put("C", true);
+        tp.process(rec);
+        assertEquals("abc", tl.get());
+    }
 
     @Test
     public void testThreadLocalGet() {
-        ThreadLocal tl = new ThreadLocal();
+        ThreadLocal<Object> tl = new ThreadLocal<Object>();
         tl.set("abc");
-        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.GET, tl, "length()");
+        ThreadLocalProcessor tp = new ThreadLocalProcessor("S", ThreadLocalProcessor.GET, tl, null, "length()");
         Map<String, Object> rec = tp.process(new HashMap<String, Object>());
         assertEquals(3, rec.get("S"));
     }
@@ -316,7 +356,7 @@ public class ArgProcessingUnitTest extends ZorkaFixture {
     public void testThreadLocalReset() {
         ThreadLocal tl = new ThreadLocal();
         tl.set("abc");
-        ThreadLocalProcessor tp = new ThreadLocalProcessor(null, ThreadLocalProcessor.REMOVE, tl);
+        ThreadLocalProcessor tp = new ThreadLocalProcessor(null, ThreadLocalProcessor.REMOVE, tl, null);
         tp.process(new HashMap<String, Object>());
         assertNull(tl.get());
     }

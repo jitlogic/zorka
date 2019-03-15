@@ -824,18 +824,6 @@ public class SpyLib {
 
 
     /**
-     * Creates thread local getter processor. It gets a value from thread local object and stores it into dst field.
-     *
-     * @param dst         destination field
-     * @param threadLocal source thread local object
-     * @return thread local getter processor object
-     */
-    public SpyProcessor tlGet(String dst, ThreadLocal<Object> threadLocal, Object... path) {
-        return new ThreadLocalProcessor(dst, ThreadLocalProcessor.GET, threadLocal, path);
-    }
-
-
-    /**
      * Puts constant value into record.
      *
      * @param dst destination field
@@ -848,6 +836,18 @@ public class SpyLib {
 
 
     /**
+     * Creates thread local getter processor. It gets a value from thread local object and stores it into dst field.
+     *
+     * @param dst         destination field
+     * @param threadLocal source thread local object
+     * @return thread local getter processor object
+     */
+    public SpyProcessor tlGet(String dst, ThreadLocal<Object> threadLocal, Object... path) {
+        return new ThreadLocalProcessor(dst, ThreadLocalProcessor.GET, threadLocal, null, path);
+    }
+
+
+    /**
      * Creates thread local setter processor. It will fetch a field from record and store it in thread local.
      *
      * @param src         source field
@@ -855,9 +855,20 @@ public class SpyLib {
      * @return thread local setter object
      */
     public SpyProcessor tlSet(String src, ThreadLocal<Object> threadLocal) {
-        return new ThreadLocalProcessor(src, ThreadLocalProcessor.SET, threadLocal);
+        return new ThreadLocalProcessor(src, ThreadLocalProcessor.SET, threadLocal, null);
     }
 
+
+    /**
+     * Creates conditional thread local setter processor. It will fetch a field from record and store it in thread local.
+     *
+     * @param src         source field
+     * @param threadLocal destination thread local object
+     * @return thread local setter object
+     */
+    public SpyProcessor tlSetIf(String src, ThreadLocal<Object> threadLocal, Object cond) {
+        return new ThreadLocalProcessor(src, ThreadLocalProcessor.SET, threadLocal, cond);
+    }
 
     /**
      * Clears thread local object
@@ -866,7 +877,7 @@ public class SpyLib {
      * @return thread local cleaner object
      */
     public SpyProcessor tlRemove(ThreadLocal<Object> threadLocal) {
-        return new ThreadLocalProcessor(null, ThreadLocalProcessor.REMOVE, threadLocal);
+        return new ThreadLocalProcessor(null, ThreadLocalProcessor.REMOVE, threadLocal, null);
     }
 
 
