@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2019-03-17T18:02:41Z</date>
+    <date>2019-03-17T18:46:27Z</date>
     <groups>
         <group>
             <name>Templates/Zorka</name>
@@ -2006,7 +2006,16 @@
                             </applications>
                             <valuemap/>
                             <logtimefmt/>
-                            <preprocessing/>
+                            <preprocessing>
+                                <step>
+                                    <type>10</type>
+                                    <params/>
+                                </step>
+                                <step>
+                                    <type>1</type>
+                                    <params>0.1</params>
+                                </step>
+                            </preprocessing>
                             <jmx_endpoint/>
                             <timeout>3s</timeout>
                             <url/>
