@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2019-03-17T18:46:27Z</date>
+    <date>2019-03-17T19:29:48Z</date>
     <groups>
         <group>
             <name>Templates/Zorka</name>
@@ -42,7 +42,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>zabbix.advertise[*]</key>
-                    <delay>30s</delay>
+                    <delay>1h</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>
@@ -1874,7 +1874,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>zabbix.discovery[*,&quot;java&quot;, &quot;java.lang:type=GarbageCollector,*&quot;, &quot;name&quot;, &quot;*&quot;]</key>
-                    <delay>30s</delay>
+                    <delay>1h</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>
@@ -2145,7 +2145,7 @@
                     <snmp_community/>
                     <snmp_oid/>
                     <key>zabbix.discovery[*,&quot;java&quot;, &quot;java.lang:type=MemoryPool,*&quot;, &quot;name&quot;, &quot;*&quot;]</key>
-                    <delay>30s</delay>
+                    <delay>1h</delay>
                     <status>0</status>
                     <allowed_hosts/>
                     <snmpv3_contextname/>
