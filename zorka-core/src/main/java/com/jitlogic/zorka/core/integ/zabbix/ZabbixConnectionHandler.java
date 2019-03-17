@@ -43,7 +43,11 @@ public class ZabbixConnectionHandler implements TcpSessionFactory {
         try {
             ZabbixRequestHandler zch = new ZabbixRequestHandler(socket, translator);
             String req = zch.getReq();
-            agent.exec(req, zch);
+            if (req != null) {
+                agent.exec(req, zch);
+            } else {
+                zch.handleResult(null);
+            }
         } catch (IOException e) {
             log.error("Error handling Zabbix Agent request", e);
             ZorkaUtil.close(socket);

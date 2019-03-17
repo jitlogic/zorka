@@ -29,32 +29,7 @@ import static org.junit.Assert.*;
 
 public class ZabbixAgentUnitTest {
 
-	private String tr(String src) {
-		return new ZabbixQueryTranslator().translate(src);
-	}
-	
-	
-	@Test
-	public void testVarsAndAttrs() {
-		assertEquals("var", tr("var"));
-		assertEquals("some.var", tr("some__var"));
-	}
-	
-	
-	@Test
-	public void testFuncs() {
-		assertEquals("zorka.version()",   tr("zorka__version[]"));
-		assertEquals("some_func(1,2,3)",  tr("some_func[1,2,3]"));
-		assertEquals("func2(\"abc\")",    tr("func2[\"abc\"]"));
-		assertEquals("func3(\"ab[]cd\")", tr("func3[\"ab[]cd\"]"));
-	}
-	
-	@Test
-	public void testBiggerFuncs() {
-		assertEquals("zorka.jmx(\"java\", \"java.lang:type=OperatingSystem\", \"Arch\")", 
-			tr("zorka__jmx[\"java\", \"java.lang:type=OperatingSystem\", \"Arch\"]"));
-	}
-	
+
 	private static InputStream mkIS(Object...args) {
 		byte buf[] = new byte[2048];
 		int pos = 0;

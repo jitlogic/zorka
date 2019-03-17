@@ -329,10 +329,12 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 		// Insert Tasks
 		for (ActiveCheckQueryItem task : tasksToInsert) {
-			ZabbixActiveTask zabbixActiveTask = new ZabbixActiveTask(agentHost, task, agent, translator, resultsQueue);
-			ScheduledFuture<?> taskHandler = scheduler.scheduleAtFixedRate(zabbixActiveTask, 5, task.getDelay(), TimeUnit.SECONDS);
-			log.debug("ZabbixActive - task: " + task.toString());
-			runningTasks.put(task, taskHandler);
+			if (translator.translate(task.key) != null) {
+				ZabbixActiveTask zabbixActiveTask = new ZabbixActiveTask(agentHost, task, agent, translator, resultsQueue);
+				ScheduledFuture<?> taskHandler = scheduler.scheduleAtFixedRate(zabbixActiveTask, 5, task.getDelay(), TimeUnit.SECONDS);
+				log.debug("ZabbixActive - task: " + task.toString());
+				runningTasks.put(task, taskHandler);
+			}
 		}
 		log.debug("ZabbixActive - new scheduled tasks: " + tasksToInsert.size());
 		log.debug("ZabbixActive - deleted old tasks: " + tasksToDelete.size());

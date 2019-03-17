@@ -30,6 +30,12 @@ public class ZabbixQueryTranslator implements QueryTranslator {
 
     private Set<String> allowed = new HashSet<String>();
 
+    private String requestPrefix;
+
+    public ZabbixQueryTranslator(String requestPrefix) {
+        this.requestPrefix = requestPrefix;
+    }
+
     public void allow(String fn) {
         allowed.add(fn);
     }
@@ -55,29 +61,48 @@ public class ZabbixQueryTranslator implements QueryTranslator {
 
         sb.append(fn);
 
+        boolean pfx = requestPrefix != null;
+
         if (pos >= query.length()) {
-            return sb.toString();
+            return pfx ? null : sb.toString();
         }
 
         sb.append('(');
         pos++;
 
         while (pos < query.length() && query.charAt(pos) != ']') {
+            String s;
             if (query.charAt(pos) == '"') {
                 int pstart = pos++;
                 while (pos < query.length() && query.charAt(pos) != '"') {
                     pos++;
                 }
-                sb.append(query.substring(pstart, pos + 1));
+                s = query.substring(pstart, pos + 1);
             } else {
-                sb.append(query.charAt(pos));
+                int pstart = pos;
+                while (pos < query.length() && query.charAt(pos) != ',' && query.charAt(pos) != ']') pos++;
+                s = query.substring(pstart, pos);
             }
-            pos++;
+
+            String str = s.trim().replace("\"", "");
+
+            if (pfx) {
+                if (!requestPrefix.equals(str) && !"*".equals(str)) return null;
+                pfx = false;
+                // This is crutch ...
+                if (pos < query.length() && query.charAt(pos) == '"') pos++;
+                while (pos < query.length() && query.charAt(pos) == ' ') pos++;
+                if (pos < query.length() && query.charAt(pos) == ',') pos++;
+            } else {
+                sb.append(s);
+                if (pos < query.length() && query.charAt(pos) == ',') sb.append(',');
+                pos++;
+            }
         }
 
         sb.append(')');
 
-        return sb.toString();
+        return pfx ? null : sb.toString();
     }
 
     private void isAllowed(String fn) {

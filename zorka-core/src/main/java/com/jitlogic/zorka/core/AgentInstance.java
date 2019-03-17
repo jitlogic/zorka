@@ -45,6 +45,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.*;
 
 import static com.jitlogic.zorka.core.AgentConfigProps.*;
@@ -269,7 +270,8 @@ public class AgentInstance implements ZorkaService {
 
     public synchronized QueryTranslator getTranslator() {
         if (translator == null) {
-            translator = new ZabbixQueryTranslator();
+            String prefix = config.stringCfg(ZORKA_PREFIX_PROP, null);
+            translator = new ZabbixQueryTranslator(prefix);
         }
         return translator;
     }

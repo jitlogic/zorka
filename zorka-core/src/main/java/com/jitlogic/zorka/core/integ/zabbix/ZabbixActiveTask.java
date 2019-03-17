@@ -58,7 +58,11 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 			log.debug("Translated task: " + expr);
 			
 			clock = (new Date()).getTime() / 1000L;
-			agent.exec(expr, this);
+			if (expr != null) {
+				agent.exec(expr, this);
+			} else {
+				this.handleResult(null);
+			}
 		}
 		catch (Exception ex ) {
 			log.error("Failed to run ZabbixActiveTask key : " + key, ex);

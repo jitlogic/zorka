@@ -19,16 +19,15 @@ package com.jitlogic.zorka.core.integ.zabbix;
 
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+import com.jitlogic.zorka.core.AgentConfigProps;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import com.jitlogic.zorka.core.perfmon.QueryDef;
 import com.jitlogic.zorka.core.perfmon.QueryLister;
 import com.jitlogic.zorka.core.perfmon.QueryResult;
 import com.jitlogic.zorka.common.util.JSONWriter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,9 +43,27 @@ public class ZabbixLib implements ZorkaService {
     private MBeanServerRegistry mbsRegistry;
     private ZorkaConfig config;
 
+    /** Advertisement to be returned when zorka.req.prefix != null. */
+    private String advertisement;
+
+    /** Request prefix (if set in zabbix configuration) */
+    private final String requestPrefix;
+
+    private final String metadataTag;
+
+    private static final String ZORKA = "{#ZORKA}";
+
+
     public ZabbixLib(MBeanServerRegistry mbsRegistry, ZorkaConfig config) {
         this.mbsRegistry = mbsRegistry;
         this.config = config;
+
+        requestPrefix = config.stringCfg(AgentConfigProps.ZORKA_PREFIX_PROP, null);
+        if (requestPrefix != null) {
+            advertisement =  new JSONWriter().write(ZorkaUtil.map("data",
+                    Collections.singletonList(ZorkaUtil.map(ZORKA, requestPrefix))));
+        }
+        metadataTag = requestPrefix != null ? "ZORKA:MULTI:" : "ZORKA:";
     }
 
 
@@ -78,6 +95,7 @@ public class ZabbixLib implements ZorkaService {
                         break;
                     }
                     item.put("{#" + e.getKey().toUpperCase().replace("-", "") + "}", e.getValue().toString());
+                    if (requestPrefix != null) item.put(ZORKA, requestPrefix);
                 }
                 if (item != null) {
                     data.add(item);
@@ -113,6 +131,9 @@ public class ZabbixLib implements ZorkaService {
         return _discovery(QueryDef.NO_NULL_ATTRS, new QueryDef(mbs, filter, attrs));
     }
 
+    public String advertise() {
+        return advertisement;
+    }
 
     /**
      * Returns zabbix trapper registered as id or null.
@@ -152,8 +173,8 @@ public class ZabbixLib implements ZorkaService {
 
         // TODO always sort tags (?)
 
-        if (!tag.startsWith("ZORKA:")) {
-            tag = "ZORKA:" + tag;
+        if (!tag.startsWith(metadataTag)) {
+            tag = metadataTag + tag;
         }
 
         if (!meta.contains(tag)) {

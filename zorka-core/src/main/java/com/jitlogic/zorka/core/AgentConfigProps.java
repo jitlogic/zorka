@@ -1,5 +1,9 @@
 package com.jitlogic.zorka.core;
 
+import com.jitlogic.zorka.common.util.ZorkaUtil;
+
+import java.util.Set;
+
 public class AgentConfigProps {
 
     public static final String NAGIOS_PROP = "nagios";
@@ -152,6 +156,8 @@ public class AgentConfigProps {
 
     public static final String ZORKA_LOG_FSYNC_PROP = "zorka.log.fsync";
     public static final boolean ZORKA_LOG_FSYNC_DVAL = false;
+
+    public static final String ZORKA_PREFIX_PROP = "zorka.prefix";
 
     /** Request queue length. */
     public static final String ZORKA_REQ_QUEUE_PROP = "zorka.req.queue";
