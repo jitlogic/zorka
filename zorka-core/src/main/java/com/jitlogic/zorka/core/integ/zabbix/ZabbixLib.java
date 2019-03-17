@@ -131,7 +131,7 @@ public class ZabbixLib implements ZorkaService {
         return _discovery(QueryDef.NO_NULL_ATTRS, new QueryDef(mbs, filter, attrs));
     }
 
-    public String advertise() {
+    public String advertise(String...args) {
         return advertisement;
     }
 

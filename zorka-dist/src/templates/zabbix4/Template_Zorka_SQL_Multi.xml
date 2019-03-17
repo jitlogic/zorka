@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>4.0</version>
-    <date>2019-03-17T19:46:00Z</date>
+    <date>2019-03-17T20:30:36Z</date>
     <groups>
         <group>
             <name>Templates/Zorka</name>
@@ -29,7 +29,7 @@
                     <type>7</type>
                     <snmp_community/>
                     <snmp_oid/>
-                    <key>zabbix.advertise[*]</key>
+                    <key>zabbix.advertise[*,SQL]</key>
                     <delay>30s</delay>
                     <status>0</status>
                     <allowed_hosts/>
@@ -456,7 +456,100 @@
                         </item_prototype>
                     </item_prototypes>
                     <trigger_prototypes/>
-                    <graph_prototypes/>
+                    <graph_prototypes>
+                        <graph_prototype>
+                            <name>{#ZORKA}: SQL Queries Performance</name>
+                            <width>900</width>
+                            <height>200</height>
+                            <yaxismin>0.0000</yaxismin>
+                            <yaxismax>100.0000</yaxismax>
+                            <show_work_period>1</show_work_period>
+                            <show_triggers>1</show_triggers>
+                            <type>0</type>
+                            <show_legend>1</show_legend>
+                            <show_3d>0</show_3d>
+                            <percent_left>0.0000</percent_left>
+                            <percent_right>0.0000</percent_right>
+                            <ymin_type_1>0</ymin_type_1>
+                            <ymax_type_1>0</ymax_type_1>
+                            <ymin_item_1>0</ymin_item_1>
+                            <ymax_item_1>0</ymax_item_1>
+                            <graph_items>
+                                <graph_item>
+                                    <sortorder>0</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>42A5F5</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>Template_Zorka_SQL_Multi</host>
+                                        <key>sql.avg1[{#ZORKA},&quot;stats&quot;, &quot;ALL&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>1</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>1E88E5</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>Template_Zorka_SQL_Multi</host>
+                                        <key>sql.avg5[{#ZORKA},&quot;stats&quot;, &quot;ALL&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>2</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>0040FF</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>Template_Zorka_SQL_Multi</host>
+                                        <key>sql.avg15[{#ZORKA},&quot;stats&quot;, &quot;ALL&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>3</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>FF0000</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>Template_Zorka_SQL_Multi</host>
+                                        <key>sql.errors[{#ZORKA},&quot;stats&quot;, &quot;ALL&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>4</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>FFFF00</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>Template_Zorka_SQL_Multi</host>
+                                        <key>sql.peak[{#ZORKA},&quot;stats&quot;, &quot;ALL&quot;]</key>
+                                    </item>
+                                </graph_item>
+                                <graph_item>
+                                    <sortorder>5</sortorder>
+                                    <drawtype>0</drawtype>
+                                    <color>4CAF50</color>
+                                    <yaxisside>0</yaxisside>
+                                    <calc_fnc>2</calc_fnc>
+                                    <type>0</type>
+                                    <item>
+                                        <host>Template_Zorka_SQL_Multi</host>
+                                        <key>sql.calls[{#ZORKA},&quot;stats&quot;, &quot;ALL&quot;]</key>
+                                    </item>
+                                </graph_item>
+                            </graph_items>
+                        </graph_prototype>
+                    </graph_prototypes>
                     <host_prototypes/>
                     <jmx_endpoint/>
                     <timeout>3s</timeout>
