@@ -149,6 +149,11 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		/* Active Check: Interval, message+hostname */ 
 		activeCheckInterval = config.intCfg(prefix + ".check.interval", 120);
 		agentHost = config.stringCfg("zorka.hostname", null);
+		// Allow to override the zorka.hostname property usind -D flag with the java command
+		String propHostname = System.getProperty("zorka.hostname");
+		if (propHostname != null && propHostname.length() > 0) {
+			agentHost = propHostname;
+		}
 
 		log.info(ZorkaLogger.ZAG_INFO, "ZabbixActive Agent (" + agentHost + ") will send Active Checks to " + 
 				activeAddr + ":" + activePort + " every " + activeCheckInterval + " seconds");

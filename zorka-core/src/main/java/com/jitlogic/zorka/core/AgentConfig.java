@@ -95,6 +95,12 @@ public class AgentConfig extends ZorkaConfig {
         try {
             String server = stringCfg("zorka.syslog.server", "127.0.0.1");
             String hostname = stringCfg("zorka.hostname", "zorka");
+            // Allow to override the zorka.hostname property usind -D flag with the java command
+            String propHostname = System.getProperty("zorka.hostname");
+            if (propHostname != null && propHostname.length() > 0) {
+                        hostname = propHostname;
+            }
+
             int syslogFacility = SyslogLib.getFacility(stringCfg("zorka.syslog.facility", "F_LOCAL0"));
 
             SyslogTrapper syslog = new SyslogTrapper(server, hostname, syslogFacility, true);
