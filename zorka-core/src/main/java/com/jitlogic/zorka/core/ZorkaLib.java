@@ -91,6 +91,11 @@ public class ZorkaLib implements ZorkaService {
         this.instance = instance;
 
         this.hostname = config.getProperties().getProperty("zorka.hostname").trim();
+        // Allow to override the zorka.hostname property usind -D flag with the java command
+        String propHostname = System.getProperty("zorka.hostname");
+        if (propHostname != null && propHostname.length() > 0) {
+              this.hostname = propHostname;
+        }
         this.version = config.getProperties().getProperty("zorka.version").trim();
     }
 
