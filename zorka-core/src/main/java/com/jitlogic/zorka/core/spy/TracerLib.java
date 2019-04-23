@@ -44,19 +44,6 @@ public abstract class TracerLib {
 
     public final static int TR_FORCE_TRACE = TraceRecord.FORCE_TRACE;
 
-    public final static String DTRACE_UUID = "DTRACE_UUID";
-    public final static String DTRACE_IN   = "DTRACE_IN";
-    public final static String DTRACE_OUT  = "DTRACE_OUT";
-    public final static String DTRACE_XTT = "DTRACE_XTT";
-
-    public final static String DTRACE_STATE = "DTRACE";
-
-    public final static String DTRACE_SEP  = "_";
-
-    public final static String DTRACE_UUID_HDR = "x-zorka-dtrace-uuid";
-    public final static String DTRACE_TID_HDR  = "x-zorka-dtrace-tid";
-    public final static String DTRACE_XTT_HDR  = "x-zorka-dtrace-xtt";
-
     public static final int TUNING_OFF = 0x00;
     public static final int TUNING_SUM = 0x01;
     public static final int TUNING_DET = 0x02;
@@ -73,13 +60,43 @@ public abstract class TracerLib {
     public static final int PA_TO_STRING      = 0x1000;
     public static final int PA_WARN_ON_NULL   = 0x2000;
 
+    public final static String DTRACE_STATE = "DTRACE";
+
+    public final static String DH_B3_TRACEID = "x-b3-traceid";
+    public final static String DH_B3_SPANID = "x-b3-spanid";
+    public final static String DH_B3_PARENTID = "x-b3-parentspanid";
+    public final static String DH_B3_SAMPLED = "x-b3-sampled";
+    public final static String DH_B3_FLAGS = "x-b3-flags";
+    public final static String DH_B3 = "b3";
+
+    public final static String DH_UBER_TID = "uber-trace-id";
+    public final static String DH_UBER_CTX = "uberctx-";
+
+    public final static String DH_W3_TRACEPARENT = "traceparent";
+    public final static String DH_W3_TRACESTATE = "tracestate";
+
+    public final static String DT_TRACE_ID = "TRACE_ID";
+    public final static String DT_SPAN_ID  = "SPAN_ID";
+    public final static String DT_PARENT_ID = "PARENT_ID";
+
+
+    public static final int F_SAMPLE      = 0x000001; // SAMPLE flag
+    public static final int F_DEBUG       = 0x000100; // DEBUG flag
+    public static final int F_DROP        = 0x000200; // DROP trace flag
+    public static final int F_B3_HDR      = 0x000400; // Use short B3 header form
+
+    public static final int F_MODE_MASK   = 0x0f0000; // Context propagation mode
+    public static final int F_ZIPKIN_MODE = 0x010000; // Zipkin context propagation, x-b3-* headers
+    public static final int F_JAEGER_MODE = 0x020000; // Jaeger context propagation
+    public static final int F_W3_TRC_MODE = 0x030000; // W3C Context Propagation
+
+    protected final ThreadLocal<DTraceState> dtraceLocal = new ThreadLocal<DTraceState>();
+
     protected Tracer tracer;
     protected ZorkaConfig config;
     protected SymbolRegistry symbolRegistry;
     protected MetricsRegistry metricsRegistry;
     protected int defaultTraceFlags = TraceMarker.DROP_INTERIM;
-
-    protected final ThreadLocal<DTraceState> dtraceLocal = new ThreadLocal<DTraceState>();
 
     public TracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
         this.symbolRegistry = symbolRegistry;
@@ -368,22 +385,18 @@ public abstract class TracerLib {
         return new TraceFlagsProcessor(tracer, srcField, symbolRegistry.symbolId(traceName), flags);
     }
 
-
-    public SpyProcessor dtraceInput(long threshold) {
-        return new DTraceInputProcessor(this, dtraceLocal, threshold);
+    public SpyProcessor dtraceInput(int flags) {
+        return new DTraceInputProcessor(this, dtraceLocal, flags);
     }
 
-    public SpyProcessor dtraceOutput(boolean nextTid, boolean setAttrs) {
-        return new DTraceOutputProcessor(this, dtraceLocal, nextTid, setAttrs);
-    }
-
-    public SpyProcessor dtraceOutput() {
-        return new DTraceOutputProcessor(this, dtraceLocal);
+    public SpyProcessor dtraceOutput(int addFlags, int delFlags) {
+        return new DTraceOutputProcessor(this, dtraceLocal, addFlags, delFlags);
     }
 
     public SpyProcessor dtraceClean() {
         return new DTraceCleanProcessor(this, dtraceLocal);
     }
+
 
     /**
      * Creates trace network sender using HTTP protocol and CBOR representation.

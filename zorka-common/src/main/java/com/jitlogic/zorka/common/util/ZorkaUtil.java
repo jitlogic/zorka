@@ -860,6 +860,14 @@ public class ZorkaUtil {
         return sb.toString();
     }
 
+    public static String hex(long l) {
+        return String.format("%08x%08x", l >>> 32, l & 0xffffffffL);
+    }
+
+    public static String hex(long l1, long l2) {
+        return String.format("%08x%08x%08x%08x", l1 >>> 32, l1 & 0xffffffffL, l2 >>> 32, l2 & 0xffffffffL);
+    }
+
 
     public static String crc32(String input) {
         CRC32 crc32 = new CRC32();

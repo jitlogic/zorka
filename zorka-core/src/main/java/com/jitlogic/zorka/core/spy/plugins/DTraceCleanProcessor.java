@@ -23,6 +23,8 @@ import com.jitlogic.zorka.core.spy.TracerLib;
 
 import java.util.Map;
 
+import static com.jitlogic.zorka.core.spy.TracerLib.F_SAMPLE;
+
 /**
  * Cleans up distributed tracing state for current thread.
  * Should be attached to SUBMIT chain where DTraceInputProcessor is attached at ENTER.
@@ -42,15 +44,8 @@ public class DTraceCleanProcessor implements SpyProcessor {
         DTraceState ds = dtraceLocal.get();
 
         if (ds != null) {
-            long xtt = ds.getThreshold();
-            Long t1 = (Long) rec.get("T1");
-            Long t2 = (Long) rec.get("T2");
-
-            if (t1 != null && t2 != null && xtt >= 0L) {
-                long t = (t2 - t1) / 1000000L;
-                if (t >= xtt) {
-                    tracer.newFlags(LTracerLib.SUBMIT_TRACE);
-                }
+            if (0 != (ds.getFlags() & F_SAMPLE)) {
+                tracer.newFlags(LTracerLib.SUBMIT_TRACE);
             }
         }
 

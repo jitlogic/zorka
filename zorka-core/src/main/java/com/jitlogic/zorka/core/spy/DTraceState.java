@@ -16,58 +16,132 @@
 
 package com.jitlogic.zorka.core.spy;
 
-import java.util.UUID;
 
-import static com.jitlogic.zorka.core.spy.TracerLib.DTRACE_SEP;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.util.Map;
+import java.util.TreeMap;
+
+/**
+ * Represents distribute trace context. Note that this is now central context for tracer, even in single-host mode.
+ */
 public class DTraceState {
 
-    private String uuid;
-    private String tid;
-    private int seq;
+    /** Trace ID (64 or 128 bit) */
+    private long traceId1, traceId2;
+
+    /** Span ID and Parent Span ID */
+    private long spanId, parentId;
+
+    /** Start timestamp */
     private long tstart;
-    private long threshold;
 
-    public DTraceState(String uuid, String tid, long tstart, long threshold) {
-        this.uuid = uuid != null ? uuid : UUID.randomUUID().toString();
-        this.tid = tid != null ? tid : "";
+    /** Context Flags */
+    private int flags;
+
+    /** Debug ID (if any) */
+    private String debugId;
+
+    /** Baggage */
+    private Map<String,String> baggage = new TreeMap<String, String>();
+
+    private String traceState;
+
+    public DTraceState(long traceId1, long traceId2, long parentId, long spanId, long tstart, int flags) {
+        this.traceId1 = traceId1;
+        this.traceId2 = traceId2;
+        this.parentId = parentId;
+        this.flags = flags;
+
+        this.spanId = spanId;
         this.tstart = tstart;
-        this.threshold = threshold;
     }
 
-    public String getUuid() {
-        return uuid;
+    public long getTraceId1() {
+        return traceId1;
     }
 
-    public String getTid() {
-        return tid;
+    public long getTraceId2() {
+        return traceId2;
+    }
+
+    public String getTraceIdHex() {
+        return traceId2 != 0 ? ZorkaUtil.hex(traceId1, traceId2) : ZorkaUtil.hex(traceId1);
+    }
+
+    public long getSpanId() {
+        return spanId;
+    }
+
+    public void setSpanId(long spanId) {
+        this.spanId = spanId;
+    }
+
+    public String getSpanIdHex() {
+        return ZorkaUtil.hex(spanId);
+    }
+
+    public long getParentId() {
+        return parentId;
+    }
+
+    public String getParentIdHex() {
+        return ZorkaUtil.hex(parentId);
     }
 
     public long getTstart() {
         return tstart;
     }
 
-    public long getThreshold() {
-        return threshold;
+    public int getFlags() {
+        return flags;
     }
 
-    public synchronized int nextSeq() {
-        seq++;
-        return seq;
+    public void setFlags(int flags) {
+        this.flags = flags;
     }
 
-    public synchronized String nextTid() {
-        seq++;
-        return String.format("%s%s%x", tid, DTRACE_SEP, seq);
+    public String getDebugId() {
+        return debugId;
     }
 
-    public synchronized String lastTid() {
-        return String.format("%s%s%x", tid, DTRACE_SEP, seq);
+    public DTraceState setDebugId(String debugId) {
+        this.debugId = debugId;
+        return this;
+    }
+
+    public Map<String, String> getBaggage() {
+        return baggage;
+    }
+
+    public String getTraceState() {
+        return traceState;
+    }
+
+    public void setTraceState(String traceState) {
+        this.traceState = traceState;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof DTraceState) {
+            DTraceState ds = (DTraceState)obj;
+            return ds.traceId1 == traceId1 &&
+                    ds.traceId2 == traceId2 &&
+                    ds.spanId == spanId &&
+                    ds.parentId == parentId &&
+                    ds.tstart == tstart &&
+                    ds.flags == flags;
+        } else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (11 * traceId1 + 17 * traceId2 + 31 * spanId + 41 * parentId + 7 * tstart + 3 * flags);
     }
 
     @Override
     public String toString() {
-        return "DT(" + uuid + ", '" + tid + "', " + threshold + ")";
+        return String.format("DT(%016x%016x,%016x,%02x,t=%d)", traceId1, traceId2, spanId, flags, tstart);
     }
-
 }
