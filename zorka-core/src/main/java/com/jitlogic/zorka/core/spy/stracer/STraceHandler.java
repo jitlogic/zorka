@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.spy.stracer;
 
 import com.jitlogic.zorka.cbor.TraceRecordFlags;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.tracedata.DTraceState;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.cbor.CBOR;
@@ -375,6 +376,16 @@ public class STraceHandler extends TraceHandler {
         if (tuningEnabled) {
             tunStats.markRank(mid, ERROR_PENALTY);
         }
+    }
+
+    @Override
+    public DTraceState getDTraceState() {
+        return null;
+    }
+
+    @Override
+    public void setDTraceState(DTraceState state) {
+
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.core.spy.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceState;
 import com.jitlogic.zorka.core.spy.TracerLib;
+import com.jitlogic.zorka.core.spy.ltracer.LTraceHandler;
 import com.jitlogic.zorka.core.spy.ltracer.LTracer;
-import com.jitlogic.zorka.core.spy.ltracer.LTracerLib;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
@@ -15,33 +15,44 @@ import static org.junit.Assert.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class DTraceComponentsUnitTest extends ZorkaFixture {
 
     @Test
-    public void testTraceInputProcessingInitialTraceJaeger() {
+    public void testTraceInputOutputProcessingInitialTraceJaeger() {
         SpyProcessor dti = tracer.dtraceInput(TracerLib.F_JAEGER_MODE);
 
-        Map<String,Object> rec = new HashMap<String, Object>();
-        rec.put("T1", 100L);
+        Map<String,Object> r1 = new HashMap<String, Object>();
+        r1.put("T1", 100L);
 
-        assertSame(rec, dti.process(rec));
+        assertSame(r1, dti.process(r1));
 
-        DTraceState ds = (DTraceState)rec.get("DTRACE");
-        assertNotNull(ds);
+        DTraceState ds1 = (DTraceState)r1.get("DTRACE");
+        assertNotNull(ds1);
 
-        assertNotEquals(0, ds.getTraceId1());
-        assertNotEquals(0, ds.getTraceId2());
-        assertNotNull(ds.getTraceIdHex());
-        assertNotEquals(0, ds.getSpanId());
-        assertNotNull(ds.getSpanIdHex());
-        assertEquals(0, ds.getParentId());
-        assertNotEquals(0, ds.getTstart());
+        assertNotEquals(0, ds1.getTraceId1());
+        assertNotEquals(0, ds1.getTraceId2());
+        assertNotNull(ds1.getTraceIdHex());
+        assertNotEquals(0, ds1.getSpanId());
+        assertNotNull(ds1.getSpanIdHex());
+        assertEquals(0, ds1.getParentId());
+        assertNotEquals(0, ds1.getTstart());
 
-        TraceRecord tr = ((LTracer)(agentInstance.getTracer())).getLtHandler().realTop();
-        assertEquals(ds.getTraceIdHex(), tr.getAttr(symbols.symbolId(DT_TRACE_ID)));
-        assertEquals(ds.getSpanIdHex(), tr.getAttr(symbols.symbolId(DT_SPAN_ID)));
+        LTraceHandler th = ((LTracer) (agentInstance.getTracer())).getLtHandler();
+
+        TraceRecord tr = th.realTop();
+        assertEquals(ds1.getTraceIdHex(), tr.getAttr(symbols.symbolId(DT_TRACE_ID)));
+        assertEquals(ds1.getSpanIdHex(), tr.getAttr(symbols.symbolId(DT_SPAN_ID)));
+
+        SpyProcessor dto = tracer.dtraceOutput(0, 0);
+        Map<String,Object> r2 = new HashMap<String, Object>();
+
+        dto.process(r2);
+
+        DTraceState ds2 = (DTraceState)r2.get("DTRACE");
+        assertNotNull(ds2);
+
+        String dh2 = (String)r2.get(DH_UBER_TID);
 
     }
 
@@ -73,22 +84,12 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
 
     // TODO continuation dla w3c
 
+    // TODO test na flagę SAMPLED=1
 
-//
-//    @Test
-//    public void testTraceInputWithThresholdData() {
-//        SpyProcessor dti = tracer.dtraceInput(-1);
-//
-//        Map<String,Object> rec = new HashMap<String, Object>();
-//        rec.put("DTRACE_XTT", "42");
-//
-//        assertSame(rec, dti.process(rec));
-//
-//        DTraceState ds = (DTraceState)rec.get("DTRACE");
-//        assertNotNull(ds);
-//
-//        assertEquals(42L, ds.getThreshold());
-//    }
+    // TODO test na flagę SAMPLED=0
+
+    // TODO test na flagę DEBUG=1
+
 //
 //    @Test
 //    public void testTraceOutputProcessing() {
@@ -148,4 +149,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
 //
 //        assertTrue(0 != (tr.getMarker().getFlags() & LTracerLib.SUBMIT_TRACE));
 //    }
+
+    // TODO dokładniejsze testowanie
+
 }

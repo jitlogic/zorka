@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy.ltracer;
 
+import com.jitlogic.zorka.common.tracedata.DTraceState;
 import com.jitlogic.zorka.core.spy.tuner.TraceTuningStats;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import org.slf4j.Logger;
@@ -149,6 +150,10 @@ public abstract class TraceHandler {
     public abstract void traceEnter(int mid, long tstamp);
 
     public abstract void traceError(Object e, long tstamp);
+
+    public abstract DTraceState getDTraceState();
+
+    public abstract void setDTraceState(DTraceState state);
 
     public static long getTuningExchangeMinCalls() {
         return tuningExchangeMinCalls;

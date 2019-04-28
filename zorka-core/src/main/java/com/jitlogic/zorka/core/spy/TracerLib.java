@@ -386,7 +386,7 @@ public abstract class TracerLib {
     }
 
     public SpyProcessor dtraceInput(int flags) {
-        return new DTraceInputProcessor(this, dtraceLocal, flags);
+        return new DTraceInputProcessor(tracer, this, dtraceLocal, flags);
     }
 
     public SpyProcessor dtraceOutput(int addFlags, int delFlags) {

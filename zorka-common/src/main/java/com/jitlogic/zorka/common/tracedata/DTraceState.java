@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.common.tracedata;
 
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -45,7 +45,19 @@ public class DTraceState {
     /** Baggage */
     private Map<String,String> baggage = new TreeMap<String, String>();
 
+    /** W3C Trace State */
     private String traceState;
+
+    public DTraceState(DTraceState orig) {
+        this.traceId1 = orig.traceId1;
+        this.traceId2 = orig.traceId2;
+        this.parentId = orig.parentId;
+        this.spanId = orig.spanId;
+        this.flags = orig.flags;
+        this.debugId = orig.debugId;
+        this.baggage = orig.baggage;
+        this.traceState = orig.traceState;
+    }
 
     public DTraceState(long traceId1, long traceId2, long parentId, long spanId, long tstart, int flags) {
         this.traceId1 = traceId1;

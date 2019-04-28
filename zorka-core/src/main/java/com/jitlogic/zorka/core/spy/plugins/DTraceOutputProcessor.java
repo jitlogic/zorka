@@ -17,8 +17,9 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.spy.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceState;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
 
 import java.util.Map;
@@ -28,15 +29,17 @@ import static com.jitlogic.zorka.core.spy.TracerLib.*;
 
 public class DTraceOutputProcessor implements SpyProcessor {
 
-    private TracerLib tracer;
+    private Tracer tracer;
+    private TracerLib tracerLib;
     private ThreadLocal<DTraceState> dtraceLocal;
     private Random rand = new Random();
 
     private int delFlags;
     private int addFlags;
 
-    public DTraceOutputProcessor(TracerLib tracer, ThreadLocal<DTraceState> dtraceLocal, int delFlags, int addFlags) {
+    public DTraceOutputProcessor(Tracer tracer, TracerLib tracerLib, ThreadLocal<DTraceState> dtraceLocal, int delFlags, int addFlags) {
         this.tracer = tracer;
+        this.tracerLib = tracerLib;
         this.dtraceLocal = dtraceLocal;
         this.delFlags = delFlags;
         this.addFlags = addFlags;
@@ -82,18 +85,20 @@ public class DTraceOutputProcessor implements SpyProcessor {
         DTraceState ds = dtraceLocal.get();
 
         if (ds != null) {
+            ds = new DTraceState(ds);
             long spanId = rand.nextLong();
             int flags = (ds.getFlags() & ~delFlags) | addFlags;
             rec.put(DTRACE_STATE, ds);
+            tracer.getHandler().setDTraceState(ds);
             String tid = ds.getTraceIdHex();
             rec.put(DT_TRACE_ID, tid);
-            tracer.newAttr(DT_TRACE_ID, tid);
+            tracerLib.newAttr(DT_TRACE_ID, tid);
             String sid = ZorkaUtil.hex(spanId);
             rec.put(DT_SPAN_ID, sid);
-            tracer.newAttr(DT_SPAN_ID, sid);
+            tracerLib.newAttr(DT_SPAN_ID, sid);
             long pid = ds.getSpanId();
             rec.put(DT_PARENT_ID, pid);
-            tracer.newAttr(DT_PARENT_ID, pid);
+            tracerLib.newAttr(DT_PARENT_ID, pid);
             switch (ds.getFlags() & F_MODE_MASK) {
                 case F_ZIPKIN_MODE: {
                     if (0 != (flags & F_B3_HDR)) {

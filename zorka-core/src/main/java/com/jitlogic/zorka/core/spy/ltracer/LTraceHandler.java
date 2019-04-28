@@ -19,10 +19,7 @@ package com.jitlogic.zorka.core.spy.ltracer;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.tracedata.TraceMarker;
-import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 
 /**
@@ -181,6 +178,22 @@ public class LTraceHandler extends TraceHandler {
         }
 
         pop();
+    }
+
+
+    @Override
+    public DTraceState getDTraceState() {
+        TraceRecord top = realTop();
+        return top != null && top.getMarker() != null ? top.getMarker().getDstate() : null;
+    }
+
+
+    @Override
+    public void setDTraceState(DTraceState dtraceState) {
+        TraceRecord top = realTop();
+        if (top != null && top.getMarker() != null) {
+            top.getMarker().setDstate(dtraceState);
+        }
     }
 
 

@@ -15,8 +15,9 @@
  */
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.core.spy.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceState;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
+import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,9 @@ public class DTraceInputProcessor implements SpyProcessor {
 
     private static final Logger log = LoggerFactory.getLogger(DTraceInputProcessor.class);
 
-    private TracerLib tracer;
+    private Tracer tracer;
+    private TracerLib tracerLib;
+
     private ThreadLocal<DTraceState> dtraceLocal;
     private Random rand;
 
@@ -52,8 +55,9 @@ public class DTraceInputProcessor implements SpyProcessor {
     public final static Pattern RE_JG_128 = Pattern.compile("([0-9a-zA-Z]{32}):([0-9a-zA-Z]{16}):([0-9a-zA-Z]{16}):([0-9a-zA-Z]{2})");
     public final static Pattern RE_W3 = Pattern.compile("([0-9a-zA-Z]{2})-([0-9a-zA-Z]{32})-([0-9a-zA-Z]{16})-([0-9a-zA-Z]{2})");
 
-    public DTraceInputProcessor(TracerLib tracer, ThreadLocal<DTraceState> dtraceLocal, int flags) {
+    public DTraceInputProcessor(Tracer tracer, TracerLib tracerLib, ThreadLocal<DTraceState> dtraceLocal, int flags) {
         this.tracer = tracer;
+        this.tracerLib = tracerLib;
         this.dtraceLocal = dtraceLocal;
         this.flags = flags;
         this.rand = new Random();
@@ -218,10 +222,12 @@ public class DTraceInputProcessor implements SpyProcessor {
         // TODO tutaj ew. decyzja samplera
 
         rec.put(DTRACE_STATE, ds);
+        tracer.getHandler().setDTraceState(ds);
+
         dtraceLocal.set(ds);
-        tracer.newAttr(DT_TRACE_ID, ds.getTraceIdHex());
-        tracer.newAttr(DT_SPAN_ID, ds.getSpanIdHex());
-        if (ds.getParentId() != 0) tracer.newAttr(DT_PARENT_ID, ds.getParentIdHex());
+        tracerLib.newAttr(DT_TRACE_ID, ds.getTraceIdHex());
+        tracerLib.newAttr(DT_SPAN_ID, ds.getSpanIdHex());
+        if (ds.getParentId() != 0) tracerLib.newAttr(DT_PARENT_ID, ds.getParentIdHex());
 
         // TODO tutaj submit danych do odpowiednich backendów, np. zipkin, jaeger itd. (do zico idzie normalnym tracerem)
 
