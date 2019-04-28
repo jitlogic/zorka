@@ -99,8 +99,8 @@ public class DTraceOutputProcessor implements SpyProcessor {
             long pid = ds.getSpanId();
             rec.put(DT_PARENT_ID, pid);
             tracerLib.newAttr(DT_PARENT_ID, pid);
-            switch (ds.getFlags() & F_MODE_MASK) {
-                case F_ZIPKIN_MODE: {
+            switch (ds.getFlags() & DFM_MASK) {
+                case DFM_ZIPKIN: {
                     if (0 != (flags & F_B3_HDR)) {
                         formatZipkinB3Ctx(ds, rec, spanId);
                     } else {
@@ -109,8 +109,8 @@ public class DTraceOutputProcessor implements SpyProcessor {
 
                     break;
                 }
-                case F_JAEGER_MODE: formatJaegerCtx(ds, rec, spanId); break;
-                case F_W3_TRC_MODE: formatW3Ctx(ds, rec, spanId); break;
+                case DJM_JAEGER: formatJaegerCtx(ds, rec, spanId); break;
+                case DFM_W3C: formatW3Ctx(ds, rec, spanId); break;
             }
 
             // TODO tutaj odesłanie kontekstu do właściwego typu kolektora (zipkin itd.).

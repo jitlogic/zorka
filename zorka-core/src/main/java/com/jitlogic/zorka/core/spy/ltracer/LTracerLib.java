@@ -26,6 +26,7 @@ import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixTraceOutput;
 import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.spy.*;
+import com.jitlogic.zorka.core.spy.output.LTraceHttpOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

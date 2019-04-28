@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.core.spy.ltracer;
+package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.cbor.CborDataWriter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.cbor.CborResendException;
-import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
+import com.jitlogic.zorka.core.spy.output.ZicoHttpOutput;
 
 import static com.jitlogic.zorka.cbor.TraceDataTags.*;
 import static com.jitlogic.zorka.cbor.TraceRecordFlags.*;

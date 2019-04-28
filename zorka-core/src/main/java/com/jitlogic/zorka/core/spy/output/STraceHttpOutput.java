@@ -1,10 +1,13 @@
-package com.jitlogic.zorka.core.spy.stracer;
+package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.cbor.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
+import com.jitlogic.zorka.core.spy.output.ZicoHttpOutput;
+import com.jitlogic.zorka.core.spy.stracer.ChunkedCborInput;
+import com.jitlogic.zorka.core.spy.stracer.STraceBufChunk;
+import com.jitlogic.zorka.core.spy.stracer.SymbolsScanner;
 
 import java.util.List;
 import java.util.Map;

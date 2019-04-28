@@ -20,6 +20,7 @@ import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
@@ -32,7 +33,7 @@ import java.util.Set;
 
 public abstract class TracerLib {
 
-    public static final Logger log = LoggerFactory.getLogger(TracerLib.class);
+    private static final Logger log = LoggerFactory.getLogger(TracerLib.class);
 
     public static final int SUBMIT_TRACE = TraceMarker.SUBMIT_TRACE;
     public static final int ALL_METHODS = TraceMarker.ALL_METHODS;
@@ -84,11 +85,19 @@ public abstract class TracerLib {
     public static final int F_DEBUG       = 0x000100; // DEBUG flag
     public static final int F_DROP        = 0x000200; // DROP trace flag
     public static final int F_B3_HDR      = 0x000400; // Use short B3 header form
+    public static final int F_SENT        = 0x000800; // Span already sent
 
-    public static final int F_MODE_MASK   = 0x0f0000; // Context propagation mode
-    public static final int F_ZIPKIN_MODE = 0x010000; // Zipkin context propagation, x-b3-* headers
-    public static final int F_JAEGER_MODE = 0x020000; // Jaeger context propagation
-    public static final int F_W3_TRC_MODE = 0x030000; // W3C Context Propagation
+    public static final int DFM_MASK   = 0x0f0000; // Context propagation mode
+    public static final int DFM_ZIPKIN = 0x010000; // Zipkin context propagation, x-b3-* headers
+    public static final int DJM_JAEGER = 0x020000; // Jaeger context propagation
+    public static final int DFM_W3C    = 0x030000; // W3C Context Propagation
+
+    /** Span kinds */
+    public static final int DFK_MASK       = 0xf00000; // Kind mask
+    public static final int DFK_CLIENT     = 0x100000; // Kind: client request
+    public static final int DFK_SERVER     = 0x200000; // Kind: server request handling
+    public static final int DFK_PRODUCER   = 0x300000; // Kind: message send
+    public static final int DFK_CONSUMER   = 0x400000; // Kind: message receive (& handling)
 
     protected final ThreadLocal<DTraceState> dtraceLocal = new ThreadLocal<DTraceState>();
 
@@ -97,6 +106,29 @@ public abstract class TracerLib {
     protected SymbolRegistry symbolRegistry;
     protected MetricsRegistry metricsRegistry;
     protected int defaultTraceFlags = TraceMarker.DROP_INTERIM;
+
+    public static final Map<String,String> OPENTRACING_TAGS = ZorkaUtil.constMap(
+            "REMOTE_IP", "peer.ipv4",
+            "REMOTE_IP6", "peer.ipv6",
+            "REMOTE_PORT", "peer.port",
+            "REMOTE_SVC", "peer.service",
+            "LOCAL_IP", "local.ipv4",
+            "LOCAL_IP6", "local.ipv6",
+            "LOCAL_PORT", "local.port",
+            "LOCAL_SVC", "local.service",
+            "SQL", "db.statement",
+            // TODO db.instance - database name
+            // TODO db.type - 'sql', 'redis', 'cassandra', 'hbase', 'redis'
+            // TODO db.user
+            "METHOD", "http.method",
+            "STATUS", "http.status_code",
+            "URL", "http.url"
+            // TODO peer.address
+            // TODO peer.hostname
+            // TODO sampling.priority - 0 or more
+            // TODO span.kind - client, server, producer, consumer
+            // TODO message_bus.destination
+    );
 
     public TracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
         this.symbolRegistry = symbolRegistry;
@@ -390,7 +422,7 @@ public abstract class TracerLib {
     }
 
     public SpyProcessor dtraceOutput(int addFlags, int delFlags) {
-        return new DTraceOutputProcessor(this, dtraceLocal, addFlags, delFlags);
+        return new DTraceOutputProcessor(tracer, this, dtraceLocal, addFlags, delFlags);
     }
 
     public SpyProcessor dtraceClean() {

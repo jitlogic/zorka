@@ -23,6 +23,7 @@ import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
+import com.jitlogic.zorka.core.spy.output.STraceHttpOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

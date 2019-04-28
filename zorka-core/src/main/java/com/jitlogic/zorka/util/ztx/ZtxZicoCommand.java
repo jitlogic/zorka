@@ -19,8 +19,8 @@ package com.jitlogic.zorka.util.ztx;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.AgentConfig;
-import com.jitlogic.zorka.core.spy.ZicoHttpOutput;
-import com.jitlogic.zorka.core.spy.stracer.STraceHttpOutput;
+import com.jitlogic.zorka.core.spy.output.ZicoHttpOutput;
+import com.jitlogic.zorka.core.spy.output.STraceHttpOutput;
 
 import java.io.*;
 

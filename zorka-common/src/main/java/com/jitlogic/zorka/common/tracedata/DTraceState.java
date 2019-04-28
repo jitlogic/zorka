@@ -53,6 +53,7 @@ public class DTraceState {
         this.traceId2 = orig.traceId2;
         this.parentId = orig.parentId;
         this.spanId = orig.spanId;
+        this.tstart = orig.tstart;
         this.flags = orig.flags;
         this.debugId = orig.debugId;
         this.baggage = orig.baggage;
@@ -105,11 +106,19 @@ public class DTraceState {
         return tstart;
     }
 
-    public int getFlags() {
+    public synchronized void markFlags(int flags) {
+        this.flags |= flags;
+    }
+
+    public synchronized boolean hasFlags(int flags) {
+        return 0 != (this.flags & flags);
+    }
+
+    public synchronized int getFlags() {
         return flags;
     }
 
-    public void setFlags(int flags) {
+    public synchronized void setFlags(int flags) {
         this.flags = flags;
     }
 

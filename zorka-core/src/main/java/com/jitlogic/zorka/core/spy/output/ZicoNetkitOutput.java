@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;

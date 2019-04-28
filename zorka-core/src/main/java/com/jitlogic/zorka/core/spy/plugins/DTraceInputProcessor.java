@@ -113,7 +113,7 @@ public class DTraceInputProcessor implements SpyProcessor {
         String sidStr = (String)rec.get(DH_B3_SPANID);
         String pidStr = (String)rec.get(DH_B3_PARENTID);
 
-        int flags = F_ZIPKIN_MODE;
+        int flags = DFM_ZIPKIN;
         String smpStr = (String)rec.get(DH_B3_SAMPLED);
         if ("true".equalsIgnoreCase(smpStr) || "1".equalsIgnoreCase(smpStr)) flags |= F_SAMPLE;
         if ("false".equalsIgnoreCase(smpStr) || "0".equalsIgnoreCase(smpStr)) flags |= F_DROP;
@@ -131,7 +131,7 @@ public class DTraceInputProcessor implements SpyProcessor {
             if (!m.matches()) m = RE_B3_64.matcher(b3Str);
 
             if (m.matches()) {
-                int flags = F_ZIPKIN_MODE|F_B3_HDR;
+                int flags = DFM_ZIPKIN |F_B3_HDR;
                 if ("1".equals(m.group(3))) flags |= F_SAMPLE;
                 if ("0".equals(m.group(3))) flags |= F_DROP;
                 if ("d".equals(m.group(3))) flags |= F_SAMPLE|F_DEBUG;
@@ -153,7 +153,7 @@ public class DTraceInputProcessor implements SpyProcessor {
 
             if (m.matches()) {
                 int f = Integer.parseInt(m.group(4), 16);
-                int flags = F_JAEGER_MODE | ((0 != (f&1)) ? F_SAMPLE : F_DROP);
+                int flags = DJM_JAEGER | ((0 != (f&1)) ? F_SAMPLE : F_DROP);
                 if (0 != (f & 2)) flags |= F_DEBUG;
                 DTraceState ds = dtrace(m.group(1), m.group(2), m.group(3), flags);
 
@@ -178,7 +178,7 @@ public class DTraceInputProcessor implements SpyProcessor {
         if (pidStr != null) {
             Matcher m = RE_W3.matcher(pidStr);
             if (m.matches()) {
-                int flags = F_W3_TRC_MODE;
+                int flags = DFM_W3C;
                 int f = Integer.parseInt(m.group(4), 16);
                 if (0 != (f & 0x01)) flags |= F_SAMPLE;
                 DTraceState ds = dtrace(m.group(2), null, m.group(3), flags);

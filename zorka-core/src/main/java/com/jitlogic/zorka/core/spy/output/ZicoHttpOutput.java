@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.core.spy;
+package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.netkit.http.HttpConfig;
 import com.jitlogic.netkit.http.HttpMessage;
