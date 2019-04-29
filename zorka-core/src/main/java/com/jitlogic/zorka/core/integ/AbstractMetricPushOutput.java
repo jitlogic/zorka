@@ -43,7 +43,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
     private PerfSampleFilter filter;
 
     /** Submitted responsible for sending data to monitoring system. */
-    private ZorkaSubmitter<String> output;
+    private ZorkaSubmitter<byte[]> output;
 
     /** Symbol registry. */
     private SymbolRegistry symbolRegistry;
@@ -68,7 +68,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
             Map<String,String> constAttrMap,
             PerfAttrFilter attrFilter,
             PerfSampleFilter filter,
-            ZorkaSubmitter<String> output) {
+            ZorkaSubmitter<byte[]> output) {
         this.symbolRegistry = symbolRegistry;
         this.constAttrMap = constAttrMap;
         this.attrFilter = attrFilter;
@@ -188,7 +188,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                         if (log.isTraceEnabled()) {
                             log.trace("Submit: '" + sb + "'");
                         }
-                        rslt &= output.submit(sb.toString());
+                        rslt &= output.submit(sb.toString().getBytes());
                         sb = new StringBuilder(chunkSize);
                         chs = chunkStart;
                     }
@@ -202,7 +202,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                 if (log.isTraceEnabled()) {
                     log.trace("Submit: '" + sb + "'");
                 }
-                rslt &= output.submit(sb.toString());
+                rslt &= output.submit(sb.toString().getBytes());
             }
         } // if (sr instanceof PerfRecord)
 

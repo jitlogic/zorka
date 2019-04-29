@@ -33,7 +33,7 @@ import static com.jitlogic.netkit.http.HttpProtocol.REG_URL_QSTR;
 /**
  * Generic HTTP output for text data. Accepts strings that will be
  */
-public class HttpTextOutput extends ZorkaAsyncThread<String> {
+public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
 
     private String url;
     private String uri;
@@ -99,8 +99,8 @@ public class HttpTextOutput extends ZorkaAsyncThread<String> {
 
 
     @Override
-    protected void process(List<String> msgs) {
-        for (String msg : msgs) {
+    protected void process(List<byte[]> msgs) {
+        for (byte[] msg : msgs) {
             try {
                 HttpMessage req = HttpMessage.POST(uri, msg, headers);
                 HttpMessage res = client.exec(req);

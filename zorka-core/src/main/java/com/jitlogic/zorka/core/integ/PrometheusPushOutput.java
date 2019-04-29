@@ -31,7 +31,7 @@ public class PrometheusPushOutput extends AbstractMetricPushOutput {
             Map<String, String> constAttrMap,
             PerfAttrFilter attrFilter,
             PerfSampleFilter filter,
-            ZorkaSubmitter<String> output) {
+            ZorkaSubmitter<byte[]> output) {
 
         super(symbolRegistry, constAttrMap, attrFilter, filter, output);
 

@@ -162,14 +162,14 @@ public class PerfMonLib {
 
     public InfluxPushOutput influxPushOutput(
             Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<byte[]> httpOutput) {
         return new InfluxPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
     }
 
 
     public OpenTsdbPushOutput tsdbPushOutput(
             Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> httpOutput) {
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<byte[]> httpOutput) {
         return new OpenTsdbPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
     }
 
@@ -177,7 +177,7 @@ public class PerfMonLib {
     public GraphitePushOutput graphitePushOutput(
             Map<String,String> config,
             Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<byte[]> tcpOutput) {
         return new GraphitePushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
     }
 
@@ -185,7 +185,7 @@ public class PerfMonLib {
     public PrometheusPushOutput prometheusPushOutput(
             Map<String,String> config,
             Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<String> tcpOutput) {
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<byte[]> tcpOutput) {
         return new PrometheusPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
     }
 

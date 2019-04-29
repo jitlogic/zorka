@@ -18,10 +18,11 @@ package com.jitlogic.zorka.core.test.support;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestStringOutput implements ZorkaSubmitter<String> {
+public class TestStringOutput implements ZorkaSubmitter<byte[]> {
 
     private List<String> results = new ArrayList<String>();
 
@@ -30,8 +31,8 @@ public class TestStringOutput implements ZorkaSubmitter<String> {
     }
 
     @Override
-    public boolean submit(String item) {
-        return results.add(item);
+    public boolean submit(byte[] item) {
+        return results.add(new String(item, Charset.defaultCharset()));
     }
 
     @Override
