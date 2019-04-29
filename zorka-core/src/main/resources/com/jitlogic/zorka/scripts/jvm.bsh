@@ -124,17 +124,14 @@ __jvm() {
       props = conn.getRequestProperties();
       rec.put("HDR_OUT", props);
       if (_dtrace_enabled) {
-        dtraceUuid = rec.get("DTRACE").getUuid();
-        dtraceOut = rec.get(tracer.DTRACE_OUT);
-        dtraceXtt = rec.get(tracer.DTRACE_XTT);
         requests = util.getField(conn, "requests");
-        requests.add(tracer.DTRACE_UUID_HDR, dtraceUuid);
-        requests.add(tracer.DTRACE_TID_HDR, dtraceOut);
-        if (dtraceXtt != null) requests.add(tracer.DTRACE_XTT_HDR, ""+dtraceXtt);
         uheaders = util.getField(conn, "userHeaders");
-        uheaders.add(tracer.DTRACE_UUID_HDR, dtraceUuid);
-        uheaders.add(tracer.DTRACE_TID_HDR, dtraceOut);
-        if (dtraceXtt != null) uheaders.add(tracer.DTRACE_XTT_HDR, ""+dtraceXtt);
+        for (e : rec.entrySet()) {
+          if (tracer.CTX_HEADERS.contains(e.getKey()) || e.getKey().startsWith(tracer.DH_UBER_CTX)) {
+            requests.add(e.getKey(), e.getValue());
+            uheaders.add(e.getKey(), e.getValue());
+          }
+        }
       }
       return rec;
     }
@@ -148,7 +145,7 @@ __jvm() {
     spy.add(spy.instrument("SUN_HTTP_CLIENT_CONNECT")
       .onEnter(spy.fetchArg("THIS", 0),
         _trace_enabled ? tracer.begin("HTTP_CLI") : null,
-        _dtrace_enabled ? tracer.dtraceOutput() : null,
+        _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
         sun_http_client_pre(),
         tracer.procAttr(tracer.PA_MAP_OF_LISTS_1, "HdrOut__", "HDR_OUT"))
       .onReturn(spy.fetchRetVal("STATUS"))

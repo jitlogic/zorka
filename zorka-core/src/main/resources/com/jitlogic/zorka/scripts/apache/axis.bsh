@@ -23,25 +23,15 @@ __axis() {
 
   dtrace_req() {
     process(rec) {
-      ds = rec.get("DTRACE");
       hb = rec.get("HBUF");
-      dt = rec.get("DTRACE_OUT");
-      if (ds != null && hb != null && dt != null) {
-        hb.append(tracer.DTRACE_UUID_HDR);
-        hb.append(": ");
-        hb.append(ds.getUuid());
-        hb.append("\r\n");
-        hb.append(tracer.DTRACE_TID_HDR);
-        hb.append(": ");
-        hb.append(dt);
-        hb.append("\r\n");
-
-        xtt = rec.get(tracer.DTRACE_XTT);
-        if (xtt != null) {
-          hb.append(tracer.DTRACE_XTT_HDR);
-          hb.append(": ");
-          hb.append(xtt);
-          hb.append("\r\n");
+      if (ds != null && hb != null) {
+        for (e : rec.entrySet()) {
+          if (tracer.CTX_HEADERS.contains(e.getKey()) || e.getKey().startsWith(tracer.DH_UBER_CTX)) {
+            hb.append(e.getKey());
+            hb.append(": ");
+            hb.append(e.getValue());
+            hb.append("\r\n");
+          }
         }
       }
       return rec;
@@ -96,7 +86,7 @@ __axis() {
         _dtrace_enabled ? spy.fetchArg("HBUF", 4) : null,
         soap._trace ? spy.subchain(
           tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")),
-          _dtrace_enabled ? tracer.dtraceOutput() : null,
+          _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
           _dtrace_enabled ? dtrace_req() : null) : null)
       .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
         __get_call_obj(),

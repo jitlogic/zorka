@@ -87,17 +87,14 @@ __spring() {
 
     dtrace_req() {
       process(rec) {
-        ds = rec.get("DTRACE");
         hdrs = rec.get("HDR_OUT");
         if (ds != null && hdrs != null) {
-          hdrs.add(tracer.DTRACE_UUID_HDR, ds.getUuid());
-          hdrs.add(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
-          xtt = rec.get(tracer.DTRACE_XTT);
-          if (xtt != null) {
-              hdrs.add(tracer.DTRACE_XTT, xtt.toString());
+          for (e : rec.entrySet()) {
+            if (tracer.CTX_HEADERS.contains(e.getKey()) || e.getKey().startsWith(tracer.DH_UBER_CTX)) {
+              hdrs.add(e.getKey(), e.getValue());
+            }
           }
         }
-
         return rec;
       }
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
@@ -130,7 +127,7 @@ __spring() {
               proc_headers("HDR_OUT", "HdrOut__"),
               tracer.begin("HTTP_CLI", _traceTime),
               tracer.formatAttr("URI", "${CONN.requestUri}"),
-              _dtrace_enabled ? tracer.dtraceOutput() : null,
+              _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
               _dtrace_enabled ? dtrace_req() : null)
             : null)
           .onReturn(spy.fetchRetVal("RESP"),
@@ -161,11 +158,10 @@ __spring() {
             ds = rec.get("DTRACE");
             hdrs = rec.get("HEADERS");
             if (ds != null && hdrs != null) {
-              hdrs.put(tracer.DTRACE_UUID_HDR, ds.getUuid());
-              hdrs.put(tracer.DTRACE_TID_HDR, rec.get(tracer.DTRACE_OUT));
-              xtt = rec.get(tracer.DTRACE_XTT);
-              if (xtt != null) {
-                  hdrs.put(tracer.DTRACE_XTT_HDR, xtt.toString());
+              for (e : rec.entrySet()) {
+                if (tracer.CTX_HEADERS.contains(e.getKey()) || e.getKey().startsWith(tracer.DH_UBER_CTX)) {
+                  hdrs.put(e.getKey(), e.getValue());
+                }
               }
             }
             return rec;
@@ -188,7 +184,7 @@ __spring() {
                 tracer.formatAttr("CONTENT_TYPE", "${PROPS.contentType}"),
                 tracer.formatAttr("PRIORITY", "${PROPS.priority}"),
                 tracer.formatAttr("CONN", "${CONN.address}:${CONN.port}/${CONN.id}"),
-                _dtrace_enabled ? tracer.dtraceOutput() : null,
+                _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
                 tracer.procAttr(tracer.PA_MAP_OF_ANY, "HdrOut__", "HEADERS"),
                 _dtrace_enabled ? dtrace_send() : null)
               : null)
@@ -203,12 +199,11 @@ __spring() {
           process(rec) {
             hdrs = rec.get("HEADERS");
             if (hdrs != null) {
-              uuid = hdrs.get(tracer.DTRACE_UUID_HDR);
-              if (uuid != null) rec.put(tracer.DTRACE_UUID, uuid);
-              tid = hdrs.get(tracer.DTRACE_TID_HDR);
-              if (tid != null) rec.put(tracer.DTRACE_IN, tid);
-              xtt = hdrs.get(tracer.DTRACE_XTT_HDR);
-              if (xtt != null) rec.put(tracer.DTRACE_XTT, xtt);
+              for (k : tracer.CTX_HEADERS) {
+                v = hdrs.get(k);
+                if (v != null) rec.put(k, v);
+              }
+              // TODO uber-ctx-* headers
             }
             return rec;
           }
@@ -230,7 +225,7 @@ __spring() {
                 tracer.formatAttr("ROUTING_KEY", "${PROPS.receivedRoutingKey}"),
                 tracer.formatAttr("CONN", "${CONN.address}:${CONN.port}/${CONN.id}"),
                 _dtrace_enabled ? dtrace_recv() : null,
-                _dtrace_enabled ? tracer.dtraceInput(zorka.longCfg("tracer.min.trace.time")) : null,
+                _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags) : null,
                 tracer.procAttr(tracer.PA_MAP_OF_ANY, "HdrIn__", "HEADERS"))
               : null)
             .onError(tracer.flags(tracer.SUBMIT_TRACE))

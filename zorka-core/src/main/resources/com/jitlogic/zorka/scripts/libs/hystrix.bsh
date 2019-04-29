@@ -21,14 +21,12 @@ zorka.require(
 
 __hystrix() {
 
-
-
   spy.add(spy.instrument("HYSTRIX_COMMAND_OUT")
     .onEnter(
       spy.fetchArg("THIS", 0),
       _trace_enabled ? tracer.begin("HYSTRIX_OUT") : null,
-      _dtrace_enabled ? tracer.dtraceOutput() : null,
-      _dtrace_enabled ? spy.shelve("HYSTRIX", 120000, true, "THIS", "DTRACE_UUID", "DTRACE_OUT") : null)
+      _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
+      _dtrace_enabled ? spy.shelve("HYSTRIX", 120000, true, "THIS", "DTRACE") : null)
     .onError(tracer.markError())
     .onSubmit(
       tracer.formatAttr("GROUP", "${THIS.commandGroup}"),
@@ -39,17 +37,18 @@ __hystrix() {
     .onEnter(
       spy.fetchArg("THIS", 0),
       _trace_enabled ? tracer.begin("HYSTRIX_IN") : null,
-      _dtrace_enabled ? spy.unshelve("HYSTRIX", true, "THIS", "DTRACE_UUID", "DTRACE_IN") : null,
-      _dtrace_enabled ? tracer.dtraceInput(zorka.longCfg("tracer.min.trace.time")) : null)
+      _dtrace_enabled ? spy.unshelve("HYSTRIX", true, "THIS", "DTRACE") : null,
+      _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags) : null)
     .onError(tracer.markError())
     .onSubmit(
       tracer.formatAttr("GROUP", "${THIS.commandGroup}"),
       tracer.formatAttr("KEY", "${THIS.commandKey}"))
     .include(
-      spy.byMethod(0, "com.netflix.hystrix.contrib.javanica.command.GenericCommand", "run", null),
+      spy.byMethod(0,
+        zorka.stringCfg("hystrix.command.class", "com.netflix.hystrix.contrib.javanica.command.GenericCommand"),
+        "run", null),
       spy.byMethod(0, "org.springframework.cloud.openfeign.support.FallbackCommand", "run", null),
       spy.byMethod(0, "com.netflix.hystrix.contrib.javanica.command.BatchHystrixCommand", "run", null)));
-
 
   return this;
 

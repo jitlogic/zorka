@@ -91,15 +91,19 @@ public class DTraceState {
     }
 
     public String getSpanIdHex() {
-        return ZorkaUtil.hex(spanId);
+        return spanId != 0 ? ZorkaUtil.hex(spanId) : null;
     }
 
     public long getParentId() {
         return parentId;
     }
 
+    public void setParentId(long parentId) {
+        this.parentId = parentId;
+    }
+
     public String getParentIdHex() {
-        return ZorkaUtil.hex(parentId);
+        return parentId != 0 ? ZorkaUtil.hex(parentId) : null;
     }
 
     public long getTstart() {

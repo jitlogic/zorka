@@ -210,6 +210,10 @@ public class LTraceHandler extends TraceHandler {
     public void newAttr(int traceId, int attrId, Object attrVal) {
         TraceRecord tr = realTop();
 
+        if (attrVal instanceof String && ((String)attrVal).length() > maxAttrLen) {
+            attrVal = ((String)attrVal).substring(0, maxAttrLen-3) + "...";
+        }
+
         while (tr != null) {
             if (traceId == -1 || (tr.hasFlag(TraceRecord.TRACE_BEGIN) &&
                 (traceId == 0 || tr.getMarker().getTraceId() == traceId))) {

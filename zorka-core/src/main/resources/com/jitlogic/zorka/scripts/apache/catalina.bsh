@@ -23,13 +23,11 @@ zorka.require(
 __catalina() {
 
     headers_in() {
-
         _iprefix = zorka.stringCfg("http.headers.iprefix");
         _matcher = util.stringMatcher(zorka.listCfg("http.headers.include"), zorka.listCfg("http.headers.exclude"));
         _maxlen = zorka.intCfg("http.headers.maxlen");
 
         process(rec) {
-
             req = rec.get("REQ");
             if (http._trace && req != null && req.getHeaderNames() != null) {
                 for (name : req.getHeaderNames()) {
@@ -37,42 +35,18 @@ __catalina() {
                     if (headers != null) {
                         i = 0;
                         for (hdr : headers) {
-                            if (hdr.length() > _maxlen) {
-                                hdr = hdr.substring(0, _maxlen) + "...";
-                            }
-                            if (i == 0) {
-                                tracer.newAttr(_iprefix + name, hdr);
-                            } else {
-                                tracer.newAttr(_iprefix + i + "_" + name, hdr);
-                            }
+                            tracer.procHeader(rec, name, i, hdr, _iprefix);
                             i++;
                         }
-                    }
-                }
-
-                if (http._trace && _dtrace_enabled) {
-                    uuid = req.getHeader(tracer.DTRACE_UUID_HDR);
-                    if (uuid != null) {
-                        rec.put(tracer.DTRACE_UUID, uuid);
-                    }
-                    tid = req.getHeader(tracer.DTRACE_TID_HDR);
-                    if (tid != null) {
-                        rec.put(tracer.DTRACE_IN, tid);
-                    }
-                    xtt = req.getHeader(tracer.DTRACE_XTT_HDR);
-                    if (xtt != null) {
-                        rec.put(tracer.DTRACE_XTT, xtt);
                     }
                 }
             }
             return rec;
         }
-
         return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
     }
 
     headers_out() {
-
         _oprefix = zorka.stringCfg("http.headers.oprefix");
         _matcher = util.stringMatcher(zorka.listCfg("http.headers.include"), zorka.listCfg("http.headers.exclude"));
         _maxlen = zorka.intCfg("http.headers.maxlen");
@@ -84,14 +58,7 @@ __catalina() {
                 for (name : headers.names()) {
                     i = 0;
                     for (hdr : headers.values(name)) {
-                        if (hdr.length() > _maxlen) {
-                            hdr = hdr.substring(0, _maxlen) + "...";
-                        }
-                        if (i == 0) {
-                            tracer.newAttr(_oprefix + name, hdr);
-                        } else {
-                            tracer.newAttr(_oprefix + i + "_" + name, hdr);
-                        }
+                        tracer.procHeader(null, name, i, hdr, _oprefix);
                     }
                 }
                 location = headers.getHeader("Location");
@@ -114,7 +81,7 @@ __catalina() {
         tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
         tracer.attr("URI", "URI"),
         http._headers ? headers_in() : null,
-        (_dtrace_enabled && http._headers) ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
+        (_dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags) : null
       ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))

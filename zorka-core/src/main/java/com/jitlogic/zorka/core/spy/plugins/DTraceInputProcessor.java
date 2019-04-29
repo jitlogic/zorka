@@ -203,9 +203,11 @@ public class DTraceInputProcessor implements SpyProcessor {
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
 
-        DTraceState ds = null;
+        DTraceState ds = (DTraceState)rec.get(DTRACE_STATE);
 
-        if (rec.containsKey(DH_B3_TRACEID)) {
+        if (ds != null) {
+            ds = new DTraceState(ds);
+        } if (rec.containsKey(DH_B3_TRACEID)) {
             ds = parseZipkinCtx(rec);
         } else if (rec.containsKey(DH_B3)) {
             ds = parseZipkinB3Ctx(rec);
@@ -215,8 +217,11 @@ public class DTraceInputProcessor implements SpyProcessor {
             ds = parseW3Ctx(rec);
         }
 
-        if (ds == null){
+        if (ds == null) {
             ds = newCtx();
+        } else {
+            ds.setParentId(ds.getSpanId());
+            ds.setSpanId(rand.nextLong());
         }
 
         // TODO tutaj ew. decyzja samplera

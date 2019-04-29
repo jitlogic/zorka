@@ -55,17 +55,14 @@ __apache_httpclient() {
 
   dtrace_req_3x() {
       process(rec) {
-        ds = rec.get("DTRACE");
         m = rec.get("METHOD");
-        if (ds != null && m != null) {
-          m.addRequestHeader(tracer.DTRACE_UUID_HDR, ds.getUuid());
-          m.addRequestHeader(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
-          xtt = rec.get(tracer.DTRACE_XTT);
-          if (xtt != null) {
-              m.addRequestHeader(tracer.DTRACE_XTT_HDR, xtt.toString());
+        if (m != null) {
+          for (e : rec.entrySet()) {
+            if (tracer.CTX_HEADERS.contains(e.getKey()) || e.getKey().startsWith(tracer.DH_UBER_CTX)) {
+              m.addRequestHeader(e.getKey(), e.getValue());
+            }
           }
         }
-
         return rec;
       }
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
@@ -79,7 +76,7 @@ __apache_httpclient() {
           tracer.begin("HTTP_CLI", _traceTime),
           tracer.formatAttr("URI", "${METHOD.URI}"),
           tracer.formatAttr("METHOD", "${METHOD.name}"),
-          _dtrace_enabled ? tracer.dtraceOutput() : null,
+          _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
           _dtrace_enabled ? dtrace_req_3x() : null) : null)
       .onReturn(spy.fetchRetVal("RET"), _trace ? tracer.attr("RET", "RET") : null)
       .onError(tracer.flags(tracer.SUBMIT_TRACE))
@@ -115,14 +112,12 @@ __apache_httpclient() {
         ds = rec.get("DTRACE");
         m = rec.get("REQ");
         if (ds != null && m != null) {
-          m.addHeader(tracer.DTRACE_UUID_HDR, ds.getUuid());
-          m.addHeader(tracer.DTRACE_TID_HDR, rec.get("DTRACE_OUT"));
-          xtt = rec.get(tracer.DTRACE_XTT);
-          if (xtt != null) {
-              m.addHeader(tracer.DTRACE_XTT_HDR, xtt.toString());
+          for (e : rec.entrySet()) {
+            if (tracer.CTX_HEADERS.contains(e.getKey()) || e.getKey().startsWith(tracer.DH_UBER_CTX)) {
+              m.addHeader(e.getKey(), e.getValue());
+            }
           }
         }
-
         return rec;
       }
       return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
@@ -137,7 +132,7 @@ __apache_httpclient() {
           tracer.formatAttr("METHOD", "${REQ.requestLine.method}"),
           tracer.formatAttr("URI", "${REQ.requestLine.uri}"),
           tracer.formatAttr("HOST", "${TGT.hostName}:${TGT.port}}"),
-          _dtrace_enabled ? tracer.dtraceOutput() : null,
+          _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
           _dtrace_enabled ? dtrace_req_4x() : null
         ) : null)
       .onReturn(spy.fetchRetVal("RET"),

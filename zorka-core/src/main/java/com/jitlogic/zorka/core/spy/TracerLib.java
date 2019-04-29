@@ -76,6 +76,9 @@ public abstract class TracerLib {
     public final static String DH_W3_TRACEPARENT = "traceparent";
     public final static String DH_W3_TRACESTATE = "tracestate";
 
+    public final static Set<String> CTX_HEADERS = ZorkaUtil.constSet(DH_B3_TRACEID, DH_B3_SPANID, DH_B3_PARENTID,
+            DH_B3_FLAGS, DH_B3_SAMPLED, DH_B3, DH_UBER_TID, DH_W3_TRACEPARENT, DH_W3_TRACESTATE);
+
     public final static String DT_TRACE_ID = "TRACE_ID";
     public final static String DT_SPAN_ID  = "SPAN_ID";
     public final static String DT_PARENT_ID = "PARENT_ID";
@@ -327,6 +330,29 @@ public abstract class TracerLib {
     public SpyProcessor formatTraceAttr(String traceName, String attrName, String attrTag, String srcFormat) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
                 srcFormat, traceName, attrName, attrTag);
+    }
+
+    /**
+     * Helper function for processing incoming (outgoing) headers as trace attributes.
+     * @param rec context record
+     * @param name header name
+     * @param index index (if many headers with the same name)
+     * @param value header value
+     * @param prefix prefix to add
+     */
+    public void procHeader(Map<String,Object> rec, String name, int index, String value, String prefix) {
+        if (name == null) return;
+        if (index == 0) {
+            newAttr(prefix + name, value);
+        } else {
+            newAttr(prefix + index +  "_" + name, value);
+        }
+
+        name = name.toLowerCase();
+
+        if (rec != null && (CTX_HEADERS.contains(name) || name.startsWith(DH_UBER_CTX))) {
+            rec.put(name, value);
+        }
     }
 
 

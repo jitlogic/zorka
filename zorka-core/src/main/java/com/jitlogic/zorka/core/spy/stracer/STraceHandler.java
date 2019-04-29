@@ -415,6 +415,9 @@ public class STraceHandler extends TraceHandler {
 
     @Override
     public void newAttr(int traceId, int attrId, Object attrVal) {
+        if (attrVal instanceof String && ((String)attrVal).length() > maxAttrLen) {
+            attrVal = ((String)attrVal).substring(0, maxAttrLen-3) + "...";
+        }
         if (traceId >= 0) {
             writeUInt(CBOR.TAG_BASE, TAG_TRACE_UP_ATTR);
             if (bufLen - bufPos < 2) nextChunk();

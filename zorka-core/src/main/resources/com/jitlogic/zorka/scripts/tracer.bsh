@@ -156,3 +156,11 @@ if (zorka.boolCfg("tracer")) {
 _trace_enabled = zorka.boolCfg("tracer");
 _dtrace_enabled = _trace_enabled && zorka.boolCfg("tracer.distributed");
 
+_dtrace_input_flags = tracer.DFM_ZIPKIN;
+
+switch (zorka.stringCfg("tracer.propagation", "zipkin").toLowerCase()) {
+  case "zipkin": _dtrace_input_flags = tracer.DFM_ZIPKIN; break;
+  case "jaeger": _dtrace_input_flags = tracer.DFM_JAEGER; break;
+  case "w3c": _dtrace_input_flags = tracer.DFM_W3C; break;
+}
+

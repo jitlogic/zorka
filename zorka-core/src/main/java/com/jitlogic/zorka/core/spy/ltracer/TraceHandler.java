@@ -53,6 +53,8 @@ public abstract class TraceHandler {
     /** Minimum default method execution time required to attach method to trace. */
     protected static long minMethodTime = DEFAULT_MIN_METHOD_TIME;
 
+    protected static int maxAttrLen = 8192;
+
     /** Maximum number of records inside trace */
     protected static int maxTraceRecords = 4096;
 
