@@ -150,7 +150,8 @@ __sql() {
       _trace ? spy.subchain(
         tracer.begin("SQL", zorka.longCfg("sql.trace.time")),
         tracer.attr("SQL", "SQL"),
-        tracer.attr("DB", "DB")
+        tracer.attr("DB", "DB"),
+        _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null
       ) : null)
     .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null, _error_chain)
     .onSubmit(spy.strTime("TIME"), _slow_chain, _stats_chain);
@@ -165,7 +166,8 @@ __sql() {
       _trace ? spy.subchain(
         tracer.begin("SQL", zorka.longCfg("sql.trace.time")),
         tracer.attr("SQL", "SQL"),
-        tracer.attr("DB", "DB")
+        tracer.attr("DB", "DB"),
+        _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null
       ) : null)
     .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null, _error_chain)
     .onSubmit(spy.strTime("TIME"), _slow_chain, _stats_chain);

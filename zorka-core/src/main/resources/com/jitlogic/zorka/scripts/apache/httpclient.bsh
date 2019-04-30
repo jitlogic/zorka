@@ -76,7 +76,7 @@ __apache_httpclient() {
           tracer.begin("HTTP_CLI", _traceTime),
           tracer.formatAttr("URI", "${METHOD.URI}"),
           tracer.formatAttr("METHOD", "${METHOD.name}"),
-          _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
+          _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
           _dtrace_enabled ? dtrace_req_3x() : null) : null)
       .onReturn(spy.fetchRetVal("RET"), _trace ? tracer.attr("RET", "RET") : null)
       .onError(tracer.flags(tracer.SUBMIT_TRACE))
@@ -132,7 +132,7 @@ __apache_httpclient() {
           tracer.formatAttr("METHOD", "${REQ.requestLine.method}"),
           tracer.formatAttr("URI", "${REQ.requestLine.uri}"),
           tracer.formatAttr("HOST", "${TGT.hostName}:${TGT.port}}"),
-          _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
+          _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
           _dtrace_enabled ? dtrace_req_4x() : null
         ) : null)
       .onReturn(spy.fetchRetVal("RET"),

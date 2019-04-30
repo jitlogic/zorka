@@ -25,7 +25,7 @@ import java.util.TreeMap;
 /**
  * Represents distribute trace context. Note that this is now central context for tracer, even in single-host mode.
  */
-public class DTraceState {
+public class DTraceContext {
 
     /** Trace ID (64 or 128 bit) */
     private long traceId1, traceId2;
@@ -48,7 +48,7 @@ public class DTraceState {
     /** W3C Trace State */
     private String traceState;
 
-    public DTraceState(DTraceState orig) {
+    public DTraceContext(DTraceContext orig) {
         this.traceId1 = orig.traceId1;
         this.traceId2 = orig.traceId2;
         this.parentId = orig.parentId;
@@ -60,7 +60,7 @@ public class DTraceState {
         this.traceState = orig.traceState;
     }
 
-    public DTraceState(long traceId1, long traceId2, long parentId, long spanId, long tstart, int flags) {
+    public DTraceContext(long traceId1, long traceId2, long parentId, long spanId, long tstart, int flags) {
         this.traceId1 = traceId1;
         this.traceId2 = traceId2;
         this.parentId = parentId;
@@ -110,6 +110,10 @@ public class DTraceState {
         return tstart;
     }
 
+    public void setTstart(long tstart) {
+        this.tstart = tstart;
+    }
+
     public synchronized void markFlags(int flags) {
         this.flags |= flags;
     }
@@ -130,7 +134,7 @@ public class DTraceState {
         return debugId;
     }
 
-    public DTraceState setDebugId(String debugId) {
+    public DTraceContext setDebugId(String debugId) {
         this.debugId = debugId;
         return this;
     }
@@ -149,8 +153,8 @@ public class DTraceState {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof DTraceState) {
-            DTraceState ds = (DTraceState)obj;
+        if (obj instanceof DTraceContext) {
+            DTraceContext ds = (DTraceContext)obj;
             return ds.traceId1 == traceId1 &&
                     ds.traceId2 == traceId2 &&
                     ds.spanId == spanId &&

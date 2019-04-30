@@ -88,7 +88,7 @@ public class TraceMarker implements SymbolicRecord, Serializable {
     private int flags;
 
     /** Distributed trace state */
-    private DTraceState dstate;
+    private DTraceContext dstate;
 
     public static long getMinTraceTime() {
         return minTraceTime;
@@ -154,11 +154,11 @@ public class TraceMarker implements SymbolicRecord, Serializable {
         this.minimumTime = minimumTime;
     }
 
-    public DTraceState getDstate() {
+    public DTraceContext getDstate() {
         return dstate;
     }
 
-    public void setDstate(DTraceState dstate) {
+    public void setDstate(DTraceContext dstate) {
         this.dstate = dstate;
     }
 

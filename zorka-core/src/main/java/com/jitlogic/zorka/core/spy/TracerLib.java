@@ -121,12 +121,14 @@ public abstract class TracerLib {
             "LOCAL_PORT", "local.port",
             "LOCAL_SVC", "local.service",
             "SQL", "db.statement",
+            "DB", "db.instance",
             // TODO db.instance - database name
             // TODO db.type - 'sql', 'redis', 'cassandra', 'hbase', 'redis'
             // TODO db.user
             "METHOD", "http.method",
             "STATUS", "http.status_code",
-            "URL", "http.url"
+            "URL", "http.url",
+            "URI", "http.uri"
             // TODO peer.address
             // TODO peer.hostname
             // TODO sampling.priority - 0 or more
@@ -448,8 +450,8 @@ public abstract class TracerLib {
         return new DTraceInputProcessor(tracer, this, defFlags, addFlags);
     }
 
-    public SpyProcessor dtraceOutput(int addFlags, int delFlags) {
-        return new DTraceOutputProcessor(tracer, this, addFlags, delFlags);
+    public SpyProcessor dtraceOutput(int delFlags, int addFlags) {
+        return new DTraceOutputProcessor(tracer, this, delFlags, addFlags);
     }
 
     public DTraceFormatter zipkinJsonFormatter(Map<String,String> tagMap) {

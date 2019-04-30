@@ -1,11 +1,10 @@
 package com.jitlogic.zorka.core.spy.output;
 
-import com.jitlogic.zorka.common.tracedata.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceContext;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.JSONWriter;
-import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +52,7 @@ public class DTraceFormatterZJ implements DTraceFormatter {
 
     private byte[] format(TraceRecord tr) {
         try {
-            DTraceState ds = tr.getDTraceState();
+            DTraceContext ds = tr.getDTraceState();
             if (tr.getTraceId() == 0 || ds == null) return null;
 
             Map<String, Object> span = ZorkaUtil.map("id", ds.getSpanIdHex(),

@@ -18,7 +18,7 @@ package com.jitlogic.zorka.core.spy.stracer;
 
 import com.jitlogic.zorka.cbor.TraceRecordFlags;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
-import com.jitlogic.zorka.common.tracedata.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceContext;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.cbor.CBOR;
@@ -379,19 +379,19 @@ public class STraceHandler extends TraceHandler {
     }
 
     @Override
-    public DTraceState getDTraceState() {
+    public DTraceContext getDTraceState() {
         // TODO to be implemented
         return null;
     }
 
     @Override
-    public DTraceState parentDTraceState() {
+    public DTraceContext parentDTraceState() {
         // TODO to be implemented
         return null;
     }
 
     @Override
-    public void setDTraceState(DTraceState state) {
+    public void setDTraceState(DTraceContext state) {
         // TODO to be implemented
     }
 

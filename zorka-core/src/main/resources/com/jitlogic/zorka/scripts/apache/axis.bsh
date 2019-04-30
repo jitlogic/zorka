@@ -86,7 +86,7 @@ __axis() {
         _dtrace_enabled ? spy.fetchArg("HBUF", 4) : null,
         soap._trace ? spy.subchain(
           tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")),
-          _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
+          _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
           _dtrace_enabled ? dtrace_req() : null) : null)
       .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
         __get_call_obj(),

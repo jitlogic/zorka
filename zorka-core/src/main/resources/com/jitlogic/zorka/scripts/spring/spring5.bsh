@@ -127,7 +127,7 @@ __spring() {
               proc_headers("HDR_OUT", "HdrOut__"),
               tracer.begin("HTTP_CLI", _traceTime),
               tracer.formatAttr("URI", "${CONN.requestUri}"),
-              _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
+              _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
               _dtrace_enabled ? dtrace_req() : null)
             : null)
           .onReturn(spy.fetchRetVal("RESP"),
@@ -184,7 +184,7 @@ __spring() {
                 tracer.formatAttr("CONTENT_TYPE", "${PROPS.contentType}"),
                 tracer.formatAttr("PRIORITY", "${PROPS.priority}"),
                 tracer.formatAttr("CONN", "${CONN.address}:${CONN.port}/${CONN.id}"),
-                _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
+                _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
                 tracer.procAttr(tracer.PA_MAP_OF_ANY, "HdrOut__", "HEADERS"),
                 _dtrace_enabled ? dtrace_send() : null)
               : null)

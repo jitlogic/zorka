@@ -145,7 +145,7 @@ __jvm() {
     spy.add(spy.instrument("SUN_HTTP_CLIENT_CONNECT")
       .onEnter(spy.fetchArg("THIS", 0),
         _trace_enabled ? tracer.begin("HTTP_CLI") : null,
-        _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
+        _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
         sun_http_client_pre(),
         tracer.procAttr(tracer.PA_MAP_OF_LISTS_1, "HdrOut__", "HDR_OUT"))
       .onReturn(spy.fetchRetVal("STATUS"))

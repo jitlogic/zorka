@@ -15,7 +15,7 @@
  */
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.common.tracedata.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceContext;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
@@ -64,7 +64,7 @@ public class DTraceInputProcessor implements SpyProcessor {
         this.rand = new Random();
     }
 
-    public static DTraceState dtrace(String tidStr, String sidStr, String pidStr, int flags) {
+    public static DTraceContext dtrace(String tidStr, String sidStr, String pidStr, int flags) {
         //
         long traceId1 = 0, traceId2 = 0;
         if (tidStr != null) {
@@ -101,15 +101,15 @@ public class DTraceInputProcessor implements SpyProcessor {
             return null;
         }
 
-        return new DTraceState(traceId1, traceId2, parentId, spanId, System.currentTimeMillis(), flags);
+        return new DTraceContext(traceId1, traceId2, parentId, spanId, System.currentTimeMillis(), flags);
     }
 
-    public static DTraceState dropTrace() {
-        return new DTraceState(0, 0, 0, 0, 0, F_DROP);
+    public static DTraceContext dropTrace() {
+        return new DTraceContext(0, 0, 0, 0, 0, F_DROP);
     }
 
     /** Parses standard zipkin context (bunch of headers). */
-    public static DTraceState parseZipkinCtx(Map<String,Object> rec) {
+    public static DTraceContext parseZipkinCtx(Map<String,Object> rec) {
         String tidStr = (String)rec.get(DH_B3_TRACEID);
         String sidStr = (String)rec.get(DH_B3_SPANID);
         String pidStr = (String)rec.get(DH_B3_PARENTID);
@@ -124,7 +124,7 @@ public class DTraceInputProcessor implements SpyProcessor {
         return dtrace(tidStr, sidStr, pidStr, flags);
     }
 
-    public DTraceState parseZipkinB3Ctx(Map<String,Object> rec) {
+    public DTraceContext parseZipkinB3Ctx(Map<String,Object> rec) {
         String b3Str = (String)rec.get(DH_B3);
 
         if (b3Str != null) {
@@ -145,7 +145,7 @@ public class DTraceInputProcessor implements SpyProcessor {
     }
 
 
-    private DTraceState parseJaegerCtx(Map<String,Object> rec) {
+    private DTraceContext parseJaegerCtx(Map<String,Object> rec) {
         String uberStr = (String)rec.get(DH_UBER_TID);
 
         if (uberStr != null) {
@@ -156,7 +156,7 @@ public class DTraceInputProcessor implements SpyProcessor {
                 int f = Integer.parseInt(m.group(4), 16);
                 int flags = DJM_JAEGER | ((0 != (f&1)) ? F_SAMPLE : F_DROP);
                 if (0 != (f & 2)) flags |= F_DEBUG;
-                DTraceState ds = dtrace(m.group(1), m.group(2), m.group(3), flags);
+                DTraceContext ds = dtrace(m.group(1), m.group(2), m.group(3), flags);
 
                 for (Map.Entry<String,Object> e : rec.entrySet()) {
                     String k = e.getKey();
@@ -173,7 +173,7 @@ public class DTraceInputProcessor implements SpyProcessor {
     }
 
 
-    private DTraceState parseW3Ctx(Map<String,Object> rec) {
+    private DTraceContext parseW3Ctx(Map<String,Object> rec) {
         String pidStr = (String)rec.get(DH_W3_TRACEPARENT);
 
         if (pidStr != null) {
@@ -182,7 +182,7 @@ public class DTraceInputProcessor implements SpyProcessor {
                 int flags = DFM_W3C;
                 int f = Integer.parseInt(m.group(4), 16);
                 if (0 != (f & 0x01)) flags |= F_SAMPLE;
-                DTraceState ds = dtrace(m.group(2), null, m.group(3), flags);
+                DTraceContext ds = dtrace(m.group(2), null, m.group(3), flags);
                 if (ds != null) {
                     ds.setTraceState((String)rec.get(DH_W3_TRACESTATE));
                     ds.setSpanId(rand.nextLong());
@@ -196,8 +196,8 @@ public class DTraceInputProcessor implements SpyProcessor {
     }
 
 
-    private DTraceState newCtx() {
-        return new DTraceState(rand.nextLong(), rand.nextLong(), 0, rand.nextLong(),
+    private DTraceContext newCtx() {
+        return new DTraceContext(rand.nextLong(), rand.nextLong(), 0, rand.nextLong(),
                 System.currentTimeMillis(), defFlags);
     }
 
@@ -205,12 +205,13 @@ public class DTraceInputProcessor implements SpyProcessor {
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
 
-        DTraceState ds = tracer.getHandler().parentDTraceState();
+        DTraceContext ds = tracer.getHandler().parentDTraceState();
 
         if (ds != null) {
-            ds = new DTraceState(ds);
+            ds = new DTraceContext(ds);
+            ds.setTstart(System.currentTimeMillis());
         } else if (rec.containsKey(DTRACE_STATE)) {
-            ds = new DTraceState((DTraceState)rec.get(DTRACE_STATE));
+            ds = new DTraceContext((DTraceContext)rec.get(DTRACE_STATE));
         } else if (rec.containsKey(DH_B3_TRACEID)) {
             ds = parseZipkinCtx(rec);
         } else if (rec.containsKey(DH_B3)) {

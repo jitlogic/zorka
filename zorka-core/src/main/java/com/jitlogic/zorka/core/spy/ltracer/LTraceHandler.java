@@ -182,16 +182,16 @@ public class LTraceHandler extends TraceHandler {
 
 
     @Override
-    public DTraceState getDTraceState() {
+    public DTraceContext getDTraceState() {
         TraceRecord top = realTop();
         return top != null && top.getMarker() != null ? top.getMarker().getDstate() : null;
     }
 
     @Override
-    public DTraceState parentDTraceState() {
+    public DTraceContext parentDTraceState() {
         TraceRecord top = realTop();
         if (top != null) {
-            for (TraceRecord tr = top.getParent(); tr != null; tr = top.getParent()) {
+            for (TraceRecord tr = top.getParent(); tr != null; tr = tr.getParent()) {
                 TraceMarker tm = tr.getMarker();
                 if (tm != null && tm.getDstate() != null) return tm.getDstate();
             }
@@ -201,7 +201,7 @@ public class LTraceHandler extends TraceHandler {
 
 
     @Override
-    public void setDTraceState(DTraceState dtraceState) {
+    public void setDTraceState(DTraceContext dtraceState) {
         TraceRecord top = realTop();
         if (top != null && top.getMarker() != null) {
             top.getMarker().setDstate(dtraceState);

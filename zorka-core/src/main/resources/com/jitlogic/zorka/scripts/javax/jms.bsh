@@ -178,7 +178,7 @@ __javax_jms() {
         .onEnter(
           zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_SEND", zorka.longCfg("jms.trace.time")) : null,
           spy.fetchArg("MSG", 1),
-          _jms_dtrace ? tracer.dtraceOutput(0, 0) : null,
+          _jms_dtrace ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
           _jms_dtrace ? dtrace_req() : null,
           _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "sent", "ALL") : null)
@@ -188,7 +188,7 @@ __javax_jms() {
         .onEnter(
           zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_SEND", zorka.longCfg("jms.trace.time")) : null,
           spy.fetchArg("MSG", 2),
-          _jms_dtrace ? tracer.dtraceOutput(0, 0) : null,
+          _jms_dtrace ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
           _jms_dtrace ? dtrace_req() : null,
           _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
         .onSubmit(zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "sent", "ALL") : null)

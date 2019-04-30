@@ -16,7 +16,7 @@
 
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.common.tracedata.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceContext;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
@@ -42,7 +42,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
         this.addFlags = addFlags;
     }
 
-    private void formatZipkinCtx(DTraceState ds, Map<String,Object> rec) {
+    private void formatZipkinCtx(DTraceContext ds, Map<String,Object> rec) {
         rec.put(DH_B3_TRACEID, ds.getTraceIdHex());
         rec.put(DH_B3_SPANID, ds.getSpanIdHex());
         rec.put(DH_B3_PARENTID, ds.getParentIdHex());
@@ -52,7 +52,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
         if (0 != (flags & F_DEBUG)) rec.put(DH_B3_FLAGS, "1");
     }
 
-    private void formatZipkinB3Ctx(DTraceState ds, Map<String,Object> rec) {
+    private void formatZipkinB3Ctx(DTraceContext ds, Map<String,Object> rec) {
         int flags = ds.getFlags();
         if (0 != (flags & F_DROP)) {
             rec.put(DH_B3, "0");
@@ -62,7 +62,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
         }
     }
 
-    private void formatJaegerCtx(DTraceState ds, Map<String,Object> rec) {
+    private void formatJaegerCtx(DTraceContext ds, Map<String,Object> rec) {
         rec.put(DH_UBER_TID, ds.getTraceIdHex() + ":" + ds.getSpanIdHex() + ":" + ds.getParentId() + ":" +
                 String.format("%02x", (ds.getFlags() & 0xff) | (0 != (ds.getFlags() & F_DEBUG) ? 0x02 : 0x00)));
         for (Map.Entry<String,String> e : ds.getBaggage().entrySet()) {
@@ -70,7 +70,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
         }
     }
 
-    private void formatW3Ctx(DTraceState ds, Map<String,Object> rec) {
+    private void formatW3Ctx(DTraceContext ds, Map<String,Object> rec) {
         String s = "00-" + ds.getTraceIdHex() + "-" + ds.getParentIdHex() + "-" + String.format("%02x", ds.getFlags() & 0xff);
         rec.put(DH_W3_TRACEPARENT, s);
         if (ds.getTraceState() != null) rec.put(DH_W3_TRACESTATE,  ds.getTraceState());
@@ -79,10 +79,11 @@ public class DTraceOutputProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
-        DTraceState ds = tracer.getHandler().parentDTraceState();
+        DTraceContext ds = tracer.getHandler().parentDTraceState();
 
         if (ds != null) {
-            ds = new DTraceState(ds);
+            ds = new DTraceContext(ds);
+            ds.setTstart(System.currentTimeMillis());
             ds.setParentId(ds.getSpanId());
             ds.setSpanId(rand.nextLong());
             ds.setFlags((ds.getFlags() & ~delFlags) | addFlags);
@@ -115,10 +116,6 @@ public class DTraceOutputProcessor implements SpyProcessor {
                 case DJM_JAEGER: formatJaegerCtx(ds, rec); break;
                 case DFM_W3C: formatW3Ctx(ds, rec); break;
             }
-
-            // TODO tutaj odesłanie kontekstu do właściwego typu kolektora (zipkin itd.).
-
-            // TODO przemyśleć integrację atrybutów opentracing i standardowych atrybutów tracera.
         }
 
         return rec;

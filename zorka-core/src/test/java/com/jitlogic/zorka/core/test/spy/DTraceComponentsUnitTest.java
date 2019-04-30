@@ -1,8 +1,7 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.common.tracedata.DTraceState;
-import com.jitlogic.zorka.core.spy.TracerLib;
+import com.jitlogic.zorka.common.tracedata.DTraceContext;
 import com.jitlogic.zorka.core.spy.ltracer.LTraceHandler;
 import com.jitlogic.zorka.core.spy.ltracer.LTracer;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
@@ -31,7 +30,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
 
         assertSame(r1, dti.process(r1));
 
-        DTraceState ds1 = (DTraceState)r1.get("DTRACE");
+        DTraceContext ds1 = (DTraceContext)r1.get("DTRACE");
         assertNotNull(ds1);
 
         assertNotEquals(0, ds1.getTraceId1());
@@ -54,7 +53,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         th.traceBegin(sid("HTTP_CLI"), 42L, 0);
         dto.process(r2);
 
-        DTraceState ds2 = (DTraceState)r2.get("DTRACE");
+        DTraceContext ds2 = (DTraceContext)r2.get("DTRACE");
         assertNotNull(ds2);
 
         String dh2 = (String)r2.get(DH_UBER_TID);
@@ -71,7 +70,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
 
         assertSame(rec, dti.process(rec));
 
-        DTraceState ds = (DTraceState)rec.get("DTRACE");
+        DTraceContext ds = (DTraceContext)rec.get("DTRACE");
 
         assertNotNull(ds);
         assertEquals("6e05fa04e3167fd5406bbcb9245dc73e", ds.getTraceIdHex());

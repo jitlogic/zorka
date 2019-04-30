@@ -1,7 +1,7 @@
 package com.jitlogic.zorka.core.test.spy;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
-import com.jitlogic.zorka.common.tracedata.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceContext;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
@@ -41,7 +41,7 @@ public class DTraceOutputsUnitTest extends ZorkaFixture {
         TraceRecord tr = tr("some.Class", "someMethod", "()V",
                 10, 1, 0, 10000L);
         TraceMarker tm = new TraceMarker(tr, sid("HTTP"), 142000000L);
-        DTraceState ds = new DTraceState(42L, 24L, 44L, 64L,
+        DTraceContext ds = new DTraceContext(42L, 24L, 44L, 64L,
                 14200000L, DFM_ZIPKIN|DFK_SERVER);
         tm.setDstate(ds);
         tr.setMarker(tm);

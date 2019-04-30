@@ -25,7 +25,7 @@ __hystrix() {
     .onEnter(
       spy.fetchArg("THIS", 0),
       _trace_enabled ? tracer.begin("HYSTRIX_OUT") : null,
-      _dtrace_enabled ? tracer.dtraceOutput(0, 0) : null,
+      _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
       _dtrace_enabled ? spy.shelve("HYSTRIX", 120000, true, "THIS", "DTRACE") : null)
     .onError(tracer.markError())
     .onSubmit(

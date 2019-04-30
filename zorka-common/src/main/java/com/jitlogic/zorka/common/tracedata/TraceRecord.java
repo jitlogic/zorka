@@ -587,7 +587,7 @@ public class TraceRecord implements SymbolicRecord, Serializable {
         this.mid = mid;
     }
 
-    public DTraceState getDTraceState() {
+    public DTraceContext getDTraceState() {
         return marker != null ? marker.getDstate() : null;
     }
 }

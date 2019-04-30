@@ -1,7 +1,7 @@
 package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
-import com.jitlogic.zorka.common.tracedata.DTraceState;
+import com.jitlogic.zorka.common.tracedata.DTraceContext;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ public class DTraceOutput implements ZorkaSubmitter<SymbolicRecord> {
     }
 
     private void process(TraceRecord tr, List<TraceRecord> acc) {
-        DTraceState ds = tr.getDTraceState();
+        DTraceContext ds = tr.getDTraceState();
         if (ds != null && !ds.hasFlags(F_SENT)) {
             acc.add(tr); ds.markFlags(F_SENT);
         }
