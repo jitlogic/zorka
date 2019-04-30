@@ -308,7 +308,6 @@ __http() {
             _headers ? headers_processor(false, true) : null,
             _params ? param_processor() : spy.put("PARAMS", "")
           ) : null,
-          _dtrace_enabled ? tracer.dtraceClean() : null,
           _slow_chain,
           spy.subchain(
             spy.valSetFilter("STATUS", _errors),

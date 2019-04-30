@@ -155,6 +155,8 @@ public abstract class TraceHandler {
 
     public abstract DTraceState getDTraceState();
 
+    public abstract DTraceState parentDTraceState();
+
     public abstract void setDTraceState(DTraceState state);
 
     public static long getTuningExchangeMinCalls() {

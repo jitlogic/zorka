@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.core.spy.plugins;
 
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.common.tracedata.DTraceState;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
@@ -31,16 +30,14 @@ public class DTraceOutputProcessor implements SpyProcessor {
 
     private Tracer tracer;
     private TracerLib tracerLib;
-    private ThreadLocal<DTraceState> dtraceLocal;
     private Random rand = new Random();
 
     private int delFlags;
     private int addFlags;
 
-    public DTraceOutputProcessor(Tracer tracer, TracerLib tracerLib, ThreadLocal<DTraceState> dtraceLocal, int delFlags, int addFlags) {
+    public DTraceOutputProcessor(Tracer tracer, TracerLib tracerLib, int delFlags, int addFlags) {
         this.tracer = tracer;
         this.tracerLib = tracerLib;
-        this.dtraceLocal = dtraceLocal;
         this.delFlags = delFlags;
         this.addFlags = addFlags;
     }
@@ -82,7 +79,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
-        DTraceState ds = dtraceLocal.get();
+        DTraceState ds = tracer.getHandler().parentDTraceState();
 
         if (ds != null) {
             ds = new DTraceState(ds);

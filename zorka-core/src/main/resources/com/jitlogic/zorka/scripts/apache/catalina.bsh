@@ -106,7 +106,6 @@ __catalina() {
         http._headers ? headers_out() : null,
         http._params ? http.param_processor() : spy.put("PARAMS", "")
       ) : null,
-      _dtrace_enabled ? tracer.dtraceClean() : null,
       http._slow_chain,
       spy.subchain(
         spy.valSetFilter("STATUS", http._errors),

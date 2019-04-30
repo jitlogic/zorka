@@ -380,12 +380,19 @@ public class STraceHandler extends TraceHandler {
 
     @Override
     public DTraceState getDTraceState() {
+        // TODO to be implemented
+        return null;
+    }
+
+    @Override
+    public DTraceState parentDTraceState() {
+        // TODO to be implemented
         return null;
     }
 
     @Override
     public void setDTraceState(DTraceState state) {
-
+        // TODO to be implemented
     }
 
     @Override

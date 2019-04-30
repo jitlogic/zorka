@@ -105,8 +105,6 @@ public abstract class TracerLib {
     public static final int DFK_PRODUCER   = 0x300000; // Kind: message send
     public static final int DFK_CONSUMER   = 0x400000; // Kind: message receive (& handling)
 
-    protected final ThreadLocal<DTraceState> dtraceLocal = new ThreadLocal<DTraceState>();
-
     protected Tracer tracer;
     protected ZorkaConfig config;
     protected SymbolRegistry symbolRegistry;
@@ -447,15 +445,11 @@ public abstract class TracerLib {
     }
 
     public SpyProcessor dtraceInput(int defFlags, int addFlags) {
-        return new DTraceInputProcessor(tracer, this, dtraceLocal, defFlags, addFlags);
+        return new DTraceInputProcessor(tracer, this, defFlags, addFlags);
     }
 
     public SpyProcessor dtraceOutput(int addFlags, int delFlags) {
-        return new DTraceOutputProcessor(tracer, this, dtraceLocal, addFlags, delFlags);
-    }
-
-    public SpyProcessor dtraceClean() {
-        return new DTraceCleanProcessor(this, dtraceLocal);
+        return new DTraceOutputProcessor(tracer, this, addFlags, delFlags);
     }
 
     public DTraceFormatter zipkinJsonFormatter(Map<String,String> tagMap) {

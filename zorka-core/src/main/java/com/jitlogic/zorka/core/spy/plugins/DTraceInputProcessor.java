@@ -40,7 +40,6 @@ public class DTraceInputProcessor implements SpyProcessor {
     private Tracer tracer;
     private TracerLib tracerLib;
 
-    private ThreadLocal<DTraceState> dtraceLocal;
     private Random rand;
 
     /** Default flags */
@@ -57,10 +56,9 @@ public class DTraceInputProcessor implements SpyProcessor {
     public final static Pattern RE_JG_128 = Pattern.compile("([0-9a-zA-Z]{32}):([0-9a-zA-Z]{16}):([0-9a-zA-Z]{16}):([0-9a-zA-Z]{2})");
     public final static Pattern RE_W3 = Pattern.compile("([0-9a-zA-Z]{2})-([0-9a-zA-Z]{32})-([0-9a-zA-Z]{16})-([0-9a-zA-Z]{2})");
 
-    public DTraceInputProcessor(Tracer tracer, TracerLib tracerLib, ThreadLocal<DTraceState> dtraceLocal, int defFlags, int addFlags) {
+    public DTraceInputProcessor(Tracer tracer, TracerLib tracerLib, int defFlags, int addFlags) {
         this.tracer = tracer;
         this.tracerLib = tracerLib;
-        this.dtraceLocal = dtraceLocal;
         this.defFlags = defFlags;
         this.addFlags = addFlags;
         this.rand = new Random();
@@ -207,11 +205,13 @@ public class DTraceInputProcessor implements SpyProcessor {
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
 
-        DTraceState ds = (DTraceState)rec.get(DTRACE_STATE);
+        DTraceState ds = tracer.getHandler().parentDTraceState();
 
         if (ds != null) {
             ds = new DTraceState(ds);
-        } if (rec.containsKey(DH_B3_TRACEID)) {
+        } else if (rec.containsKey(DTRACE_STATE)) {
+            ds = new DTraceState((DTraceState)rec.get(DTRACE_STATE));
+        } else if (rec.containsKey(DH_B3_TRACEID)) {
             ds = parseZipkinCtx(rec);
         } else if (rec.containsKey(DH_B3)) {
             ds = parseZipkinB3Ctx(rec);
@@ -233,8 +233,6 @@ public class DTraceInputProcessor implements SpyProcessor {
 
         rec.put(DTRACE_STATE, ds);
         tracer.getHandler().setDTraceState(ds);
-
-        dtraceLocal.set(ds);
         tracerLib.newAttr(DT_TRACE_ID, ds.getTraceIdHex());
         tracerLib.newAttr(DT_SPAN_ID, ds.getSpanIdHex());
         if (ds.getParentId() != 0) tracerLib.newAttr(DT_PARENT_ID, ds.getParentIdHex());

@@ -25,6 +25,10 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         Map<String,Object> r1 = new HashMap<String, Object>();
         r1.put("T1", 100L);
 
+        LTraceHandler th = ((LTracer) (agentInstance.getTracer())).getLtHandler();
+        th.traceEnter(42, 42L);
+        th.traceBegin(sid("HTTP"), 24L, 0);
+
         assertSame(r1, dti.process(r1));
 
         DTraceState ds1 = (DTraceState)r1.get("DTRACE");
@@ -38,7 +42,6 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         assertEquals(0, ds1.getParentId());
         assertNotEquals(0, ds1.getTstart());
 
-        LTraceHandler th = ((LTracer) (agentInstance.getTracer())).getLtHandler();
 
         TraceRecord tr = th.realTop();
         assertEquals(ds1.getTraceIdHex(), tr.getAttr(symbols.symbolId(DT_TRACE_ID)));
@@ -47,6 +50,8 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         SpyProcessor dto = tracer.dtraceOutput(0, 0);
         Map<String,Object> r2 = new HashMap<String, Object>();
 
+        th.traceEnter(42, 42L);
+        th.traceBegin(sid("HTTP_CLI"), 42L, 0);
         dto.process(r2);
 
         DTraceState ds2 = (DTraceState)r2.get("DTRACE");

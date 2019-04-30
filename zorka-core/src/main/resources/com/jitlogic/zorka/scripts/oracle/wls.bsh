@@ -58,7 +58,6 @@ __wls() {
         http._cookies ? http.cookies_processor(true, false) : null,
         (zorka.boolCfg("wls.headers.out", true) && http._headers) ? http.headers_processor(false, true) : null
       ) : null,
-      _dtrace_enabled ? tracer.dtraceClean() : null,
       http._slow_chain,
       http._error ? spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
