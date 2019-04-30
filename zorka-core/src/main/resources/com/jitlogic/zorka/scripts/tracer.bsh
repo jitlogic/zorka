@@ -164,3 +164,10 @@ switch (zorka.stringCfg("tracer.propagation", "zipkin").toLowerCase()) {
   case "w3c": _dtrace_input_flags = tracer.DFM_W3C; break;
 }
 
+if (zorka.boolCfg("tracer.output.zipkin",false) && zorka.stringCfg("tracer.output.zipkin.format","json").equals("json")) {
+  tracer.output(tracer.toDtraceOutput(
+    tracer.zipkinJsonFormatter(tracer.OPENTRACING_TAGS),
+    perfmon.httpTextOutput("ZIPKIN-HTTP",zorka.mapCfg("tracer.output.zipkin"),null,util.map("Content-Type","application/json"))
+  ));
+}
+

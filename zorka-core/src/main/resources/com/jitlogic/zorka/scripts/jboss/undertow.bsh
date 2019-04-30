@@ -178,7 +178,7 @@ __undertow() {
           tracer.attr("URI", "URI"),
           tracer.formatAttr("METHOD", "${EXCH.requestMethod}"),
           http._headers ? headers_processor(true, false) : null,
-          _dtrace_enabled ? tracer.dtraceInput(zorka.longCfg("http.trace.time")) : null
+          _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_SERVER) : null
         ) : null)
       .onReturn(spy.put("ERR", ""))
       .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),

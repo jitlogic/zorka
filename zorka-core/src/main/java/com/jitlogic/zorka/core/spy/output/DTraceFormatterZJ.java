@@ -5,6 +5,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.JSONWriter;
+import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,7 @@ public class DTraceFormatterZJ implements DTraceFormatter {
             case DFK_SERVER: return "SERVER";
             case DFK_PRODUCER: return "PRODUCER";
             case DFK_CONSUMER: return "CONSUMER";
-            default: return "BAD";
+            default: return null;
         }
     }
 
@@ -58,17 +59,19 @@ public class DTraceFormatterZJ implements DTraceFormatter {
             Map<String, Object> span = ZorkaUtil.map("id", ds.getSpanIdHex(),
                     "traceId", ds.getTraceIdHex(),
                     "name", symbols.symbolName(tr.getTraceId()),
-                    "kind", getKind(ds.getFlags()),
                     "timestamp", ds.getTstart() * 1000,
                     "duration", tr.getTime() / 1000
             );
+
+            String kind = getKind(ds.getFlags());
+            if (kind != null) span.put("kind", kind);
 
             if (ds.getParentId() != 0) span.put("parentId", ds.getParentIdHex());
             if (ds.hasFlags(F_DEBUG)) span.put("debug", true);
 
             // Remote endpoint
             String remoteIp = (String) tr.getAttr(remoteIpAttr);
-            Integer remotePort = (Integer) tr.getAttr(remotePortAttr);
+            Integer remotePort = ZorkaUtil.lcastInt(tr.getAttr(remotePortAttr));
             if (remoteIp != null || remotePort != null) {
                 Map<String, Object> re = new TreeMap<String, Object>();
                 if (remoteIp != null) re.put("ipv4", remoteIp);
@@ -78,7 +81,7 @@ public class DTraceFormatterZJ implements DTraceFormatter {
 
             // Local endpoint
             String localIp = (String) tr.getAttr(localIpAttr);
-            Integer localPort = (Integer) tr.getAttr(localPortAttr);
+            Integer localPort = ZorkaUtil.lcastInt(tr.getAttr(localPortAttr));
             if (localIp != null || localPort != null) {
                 Map<String, Object> le = new TreeMap<String, Object>();
                 if (localIp != null) le.put("ipv4", remoteIp);
@@ -119,12 +122,14 @@ public class DTraceFormatterZJ implements DTraceFormatter {
 
         while (size < softLimit && acc.size() > 0) {
             byte[] b = format(acc.get(0));
+            acc.remove(0);
             if (b == null) continue;
             if (size + b.length + 1 > hardLimit) break;
             fragments.add(b);
-            acc.remove(0);
             size += b.length + 1;
         }
+
+        if (fragments.size() == 0) return null;
 
         byte[] buf = new byte[size];
         buf[0] = (byte)'[';

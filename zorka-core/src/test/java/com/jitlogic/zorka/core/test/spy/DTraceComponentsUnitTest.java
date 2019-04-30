@@ -20,7 +20,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceInputOutputProcessingInitialTraceJaeger() {
-        SpyProcessor dti = tracer.dtraceInput(TracerLib.DJM_JAEGER);
+        SpyProcessor dti = tracer.dtraceInput(DJM_JAEGER, DFK_SERVER);
 
         Map<String,Object> r1 = new HashMap<String, Object>();
         r1.put("T1", 100L);
@@ -58,7 +58,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
 
     @Test
     public void testTraceInputProcessingContinuationJaeger() {
-        SpyProcessor dti = tracer.dtraceInput(-1);
+        SpyProcessor dti = tracer.dtraceInput(-1, DFK_SERVER);
 
         Map<String,Object> rec = new HashMap<String, Object>();
 

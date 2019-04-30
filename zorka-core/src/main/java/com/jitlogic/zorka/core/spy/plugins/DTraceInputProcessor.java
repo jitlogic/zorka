@@ -44,7 +44,9 @@ public class DTraceInputProcessor implements SpyProcessor {
     private Random rand;
 
     /** Default flags */
-    private int flags;
+    private int defFlags;
+
+    private int addFlags;
 
     public final static Pattern RE_DIGIT  = Pattern.compile("\\d+");
     public final static Pattern RE_HEX64  = Pattern.compile("([0-9a-zA-Z]{16})");
@@ -55,11 +57,12 @@ public class DTraceInputProcessor implements SpyProcessor {
     public final static Pattern RE_JG_128 = Pattern.compile("([0-9a-zA-Z]{32}):([0-9a-zA-Z]{16}):([0-9a-zA-Z]{16}):([0-9a-zA-Z]{2})");
     public final static Pattern RE_W3 = Pattern.compile("([0-9a-zA-Z]{2})-([0-9a-zA-Z]{32})-([0-9a-zA-Z]{16})-([0-9a-zA-Z]{2})");
 
-    public DTraceInputProcessor(Tracer tracer, TracerLib tracerLib, ThreadLocal<DTraceState> dtraceLocal, int flags) {
+    public DTraceInputProcessor(Tracer tracer, TracerLib tracerLib, ThreadLocal<DTraceState> dtraceLocal, int defFlags, int addFlags) {
         this.tracer = tracer;
         this.tracerLib = tracerLib;
         this.dtraceLocal = dtraceLocal;
-        this.flags = flags;
+        this.defFlags = defFlags;
+        this.addFlags = addFlags;
         this.rand = new Random();
     }
 
@@ -196,7 +199,8 @@ public class DTraceInputProcessor implements SpyProcessor {
 
 
     private DTraceState newCtx() {
-        return new DTraceState(rand.nextLong(), rand.nextLong(), 0, rand.nextLong(), System.currentTimeMillis(), flags);
+        return new DTraceState(rand.nextLong(), rand.nextLong(), 0, rand.nextLong(),
+                System.currentTimeMillis(), defFlags);
     }
 
 
@@ -225,6 +229,7 @@ public class DTraceInputProcessor implements SpyProcessor {
         }
 
         // TODO tutaj ew. decyzja samplera
+        ds.setFlags(ds.getFlags()|addFlags);
 
         rec.put(DTRACE_STATE, ds);
         tracer.getHandler().setDTraceState(ds);

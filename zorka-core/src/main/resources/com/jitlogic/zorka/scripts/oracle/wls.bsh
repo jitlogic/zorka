@@ -36,7 +36,7 @@ __wls() {
         tracer.attr("URI", "URI"),
         tracer.formatAttr("METHOD", "${REQ.method}"),
         http._headers ? http.headers_processor(true, false) : null,
-        (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags) : null
+        (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_SERVER) : null
       ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),

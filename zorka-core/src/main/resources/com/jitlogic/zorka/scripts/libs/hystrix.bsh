@@ -38,7 +38,7 @@ __hystrix() {
       spy.fetchArg("THIS", 0),
       _trace_enabled ? tracer.begin("HYSTRIX_IN") : null,
       _dtrace_enabled ? spy.unshelve("HYSTRIX", true, "THIS", "DTRACE") : null,
-      _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags) : null)
+      _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null)
     .onError(tracer.markError())
     .onSubmit(
       tracer.formatAttr("GROUP", "${THIS.commandGroup}"),

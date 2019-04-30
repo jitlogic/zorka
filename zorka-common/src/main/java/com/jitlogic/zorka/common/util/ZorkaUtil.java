@@ -124,6 +124,15 @@ public class ZorkaUtil {
                 : ((Number) val).doubleValue();
     }
 
+    private static Pattern RE_INTEGER = Pattern.compile("-?\\d{1,10}");
+
+    /** Lenient cast */
+    public static Integer lcastInt(Object val) {
+        if (val instanceof Number) return ((Number)val).intValue();
+        if (val instanceof String && RE_INTEGER.matcher((String)val).matches()) return Integer.parseInt((String)val);
+        return null;
+    }
+
     private static int castInteger(Object val) {
         return (val instanceof String)
                 ? Integer.parseInt(val.toString().trim())

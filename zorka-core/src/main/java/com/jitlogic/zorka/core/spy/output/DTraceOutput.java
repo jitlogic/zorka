@@ -38,6 +38,10 @@ public class DTraceOutput implements ZorkaSubmitter<SymbolicRecord> {
     private void submit(List<TraceRecord> acc) {
         while (acc.size() > 0) {
             byte[] buf = formatter.format(acc, softLimit, hardLimit);
+            if (log.isTraceEnabled()) {
+                String s = buf != null ? new String(buf) : "<null>";
+                log.trace("Submitting data to zipkin: " + s);
+            }
             if (buf != null) sender.submit(buf);
         }
     }
@@ -47,6 +51,9 @@ public class DTraceOutput implements ZorkaSubmitter<SymbolicRecord> {
         if (sr instanceof TraceRecord) {
             List<TraceRecord> acc = new LinkedList<TraceRecord>();
             process((TraceRecord) sr, acc);
+            if (log.isTraceEnabled()) {
+                log.debug("DTraceOutput: got " + acc.size() + " items to send.");
+            }
             if (acc.size() > 0) {
                 submit(acc);
             }

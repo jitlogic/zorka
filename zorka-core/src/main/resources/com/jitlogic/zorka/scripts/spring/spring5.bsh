@@ -225,7 +225,7 @@ __spring() {
                 tracer.formatAttr("ROUTING_KEY", "${PROPS.receivedRoutingKey}"),
                 tracer.formatAttr("CONN", "${CONN.address}:${CONN.port}/${CONN.id}"),
                 _dtrace_enabled ? dtrace_recv() : null,
-                _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags) : null,
+                _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null,
                 tracer.procAttr(tracer.PA_MAP_OF_ANY, "HdrIn__", "HEADERS"))
               : null)
             .onError(tracer.flags(tracer.SUBMIT_TRACE))

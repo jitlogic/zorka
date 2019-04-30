@@ -57,7 +57,7 @@ __quartz() {
         tracer.formatAttr("SCHEDULED_FIRE_TIME", "${CTX.scheduledFireTime}"),
         tracer.formatAttr("NEXT_FIRE_TIME", "${CTX.nextFireTime}"),
         spy.get("FIRE_INSTANCE_ID", "CTX", "fireInstanceId"), tracer.attr("FIRE_INSTANCE_ID", "FIRE_INSTANCE_ID"),
-        _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags) : null
+        _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null
       ) : null)
     .onError(tracer.markError())
     .onSubmit(

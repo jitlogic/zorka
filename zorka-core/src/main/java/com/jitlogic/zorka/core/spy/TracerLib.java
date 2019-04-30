@@ -22,6 +22,9 @@ import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
+import com.jitlogic.zorka.core.spy.output.DTraceFormatter;
+import com.jitlogic.zorka.core.spy.output.DTraceFormatterZJ;
+import com.jitlogic.zorka.core.spy.output.DTraceOutput;
 import com.jitlogic.zorka.core.spy.plugins.*;
 import com.jitlogic.zorka.core.spy.tuner.TracerTuner;
 import com.jitlogic.zorka.core.util.OverlayClassLoader;
@@ -443,8 +446,8 @@ public abstract class TracerLib {
         return new TraceFlagsProcessor(tracer, srcField, symbolRegistry.symbolId(traceName), flags);
     }
 
-    public SpyProcessor dtraceInput(int flags) {
-        return new DTraceInputProcessor(tracer, this, dtraceLocal, flags);
+    public SpyProcessor dtraceInput(int defFlags, int addFlags) {
+        return new DTraceInputProcessor(tracer, this, dtraceLocal, defFlags, addFlags);
     }
 
     public SpyProcessor dtraceOutput(int addFlags, int delFlags) {
@@ -453,6 +456,14 @@ public abstract class TracerLib {
 
     public SpyProcessor dtraceClean() {
         return new DTraceCleanProcessor(this, dtraceLocal);
+    }
+
+    public DTraceFormatter zipkinJsonFormatter(Map<String,String> tagMap) {
+        return new DTraceFormatterZJ(symbolRegistry, tagMap);
+    }
+
+    public ZorkaSubmitter<SymbolicRecord> toDtraceOutput(DTraceFormatter formatter, ZorkaSubmitter<byte[]> sender) {
+        return new DTraceOutput(formatter, sender);
     }
 
 
@@ -583,6 +594,7 @@ public abstract class TracerLib {
      * @param output trace processing object
      */
     public void output(ZorkaSubmitter<SymbolicRecord> output) {
+        log.info("Adding output: " + output);
         tracer.addOutput(output);
     }
 
