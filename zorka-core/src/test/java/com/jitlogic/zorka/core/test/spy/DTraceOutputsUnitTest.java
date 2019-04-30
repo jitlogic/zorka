@@ -64,7 +64,7 @@ public class DTraceOutputsUnitTest extends ZorkaFixture {
         TraceRecord tr = tr1();
 
         ZorkaSubmitter<SymbolicRecord> out = new DTraceOutput(
-                new DTraceFormatterZJ(symbols, TracerLib.OPENTRACING_TAGS),
+                new DTraceFormatterZJ(config, symbols, TracerLib.OPENTRACING_TAGS),
                 rawOutput);
 
         out.submit(tr);

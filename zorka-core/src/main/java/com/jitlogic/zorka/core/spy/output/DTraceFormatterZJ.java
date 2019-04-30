@@ -5,6 +5,7 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.JSONWriter;
+import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +19,20 @@ public class DTraceFormatterZJ implements DTraceFormatter {
 
     private static final Logger log = LoggerFactory.getLogger(DTraceFormatterZJ.class);
 
+    private String hostname;
+    private ZorkaConfig config;
     private SymbolRegistry symbols;
     private Map<Integer,String> tagMap;
     private Set<Integer> tagExclusions;
 
     private int remoteIpAttr, remotePortAttr, localIpAttr, localPortAttr;
 
-    public DTraceFormatterZJ(SymbolRegistry symbols, Map<String,String> tagMap) {
+    public DTraceFormatterZJ(ZorkaConfig config, SymbolRegistry symbols, Map<String,String> tagMap) {
+        this.config = config;
         this.symbols = symbols;
         this.tagMap = new HashMap<Integer, String>();
+
+        this.hostname = this.config.stringCfg("zorka.hostname", "zorka");
 
         for (Map.Entry<String,String> e : tagMap.entrySet()) {
             this.tagMap.put(symbols.symbolId(e.getKey()), e.getValue());
@@ -81,12 +87,12 @@ public class DTraceFormatterZJ implements DTraceFormatter {
             // Local endpoint
             String localIp = (String) tr.getAttr(localIpAttr);
             Integer localPort = ZorkaUtil.lcastInt(tr.getAttr(localPortAttr));
-            if (localIp != null || localPort != null) {
-                Map<String, Object> le = new TreeMap<String, Object>();
-                if (localIp != null) le.put("ipv4", remoteIp);
-                if (localPort != null) le.put("port", remotePort);
-                span.put("localEndpoint", le);
-            }
+            Map<String, Object> le = new TreeMap<String, Object>();
+            if (localIp != null) le.put("ipv4", remoteIp);
+            le.put("serviceName", hostname);
+            if (localPort != null) le.put("port", remotePort);
+            span.put("localEndpoint", le);
+
 
             // Annotations (only error annotation is used at the moment)
             if (tr.getMarker() != null && tr.getMarker().hasFlag(TraceMarker.ERROR_MARK)) {

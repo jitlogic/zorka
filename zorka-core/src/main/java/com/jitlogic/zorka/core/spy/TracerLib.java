@@ -455,7 +455,7 @@ public abstract class TracerLib {
     }
 
     public DTraceFormatter zipkinJsonFormatter(Map<String,String> tagMap) {
-        return new DTraceFormatterZJ(symbolRegistry, tagMap);
+        return new DTraceFormatterZJ(config, symbolRegistry, tagMap);
     }
 
     public ZorkaSubmitter<SymbolicRecord> toDtraceOutput(DTraceFormatter formatter, ZorkaSubmitter<byte[]> sender) {
