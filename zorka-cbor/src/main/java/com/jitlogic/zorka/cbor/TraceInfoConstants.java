@@ -47,4 +47,9 @@ public class TraceInfoConstants {
     /** Clear trace flags. */
     public static final int TI_FLAGS_C  = 0x10;
 
+    /** Parent spanId */
+    public static final int TI_PARENT   = 0x11;
+
+    /** spanId */
+    public static final int TI_SPAN     = 0x12;
 }
