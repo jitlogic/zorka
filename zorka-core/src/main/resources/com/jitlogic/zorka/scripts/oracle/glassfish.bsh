@@ -31,9 +31,9 @@ __glassfish() {
     spy.add(spy.instrument("GLASSFISH_EJB")
       .onEnter(
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
-          ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
-          ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
-          ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
+          ejb._trace ? tracer.begin("ejb", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.formatAttr("ejb.method", "${MDESC.name}") : null,
+          ejb._trace ? tracer.formatAttr("ejb.class", "${MDESC.declaringClass.name}") : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
@@ -44,7 +44,7 @@ __glassfish() {
           ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
           ejb._params ? ejb.arg_processor() : spy.put("PARAMS", ""),
-          ejb._trace ? tracer.attr("RET", "RET") : null,
+          ejb._trace ? tracer.attr("ejb.result", "RET") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
           ejb._tags_chain,

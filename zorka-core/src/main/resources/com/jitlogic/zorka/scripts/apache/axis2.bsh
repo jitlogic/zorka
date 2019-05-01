@@ -25,7 +25,7 @@ __axis2() {
 
     spy.add(spy.instrument("AXIS2_SERVER_INVOKE")
       .onEnter(spy.fetchArg("CTX", 0),
-        soap._trace ? tracer.begin("SOAP", soap._time) : null)
+        soap._trace ? tracer.begin("soap", soap._time) : null)
       .onError(tracer.markError())
       .onSubmit(
         spy.format("METHOD", "${CTX.axisOperation.name.localPart}"),
@@ -33,10 +33,10 @@ __axis2() {
         spy.format("XML_IN", "${CTX.envelope}"),
         spy.format("ACTION", "${CTX.soapAction}"),
         soap._trace ? spy.subchain(
-          tracer.attr("METHOD", "METHOD"),
-          tracer.attr("XML_IN", "XML_IN"),
-          tracer.attr("SERVICE", "SERVICE"),
-          tracer.attr("ACTION", "ACTION")
+          tracer.attr("soap.method", "METHOD"),
+          tracer.attr("soap.xml.in", "XML_IN"),
+          tracer.attr("soap.service", "SERVICE"),
+          tracer.attr("soap.action", "ACTION")
         ) : null,
         soap._stats ? spy.subchain(
           spy.zorkaStats("java", soap._mbean, "stats", "SVC"),

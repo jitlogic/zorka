@@ -293,9 +293,9 @@ __cxf() {
   spy.add(spy.instrument("CXF_WS_CLIENT")
     .onEnter(spy.fetchArg("MDESC", 2),
       soap._trace ? spy.subchain(
-        tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")),
-        tracer.formatAttr("METHOD", "${MDESC.name}"),
-        tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}")
+        tracer.begin("soap", zorka.longCfg("soap.trace.time")),
+        tracer.formatAttr("soap.method", "${MDESC.name}"),
+        tracer.formatAttr("soap.class.name", "${MDESC.declaringClass.name}")
       ) : null)
     .onSubmit(soap._trace ? _cxf_cli_submit() : null)
     .include(spy.byMethod("org.apache.cxf.jaxws.JaxWsClientProxy", "invoke")));

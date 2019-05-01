@@ -42,7 +42,8 @@ __axis() {
   spy.add(
     spy.instrument("AXIS_SERVER_INVOKE")
       .onEnter(spy.fetchArg("CTX", 1),
-        soap._trace ? tracer.begin("SOAP", zorka.longCfg("soap.trace.time")) : null)
+        // TODO dtraceInput() z dziedziczeniem kontekstu od http
+        soap._trace ? tracer.begin("soap", zorka.longCfg("soap.trace.time")) : null)
       .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
         spy.format("SERVICE", "${CTX.service.name}"),
         spy.format("METHOD", "${CTX.operation.name}"),
@@ -56,10 +57,10 @@ __axis() {
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
         spy.strTime("TIME"), soap._slow_chain,
         soap._trace ? spy.subchain(
-          tracer.attr("SERVICE", "SERVICE"),
-          tracer.attr("METHOD", "METHOD"),
-          soap._fetch_xml ? tracer.attr("XML_IN", "XML_IN") : null,
-          soap._fetch_xml ? tracer.attr("XML_OUT", "XML_OUT") : null
+          tracer.attr("soap.url", "SERVICE"),
+          tracer.attr("soap.method", "METHOD"),
+          soap._fetch_xml ? tracer.attr("soap.xml.in", "XML_IN") : null,
+          soap._fetch_xml ? tracer.attr("soap.xml.out", "XML_OUT") : null
         ) : null,
         soap._stats ? spy.subchain(
           spy.zorkaStats("java", soap._mbean, "stats", "SVC"),
@@ -85,7 +86,7 @@ __axis() {
       .onEnter(spy.fetchArg("CTX", 2),
         _dtrace_enabled ? spy.fetchArg("HBUF", 4) : null,
         soap._trace ? spy.subchain(
-          tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")),
+          tracer.begin("soap", zorka.longCfg("soap.trace.time")),
           _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
           _dtrace_enabled ? dtrace_req() : null) : null)
       .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
@@ -103,10 +104,10 @@ __axis() {
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
         spy.strTime("TIME"), soap._slow_chain,
         soap._trace ? spy.subchain(
-          tracer.attr("SERVICE", "SERVICE"),
-          tracer.attr("METHOD", "METHOD"),
-          soap._fetch_xml ? tracer.attr("XML_IN", "XML_IN") : null,
-          soap._fetch_xml ? tracer.attr("XML_OUT", "XML_OUT") : null
+          tracer.attr("soap.url", "SERVICE"),
+          tracer.attr("soap.method", "METHOD"),
+          soap._fetch_xml ? tracer.attr("soap.xml.in", "XML_IN") : null,
+          soap._fetch_xml ? tracer.attr("soap.xml.out", "XML_OUT") : null
         ) : null,
         soap._stats ? spy.subchain(
           spy.zorkaStats("java", soap._mbean, "stats", "CLI"),
@@ -119,7 +120,7 @@ __axis() {
   spy.add(
     spy.instrument("AXIS_CLIENT_JMS")
       .onEnter(spy.fetchArg("CTX", 1),
-        soap._trace ? tracer.begin("SOAP_CLI", zorka.longCfg("soap.trace.time")) : null)
+        soap._trace ? tracer.begin("soap", zorka.longCfg("soap.trace.time")) : null)
       .onError(spy.fetchError("ERROR"), tracer.flags(tracer.SUBMIT_TRACE),
         __get_call_obj(),
         spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
@@ -135,10 +136,10 @@ __axis() {
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
         spy.strTime("TIME"), soap._slow_chain,
         soap._trace ? spy.subchain(
-          tracer.attr("SERVICE", "SERVICE"),
-          tracer.attr("METHOD", "METHOD"),
-          soap._fetch_xml ? tracer.attr("XML_IN", "XML_IN") : null,
-          soap._fetch_xml ? tracer.attr("XML_OUT", "XML_OUT") : null
+          tracer.attr("soap.url", "SERVICE"),
+          tracer.attr("soap.method", "METHOD"),
+          soap._fetch_xml ? tracer.attr("soap.xml.in", "XML_IN") : null,
+          soap._fetch_xml ? tracer.attr("soap.xml.out", "XML_OUT") : null
         ) : null,
         soap._stats ? spy.subchain(
           spy.zorkaStats("java", soap._mbean, "stats", "CLI"),

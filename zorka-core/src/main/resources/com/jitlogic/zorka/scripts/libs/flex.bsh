@@ -54,12 +54,12 @@ __flex() {
   spy.add(
     spy.instrument("FLEX_REMOTING_SERVICE_1")
     .onEnter(spy.fetchArg("MSG", 1),
-      tracer.formatAttr("DEST", "${MSG.destination}"),
-      tracer.formatAttr("CLIENT_ID", "${MSG.clientId}"),
-      tracer.formatAttr("MESSAGE_ID", "${MSG.messageId}"),
+      tracer.formatAttr("flex.destination", "${MSG.destination}"),
+      tracer.formatAttr("flex.client_id", "${MSG.clientId}"),
+      tracer.formatAttr("flex.message_id", "${MSG.messageId}"),
       _trace ? spy.subchain(
-        tracer.begin("FLEX", _traceTime),
-        proc_headers("HdrIn__")
+        tracer.begin("flex", _traceTime),
+        proc_headers("flex.header.in.")
       ) : null)
     .onError(tracer.flags(tracer.SUBMIT_TRACE))
     .onSubmit(

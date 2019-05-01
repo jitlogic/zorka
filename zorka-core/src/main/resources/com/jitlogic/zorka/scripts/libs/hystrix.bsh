@@ -24,25 +24,27 @@ __hystrix() {
   spy.add(spy.instrument("HYSTRIX_COMMAND_OUT")
     .onEnter(
       spy.fetchArg("THIS", 0),
-      _trace_enabled ? tracer.begin("HYSTRIX_OUT") : null,
+      _trace_enabled ? tracer.begin("breaker") : null,
+      _trace_enabled ? tracer.formatAttr("breaker.type", "hystrix") : null,
       _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
       _dtrace_enabled ? spy.shelve("HYSTRIX", 120000, true, "THIS", "DTRACE") : null)
     .onError(tracer.markError())
     .onSubmit(
-      tracer.formatAttr("GROUP", "${THIS.commandGroup}"),
-      tracer.formatAttr("KEY", "${THIS.commandKey}"))
+      tracer.formatAttr("breaker.group", "${THIS.commandGroup}"),
+      tracer.formatAttr("breaker.key", "${THIS.commandKey}"))
     .include(spy.byMethod("com.netflix.hystrix.HystrixCommand", "execute")));
 
   spy.add(spy.instrument("HYSTRIX_COMMAND_IN")
     .onEnter(
       spy.fetchArg("THIS", 0),
-      _trace_enabled ? tracer.begin("HYSTRIX_IN") : null,
+      _trace_enabled ? tracer.begin("breaker") : null,
+      _trace_enabled ? tracer.formatAttr("breaker.type", "hystrix") : null,
       _dtrace_enabled ? spy.unshelve("HYSTRIX", true, "THIS", "DTRACE") : null,
       _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null)
     .onError(tracer.markError())
     .onSubmit(
-      tracer.formatAttr("GROUP", "${THIS.commandGroup}"),
-      tracer.formatAttr("KEY", "${THIS.commandKey}"))
+      tracer.formatAttr("breaker.group", "${THIS.commandGroup}"),
+      tracer.formatAttr("breaker.key", "${THIS.commandKey}"))
     .include(
       spy.byMethod(0,
         zorka.stringCfg("hystrix.command.class", "com.netflix.hystrix.contrib.javanica.command.GenericCommand"),

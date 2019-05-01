@@ -122,14 +122,7 @@ __undertow() {
                   if (hdrs != null) {
                       i = 0;
                       for (hdr : hdrs) {
-                          if (hdr.length() > _maxlen) {
-                              hdr = hdr.substring(0, _maxlen) + "...";
-                          }
-                          if (i == 0) {
-                              tracer.newAttr(_iprefix + name, hdr);
-                          } else {
-                              tracer.newAttr(_iprefix + i + "_" + name, hdr);
-                          }
+                          tracer.procHeader(rec, name, i, hdr, _iprefix);
                           i++;
                       }
                   }
@@ -143,14 +136,7 @@ __undertow() {
                   if (hdrs != null) {
                       i = 0;
                       for (hdr : hdrs) {
-                          if (hdr.length() > _maxlen) {
-                              hdr = hdr.substring(0, _maxlen) + "...";
-                          }
-                          if (i == 0) {
-                              tracer.newAttr(_oprefix + name, hdr);
-                          } else {
-                              tracer.newAttr(_oprefix + i + "_" + name, hdr);
-                          }
+                          tracer.procHeader(rec, name, i, hdr, _oprefix);
                           i++;
                       }
                   }
@@ -174,9 +160,9 @@ __undertow() {
         spy.format("URI", "${EXCH.requestURI}"),
         http._trace ? spy.subchain(
           http._uriQualifier,
-          tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
-          tracer.attr("URI", "URI"),
-          tracer.formatAttr("METHOD", "${EXCH.requestMethod}"),
+          tracer.begin("http", zorka.longCfg("http.trace.time")),
+          tracer.attr("http.url", "URI"),
+          tracer.formatAttr("http.method", "${EXCH.requestMethod}"),
           http._headers ? headers_processor(true, false) : null,
           _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_SERVER) : null
         ) : null)
@@ -186,7 +172,7 @@ __undertow() {
           http._uriQualifier,
           http._error_chain,
           tracer.markError(),
-          tracer.attr("ERR", "ERR")
+          tracer.attr("jvm.exception", "ERR")
         ) : null)
       .onSubmit(
         spy.strTime("TIME"),
@@ -194,9 +180,9 @@ __undertow() {
         spy.get("USER", "EXCH", "securityContext", "authenticatedAccount", "principal", "name"),
         http._trace ? spy.subchain(
           http._uriQualifier,
-          tracer.attr("STATUS", "STATUS"),
+          tracer.attr("http.status_code", "STATUS"),
           tracer.filterBy("STATUS", null, http._errors, null, null),
-          tracer.attr("USER", "USER"),
+          tracer.attr("http.user", "USER"),
           http._cookies ? cookies_processor(true, true) : spy.put("COOKIES", ""),
           http._headers ? headers_processor(false, true) : null,
           http._params ? param_processor() : spy.put("PARAMS", "")

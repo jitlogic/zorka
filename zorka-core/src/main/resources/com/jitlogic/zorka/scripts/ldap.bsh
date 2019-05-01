@@ -35,28 +35,13 @@ __ldap() {
     zabbix.tagMetadata("LDAP");
   }
 
-    spy.add(spy.instrument("LDAP_CONNECT")
-        .onEnter(spy.fetchArg("MAP", 0),     // TODO unpack and process map (when appropriate filters appear)
-            _trace ? tracer.formatAttr("ARGS", "${MAP}") : null)
-        .include(spy.byMethod(0, "javax.naming.spi.NamingManager", "getInitialContext", "javax.naming.Context")));
-
-    spy.add(spy.instrument("LDAP_SEARCH_old")
-        .onEnter(spy.fetchArg("DN", 1), spy.fetchArg("SCOPE", 2), spy.fetchArg("FILTER", 8),
-            _trace ? spy.subchain(
-                tracer.begin("LDAP", zorka.longCfg("ldap.trace.time")),
-                tracer.attr("DN", "DN"), tracer.attr("SCOPE", "SCOPE"), tracer.attr("FILTER", "FILTER")
-            ) : null)
-        .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
-        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
-        .include(spy.byMethod("com.sun.jndi.ldap.LdapClient", "search")));
-
-
     spy.add(spy.instrument("LDAP_SEARCH")
        .onEnter(spy.fetchArg("NAME", 1), spy.fetchArg("FILTER", 2),
            _trace ? spy.subchain(
-               tracer.begin("LDAP", _traceTime),
-               tracer.formatAttr("NAME", "${NAME}"),
-               tracer.formatAttr("FILTER", "${FILTER}")
+               tracer.begin("db", _traceTime),
+               tracer.formatAttr("db.type", "ldap"),
+               tracer.formatAttr("db.instance", "${NAME}"),
+               tracer.formatAttr("db.statement", "${FILTER}")
            ) : null)
        .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
@@ -80,7 +65,7 @@ __ldap() {
                     }
                 }
                 sb.append("]");
-                tracer.newAttr("FILTER", sb.toString());
+                tracer.newAttr("db.statement", sb.toString());
             }
             return rec;
         }
@@ -90,10 +75,10 @@ __ldap() {
     spy.add(spy.instrument("LDAP_SEARCH_ATTRS")
        .onEnter(spy.fetchArg("NAME", 1), spy.fetchArg("FILTER", 2), spy.fetchArg("ARGS", 3),
            _trace ? spy.subchain(
-               tracer.begin("LDAP", _traceTime),
-               tracer.formatAttr("NAME", "${NAME}"),
+               tracer.begin("db", _traceTime),
+               tracer.formatAttr("db.type", "ldap"),
+               tracer.formatAttr("db.instance", "${NAME}"),
                args_formatter()
-               //tracer.formatAttr("FILTER", "${FILTER}")
            ) : null)
        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
        .include(

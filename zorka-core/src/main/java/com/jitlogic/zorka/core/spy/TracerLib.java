@@ -345,10 +345,9 @@ public abstract class TracerLib {
      */
     public void procHeader(Map<String,Object> rec, String name, int index, String value, String prefix) {
         if (name == null) return;
+
         if (index == 0) {
-            newAttr(prefix + name, value);
-        } else {
-            newAttr(prefix + index +  "_" + name, value);
+            newAttr(prefix + name + "." + index, value);
         }
 
         name = name.toLowerCase();

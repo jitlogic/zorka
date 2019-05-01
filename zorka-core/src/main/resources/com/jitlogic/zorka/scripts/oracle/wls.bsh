@@ -32,9 +32,9 @@ __wls() {
       spy.format("URI", "${REQ.requestURI}"),
       http._trace ? spy.subchain(
         http._uriQualifier,
-        tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
-        tracer.attr("URI", "URI"),
-        tracer.formatAttr("METHOD", "${REQ.method}"),
+        tracer.begin("http", zorka.longCfg("http.trace.time")),
+        tracer.attr("http.url", "URI"),
+        tracer.formatAttr("http.method", "${REQ.method}"),
         http._headers ? http.headers_processor(true, false) : null,
         (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_SERVER) : null
       ) : null,
@@ -43,7 +43,7 @@ __wls() {
       http._trace ? spy.subchain(
         http._uriQualifier,
         tracer.flags(tracer.SUBMIT_TRACE),
-        tracer.attr("ERR", "ERR")
+        tracer.attr("jvm.exception", "ERR")
       ) : null)
     .onSubmit(
       spy.strTime("TIME"),
@@ -51,9 +51,9 @@ __wls() {
       spy.get("USER", "REQ", "remoteUser"),
       http._trace ? spy.subchain(
         http._uriQualifier,
-        tracer.attr("STATUS", "STATUS"),
+        tracer.attr("http.status_code", "STATUS"),
         tracer.filterBy("STATUS", null, http._errors, null, null),
-        tracer.attr("USER", "USER"),
+        tracer.attr("http.user", "USER"),
         http._params ? http.param_processor() : null,
         http._cookies ? http.cookies_processor(true, false) : null,
         (zorka.boolCfg("wls.headers.out", true) && http._headers) ? http.headers_processor(false, true) : null
@@ -73,9 +73,9 @@ __wls() {
     spy.add(spy.instrument("WLS_EJB")
       .onEnter(
           spy.fetchArg("IWRAP", 2), spy.fetchArg("ARGS", 3),
-          ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
-          ejb._trace ? tracer.formatAttr("METHOD", "${IWRAP.methodDescriptor.method.name}") : null,
-          ejb._trace ? tracer.formatAttr("CLASS", "${IWRAP.methodDescriptor.method.declaringClass.name}") : null)
+          ejb._trace ? tracer.begin("ejb", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.formatAttr("ejb.method", "${IWRAP.methodDescriptor.method.name}") : null,
+          ejb._trace ? tracer.formatAttr("ejb.class", "${IWRAP.methodDescriptor.method.declaringClass.name}") : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
@@ -86,7 +86,7 @@ __wls() {
           ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
           ejb._params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
-          ejb._trace ? tracer.attr("RET", "RET") : null,
+          ejb._trace ? tracer.attr("ejb.result", "RET") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
           ejb._tags_chain,

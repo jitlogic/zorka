@@ -36,14 +36,14 @@ __apache_httpclient() {
             ihdr = util.get(method, "requestHeaders");
             if (method != null && ihdr != null) {
               for (hdr : ihdr) {
-                  tracer.newAttr("HdrOut__" + hdr.getName(), ""+hdr.getValue());
+                  tracer.newAttr("http.header.out." + hdr.getName(), ""+hdr.getValue());
                 }
 
             }
             ohdr = util.get(method, "responseHeaders");
             if (method != null && ohdr != null) {
                 for (hdr : ohdr) {
-                    tracer.newAttr("HdrIn__" + hdr.getName(), ""+hdr.getValue());
+                    tracer.newAttr("http.header.in." + hdr.getName(), ""+hdr.getValue());
                 }
             }
           }
@@ -73,17 +73,17 @@ __apache_httpclient() {
     spy.instrument("APACHE_HTTPCLIENT3_EXECUTE")
       .onEnter(spy.fetchArg("METHOD", 2),
         _trace ? spy.subchain(
-          tracer.begin("HTTP_CLI", _traceTime),
-          tracer.formatAttr("URI", "${METHOD.URI}"),
-          tracer.formatAttr("METHOD", "${METHOD.name}"),
+          tracer.begin("http", _traceTime),
+          tracer.formatAttr("http.url", "${METHOD.URI}"),
+          tracer.formatAttr("http.method", "${METHOD.name}"),
           _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
           _dtrace_enabled ? dtrace_req_3x() : null) : null)
       .onReturn(spy.fetchRetVal("RET"), _trace ? tracer.attr("RET", "RET") : null)
       .onError(tracer.flags(tracer.SUBMIT_TRACE))
       .onSubmit(
         _trace ? spy.subchain(
-          tracer.formatAttr("STATUS", "${METHOD.statusCode}"),
-          tracer.formatAttr("STATUS_LINE", "${METHOD.getStatusLine}"),
+          tracer.formatAttr("http.status_code", "${METHOD.statusCode}"),
+          tracer.formatAttr("http.status_line", "${METHOD.getStatusLine}"),
           headers_processor()
         ) : null)
       .include(
@@ -128,23 +128,24 @@ __apache_httpclient() {
     spy.instrument("APACHE_HTTPCLIENT_4_DO_EXECUTE")
       .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("TGT", 1),
         _trace ? spy.subchain(
-          tracer.begin("HTTP_CLI", _traceTime),
-          tracer.formatAttr("METHOD", "${REQ.requestLine.method}"),
-          tracer.formatAttr("URI", "${REQ.requestLine.uri}"),
-          tracer.formatAttr("HOST", "${TGT.hostName}:${TGT.port}}"),
+          tracer.begin("http", _traceTime),
+          tracer.formatAttr("http.method", "${REQ.requestLine.method}"),
+          tracer.formatAttr("http.url", "${REQ.requestLine.uri}"),
+          tracer.formatAttr("peer.host", "${TGT.hostName}"),
+          tracer.formatAttr("peer.port", "${TGT.port}"),
           _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
           _dtrace_enabled ? dtrace_req_4x() : null
         ) : null)
       .onReturn(spy.fetchRetVal("RET"),
         _trace ? spy.subchain(
-          tracer.formatAttr("STATUS", "${RET.statusLine.statusCode}"),
-          tracer.formatAttr("STATUS_LINE", "${RET.statusLine.reasonPhrase}")
+          tracer.formatAttr("http.status_code", "${RET.statusLine.statusCode}"),
+          tracer.formatAttr("http.status_line", "${RET.statusLine.reasonPhrase}")
         ) : null)
       .onError(tracer.flags(tracer.SUBMIT_TRACE))
       .onSubmit(
         _trace ? spy.subchain(
-          headers_processor_4x("RET", "HdrIn__"),
-          headers_processor_4x("REQ", "HdrOut__")
+          headers_processor_4x("RET", "http.header.in."),
+          headers_processor_4x("REQ", "http.header.out.")
         ) : null)
       .include(spy.byMethod(0, "org.apache.**", "doExecute",
         "org.apache.http.client.methods.CloseableHttpResponse",

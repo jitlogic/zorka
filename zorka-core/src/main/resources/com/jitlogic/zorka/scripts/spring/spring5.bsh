@@ -124,18 +124,18 @@ __spring() {
             spy.get("CONN", "REQ", "connection"),
             spy.get("HDR_OUT", "REQ", "headers"),
             _trace ? spy.subchain(
-              proc_headers("HDR_OUT", "HdrOut__"),
-              tracer.begin("HTTP_CLI", _traceTime),
-              tracer.formatAttr("URI", "${CONN.requestUri}"),
+              proc_headers("HDR_OUT", "http.header.out."),
+              tracer.begin("http", _traceTime),
+              tracer.formatAttr("http.url", "${CONN.requestUri}"),
               _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
               _dtrace_enabled ? dtrace_req() : null)
             : null)
           .onReturn(spy.fetchRetVal("RESP"),
             spy.get("HDR_IN", "RESP", "headers"),
             _trace ? spy.subchain(
-              tracer.formatAttr("METHOD", "${REQ.method}"),
-              tracer.formatAttr("STATUS", "${CONN.status}"),
-              proc_headers("HDR_IN", "HdrIn__"))
+              tracer.formatAttr("http.method", "${REQ.method}"),
+              tracer.formatAttr("http.status_code", "${CONN.status}"),
+              proc_headers("HDR_IN", "http.header.in."))
             : null)
           .onError(tracer.flags(tracer.SUBMIT_TRACE))
           .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "webClient", "ALL") : null)
@@ -177,15 +177,17 @@ __spring() {
               spy.get("PROPS", "MSG", "messageProperties"),
               spy.get("HEADERS", "PROPS", "headers"),
               _trace ? spy.subchain(
-                tracer.begin("AMQP_SEND"),
-                tracer.formatAttr("EXCHANGE", "${EXCH}"),
-                tracer.formatAttr("ROUTING_KEY", "${RKEY}"),
-                tracer.formatAttr("DELIVERY", "${PROPS.deliveryMode}"),
-                tracer.formatAttr("CONTENT_TYPE", "${PROPS.contentType}"),
-                tracer.formatAttr("PRIORITY", "${PROPS.priority}"),
-                tracer.formatAttr("CONN", "${CONN.address}:${CONN.port}/${CONN.id}"),
+                tracer.begin("amqp"),
+                tracer.formatAttr("message.exchange", "${EXCH}"),
+                tracer.formatAttr("message.routing_key", "${RKEY}"),
+                tracer.formatAttr("message.delivery", "${PROPS.deliveryMode}"),
+                tracer.formatAttr("message.content_type", "${PROPS.contentType}"),
+                tracer.formatAttr("message.priority", "${PROPS.priority}"),
+                tracer.formatAttr("peer.port", "${CONN.port}"),
+                tracer.formatAttr("peer.ipv4", "${CONN.address}"),
+                tracer.formatAttr("message_bus.destination", "${CONN.id}"),
                 _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
-                tracer.procAttr(tracer.PA_MAP_OF_ANY, "HdrOut__", "HEADERS"),
+                tracer.procAttr(tracer.PA_MAP_OF_ANY, "message.header.out.", "HEADERS"),
                 _dtrace_enabled ? dtrace_send() : null)
               : null)
             .onError(tracer.flags(tracer.SUBMIT_TRACE))
@@ -217,16 +219,18 @@ __spring() {
               spy.get("PROPS", "MSG", "messageProperties"),
               spy.get("HEADERS", "PROPS", "headers"),
               _trace ? spy.subchain(
-                tracer.begin("AMQP_RECV"),
+                tracer.begin("amqp"),
                 //tracer.formatAttr("DELIVERY", "${PROPS.deliveryMode}"),
-                tracer.formatAttr("CONTENT_TYPE", "${PROPS.contentType}"),
-                tracer.formatAttr("PRIORITY", "${PROPS.priority}"),
-                tracer.formatAttr("EXCHANGE", "${PROPS.receivedExchange}"),
-                tracer.formatAttr("ROUTING_KEY", "${PROPS.receivedRoutingKey}"),
-                tracer.formatAttr("CONN", "${CONN.address}:${CONN.port}/${CONN.id}"),
+                tracer.formatAttr("message.content_type", "${PROPS.contentType}"),
+                tracer.formatAttr("message.priority", "${PROPS.priority}"),
+                tracer.formatAttr("message.exchange", "${PROPS.receivedExchange}"),
+                tracer.formatAttr("message.routing_key", "${PROPS.receivedRoutingKey}"),
+                tracer.formatAttr("peer.port", "${CONN.port}"),
+                tracer.formatAttr("peer.ipv4", "${CONN.address}"),
+                tracer.formatAttr("message_bus.source", "${CONN.id}"),
                 _dtrace_enabled ? dtrace_recv() : null,
                 _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null,
-                tracer.procAttr(tracer.PA_MAP_OF_ANY, "HdrIn__", "HEADERS"))
+                tracer.procAttr(tracer.PA_MAP_OF_ANY, "message.header.in.", "HEADERS"))
               : null)
             .onError(tracer.flags(tracer.SUBMIT_TRACE))
             .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "rabbit", "RECV") : null)

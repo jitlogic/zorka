@@ -33,7 +33,7 @@ __ejb() {
 
   // Default values for EJB argument processing
   zorka.defCfg("ejb.params", zorka.stringCfg("ejb.trace"));
-  zorka.defCfg("ejb.params.prefix", "ARG");
+  zorka.defCfg("ejb.params.prefix", "ejb.call.arg.");
   zorka.defCfg("ejb.params.include", "");
   zorka.defCfg("ejb.params.exclude", "");
 

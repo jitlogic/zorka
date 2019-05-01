@@ -49,9 +49,9 @@ __javax_jms() {
   zorka.defCfg("jms.fetch.attrs", zorka.boolCfg("jms"));
   zorka.defCfg("jms.fetch.text", zorka.boolCfg("jms.fetch.all"));
   zorka.defCfg("jms.fetch.map", zorka.boolCfg("jms.fetch.all"));
-  zorka.defCfg("jms.fetch.map.prefix", "M_");
+  zorka.defCfg("jms.fetch.map.prefix", "message.map.");
   zorka.defCfg("jms.fetch.props", zorka.boolCfg("jms.fetch.all"));
-  zorka.defCfg("jms.fetch.props.prefix", "P_");
+  zorka.defCfg("jms.fetch.props.prefix", "message.props.");
 
   zorka.defCfg("jms.trace", zorka.boolCfg("tracer"));
   zorka.defCfg("jms.trace.time", zorka.longCfg("tracer.min.trace.time"));
@@ -76,14 +76,14 @@ __javax_jms() {
   if (zorka.boolCfg("jms")) {
 
     _fetchAttrs = zorka.boolCfg("jms.fetch.attrs") ? spy.subchain(
-      spy.get("ID", "MSG", "JMSMessageID"), tracer.attr("ID", "ID"),
-      spy.get("TSTAMP", "MSG", "JMSTimestamp"), spy.strClock("TSTAMP", "TSTAMP"), tracer.attr("TSTAMP", "TSTAMP"),
-      spy.get("CORRELATION", "MSG", "JMSCorrelationID"), tracer.attr("CORRELATION", "CORRELATION"),
-      spy.get("PERSIST", "MSG", "JMSDeliveryMode"), tracer.attr("PERSIST", "PERSIST"),
-      spy.get("REDELIVERY", "MSG", "JMSRedelivered"), tracer.attr("REDELIVERY", "REDELIVERY"),
-      spy.get("JMSTYPE", "MSG", "JMSType"), tracer.attr("JMSTYPE", "JMSTYPE"),
-      spy.get("PRIORITY", "MSG", "JMSPriority"), tracer.attr("PRIORITY", "PRIORITY"),
-      spy.get("EXPIRATION", "MSG", "JMSExpiration"), tracer.attr("EXPIRATION", "EXPIRATION")
+      spy.get("ID", "MSG", "JMSMessageID"), tracer.attr("message.id", "ID"),
+      spy.get("TSTAMP", "MSG", "JMSTimestamp"), spy.strClock("TSTAMP", "TSTAMP"), tracer.attr("message.tstamp", "TSTAMP"),
+      spy.get("CORRELATION", "MSG", "JMSCorrelationID"), tracer.attr("message.correlation_id", "CORRELATION"),
+      spy.get("PERSIST", "MSG", "JMSDeliveryMode"), tracer.attr("message.persist", "PERSIST"),
+      spy.get("REDELIVERY", "MSG", "JMSRedelivered"), tracer.attr("message.redelivery", "REDELIVERY"),
+      spy.get("JMSTYPE", "MSG", "JMSType"), tracer.attr("message.jms_type", "JMSTYPE"),
+      spy.get("PRIORITY", "MSG", "JMSPriority"), tracer.attr("message.priority", "PRIORITY"),
+      spy.get("EXPIRATION", "MSG", "JMSExpiration"), tracer.attr("message.expiration", "EXPIRATION")
     ) : null;
 
     _fetchText = zorka.boolCfg("jms.fetch.text") ? spy.subchain(
@@ -165,7 +165,7 @@ __javax_jms() {
     if (zorka.boolCfg("jms.generic")) {
       spy.add(spy.instrument("JAVAX_JMS_LISTENER")
         .onEnter(spy.fetchArg("MSG", 1),
-          zorka.boolCfg("jms.trace") ? tracer.begin("JMS", zorka.longCfg("jms.trace.time")) : null,
+          zorka.boolCfg("jms.trace") ? tracer.begin("jms", zorka.longCfg("jms.trace.time")) : null,
           _jms_dtrace ? dtrace_resp() : null,
           _jms_dtrace ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_CONSUMER) : null,
           _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
@@ -176,7 +176,7 @@ __javax_jms() {
 
       spy.add(spy.instrument("JAVAX_JMS_PRODUCER1")
         .onEnter(
-          zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_SEND", zorka.longCfg("jms.trace.time")) : null,
+          zorka.boolCfg("jms.trace.comms") ? tracer.begin("jms", zorka.longCfg("jms.trace.time")) : null,
           spy.fetchArg("MSG", 1),
           _jms_dtrace ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
           _jms_dtrace ? dtrace_req() : null,
@@ -186,7 +186,7 @@ __javax_jms() {
 
       spy.add(spy.instrument("JAVAX_JMS_PRODUCER2")
         .onEnter(
-          zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_SEND", zorka.longCfg("jms.trace.time")) : null,
+          zorka.boolCfg("jms.trace.comms") ? tracer.begin("jms", zorka.longCfg("jms.trace.time")) : null,
           spy.fetchArg("MSG", 2),
           _jms_dtrace ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
           _jms_dtrace ? dtrace_req() : null,
@@ -195,7 +195,7 @@ __javax_jms() {
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageProducer", "send", "void", "javax.jms.Destination", "javax.jms.Message")));
 
       spy.add(spy.instrument("JAVAX_JMX_CONSUMER")
-        .onEnter(zorka.boolCfg("jms.trace.comms") ? tracer.begin("JMS_RECV", zorka.longCfg("jms.trace.time")) : null)
+        .onEnter(zorka.boolCfg("jms.trace.comms") ? tracer.begin("jms", zorka.longCfg("jms.trace.time")) : null)
         .onReturn(spy.fetchRetVal("MSG"),
           _jms_dtrace ? dtrace_resp() : null,
           _jms_dtrace ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_CONSUMER) : null,

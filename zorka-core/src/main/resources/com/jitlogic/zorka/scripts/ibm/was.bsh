@@ -174,8 +174,8 @@ __was() {
       spy.format("URI", "${IREQ.requestURI}"),
       http._trace ? spy.subchain(
         http._uriQualifier,
-        tracer.begin("HTTP", zorka.longCfg("http.trace.time")),
-        tracer.attr("URI", "URI")
+        tracer.begin("http", zorka.longCfg("http.trace.time")),
+        tracer.attr("http.url", "URI")
       ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))
@@ -183,13 +183,13 @@ __was() {
       http._trace ? spy.subchain(
         http._uriQualifier,
         tracer.flags(tracer.SUBMIT_TRACE),
-        tracer.attr("ERR", "ERR")
+        tracer.attr("jvm.exception", "ERR")
       ) : null)
     .onSubmit(spy.strTime("TIME"),
       spy.get("STATUS", "RESP", "statusCode"),
       http._trace ? spy.subchain(
         http._uriQualifier,
-        tracer.attr("STATUS", "STATUS"),
+        tracer.attr("http.status_code", "STATUS"),
         tracer.filterBy("STATUS", null, http._errors, null, null),
         http._params ? http.param_processor() : spy.put("PARAMS", ""),
         http._headers ? http.headers_processor(true, true) : null,
@@ -212,20 +212,20 @@ __was() {
     spy.add(spy.instrument("WAS_EJB")
       .onEnter(
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 4),
-          ejb._trace ? tracer.begin("EJB", zorka.longCfg("ejb.trace.time")) : null,
-          ejb._trace ? tracer.formatAttr("METHOD", "${MDESC.name}") : null,
-          ejb._trace ? tracer.formatAttr("CLASS", "${MDESC.declaringClass.name}") : null)
+          ejb._trace ? tracer.begin("ejb", zorka.longCfg("ejb.trace.time")) : null,
+          ejb._trace ? tracer.formatAttr("ejb.method", "${MDESC.name}") : null,
+          ejb._trace ? tracer.formatAttr("ejb.class", "${MDESC.declaringClass.name}") : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
-          spy.format("MSG", "${ERR.message}"),
+          spy.format("error.message", "${ERR.message}"),
           spy.strTime("TIME"),
           ejb._error_chain)
       .onReturn(
           ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
           ejb._params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
-          ejb._trace ? tracer.attr("RET", "RET") : null,
+          ejb._trace ? tracer.attr("ejb.result", "RET") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
           ejb._tags_chain,

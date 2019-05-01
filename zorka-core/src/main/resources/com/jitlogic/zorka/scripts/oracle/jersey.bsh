@@ -23,14 +23,14 @@ __jersey() {
 
   spy.add(spy.instrument("JERSEY2_SERVICE")
     .onEnter(spy.fetchArg("REQ", 1),
-      rest._trace ? tracer.begin("REST", rest._time) : null)
+      rest._trace ? tracer.begin("rest", rest._time) : null)
     .onError(tracer.markError())
     .onSubmit(
       spy.get("SERVICE", "REQ", "baseUri"),
       rest._trace ? spy.subchain(
-        tracer.attr("SERVICE", "SERVICE"),
-        tracer.formatAttr("URI", "${REQ.requestUri}"),
-        tracer.formatAttr("HTTP_METHOD", "${REQ.method}")
+        tracer.attr("rest.service", "SERVICE"),
+        tracer.formatAttr("http.url", "${REQ.requestUri}"),
+        tracer.formatAttr("http.method", "${REQ.method}")
       ) : null,
       rest._stats ? spy.subchain(
         spy.zorkaStats("java", rest._mbean, "stats", "SVC")

@@ -27,10 +27,10 @@ __apache_camel() {
     spy.add(spy.instrument("CAMEL_PROCESSOR")
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("EXCH", 1),
             _trace ? spy.subchain(
-                tracer.begin("CAMEL"),
-                tracer.formatAttr("CONTEXT_NAME", "${EXCH.context.name}"),
+                tracer.begin("camel"),
+                tracer.formatAttr("camel.context.name", "${EXCH.context.name}"),
                 //tracer.formatAttr("PROPS", "${EXCH.properties}"),
-                tracer.formatAttr("CLASS", "${THIS.class.name}")
+                tracer.formatAttr("camel.component.class", "${THIS.class.name}")
             ) : null)
         .include(
             spy.byInterfaceAndMethod("org.apache.camel.Processor", "process"),

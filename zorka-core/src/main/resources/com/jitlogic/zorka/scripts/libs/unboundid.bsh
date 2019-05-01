@@ -35,15 +35,15 @@ __unboundid() {
 
     spy.add(spy.instrument("UNBOUNDID_CONNECT")
         .onEnter(spy.fetchArg("HOST", 1), spy.fetchArg("PORT", 2),
-            _trace ? tracer.attr("HOST", "HOST") : null,
-            _trace ? tracer.attr("PORT", "PORT") : null)
+            _trace ? tracer.attr("peer.host", "HOST") : null,
+            _trace ? tracer.attr("peer.port", "PORT") : null)
         .onSubmit(spy.zorkaStats("java", _mbean, "stats", "CONNECT"), spy.zorkaStats("java", _mbean, "stats", "ALL"))
         .include(spy.byMethod("com.unboundid.ldap.sdk.LDAPConnection", "connect")));
 
 
     spy.add(spy.instrument("UNBOUNDID_BIND")
         .onEnter(spy.fetchArg("REQ", 1),
-            _trace ? tracer.formatAttr("USERDN", "${REQ.bindDN}") : null)
+            _trace ? tracer.formatAttr("db.user", "${REQ.bindDN}") : null)
         .onSubmit(spy.zorkaStats("java", _mbean, "stats", "BIND"), spy.zorkaStats("java", _mbean, "stats", "ALL"))
         .include(spy.byMethod(0, "com.unboundid.ldap.sdk.LDAPConnection", "bind", 
                                  "com.unboundid.ldap.sdk.BindResult", 
@@ -53,8 +53,9 @@ __unboundid() {
     spy.add(spy.instrument("UNBOUNDID_SEARCH")
         .onEnter(spy.fetchArg("REQ", 1),
             _trace ? spy.subchain(
-                tracer.formatAttr("BASEDN", "${REQ.baseDN}"),
-                tracer.formatAttr("FILTER", "${REQ.filter}")) : null)
+                tracer.formatAttr("ldap.base_dn", "${REQ.baseDN}"),
+                tracer.formatAttr("db.type", "ldap"),
+                tracer.formatAttr("db.statement", "${REQ.filter}")) : null)
         .onSubmit(spy.zorkaStats("java", _mbean, "stats", "SEARCH"), spy.zorkaStats("java", _mbean, "stats", "ALL"))
         .include(spy.byMethod(0, "com.unboundid.ldap.sdk.LDAPConnection", "search",
                                  "com.unboundid.ldap.sdk.SearchResult",
