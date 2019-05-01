@@ -124,13 +124,19 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             TraceMarker tm = tr.getMarker();
             int tid = ref(tm.getTraceId(), STRING_TYPE);
             twriter.writeTag(TAG_TRACE_BEGIN);
+            int l = 2;
             DTraceContext ds = tm.getDstate();
-            int l = 2 + (ds.getSpanId() != 0 ? 1 : 0) + (ds.getParentId() != 0 ? 1 : 0);
+            if (ds != null) {
+                if (ds.getSpanId() != 0) l++;
+                if (ds.getParentId() != 0) l++;
+            }
             twriter.writeUInt(CBOR.ARR_BASE, l);
             twriter.writeLong(tm.getClock());
             twriter.writeInt(tid);
-            if (ds.getSpanId() != 0) twriter.writeLong(ds.getSpanId());
-            if (ds.getParentId() != 0) twriter.writeLong(ds.getParentId());
+            if (ds != null) {
+                if (ds.getSpanId() != 0) twriter.writeLong(ds.getSpanId());
+                if (ds.getParentId() != 0) twriter.writeLong(ds.getParentId());
+            }
             if (tm.hasFlag(TraceMarker.ERROR_MARK)) {
                 twriter.writeTag(TAG_TRACE_FLAGS);
                 twriter.writeInt(TF_ERROR_MARK);
@@ -219,7 +225,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
     protected void process(List<SymbolicRecord> obj) {
         for (SymbolicRecord sr : obj) {
             long rt = retryTime;
-            for (int i = 0; i < retries; i++) {
+            for (int i = 0; i < retries+1; i++) {
                 try {
                     awriter.reset();
                     twriter.reset();

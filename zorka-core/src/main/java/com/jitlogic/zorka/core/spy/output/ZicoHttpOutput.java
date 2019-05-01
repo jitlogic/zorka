@@ -153,7 +153,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
             throw e;
         }
 
-        log.debug("Requesting session for agent: uuid=" + agentID);
+        log.debug("Requesting session for agent: id=" + agentID);
 
         HttpMessage req = HttpMessage.POST(sessionUrl,
                 new JSONWriter().write(ZorkaUtil.map(
@@ -226,7 +226,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
                 log.trace("ERROR at send(): uri=" + uri + ", status=" + res.getStatus() + ", data=" + ZorkaUtil.hex(body, bodyLength)
                     + ": " + new String(body, 0, bodyLength, Charset.defaultCharset()));
             }
-            throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + res.getStatus());
+            throw new ZorkaRuntimeException("Server error: " + res.getStatus() + " " + uri);
         }
     }
 

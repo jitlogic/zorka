@@ -70,7 +70,7 @@ public class DTraceInputProcessor implements SpyProcessor {
         if (tidStr != null) {
             Matcher tidMatch = RE_HEX128.matcher(tidStr);
             if (tidMatch.matches()) {
-                traceId1 = new BigInteger(tidMatch.group(1), 16).longValue();
+                traceId1 = new BigInteger(tidMatch.group(1), 16).longValue(); // TODO do not use BigInteger here
                 traceId2 = new BigInteger(tidMatch.group(2), 16).longValue();
             } else {
                 tidMatch = RE_HEX64.matcher(tidStr);
