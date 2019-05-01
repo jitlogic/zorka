@@ -18,10 +18,9 @@
 // Common JBoss 5/6 support functions
 
 zorka.require(
-  "audit.bsh",
   "apache/catalina.bsh",
-  "jboss/jbossejb.bsh",
-  "javax/jms.bsh"
+  "servers/jbossejb.bsh",
+  "jms.bsh"
 );
 
 __jboss() {
@@ -69,46 +68,6 @@ __jboss() {
 
   servlet = __servlet();
 
-  if (zorka.boolCfg("audit.log.logins")) {
-
-     zorka.logInfo("Enabling AUTHENTICATION audit for JBoss ...");
-
-    __checkPrincipal() {
-      process(rec) {
-        rec.put("ACTION", rec.get("PRINCIPAL") != null ? "AUTHENTICATION_SUCCESS" : "AUTHENTICATION_FAILURE");
-        return rec;
-      }
-      return this;
-    }
-
-    sdefWebLogin = spy.instrument("JBOSS_AUDIT_WEB_LOGIN")
-      .onEnter(spy.fetchArg("USER", 1))
-      .onReturn(spy.fetchRetVal("PRINCIPAL"))
-      .onError(spy.fetchError("ERROR"))
-      .onSubmit((com.jitlogic.zorka.core.spy.SpyProcessor)__checkPrincipal())
-      .include(
-        spy.byMethod(0, "org.jboss.web.tomcat.security.JBossSecurityMgrRealm", "authenticate",
-                     "java.security.Principal", "String"));
-
-    audit.audit(sdefWebLogin, "AUTHENTICATION", "${ACTION} who=${USER} result=${PRINCIPAL|ERROR:NOT_LOGGED_IN}");
-
-    // TODO JBOSS_AUDIT_EJB_LOGIN
-
-    // Doing more JBoss 5.x work upfront is waste of time. Examples are complete mess.
-    // Maven repository has been fucked up by RedHat and packages refer to non-existent repositories.
-    // I wasn't even able to compile anything useful with this. JBoss 5 is such a piece of shit.
-    // If you need EJB auditing for JBoss 5, send me precompiled binaries of both .ear and client.
-
-  }
-
-  if (zorka.boolCfg("audit.log.authorizations")) {
-
-     zorka.logInfo("Enabling AUTHORIZATION audit for JBoss ...");
-
-     // Nothing here (yet), Catalina does (most of the) work
-
-  }
-
   if (zorka.boolCfg("tracer", false)) {
     tracer.exclude("org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate");
   }
@@ -135,10 +94,6 @@ __jboss() {
           zorka.registerMbs("jboss", mbs, ccl);
           super.jbossMbs = mbs;
           zorka.logInfo("Registered JBoss MBean server as 'jboss'");
-          if (zorka.boolCfg("jboss.dsquery", false)) {
-            super.super.dsquery = __dsquery(ccl);
-            zorka.logInfo("Created jboss.dsquery JDBC DataSource interface.");
-          }
         }
       }
       return record;

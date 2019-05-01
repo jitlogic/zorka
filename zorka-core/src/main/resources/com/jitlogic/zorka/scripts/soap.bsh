@@ -15,10 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require(
-  "tracer.bsh",
-  "traps.bsh"
-);
+zorka.require("tracer.bsh");
 
 __soap() {
 
@@ -33,30 +30,6 @@ __soap() {
   zorka.defCfg("soap.fetch.xml.in", zorka.boolCfg("soap.fetch.xml"));
   zorka.defCfg("soap.fetch.xml.out", zorka.boolCfg("soap.fetch.xml"));
 
-
-  // Default values for SOAP slow requests log configuration options
-  zorka.defCfg("soap.slow", zorka.boolCfg("traps.slow"));
-  zorka.defCfg("soap.slow.time", "5000");
-  zorka.defCfg("soap.slow.file.path", util.path("${zorka.log.dir}", "soap-slow.log"));
-  zorka.defCfg("soap.slow.file.max", "8M");
-  zorka.defCfg("soap.slow.file.num", "8");
-  zorka.defCfg("soap.slow.format",
-    zorka.boolCfg("soap.fetch.xml")
-      ? "[${TIME}] ${SERVICE}/${METHOD} -> \n ${XML_IN} \n ${XML_OUT}"
-      : "[${TIME}] ${SERVICE}/${METHOD}");
-
-
-  // Default values for SOAP error log configuration options
-  zorka.defCfg("soap.error", zorka.boolCfg("traps.error"));
-  zorka.defCfg("soap.error.file.path", util.path("${zorka.log.dir}", "soap-error.log"));
-  zorka.defCfg("soap.error.file.max", "8M");
-  zorka.defCfg("soap.error.file.num", "8");
-  zorka.defCfg("soap.error.format",
-    zorka.boolCfg("soap.fetch.xml")
-      ? "${SERVICE}${METHOD} -> ${ERROR} \nXML_IN='''${XML_IN}''' \nXML_OUT='''${XML_OUT}'''"
-      : "${SERVICE}${METHOD} -> ${ERROR}");
-
-
   _trace = zorka.boolCfg("soap.trace");
   _time = zorka.longCfg("soap.trace.time");
   _stats = zorka.boolCfg("soap.stats");
@@ -68,8 +41,6 @@ __soap() {
 
   _mbean = zorka.stringCfg("soap.stats.mbean");
 
-  _slow_chain = traps.subchain("soap", "slow");
-  _error_chain = traps.subchain("soap", "error");
 
   discovery(type) {
     return zabbix.discovery(zorka.query("java", _mbean, "name", "type").get(type).listAs("**", "OP"));

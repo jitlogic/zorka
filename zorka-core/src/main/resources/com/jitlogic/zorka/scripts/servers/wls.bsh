@@ -19,7 +19,7 @@ zorka.require(
   "ejb.bsh",
   "jvm.bsh",
   "http.bsh",
-  "javax/jms.bsh",
+  "jms.bsh",
   "apache/cxf.bsh"
 );
 
@@ -58,11 +58,7 @@ __wls() {
         http._cookies ? http.cookies_processor(true, false) : null,
         (zorka.boolCfg("wls.headers.out", true) && http._headers) ? http.headers_processor(false, true) : null
       ) : null,
-      http._slow_chain,
-      http._error ? spy.subchain(
-        spy.valSetFilter("STATUS", http._errors),
-        spy.markError(),
-        http._error_chain) : null,
+      spy.subchain(spy.valSetFilter("STATUS", http._errors),spy.markError()),
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
       http._tags_chain)
     .include(
@@ -79,9 +75,7 @@ __wls() {
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
-          spy.format("MSG", "${ERR.message}"),
-          spy.strTime("TIME"),
-          ejb._error_chain)
+          spy.format("MSG", "${ERR.message}"))
       .onReturn(
           ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
@@ -89,10 +83,7 @@ __wls() {
           ejb._trace ? tracer.attr("ejb.result", "RET") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
-          ejb._tags_chain,
-          spy.longerThan(zorka.longCfg("ejb.slow.time")),
-          spy.strTime("TIME"),
-          ejb._slow_chain)
+          ejb._tags_chain)
       .include(
           spy.byMethod(0, "weblogic.ejb.container.internal.SessionLocalMethodInvoker", "invoke", null),
           spy.byMethod(0, "weblogic.ejb.container.internal.SessionRemoteMethodInvoker", "invoke", null)

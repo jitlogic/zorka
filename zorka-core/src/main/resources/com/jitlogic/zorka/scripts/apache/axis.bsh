@@ -48,14 +48,13 @@ __axis() {
         spy.format("SERVICE", "${CTX.service.name}"),
         spy.format("METHOD", "${CTX.operation.name}"),
         soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
-        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
-        soap._error_chain)
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null)
       .onSubmit(
         spy.format("SERVICE", "${CTX.service.name}"),
         spy.format("METHOD", "${CTX.operation.name}"),
         soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
-        spy.strTime("TIME"), soap._slow_chain,
+        spy.strTime("TIME"),
         soap._trace ? spy.subchain(
           tracer.attr("soap.url", "SERVICE"),
           tracer.attr("soap.method", "METHOD"),
@@ -94,15 +93,14 @@ __axis() {
         spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
         spy.format("METHOD", "${CALL_OBJ.operationName.localPart}"),
         soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
-        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
-        soap._error_chain)
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null)
       .onSubmit(
         __get_call_obj(),
         spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
         spy.format("METHOD", "${CALL_OBJ.operationName.localPart}"),
         soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
-        spy.strTime("TIME"), soap._slow_chain,
+        spy.strTime("TIME"),
         soap._trace ? spy.subchain(
           tracer.attr("soap.url", "SERVICE"),
           tracer.attr("soap.method", "METHOD"),
@@ -126,15 +124,14 @@ __axis() {
         spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
         spy.format("METHOD", "${CALL_OBJ.operationName.localPart}"),
         soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
-        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
-        soap._error_chain)
+        soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null)
       .onSubmit(
         __get_call_obj(),
         spy.format("SERVICE", "${CALL_OBJ.operationName.namespaceURI}"),
         spy.format("METHOD", "${CALL_OBJ.operationName.localPart}"),
         soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
-        spy.strTime("TIME"), soap._slow_chain,
+        spy.strTime("TIME"),
         soap._trace ? spy.subchain(
           tracer.attr("soap.url", "SERVICE"),
           tracer.attr("soap.method", "METHOD"),

@@ -18,11 +18,10 @@
 
 zorka.require(
   "ejb.bsh",
-  "audit.bsh",
-  "javax/jms.bsh",
+  "jms.bsh",
   "apache/catalina.bsh",
   "apache/cxf.bsh",
-  "jboss/undertow.bsh",
+  "servers/undertow.bsh",
   "jdbc/h2.bsh"
 );
 
@@ -271,9 +270,7 @@ __jboss7() {
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
-          spy.format("MSG", "${ERR.message}"),
-          spy.strTime("TIME"),
-          ejb._error_chain)
+          spy.format("MSG", "${ERR.message}"))
       .onReturn(
           ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
@@ -281,8 +278,7 @@ __jboss7() {
           ejb._trace ? tracer.attr("RET", "RET") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
-          spy.strTime("TIME"),
-          ejb._slow_chain)
+          spy.strTime("TIME"))
       .include(
           spy.byMethod("org.jboss.as.ejb3.inflow.AbstractInvocationHandler", "invoke"),
           spy.byMethod("org.jboss.as.ee.component.ProxyInvocationHandler", "invoke"),
@@ -292,90 +288,8 @@ __jboss7() {
 
   }
 
-
   if (zorka.boolCfg("tracer")) {
       tracer.exclude("100:org.jboss.jms.client.delegate.ClientClusteredConnectionFactoryDelegate");
-  }
-
-
-  if (zorka.boolCfg("audit.log.logins")) {
-
-      zorka.logInfo("Enabling AUTHENTICATION audit for JBoss7 ...");
-
-      sdefEjbLogin = spy.instrument("JBOSS7_AUDIT_EJB_LOGIN")
-        .onEnter(spy.fetchArg("CTX", 1))
-        .onReturn(spy.fetchRetVal("RET"),
-          spy.put("ACTION", "AUTHENTICATION_SUCCESS"),
-          spy.subchain(
-            spy.vcmp("PRINCIPAL", "==", null),
-            spy.put("ACTION", "AUTHENTICATION_FAILURE"),
-            spy.markError()))
-        .onError(
-          spy.put("ACTION", "AUTHENTICATION_FAILURE"),
-          spy.fetchError("ERROR"))
-        .include(
-          spy.byMethod("org.jboss.as.security.service.SimpleSecurityManager", "authenticate"));
-
-      audit.audit(sdefEjbLogin, "AUTHENTICATION", "${ACTION} result=${CTX.subjectInfo.authenticatedSubject|ERROR}");
-
-      sdefWebLogin = spy.instrument("JBOSS7_AUDIT_WEB_LOGIN")
-        .onEnter(spy.fetchArg("USERNAME", 1))
-        .onReturn(
-          spy.fetchRetVal("PRINCIPAL"),
-          spy.put("ACTION", "AUTHENTICATION_SUCCESS"),
-          spy.subchain(
-            spy.vcmp("PRINCIPAL", "==", null),
-            spy.put("ACTION", "AUTHENTICATION_FAILURE"),
-            spy.markError()))
-        .onError(
-          spy.put("ACTION", "AUTHENTICATION_FAILURE"),
-          spy.fetchError("ERROR"))
-        .include(
-          spy.byMethod("org.jboss.as.web.security.JBossWebRealm", "authenticate"));
-
-      audit.audit(sdefWebLogin, "AUTHENTICATION", "${ACTION} who=${USERNAME} result=${PRINCIPAL|ERROR}");
-  }
-
-
-  if (zorka.boolCfg("audit.log.authorizations")) {
-
-    zorka.logInfo("Enabling AUTHORIZATION audit for JBoss ...");
-
-    sdefEjbAuthorize = spy.instrument("JBOSS7_AUDIT_EJB_AUTHORIZE")
-        .onEnter(spy.fetchArg("THIS", 0),
-          spy.fetchArg("METHOD", 4),
-          spy.fetchArg("CTX_ID", 5))
-        .onReturn(
-          spy.fetchRetVal("RET"),
-          spy.put("ACTION", "AUTHORIZATION_SUCCESS"),
-          spy.subchain(
-            spy.vcmp("RET", "==", false),
-            spy.put("ACTION", "AUTHORIZATION_FAILURE"),
-            spy.markError()))
-        .onError(
-          spy.put("ACTION", "AUTHORIZATION_FAILURE"),
-          spy.fetchError("ERROR"))
-        .include(
-          spy.byMethod("org.jboss.as.security.service.SimpleSecurityManager", "authorize"));
-
-      audit.audit(sdefEjbAuthorize, "AUTHORIZATION",
-        "${ACTION} who=${THIS.callerPrincipal.name} type=EJB what=${METHOD.declaringClass.name}.${METHOD.name}() ctx=${CTX_ID}");
-
-      sdefWebAuthorize = spy.instrument("JBOSS7_AUDIT_WEB_AUTHORIZE")
-        .onEnter(spy.fetchArg("REQ", 1))
-        .onReturn(spy.fetchRetVal("RET"),
-          spy.put("ACTION", "AUTHORIZATION_SUCCESS"),
-          spy.subchain(
-            spy.vcmp("RET", "==", false),
-            spy.put("ACTION", "AUTHORIZATION_FAILURE"),
-            spy.markError()))
-        .onError(
-          spy.put("ACTION", "AUTHORIZATION_FAILURE"),
-          spy.fetchError("ERROR"))
-        .include(spy.byMethod("org.jboss.as.web.security.JBossWebRealm", "hasResourcePermission"));
-
-      audit.audit(sdefWebAuthorize, "AUTHORIZATION",
-        "${ACTION} who=${REQ.remoteUser} type=HTTP what=${REQ.requestURI}");
   }
 
   if (zorka.boolCfg("zabbix.active")) {

@@ -170,7 +170,6 @@ __undertow() {
       .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
         http._trace ? spy.subchain(
           http._uriQualifier,
-          http._error_chain,
           tracer.markError(),
           tracer.attr("jvm.exception", "ERR")
         ) : null)
@@ -187,11 +186,9 @@ __undertow() {
           http._headers ? headers_processor(false, true) : null,
           http._params ? param_processor() : spy.put("PARAMS", "")
         ) : null,
-        http._slow_chain,
         spy.subchain(
           spy.valSetFilter("STATUS", http._errors),
-          spy.markError(), tracer.markError(),
-          http._error_chain),
+          spy.markError(), tracer.markError()),
         http._redirQualifier,
         http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
         http._tags_chain)

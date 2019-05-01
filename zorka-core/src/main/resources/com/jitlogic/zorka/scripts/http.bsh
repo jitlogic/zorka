@@ -15,10 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require(
-  "tracer.bsh",
-  "traps.bsh"
-);
+zorka.require("tracer.bsh");
 
 __http() {
 
@@ -56,43 +53,21 @@ __http() {
   zorka.defCfg("http.headers.oprefix", "http.header.out.");
   zorka.defCfg("http.headers.maxlen", "256");
 
-  // Default values for HTTP slow requests log configuration options
-  zorka.defCfg("http.slow", zorka.boolCfg("traps.slow"));
-  zorka.defCfg("http.slow.time", "5000");
-  zorka.defCfg("http.slow.file.path", util.path("${zorka.log.dir}", "http-slow.log"));
-  zorka.defCfg("http.slow.file.max", "8M");
-  zorka.defCfg("http.slow.file.num", "8");
-  zorka.defCfg("http.slow.format", "[${TIME}] ${URI}${PARAMS: } -> ${STATUS}");
-
-  // Default values for HTTP error log configuration options
-  zorka.defCfg("http.error", zorka.boolCfg("traps.error"));
-  zorka.defCfg("http.error.codes", "400,404,405,406,407,408,409,410,411,412,413,414,415,416,417,419,420,422,423,424,"
-    + "425,426,428,429,431,444,451,500,501,502,503,504,505,506,507,508,510,598,599");
-  zorka.defCfg("http.error.file.path", util.path("${zorka.log.dir}", "http-error.log"));
-  zorka.defCfg("http.error.file.max", "8M");
-  zorka.defCfg("http.error.file.num", "8");
-  zorka.defCfg("http.error.format", "[${TIME}] ${URI}${PARAMS: } -> ${STATUS}");
-
   _trace = zorka.boolCfg("http.trace");
   _stats = zorka.boolCfg("http.stats");
   _congestion = zorka.boolCfg("http.stats.congestion");
   _mbean = zorka.stringCfg("http.stats.mbean");
   _action = _congestion ? spy.ACTION_EXIT|spy.ACTION_STATS : spy.ACTION_STATS;
-  _slow = zorka.boolCfg("http.slow");
   _params = zorka.boolCfg("http.params");
   _paramLen = zorka.intCfg("http.param.maxlen", 128);
   _cookies = zorka.boolCfg("http.cookies");
   _headers = zorka.boolCfg("http.headers");
-  _error = zorka.boolCfg("http.error");
 
   _uriQualifier = spy.stringMatcher("URI", zorka.listCfg("http.trace.include"), zorka.listCfg("http.trace.exclude"));
 
   _errors = zorka.setCfg("http.error.codes");
 
-  _slow_chain = traps.subchain("http", "slow");
-  _error_chain = traps.subchain("http", "error");
-
-  _redirQualifier = zorka.hasCfg("http.redir.errors") ? 
+  _redirQualifier = zorka.hasCfg("http.redir.errors") ?
     spy.subchain(
       spy.stringMatcher("REDIRECT", zorka.listCfg("http.redir.errors"), zorka.listCfg("")),
       tracer.traceFlags("HTTP", tracer.SUBMIT_TRACE|tracer.ERROR_MARK)
@@ -290,7 +265,6 @@ __http() {
         .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
           _trace ? spy.subchain(
             _uriQualifier,
-            _error_chain,
             tracer.flags(tracer.SUBMIT_TRACE),
             tracer.attr("ERR", "ERR")
             ) : null)
@@ -308,11 +282,9 @@ __http() {
             _headers ? headers_processor(false, true) : null,
             _params ? param_processor() : spy.put("PARAMS", "")
           ) : null,
-          _slow_chain,
           spy.subchain(
             spy.valSetFilter("STATUS", _errors),
-            spy.markError(), tracer.markError(),
-            _error_chain),
+            spy.markError(), tracer.markError()),
           _redirQualifier,
           _stats ? spy.zorkaStats("java", _mbean, "stats", "ALL", "T", null, _action) : null,
           _tags_chain)

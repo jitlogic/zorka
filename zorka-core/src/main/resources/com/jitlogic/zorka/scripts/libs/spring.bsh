@@ -19,9 +19,9 @@ zorka.defCfg("spring.version", "5");
 
 if (zorka.intCfg("spring.version") == 5) {
   zorka.logInfo("Configuring for Spring 5.x");
-  zorka.require("spring/spring5.bsh");
+  zorka.require("libs/spring5.bsh");
 } else if (zorka.intCfg("spring.version") == 3) {
   zorka.logInfo("Configuring for Spring 3.x");
-  zorka.require("spring/spring3.bsh");
+  zorka.require("libs/spring3.bsh");
 }
 

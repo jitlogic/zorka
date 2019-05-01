@@ -15,10 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require(
-  "tracer.bsh",
-  "traps.bsh"
-);
+zorka.require("tracer.bsh");
 
 // Generic JMS monitoring
 
@@ -29,21 +26,6 @@ __javax_jms() {
 
   zorka.defCfg("jms.stats", "yes");
   zorka.defCfg("jms.stats.mbean", "zorka:type=ZorkaStats,name=JMS");
-
-  // Default values for JMS slow requests log configuration options
-  zorka.defCfg("jms.slow", zorka.boolCfg("traps.slow"));
-  zorka.defCfg("jms.slow.time", zorka.longCfg("traps.slow.time"));
-  zorka.defCfg("jms.slow.file.path", util.path("${zorka.log.dir}", "jms-slow.log"));
-  zorka.defCfg("jms.slow.file.max", "8M");
-  zorka.defCfg("jms.slow.file.num", "8");
-  zorka.defCfg("jms.slow.format", "[${TIME}] ${ID}");
-
-  // Default values for JMS error log configuration options
-  zorka.defCfg("jms.error", zorka.boolCfg("traps.error"));
-  zorka.defCfg("jms.error.file.path", util.path("${zorka.log.dir}", "jms-error.log"));
-  zorka.defCfg("jms.error.file.max", "8M");
-  zorka.defCfg("jms.error.file.num", "8");
-  zorka.defCfg("jms.error.format", "[${TIME}] ${ID} -> ${ERR}");
 
   zorka.defCfg("jms.fetch.all", "no");
   zorka.defCfg("jms.fetch.attrs", zorka.boolCfg("jms"));
@@ -64,9 +46,6 @@ __javax_jms() {
   _trace = zorka.boolCfg("jms.trace");
   _mapPrefix = zorka.stringCfg("jms.fetch.map.prefix");
   _propPrefix = zorka.stringCfg("jms.fetch.props.prefix");
-
-  _slow_chain  = traps.subchain("jms", "slow");
-  _error_chain = traps.subchain("jms", "error");
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");
@@ -169,8 +148,8 @@ __javax_jms() {
           _jms_dtrace ? dtrace_resp() : null,
           _jms_dtrace ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_CONSUMER) : null,
           _fetchAttrs, _fetchText, _fetchMap, _fetchProps)
-        .onError(spy.fetchError("ERR"), spy.strTime("TIME"), _error_chain, spy.markError())
-        .onSubmit(spy.strTime("TIME"), _slow_chain,
+        .onError(spy.fetchError("ERR"), spy.strTime("TIME"), spy.markError())
+        .onSubmit(spy.strTime("TIME"),
           zorka.boolCfg("jms.stats") ? spy.zorkaStats("java", zorka.stringCfg("jms.stats.mbean"), "handled", "ALL") : null)
         .include(spy.byInterfaceAndMethod(0, "javax.jms.MessageListener", "onMessage", "void", "javax.jms.Message")));
 

@@ -20,20 +20,20 @@ zorka.require(
   "http.bsh"
 );
 
-__jetty6() {
+__jetty() {
 
   if (zorka.boolCfg("http.instrument.jetty", true))
-  spy.add(spy.instrument("JETTY6_HTTP")
-    .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 3),
+  spy.add(spy.instrument("JETTY_HTTP")
+    .onEnter(spy.fetchArg("REQ", 2), spy.fetchArg("RESP", 4),
       spy.format("URI", "${REQ.requestURI}"),
       http._trace ? spy.subchain(
         http._uriQualifier,
         tracer.begin("http", zorka.longCfg("http.trace.time")),
         tracer.attr("http.url", "URI"),
         tracer.formatAttr("http.method", "${REQ.method}"),
-        http._headers ? http.headers_processor(true, false) : null,
-        (_dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_SERVER) : null
+        http._headers ? http.headers_processor(true, false) : null
       ) : null,
+      (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_SERVER) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onError(spy.fetchError("EX"), spy.format("ERR", "${EX}"),
       http._trace ? spy.subchain(
@@ -54,15 +54,13 @@ __jetty6() {
         http._cookies ? http.cookies_processor(true, false) : null,
         http._headers ? http.headers_processor(false, true) : null
       ) : null,
-      http._slow_chain,
       spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
-        spy.markError(),
-        http._error_chain),
-      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null)
+        spy.markError()),
+      http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
+      http._tags_chain)
     .include(
-      spy.byMethod("org.mortbay.jetty.servlet.ServletHandler", "handle")));
-
+      spy.byMethod("org.eclipse.jetty.servlet.ServletHandler", "doHandle")));
 
   if (zorka.boolCfg("zabbix.active")) {
     zorka.require("zabbix.bsh");
@@ -74,5 +72,5 @@ __jetty6() {
   return this;
 }
 
-jetty6 = __jetty6();
+jetty = __jetty();
 

@@ -15,10 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require(
-  "tracer.bsh",
-  "traps.bsh"
-);
+zorka.require("tracer.bsh");
 
 __sql() {
 
@@ -32,20 +29,6 @@ __sql() {
   // Default values for SQL parameter processing
   zorka.defCfg("sql.params", "no");
 
-  // Default values for SQL slow requests log configuration options
-  zorka.defCfg("sql.slow", zorka.boolCfg("traps.slow"));
-  zorka.defCfg("sql.slow.time", "5000");
-  zorka.defCfg("sql.slow.file.path", util.path("${zorka.log.dir}", "sql-slow.log"));
-  zorka.defCfg("sql.slow.file.max", "8M");
-  zorka.defCfg("sql.slow.file.num", "8");
-  zorka.defCfg("sql.slow.format", "[${TIME}] ${DB}: ${SQL}");
-
-  // Default values for SQL error log configuration options
-  zorka.defCfg("sql.error", zorka.boolCfg("traps.error"));
-  zorka.defCfg("sql.error.file.path", util.path("${zorka.log.dir}", "sql-error.log"));
-  zorka.defCfg("sql.error.file.max", "8M");
-  zorka.defCfg("sql.error.file.num", "8");
-  zorka.defCfg("sql.error.format", "[${TIME}] ${DB}: ${SQL} -> ${ERR}");
 
   // Default values for SQL tracer options
   zorka.defCfg("sql.trace", zorka.stringCfg("tracer"));
@@ -58,13 +41,9 @@ __sql() {
   _action = _congestion ? spy.ACTION_EXIT|spy.ACTION_STATS : spy.ACTION_STATS;
   _params = zorka.boolCfg("sql.params");
   _prefix = zorka.stringCfg("sql.trace.params.prefix");
-  _error = zorka.boolCfg("sql.error");
   _excludedParams = zorka.setCfg("sql.params.exclude");
 
   _errors = zorka.setCfg("sql.error.codes");
-
-  _slow_chain = traps.subchain("sql", "slow");
-  _error_chain = traps.subchain("sql", "error");
 
   _tags_chain = null;
 
@@ -148,8 +127,8 @@ __sql() {
         tracer.formatAttr("db.type", "sql"),
         _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null
       ) : null)
-    .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null, _error_chain)
-    .onSubmit(spy.strTime("TIME"), _slow_chain, _stats_chain);
+    .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
+    .onSubmit(spy.strTime("TIME"), _stats_chain);
   }
 
 
@@ -165,8 +144,8 @@ __sql() {
         tracer.formatAttr("db.type", "sql"),
         _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null
       ) : null)
-    .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null, _error_chain)
-    .onSubmit(spy.strTime("TIME"), _slow_chain, _stats_chain);
+    .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
+    .onSubmit(spy.strTime("TIME"), _stats_chain);
   }
 
   return this;

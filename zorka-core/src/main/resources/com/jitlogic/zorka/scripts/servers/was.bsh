@@ -19,7 +19,7 @@ zorka.require(
   "jvm.bsh",
   "ejb.bsh",
   "http.bsh",
-  "javax/jms.bsh",
+  "jms.bsh",
   "apache/cxf.bsh"
 );
 
@@ -195,11 +195,9 @@ __was() {
         http._headers ? http.headers_processor(true, true) : null,
         http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", "")
       ) : null,
-      http._slow_chain,
       spy.subchain(
         spy.valSetFilter("STATUS", http._errors),
-        spy.markError(),
-        http._error_chain),
+        spy.markError()),
       http._stats ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, http._action) : null,
       http._tags_chain)
     .include(
@@ -219,8 +217,7 @@ __was() {
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),
           spy.format("error.message", "${ERR.message}"),
-          spy.strTime("TIME"),
-          ejb._error_chain)
+          spy.strTime("TIME"))
       .onReturn(
           ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
@@ -228,10 +225,7 @@ __was() {
           ejb._trace ? tracer.attr("ejb.result", "RET") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
           ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null,
-          ejb._tags_chain,
-          spy.longerThan(zorka.longCfg("ejb.slow.time")),
-          spy.strTime("TIME"),
-          ejb._slow_chain)
+          ejb._tags_chain)
       .include(
           spy.byMethod("com.ibm.ejs.container.EJSContainer", "invokeProceed")
       ));

@@ -15,10 +15,7 @@
  * ZORKA. If not, see <http://www.gnu.org/licenses/>.
  */
 
-zorka.require(
-  "tracer.bsh",
-  "audit.bsh"
-);
+zorka.require("tracer.bsh");
 
 __spring() {
 
@@ -60,11 +57,6 @@ __spring() {
     .include(spy.byInterfaceAndMethod(0, "org.springframework.security.authentication.AuthenticationManager",
       "authenticate", "org.springframework.security.core.Authentication", "org.springframework.security.core.Authentication"));
 
-  if (zorka.boolCfg("audit.log.logins")) {
-    audit.audit(sdefSpringAuthManager, "AUTHENTICATION", "${ACTION} who=${USER} details=${DETAILS}");
-  } else if (_stats || _trace) {
-    spy.add(sdefSpringAuthManager);
-  }
 
   // TODO org.springframework.security.access.AccessDecisionManager.decide()
   // TODO org.springframework.security.provisioning.UserDetailsManager: createUser(), updateUser(), deleteUser(),

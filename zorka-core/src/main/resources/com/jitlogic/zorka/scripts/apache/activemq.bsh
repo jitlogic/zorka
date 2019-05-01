@@ -20,7 +20,7 @@
 zorka.require(
   "jvm.bsh",
   "tracer.bsh",
-  "eclipse/jetty.bsh");
+  "servers/jetty.bsh");
 
 
 __activemq() {

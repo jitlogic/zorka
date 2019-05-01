@@ -17,8 +17,8 @@
 
 zorka.require(
   "tracer.bsh",
-  "javax/jms.bsh",
-  "spring.bsh",
+  "jms.bsh",
+  "libs/spring.bsh",
   "apache/cxf.bsh",
   "apache/camel.bsh",
   "lang/groovy.bsh",
