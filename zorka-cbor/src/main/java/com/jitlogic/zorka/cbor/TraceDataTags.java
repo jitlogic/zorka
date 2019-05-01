@@ -6,7 +6,6 @@ public class TraceDataTags {
 
     public static final int TAG_STRING_DEF = 0x01;
     public static final int TAG_METHOD_DEF = 0x02;
-    public static final int TAG_AGENT_ATTR = 0x03;
 
     /** String reference is a tagged number. */
     public static final int TAG_STRING_REF     = 0x06;
