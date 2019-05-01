@@ -124,9 +124,13 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             TraceMarker tm = tr.getMarker();
             int tid = ref(tm.getTraceId(), STRING_TYPE);
             twriter.writeTag(TAG_TRACE_BEGIN);
-            twriter.writeUInt(CBOR.ARR_BASE, 2);
+            DTraceContext ds = tm.getDstate();
+            int l = 2 + (ds.getSpanId() != 0 ? 1 : 0) + (ds.getParentId() != 0 ? 1 : 0);
+            twriter.writeUInt(CBOR.ARR_BASE, l);
             twriter.writeLong(tm.getClock());
             twriter.writeInt(tid);
+            if (ds.getSpanId() != 0) twriter.writeLong(ds.getSpanId());
+            if (ds.getParentId() != 0) twriter.writeLong(ds.getParentId());
             if (tm.hasFlag(TraceMarker.ERROR_MARK)) {
                 twriter.writeTag(TAG_TRACE_FLAGS);
                 twriter.writeInt(TF_ERROR_MARK);
@@ -230,12 +234,23 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
                     if (awriter.position() > 0) {
                         byte[] data = ZorkaUtil.clipArray(awriter.getBuf(), awriter.position()); // TODO get rid of this allocation
-                        send(data, data.length, submitAgentUrl, null);
+                        send(data, data.length, submitAgentUrl, 0, 0);
                     }
 
                     if (twriter.position() > 0) {
+                        long traceId1 = 0, traceId2 = 0;
+                        if (sr instanceof TraceRecord) {
+                            TraceMarker tm = ((TraceRecord)sr).getMarker();
+                            if (tm.getDstate() != null) {
+                                traceId1 = tm.getDstate().getTraceId1();
+                                traceId2 = tm.getDstate().getTraceId2();
+                            } else {
+                                traceId1 = rand.nextLong();
+                                traceId2 = rand.nextLong();
+                            }
+                        }
                         byte[] data = ZorkaUtil.clipArray(twriter.getBuf(), twriter.position()); // TODO get rid of this allocation
-                        send(data, data.length, submitTraceUrl, UUID.randomUUID().toString());
+                        send(data, data.length, submitTraceUrl, traceId1, traceId2);
                     }
 
                     break;

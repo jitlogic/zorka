@@ -70,12 +70,11 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                         CborDataReader rdr = new CborDataReader(input, scanner, svr);
                         while (!input.eof()) rdr.read();
                         if (scanner.getPosition() > 0) {
-                            send(scanner.getBuf(), scanner.getPosition(), submitAgentUrl, null);
+                            send(scanner.getBuf(), scanner.getPosition(), submitAgentUrl, 0L, 0L);
                         }
                     }
 
-                    UUID uuid = new UUID(chunk.getUuidH(), chunk.getUuidL());
-                    send(chunk.getBuffer(), chunk.getPosition(), submitTraceUrl, uuid.toString());
+                    send(chunk.getBuffer(), chunk.getPosition(), submitTraceUrl, chunk.getUuidH(), chunk.getUuidL());
                     break;
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");

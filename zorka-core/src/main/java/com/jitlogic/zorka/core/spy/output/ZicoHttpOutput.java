@@ -26,6 +26,7 @@ import com.jitlogic.zorka.common.util.*;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
+import java.util.Random;
 
 import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
 import static com.jitlogic.zorka.common.util.ZorkaConfig.parseStr;
@@ -47,6 +48,8 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
     protected HttpConfig httpConfig;
     protected HttpMessageClient httpClient;
+
+    protected Random rand = new Random();
 
     protected abstract void resetState();
 
@@ -205,15 +208,17 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         }
     }
 
-    protected void send(byte[] body, int bodyLength, String uri, String traceUUID) {
+    protected void send(byte[] body, int bodyLength, String uri, long traceId1, long traceId2) {
         HttpMessage req = HttpMessage.POST(uri, ByteBuffer.wrap(body, 0, bodyLength),
                 "X-Zorka-Agent-ID", agentID,
                 "X-Zorka-Session-UUID", sessionUUID,
                 "Content-Type", "application/zorka+cbor+v1");
-        if (traceUUID != null) req.header("X-Zorka-Trace-UUID", traceUUID);
+        if (traceId1 != 0 && traceId2 != 0) {
+            req.header("X-Zorka-Trace-ID", ZorkaUtil.hex(traceId1, traceId2));
+        }
         HttpMessage res = httpClient.exec(req);
         if (res.getStatus() < 300) {
-            log.trace("Submitted: " + uri + " : " + traceUUID);
+            if (log.isTraceEnabled()) log.trace("Submitted: " + uri + " : " + ZorkaUtil.hex(traceId1, traceId2));
         } else if (res.getStatus() == 412) {
             throw new ZorkaRuntimeException("Resend.");
         } else {
