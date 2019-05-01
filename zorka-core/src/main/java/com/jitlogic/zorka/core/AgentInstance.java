@@ -29,7 +29,6 @@ import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.integ.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.normproc.NormLib;
 import com.jitlogic.zorka.core.spy.ltracer.LTracer;
 import com.jitlogic.zorka.core.spy.ltracer.LTracerLib;
 import com.jitlogic.zorka.core.spy.stracer.STraceBufManager;
@@ -45,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.*;
 
 import static com.jitlogic.zorka.core.AgentConfigProps.*;
@@ -127,11 +125,6 @@ public class AgentInstance implements ZorkaService {
     private UtilLib utilLib;
 
     /**
-     * Reference to normalizers library - available to zorka scripts as 'normalizers.*' function
-     */
-    private NormLib normLib;
-
-    /**
      * Reference to ranking and metrics processing library.
      */
     private PerfMonLib perfMonLib;
@@ -209,8 +202,6 @@ public class AgentInstance implements ZorkaService {
             log.info("Enabling Syslog subsystem ....");
             this.zorkaAgent.put("syslog", getSyslogLib());
         }
-
-        bsh.put("normalizers", getNormLib());
 
     }
 
@@ -489,16 +480,6 @@ public class AgentInstance implements ZorkaService {
 
         return tracerLib;
     }
-
-    public synchronized NormLib getNormLib() {
-
-        if (normLib == null) {
-            normLib = new NormLib();
-        }
-
-        return normLib;
-    }
-
 
     /**
      * Returns reference to rank processing & metrics

@@ -5,7 +5,12 @@ Zorka 1.90.7 (2019-??-??)
 * thread monitoring: ranking with cpu utilization;
 * thread monitoring: thread contention log;
 * generic servlet container instrumentation;
-* remove snmp trapper support (no one is using it anyway);
+* remove snmp trapper support;
+* remove nagios support;
+* remove normalizers framework;
+* tracing context propagation compatible with Zipkin/Jaeger/W3;
+* zipkin trace output (v2, http/json);
+* simplify agent-collector interaction & collector side data model;
 
 
 Zorka 1.90.6 (2019-01-19)

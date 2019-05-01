@@ -20,7 +20,6 @@ package com.jitlogic.zorka.core.spy;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.normproc.Normalizer;
 import com.jitlogic.zorka.core.spy.plugins.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -777,19 +776,6 @@ public class SpyLib {
      */
     public SpyProcessor transform(String dst, String src, String regex, String expr, boolean filterOut) {
         return new RegexFilterProcessor(src, dst, regex, expr, filterOut);
-    }
-
-
-    /**
-     * Normalizes a query string from src and puts result into dst.
-     *
-     * @param dst        destination field
-     * @param src        source field
-     * @param normalizer normalizer object
-     * @return normalizing processor object
-     */
-    public SpyProcessor normalize(String dst, String src, Normalizer normalizer) {
-        return new NormalizingProcessor(src, dst, normalizer);
     }
 
 
