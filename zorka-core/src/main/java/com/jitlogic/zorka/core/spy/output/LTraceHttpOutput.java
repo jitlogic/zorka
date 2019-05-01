@@ -21,7 +21,6 @@ import com.jitlogic.zorka.cbor.CborDataWriter;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.cbor.CborResendException;
-import com.jitlogic.zorka.core.spy.output.ZicoHttpOutput;
 
 import static com.jitlogic.zorka.cbor.TraceDataTags.*;
 import static com.jitlogic.zorka.cbor.TraceRecordFlags.*;
@@ -213,11 +212,11 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
     } // processTraceRecord()
 
 
-    protected void resetState() {
+    private void resetState() {
         symbolsSent.reset();
         mids.clear();
         lastMid = 0;
-        sessionUUID = null;
+        isClean = true;
     }
 
 
@@ -231,8 +230,6 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
                     twriter.reset();
                     nExceptions = 0;
 
-                    if (sessionUUID == null) newSession();
-
                     if (sr instanceof TraceRecord) {
                         TraceRecord tr = (TraceRecord) sr;
                         processTraceRecord(0, tr);
@@ -240,7 +237,8 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
                     if (awriter.position() > 0) {
                         byte[] data = ZorkaUtil.clipArray(awriter.getBuf(), awriter.position()); // TODO get rid of this allocation
-                        send(data, data.length, submitAgentUrl, 0, 0);
+                        send(data, data.length, submitAgentUrl, 0, 0, isClean);
+                        isClean = false;
                     }
 
                     if (twriter.position() > 0) {
@@ -256,17 +254,17 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
                             }
                         }
                         byte[] data = ZorkaUtil.clipArray(twriter.getBuf(), twriter.position()); // TODO get rid of this allocation
-                        send(data, data.length, submitTraceUrl, traceId1, traceId2);
+                        send(data, data.length, submitTraceUrl, traceId1, traceId2, false);
                     }
 
                     break;
 
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");
-                    newSession();
+                    resetState();
                 } catch (Exception e) {
                     log.error("Error sending trace record: " + e + ". Resetting connection.", e);
-                    newSession();
+                    resetState();
                 }
 
                 try {

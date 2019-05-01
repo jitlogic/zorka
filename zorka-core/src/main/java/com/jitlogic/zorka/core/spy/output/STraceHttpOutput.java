@@ -41,12 +41,12 @@ public class STraceHttpOutput extends ZicoHttpOutput {
         scanner = new SymbolsScanner(registry);
     }
 
-    @Override
-    protected void resetState() {
+    private void resetState() {
         if (log.isDebugEnabled()) {
             log.debug("Resetting state ...");
         }
         scanner.reset();
+        isClean = true;
     }
 
     private static SimpleValResolver svr = new SimpleValResolver() {
@@ -65,23 +65,23 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                 try {
                     synchronized (scanner) {
                         scanner.clear();
-                        if (sessionUUID == null) newSession();
                         CborInput input = new ChunkedCborInput(chunk);
                         CborDataReader rdr = new CborDataReader(input, scanner, svr);
                         while (!input.eof()) rdr.read();
                         if (scanner.getPosition() > 0) {
-                            send(scanner.getBuf(), scanner.getPosition(), submitAgentUrl, 0L, 0L);
+                            send(scanner.getBuf(), scanner.getPosition(), submitAgentUrl, 0L, 0L, isClean);
+                            isClean = false;
                         }
                     }
 
-                    send(chunk.getBuffer(), chunk.getPosition(), submitTraceUrl, chunk.getUuidH(), chunk.getUuidL());
+                    send(chunk.getBuffer(), chunk.getPosition(), submitTraceUrl, chunk.getUuidH(), chunk.getUuidL(), false);
                     break;
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");
-                    newSession();
+                    resetState();
                 } catch (Exception e) {
                     log.error("Error sending trace record: " + e + ". Resetting connection.", e);
-                    newSession();
+                    resetState();
                 }
 
                 try {
