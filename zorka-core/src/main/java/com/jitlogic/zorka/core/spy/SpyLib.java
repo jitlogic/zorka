@@ -19,10 +19,7 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
-import com.jitlogic.zorka.core.integ.SnmpTrapper;
-import com.jitlogic.zorka.core.integ.TrapVarBindDef;
 import com.jitlogic.zorka.core.normproc.Normalizer;
 import com.jitlogic.zorka.core.spy.plugins.*;
 import org.slf4j.Logger;
@@ -613,19 +610,6 @@ public class SpyLib {
      */
     public SpyProcessor asyncCollector(String... attrs) {
         return new AsyncQueueCollector(attrs);
-    }
-
-    /**
-     * Creates SNMP collector object. It sends collected records as SNMP traps using SNMP trapper.
-     *
-     * @param trapper  snmp trapper used to send traps;
-     * @param oid      base OID - used as both enterprise OID in produced traps and prefix for variable OIDs;
-     * @param spcode   - specific trap code; generic trap type is always enterpriseSpecific (6);
-     * @param bindings bindings defining additional variables attached to this trap;
-     * @return SNMP collector object
-     */
-    public SpyProcessor snmpCollector(SnmpTrapper trapper, String oid, int spcode, TrapVarBindDef... bindings) {
-        return new SnmpCollector(trapper, oid, SnmpLib.GT_SPECIFIC, spcode, oid, bindings);
     }
 
 

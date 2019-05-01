@@ -5,6 +5,7 @@ Zorka 1.90.7 (2019-??-??)
 * thread monitoring: ranking with cpu utilization;
 * thread monitoring: thread contention log;
 * generic servlet container instrumentation;
+* remove snmp trapper support (no one is using it anyway);
 
 
 Zorka 1.90.6 (2019-01-19)

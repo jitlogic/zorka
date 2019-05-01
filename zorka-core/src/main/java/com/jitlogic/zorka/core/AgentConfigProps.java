@@ -17,10 +17,6 @@ public class AgentConfigProps {
     public static final String SCRIPTS_DIR_PROP = "zorka.scripts.dir";
     public static final String SCRIPTS_DIR_DVAL = "scripts";
 
-    /** Enables or disables SNMP subsystem. */
-    public static final String SNMP_PROP = "snmp";
-    public static final boolean SNMP_DEFV = true;
-
     /** Enables or disables spy instrumentation. */
     public static final String SPY_PROP = "spy";
     public static final boolean SPY_DEFV = true;

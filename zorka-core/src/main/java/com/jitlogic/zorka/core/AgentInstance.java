@@ -137,11 +137,6 @@ public class AgentInstance implements ZorkaService {
     private UtilLib utilLib;
 
     /**
-     * Reference to SNMP library - available to zorka scripts as 'snmp.*' functions
-     */
-    private SnmpLib snmpLib;
-
-    /**
      * Reference to normalizers library - available to zorka scripts as 'normalizers.*' function
      */
     private NormLib normLib;
@@ -223,11 +218,6 @@ public class AgentInstance implements ZorkaService {
         if (config.boolCfg(SYSLOG_PROP, SYSLOG_DEFV)) {
             log.info("Enabling Syslog subsystem ....");
             this.zorkaAgent.put("syslog", getSyslogLib());
-        }
-
-        if (config.boolCfg(SNMP_PROP, SNMP_DEFV)) {
-            log.info("Enabling SNMP subsystem ...");
-            this.zorkaAgent.put("snmp", getSnmpLib());
         }
 
         bsh.put("normalizers", getNormLib());
@@ -538,21 +528,6 @@ public class AgentInstance implements ZorkaService {
 
 
     /**
-     * Returns reference to SNMP library
-     *
-     * @return instance of snmp library
-     */
-    public synchronized SnmpLib getSnmpLib() {
-
-        if (snmpLib == null) {
-            snmpLib = new SnmpLib(config);
-        }
-
-        return snmpLib;
-    }
-
-
-    /**
      * Returns reference to rank processing & metrics
      *
      * @return instance of perfmon library
@@ -624,10 +599,6 @@ public class AgentInstance implements ZorkaService {
 
         if (zorkaLib != null) {
             zorkaLib.shutdown();
-        }
-
-        if (snmpLib != null) {
-            snmpLib.shutdown();
         }
 
         if (zabbixLib != null) {

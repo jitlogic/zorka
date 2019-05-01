@@ -19,13 +19,11 @@ import com.jitlogic.netkit.test.support.TestHttpMessageClient;
 import com.jitlogic.zorka.common.test.support.CommonFixture;
 import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
-import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.*;
 import com.jitlogic.zorka.core.integ.NagiosLib;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
-import com.jitlogic.zorka.core.integ.SnmpLib;
 import com.jitlogic.zorka.core.integ.SyslogLib;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixLib;
 import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
@@ -62,7 +60,6 @@ public class ZorkaFixture extends CommonFixture {
     protected SyslogLib syslogLib;
     protected SpyLib spy;
     protected TracerLib tracer;
-    protected SnmpLib snmpLib;
 
     protected ZorkaBshAgent zorkaAgent;
     protected ZorkaLib zorka;
@@ -118,7 +115,6 @@ public class ZorkaFixture extends CommonFixture {
         zorkaAgent = agentInstance.getZorkaAgent();
         zorka = agentInstance.getZorkaLib();
         syslogLib = agentInstance.getSyslogLib();
-        snmpLib = agentInstance.getSnmpLib();
         spy = agentInstance.getSpyLib();
         tracer = agentInstance.getTracerLib();
         perfmon = agentInstance.getPerfMonLib();
