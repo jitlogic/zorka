@@ -110,16 +110,6 @@ public class AgentInstance implements ZorkaService {
     private ZabbixLib zabbixLib;
 
     /**
-     * Reference to nagios agents - one that handles nagios NRPE requests and passes them to BSH agent
-     */
-    private NagiosAgent nagiosAgent;
-
-    /**
-     * Reference to nagios library - available to zorka scripts as 'nagios.*' functions
-     */
-    private NagiosLib nagiosLib;
-
-    /**
      * Reference to spy library - available to zorka scripts as 'spy.*' functions
      */
     private SpyLib spyLib;
@@ -405,13 +395,6 @@ public class AgentInstance implements ZorkaService {
     }
 
 
-    public synchronized NagiosAgent getNagiosAgent() {
-        if (nagiosAgent == null) {
-            nagiosAgent = new NagiosAgent(config, getZorkaAgent(), getTranslator());
-        }
-        return nagiosAgent;
-    }
-
     public synchronized ZabbixActiveAgent getZabbixActiveAgent() {
         if (zabbixActiveAgent == null) {
             zabbixActiveAgent = new ZabbixActiveAgent(config, getZorkaAgent(), getTranslator(), getScheduledExecutor());
@@ -506,16 +489,6 @@ public class AgentInstance implements ZorkaService {
 
         return tracerLib;
     }
-
-    public synchronized NagiosLib getNagiosLib() {
-
-        if (nagiosLib == null) {
-            nagiosLib = new NagiosLib(getMBeanServerRegistry());
-        }
-
-        return nagiosLib;
-    }
-
 
     public synchronized NormLib getNormLib() {
 
@@ -617,10 +590,6 @@ public class AgentInstance implements ZorkaService {
         	zabbixActiveAgent.shutdown();
         }
 
-        if (nagiosAgent != null) {
-            nagiosAgent.shutdown();
-        }
-
         if (httpService != null) {
             httpService.shutdown();
         }
@@ -646,10 +615,6 @@ public class AgentInstance implements ZorkaService {
             getZabbixActiveAgent().restart();
         }
         
-        if (config.boolCfg(NAGIOS_PROP, NAGIOS_DVAL)) {
-            getNagiosAgent().restart();
-        }
-
         getZorkaAgent().restart();
         initBshLibs();
         getZorkaAgent().reloadScripts();

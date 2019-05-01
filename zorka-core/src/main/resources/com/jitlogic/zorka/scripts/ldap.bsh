@@ -100,12 +100,6 @@ __ldap() {
            spy.byMethod(0, "javax.naming.directory.InitialDirContext", "search", null, "String", "String", "Object[]", "javax.naming.directory.SearchControls")
         ));
 
-  // Nagios commands for zorka stats
-  if (zorka.boolCfg("nagios", false)) {
-    zorka.require("nagios.bsh");
-    nagios_util.def_zorka_stat(_mbean, "LDAP");
-  }
-
   return this;
 
 }

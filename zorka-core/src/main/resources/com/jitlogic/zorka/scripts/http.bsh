@@ -321,12 +321,6 @@ __http() {
               "javax.servlet.ServletRequest", "javax.servlet.ServletResponse")));
   } // http.instrument.servlet
 
-  // Nagios commands for zorka stats
-  if (zorka.boolCfg("nagios", false)) {
-    zorka.require("nagios.bsh");
-    nagios_util.def_zorka_stat(_mbean, "HTTP");
-  }
-
   discovery(attr, tag) {
     return zabbix.discovery(
       zorka.query("java", _mbean, "name", "type")

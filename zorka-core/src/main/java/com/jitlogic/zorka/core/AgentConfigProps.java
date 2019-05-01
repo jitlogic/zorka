@@ -6,9 +6,6 @@ import java.util.Set;
 
 public class AgentConfigProps {
 
-    public static final String NAGIOS_PROP = "nagios";
-    public static final boolean NAGIOS_DVAL = true;
-
     public static final String SCRIPTS_PROP = "scripts";
 
     public static final String SCRIPTS_AUTO_PROP = "scripts.auto";

@@ -22,7 +22,6 @@ import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.*;
-import com.jitlogic.zorka.core.integ.NagiosLib;
 import com.jitlogic.zorka.core.integ.QueryTranslator;
 import com.jitlogic.zorka.core.integ.SyslogLib;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixLib;
@@ -70,7 +69,6 @@ public class ZorkaFixture extends CommonFixture {
     protected SymbolRegistry symbols;
 
     protected ZabbixLib zabbixLib;
-    protected NagiosLib nagiosLib;
     protected UtilLib util;
 
     protected QueryTranslator translator;
@@ -120,7 +118,6 @@ public class ZorkaFixture extends CommonFixture {
         perfmon = agentInstance.getPerfMonLib();
         spyTransformer = agentInstance.getClassTransformer();
         zabbixLib = agentInstance.getZabbixLib();
-        nagiosLib = agentInstance.getNagiosLib();
         translator = agentInstance.getTranslator();
         util = agentInstance.getUtilLib();
 
