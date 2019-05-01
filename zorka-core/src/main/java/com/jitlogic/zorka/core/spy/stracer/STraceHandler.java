@@ -121,7 +121,8 @@ public class STraceHandler extends TraceHandler {
     private final boolean debugEnabled;
     private final boolean traceEnabled;
 
-    private long uuidL, uuidH;
+    private long traceId1, traceId2;
+    private long spanId;
 
     /**
      * Contains 'image' of traced thread call stack containing basic information needed to manage tracing process.
@@ -288,7 +289,7 @@ public class STraceHandler extends TraceHandler {
 
             // Reset UUID
             if (tracePos == 0) {
-                uuidL = uuidH = 0;
+                traceId1 = traceId2 = 0;
             }
         }
 
@@ -403,16 +404,17 @@ public class STraceHandler extends TraceHandler {
         stack[stackPos-W0_OFF] = (w0 & TSTAMP_MASK) | ((long)traceId << TSTAMP_BITS);
 
         writeUInt(CBOR.TAG_BASE, TAG_TRACE_BEGIN);
-        writeUInt(CBOR.ARR_BASE, 2);
+        writeUInt(CBOR.ARR_BASE, 1);
         writeLong(clock);
-        writeInt(traceId);
 
         if (tracePos == 0) {
-            uuidL = random.nextLong();
-            uuidH = random.nextLong();
+            traceId1 = random.nextLong();
+            traceId2 = random.nextLong();
+            spanId = random.nextLong();
             if (chunk != null) {
-                chunk.setUuidL(uuidL);
-                chunk.setUuidH(uuidH);
+                chunk.setTraceId1(traceId1);
+                chunk.setTraceId2(traceId2);
+                chunk.setSpanId(spanId);
                 chunk.setStartOffset(lastPos);
             }
         }
@@ -578,8 +580,8 @@ public class STraceHandler extends TraceHandler {
         ch.setStartOffset(0);
         ch.setExtOffset(bufOffs);
         ch.setNext(chunk);
-        ch.setUuidL(uuidL);
-        ch.setUuidH(uuidH);
+        ch.setTraceId1(traceId1);
+        ch.setTraceId2(traceId2);
 
         chunk = ch;
         buffer = ch.getBuffer();

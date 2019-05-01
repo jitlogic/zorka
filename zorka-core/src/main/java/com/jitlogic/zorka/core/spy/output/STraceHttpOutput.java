@@ -4,14 +4,12 @@ import com.jitlogic.zorka.cbor.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.core.spy.output.ZicoHttpOutput;
 import com.jitlogic.zorka.core.spy.stracer.ChunkedCborInput;
 import com.jitlogic.zorka.core.spy.stracer.STraceBufChunk;
 import com.jitlogic.zorka.core.spy.stracer.SymbolsScanner;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 
 public class STraceHttpOutput extends ZicoHttpOutput {
@@ -74,7 +72,7 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                         }
                     }
 
-                    send(chunk.getBuffer(), chunk.getPosition(), submitTraceUrl, chunk.getUuidH(), chunk.getUuidL(), false);
+                    send(chunk.getBuffer(), chunk.getPosition(), submitTraceUrl, chunk.getTraceId2(), chunk.getTraceId1(), false);
                     break;
                 } catch (CborResendException e) {
                     log.info("Session expired. Reauthenticating ...");

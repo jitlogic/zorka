@@ -121,9 +121,8 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         // Trace Marker (if this is trace beginning)
         if (tr.hasFlag(TraceRecord.TRACE_BEGIN)) {
             TraceMarker tm = tr.getMarker();
-            int tid = ref(tm.getTraceId(), STRING_TYPE);
             twriter.writeTag(TAG_TRACE_BEGIN);
-            int l = 2;
+            int l = 1;
             DTraceContext ds = tm.getDstate();
             if (ds != null) {
                 if (ds.getSpanId() != 0) l++;
@@ -131,7 +130,6 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             }
             twriter.writeUInt(CBOR.ARR_BASE, l);
             twriter.writeLong(tm.getClock());
-            twriter.writeInt(tid);
             if (ds != null) {
                 if (ds.getSpanId() != 0) twriter.writeLong(ds.getSpanId());
                 if (ds.getParentId() != 0) twriter.writeLong(ds.getParentId());

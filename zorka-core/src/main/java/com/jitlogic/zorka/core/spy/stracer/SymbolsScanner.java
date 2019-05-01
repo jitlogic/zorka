@@ -114,10 +114,6 @@ public class SymbolsScanner implements TagProcessor {
                 }
             }
             return null;
-        } else if (tag == TAG_TRACE_BEGIN) {
-            List<Object> lst = (List<Object>)obj;
-            addSymbol((Integer)lst.get(1), STRING_TYPE);
-            return null;
         } else if (tag == TAG_TRACE_ATTR) {
             Map<Object, Object> m = (Map) obj;
             for (Map.Entry e : m.entrySet()) {

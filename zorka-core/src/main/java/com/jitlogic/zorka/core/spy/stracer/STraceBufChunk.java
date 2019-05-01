@@ -39,10 +39,12 @@ public class STraceBufChunk implements SymbolicRecord {
     private int position;
 
     /** Low word of top-level trace UUID (sent to collector in order to bind all chunks together). */
-    private long uuidL;
+    private long traceId1;
 
     /** High word of top-level trace UUID (sent to collector in order to bind all chunks together). */
-    private long uuidH;
+    private long traceId2;
+
+    private long spanId;
 
     /** Previous chunk (used if chunks are grouped together). */
     private STraceBufChunk next;
@@ -95,25 +97,33 @@ public class STraceBufChunk implements SymbolicRecord {
     public void reset() {
         extOffset = 0;
         position = 0;
-        uuidL = 0L;
-        uuidH = 0L;
+        traceId1 = 0L;
+        traceId2 = 0L;
         next = null;
     }
 
-    public long getUuidL() {
-        return uuidL;
+    public long getTraceId1() {
+        return traceId1;
     }
 
-    public void setUuidL(long uuidL) {
-        this.uuidL = uuidL;
+    public void setTraceId1(long traceId1) {
+        this.traceId1 = traceId1;
     }
 
-    public long getUuidH() {
-        return uuidH;
+    public long getTraceId2() {
+        return traceId2;
     }
 
-    public void setUuidH(long uuidH) {
-        this.uuidH = uuidH;
+    public void setTraceId2(long traceId2) {
+        this.traceId2 = traceId2;
+    }
+
+    public long getSpanId() {
+        return spanId;
+    }
+
+    public void setSpanId(long spanId) {
+        this.spanId = spanId;
     }
 
     @Override

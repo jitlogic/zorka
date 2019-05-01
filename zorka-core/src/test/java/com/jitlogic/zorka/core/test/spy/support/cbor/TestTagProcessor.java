@@ -96,11 +96,10 @@ public class TestTagProcessor implements TagProcessor {
         } else if (tag == TAG_TRACE_BEGIN) {
             Map<String,Object> rec = ZorkaUtil.map("_", "B");
             List<Object> lst = (List<Object>)obj;
-            if (lst.size() < 2) {
+            if (lst.size() < 1) {
                 fail("Incomplete trace BEGIN marker.");
             }
             rec.put("clock", lst.get(0));
-            rec.put("trace", lst.get(1));
             return rec;
         } else if (tag == TAG_TRACE_ATTR) {
             Map<Object, Object> rec = (Map) obj;

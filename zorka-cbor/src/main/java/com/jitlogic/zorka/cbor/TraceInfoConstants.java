@@ -20,9 +20,6 @@ public class TraceInfoConstants {
     /** Trace duration. */
     public static final int TI_DURATION = 0x06;
 
-    /** Trace type (refers to string from text index). */
-    public static final int TI_TYPE     = 0x07;
-
     /** Number of trace records below current one. */
     public static final int TI_RECS     = 0x08;
 

@@ -113,11 +113,10 @@ public class STTagProcessor implements TagProcessor {
         } else if (tag == TAG_TRACE_BEGIN) {
             STBeg begin = new STBeg();
             List<Object> lst = (List<Object>)obj;
-            if (lst.size() < 2) {
+            if (lst.size() < 1) {
                 fail("Incomplete trace BEGIN marker.");
             }
             begin.setTraceClock((Long)(lst.get(0)));
-            begin.setTraceId(((Integer)(lst.get(1))));
             begin.setTraceName(registry.symbolName(begin.getTraceId()));
             return begin;
         } else if (tag == TAG_TRACE_ATTR) {

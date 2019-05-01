@@ -106,7 +106,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 1L,
-            "begin", m("_", "B", "clock", 11, "trace", 1)), decodeTrace(o.getChunks()));
+            "begin", m("_", "B", "clock", 11)), decodeTrace(o.getChunks()));
     }
 
     @Test
@@ -122,7 +122,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 2L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "children", l(m("_", "T", "method", 12L, "tstart", 3L, "tstop", 8L, "calls", 1L))
         ), decodeTrace(o.getChunks()));
     }
@@ -140,7 +140,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 2L,
-            "begin", m("_", "B", "clock", 11, "trace", 1)
+            "begin", m("_", "B", "clock", 11)
         ), decodeTrace(o.getChunks()));
     }
 
@@ -155,7 +155,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 1L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "attrs", m(99, "OJAAA!")),
             decodeTrace(o.getChunks()));
     }
@@ -173,7 +173,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 2L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "children", l(m("_", "T", "method", 12L, "tstart", 3L, "tstop", 8L,
                             "calls", 1L, "attrs", m(99, "OJAAA!")))
         ), decodeTrace(o.getChunks()));
@@ -195,7 +195,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "children", l(m("_", "T", "method", 12L, "tstart", 3L, "tstop", 10L, "calls", 2L,
                 "children", l(m("_", "T", "method", 14L, "tstart", 4L, "tstop", 9L, "calls", 1L,
                     "attrs", m(99, "OJAAA!")))))
@@ -232,7 +232,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(
             m("_", "T", "method", 10L, "tstart", 1L, "tstop", 8L, "calls", 1L,
-                "begin", m("_", "B", "clock", 11, "trace", 1),
+                "begin", m("_", "B", "clock", 11),
                 "error", errorToMap(e)),
             decodeTrace(o.getChunks()));
     }
@@ -253,7 +253,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "children", l(m("_", "T", "method", 12L, "tstart", 3L, "tstop", 10L, "calls", 2L,
                 "children", l(m("_", "T", "method", 14L, "tstart", 4L, "tstop", 9L, "calls", 1L,
                     "error", errorToMap(e)))))),
@@ -277,7 +277,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "children", l(m("_", "T", "method", 12L, "tstart", 3L, "tstop", 10L, "calls", 2L,
                 "children", l(m("_", "T", "method", 14L, "tstart", 4L, "tstop", 9L, "calls", 1L,
                     "error", errorToMap(e), "attrs", m(99, "OJAAA!")))))
@@ -301,7 +301,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "children", l(m("_", "T", "method", 12L, "tstart", 3L, "tstop", 10L, "calls", 2L,
                 "error", m("_", "E", "id", id),
                 "children", l(m("_", "T", "method", 14L, "tstart", 4L, "tstop", 9L, "calls", 1L,
@@ -335,7 +335,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 11L, "calls", 3L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "children", l(m("_", "T", "method", 12L, "tstart", 3L, "tstop", 10L, "calls", 2L,
                 "error", em2,
                 "children", l(m("_", "T", "method", 14L, "tstart", 4L, "tstop", 9L, "calls", 1L,
@@ -359,7 +359,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 1L,
-            "begin", m("_", "B", "clock", 11, "trace", 1)),
+            "begin", m("_", "B", "clock", 11)),
             decodeTrace(o.getChunks()));
 
     }
@@ -381,7 +381,7 @@ public class STraceHandlerUnitTest extends ZorkaFixture {
 
         assertEquals(m(
             "_", "T", "method", 10L, "tstart", 1L, "tstop", 9L, "calls", 2L,
-            "begin", m("_", "B", "clock", 11, "trace", 1),
+            "begin", m("_", "B", "clock", 11),
             "children", l(m("_", "T", "method", 12L, "calls", 1L, "tstart", 3L, "tstop", 6L, "attrs", m(1, s)))
         ), decodeTrace(o.getChunks()));
     }
