@@ -56,6 +56,7 @@ public class TraceBeginProcessor implements SpyProcessor {
      */
     private int flags;
 
+    private int componentAttr;
 
     /**
      * Creates new trace begin marking processsor.
@@ -70,16 +71,18 @@ public class TraceBeginProcessor implements SpyProcessor {
         this.symbolRegistry = symbolRegistry;
         this.minimumTraceTime = minimumTraceTime;
         this.flags = flags;
+        this.componentAttr = symbolRegistry.symbolId("component");
     }
 
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
-        TraceHandler traceBuilder = tracer.getHandler();
-        int traceId = symbolRegistry.symbolId(ObjectInspector.substitute(traceName, record));
-        traceBuilder.traceBegin(traceId, System.currentTimeMillis(), flags);
+        TraceHandler traceHandler = tracer.getHandler();
+        String traceType = ObjectInspector.substitute(traceName, record);
+        traceHandler.traceBegin(symbolRegistry.symbolId(traceType), System.currentTimeMillis(), flags);
+        traceHandler.newAttr(-1, componentAttr, traceType);
 
         if (minimumTraceTime >= 0) {
-            traceBuilder.setMinimumTraceTime(minimumTraceTime);
+            traceHandler.setMinimumTraceTime(minimumTraceTime);
         }
 
         return record;

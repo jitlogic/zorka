@@ -142,9 +142,10 @@ __sql() {
     .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("SQL", 1),
       spy.format("DB", dbform),
       _trace ? spy.subchain(
-        tracer.begin("SQL", zorka.longCfg("sql.trace.time")),
-        tracer.attr("SQL", "SQL"),
-        tracer.attr("DB", "DB"),
+        tracer.begin("db", zorka.longCfg("sql.trace.time")),
+        tracer.attr("db.statement", "SQL"),
+        tracer.attr("db.url", "DB"),
+        tracer.formatAttr("db.type", "sql"),
         _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null
       ) : null)
     .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null, _error_chain)
@@ -158,9 +159,10 @@ __sql() {
       spy.format("SQL", sqlform),
       spy.format("DB", dbform),
       _trace ? spy.subchain(
-        tracer.begin("SQL", zorka.longCfg("sql.trace.time")),
-        tracer.attr("SQL", "SQL"),
-        tracer.attr("DB", "DB"),
+        tracer.begin("db", zorka.longCfg("sql.trace.time")),
+        tracer.attr("db.statement", "SQL"),
+        tracer.attr("db.url", "DB"),
+        tracer.formatAttr("db.type", "sql"),
         _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null
       ) : null)
     .onError(spy.fetchError("ERR"), _trace ? tracer.flags(tracer.SUBMIT_TRACE) : null, _error_chain)
