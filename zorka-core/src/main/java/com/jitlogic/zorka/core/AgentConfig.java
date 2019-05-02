@@ -21,9 +21,12 @@ import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.core.integ.SyslogLib;
 import com.jitlogic.zorka.core.integ.SyslogTrapper;
+import org.slf4j.impl.ConsoleTrapper;
+import org.slf4j.impl.ZorkaLogLevel;
+import org.slf4j.impl.ZorkaLoggerFactory;
+import org.slf4j.impl.ZorkaTrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -119,7 +122,7 @@ public class AgentConfig extends ZorkaConfig {
 
         // Configure netkit logging
         NetkitTrapperLoggerOutput netkitLogger = new NetkitTrapperLoggerOutput();
-        StaticLoggerBinder.getSingleton().getLoggerFactory().swapInput(netkitLogger);
+        //TODO simplify netkit logging StaticLoggerBinder.getSingleton().getLoggerFactory().swapInput(netkitLogger);
 
         List<String> levels = com.jitlogic.netkit.log.LoggerFactory.LEVELS;
         String level = props.getProperty("log.com.jitlogic.netkit", "INFO");

@@ -85,7 +85,7 @@ public class ZorkaLoggerFactory implements ILoggerFactory {
         logLevel = INFO_INT;
     }
 
-    synchronized List<LogLevel> getLogLevels() {
+    public synchronized List<LogLevel> getLogLevels() {
         return logLevels;
     }
 

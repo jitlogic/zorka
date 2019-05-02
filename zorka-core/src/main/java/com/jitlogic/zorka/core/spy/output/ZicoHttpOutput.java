@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Random;
 
+import static com.jitlogic.zorka.cbor.HttpConstants.*;
 import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
 
 public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
@@ -76,9 +77,9 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
 
     protected void send(byte[] body, int bodyLength, String uri, long traceId1, long traceId2, boolean reset) {
         HttpMessage req = HttpMessage.POST(uri, ByteBuffer.wrap(body, 0, bodyLength),
-                "X-Zorka-Session-ID", sessionID,
-                "X-Zorka-Session-Reset", ""+reset,
-                "Content-Type", "application/zorka+cbor+v1");
+                HDR_ZORKA_SESSION_ID, sessionID,
+                HDR_ZORKA_SESSION_RESET, ""+reset,
+                "Content-Type", ZORKA_CBOR_CONTENT_TYPE);
         if (traceId1 != 0 && traceId2 != 0) {
             req.header("X-Zorka-Trace-ID", ZorkaUtil.hex(traceId1, traceId2));
         }

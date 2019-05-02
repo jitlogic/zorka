@@ -1,5 +1,6 @@
 package org.slf4j.impl;
 
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;

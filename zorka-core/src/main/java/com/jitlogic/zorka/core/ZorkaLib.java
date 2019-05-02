@@ -36,7 +36,6 @@ import com.jitlogic.zorka.common.stats.ValGetter;
 import com.jitlogic.zorka.core.mbeans.ZorkaMappedMBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.impl.StaticLoggerBinder;
 import org.slf4j.impl.ZorkaLogLevel;
 import org.slf4j.impl.ZorkaLoggerFactory;
 
@@ -598,8 +597,7 @@ public class ZorkaLib implements ZorkaService {
             args = args.length > 1 ? ZorkaUtil.clipArray(args, -1) : new Object[0];
         }
 
-        ZorkaLoggerFactory f = (ZorkaLoggerFactory)StaticLoggerBinder.getSingleton().getLoggerFactory();
-        f.getTrapper().trap(level, "bsh", message, ex, args);
+        ZorkaLoggerFactory.getInstance().getTrapper().trap(level, "bsh", message, ex, args);
     }
 
 

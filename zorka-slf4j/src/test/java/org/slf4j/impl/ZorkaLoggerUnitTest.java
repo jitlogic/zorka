@@ -16,9 +16,9 @@
 
 package org.slf4j.impl;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import java.util.List;
 import java.util.Properties;
@@ -46,9 +46,9 @@ public class ZorkaLoggerUnitTest {
         ZorkaTrapperLogger l2 = (ZorkaTrapperLogger)lf.getLogger("com.myapp.buggy.OtherClass");
         ZorkaTrapperLogger l3 = (ZorkaTrapperLogger)lf.getLogger("com.myapp.buggy.Some");
 
-        assertEquals(20, l1.getLogLevel());
-        assertEquals(20, l2.getLogLevel());
-        assertEquals(20, l3.getLogLevel());
+        Assert.assertEquals(20, l1.getLogLevel());
+        Assert.assertEquals(20, l2.getLogLevel());
+        Assert.assertEquals(20, l3.getLogLevel());
 
         lf.configure(props(
                 "log", "ERROR",
@@ -56,23 +56,23 @@ public class ZorkaLoggerUnitTest {
                 "log.com.myapp.buggy", "DEBUG",
                 "log.com.myapp.buggy.Some", "TRACE"));
 
-        assertEquals(30, l1.getLogLevel());
-        assertEquals(10, l2.getLogLevel());
-        assertEquals(0, l3.getLogLevel());
+        Assert.assertEquals(30, l1.getLogLevel());
+        Assert.assertEquals(10, l2.getLogLevel());
+        Assert.assertEquals(0, l3.getLogLevel());
 
         List<ZorkaLoggerFactory.LogLevel> ll = lf.getLogLevels();
 
-        assertEquals(0, ll.get(0).getLevel());
-        assertEquals("com.myapp.buggy.Some", ll.get(0).getPrefix());
+        Assert.assertEquals(0, ll.get(0).getLevel());
+        Assert.assertEquals("com.myapp.buggy.Some", ll.get(0).getPrefix());
 
-        assertEquals(10, ll.get(1).getLevel());
-        assertEquals("com.myapp.buggy", ll.get(1).getPrefix());
+        Assert.assertEquals(10, ll.get(1).getLevel());
+        Assert.assertEquals("com.myapp.buggy", ll.get(1).getPrefix());
 
-        assertEquals(30, ll.get(2).getLevel());
-        assertEquals("com.myapp", ll.get(2).getPrefix());
+        Assert.assertEquals(30, ll.get(2).getLevel());
+        Assert.assertEquals("com.myapp", ll.get(2).getPrefix());
 
         ZorkaTrapperLogger l4 = (ZorkaTrapperLogger)lf.getLogger("com.jitlogic.YetAnotherClass");
-        assertEquals(40, l4.getLogLevel());
+        Assert.assertEquals(40, l4.getLogLevel());
     }
 
     @Test
@@ -93,16 +93,24 @@ public class ZorkaLoggerUnitTest {
 
         MemoryTrapper mt = (MemoryTrapper)lf.getTrapper();
 
-        l1.trace("OJA!");assertEquals(0, mt.drain().size());
-        l1.info("OJA!");assertEquals(0, mt.drain().size());
-        l1.warn("OJA!");assertEquals(1, mt.drain().size());
-        l1.error("OJA!");assertEquals(1, mt.drain().size());
+        l1.trace("OJA!");
+        Assert.assertEquals(0, mt.drain().size());
+        l1.info("OJA!");
+        Assert.assertEquals(0, mt.drain().size());
+        l1.warn("OJA!");
+        Assert.assertEquals(1, mt.drain().size());
+        l1.error("OJA!");
+        Assert.assertEquals(1, mt.drain().size());
 
-        l3.trace("OJA!");assertEquals(1, mt.drain().size());
-        l3.error("OJA!");assertEquals(1, mt.drain().size());
+        l3.trace("OJA!");
+        Assert.assertEquals(1, mt.drain().size());
+        l3.error("OJA!");
+        Assert.assertEquals(1, mt.drain().size());
 
-        l4.warn("OJA!");assertEquals(0, mt.drain().size());
-        l4.error("OJA!");assertEquals(1, mt.drain().size());
+        l4.warn("OJA!");
+        Assert.assertEquals(0, mt.drain().size());
+        l4.error("OJA!");
+        Assert.assertEquals(1, mt.drain().size());
     }
 
 }
