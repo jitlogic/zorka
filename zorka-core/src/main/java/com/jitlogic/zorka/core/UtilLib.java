@@ -22,7 +22,7 @@ import com.jitlogic.zorka.common.util.StringMatcher;
 import com.jitlogic.zorka.common.util.TapInputStream;
 import com.jitlogic.zorka.common.util.TapOutputStream;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.core.util.Base64;
+import com.jitlogic.zorka.common.util.Base64;
 
 import java.io.IOException;
 import java.io.InputStream;

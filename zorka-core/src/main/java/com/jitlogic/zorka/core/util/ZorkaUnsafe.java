@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2012-2016 Rafal Lewczuk <rafal.lewczuk@jitlogic.com>
  * <p/>
  * This is free software. You can redistribute it and/or modify it under the

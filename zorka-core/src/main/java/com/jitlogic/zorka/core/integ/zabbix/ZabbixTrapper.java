@@ -18,7 +18,6 @@ package com.jitlogic.zorka.core.integ.zabbix;
 
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
-import com.jitlogic.zorka.core.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.impl.ZorkaLogLevel;
