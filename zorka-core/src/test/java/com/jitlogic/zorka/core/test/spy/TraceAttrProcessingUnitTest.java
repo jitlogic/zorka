@@ -16,7 +16,6 @@
 package com.jitlogic.zorka.core.test.spy;
 
 
-import com.jitlogic.zorka.common.tracedata.TaggedValue;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyLib;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
@@ -36,7 +35,7 @@ public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture 
     @Test
     public void testTraceUntaggedAttr() {
 
-        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.FIELD_GETTING_PROCESSOR, "SQL", null, "SQL", null).process(
+        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.FIELD_GETTING_PROCESSOR, "SQL", null, "SQL").process(
                 ZorkaUtil.<String, Object>map("SQL", "select * from table"));
 
         traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("SQL"));
@@ -46,22 +45,13 @@ public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture 
 
     @Test
     public void testTraceFormattedAttr() {
-        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.STRING_FORMAT_PROCESSOR, "${SQL} GO", null, "SQL", null).process(
+        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.STRING_FORMAT_PROCESSOR, "${SQL} GO", null, "SQL").process(
                 ZorkaUtil.<String, Object>map("SQL", "select 1"));
 
         traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("SQL"));
         traceBuilder.check(0, "attrVal", "select 1 GO");
     }
 
-
-    @Test
-    public void testTraceTaggedAttr() {
-        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.FIELD_GETTING_PROCESSOR, "SQL", null, "SQL", "SQL_QUERY").process(
-                ZorkaUtil.<String, Object>map("SQL", "select * from table"));
-
-        traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("SQL"));
-        traceBuilder.check(0, "attrVal", new TaggedValue(symbols.symbolId("SQL_QUERY"), "select * from table"));
-    }
 
     @Test
     public void testTraceSetErrorFlags() {

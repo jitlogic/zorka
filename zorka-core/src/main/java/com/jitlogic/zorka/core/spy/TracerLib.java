@@ -260,17 +260,6 @@ public abstract class TracerLib {
     }
 
     /**
-     * Creates spy processor that attaches attribute to current trace record.
-     *
-     * @param attrName destination attribute name (in trace data)
-     * @param srcField source field name (from spy record)
-     * @return spy processor object adding new trace attribute
-     */
-    public SpyProcessor attr(String attrName, String srcField) {
-        return attr(attrName, null, srcField);
-    }
-
-    /**
      * Creates spy processor that attaches attribute to top record of named trace
      * @param traceName trace name to look up
      * @param attrName attribute name
@@ -278,7 +267,8 @@ public abstract class TracerLib {
      * @return spy processor
      */
     public SpyProcessor traceAttr(String traceName, String attrName, String srcField) {
-        return traceAttr(traceName, attrName, null, srcField);
+        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
+                srcField, traceName, attrName);
     }
 
 
@@ -294,25 +284,20 @@ public abstract class TracerLib {
     }
 
     public SpyProcessor formatTraceAttr(String traceName, String attrName, String srcFormat) {
-        return formatTraceAttr(traceName, attrName, null, srcFormat);
+        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
+                srcFormat, traceName, attrName);
     }
 
     /**
      * Creates spy processor that attaches tagged attribute to trace record.
      *
      * @param attrName destination attribute name (in trace data)
-     * @param attrTag  attribute tag;
      * @param srcField source field name (from spy record)
      * @return spy processor object adding new trace attribute
      */
-    public SpyProcessor attr(String attrName, String attrTag, String srcField) {
+    public SpyProcessor attr(String attrName, String srcField) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
-                srcField, attrName, attrTag);
-    }
-
-    public SpyProcessor traceAttr(String traceName, String attrName, String attrTag, String srcField) {
-        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
-                srcField, traceName, attrName, attrTag);
+                srcField, attrName);
     }
 
 
@@ -329,11 +314,6 @@ public abstract class TracerLib {
                 srcFormat, attrName, attrTag);
     }
 
-
-    public SpyProcessor formatTraceAttr(String traceName, String attrName, String attrTag, String srcFormat) {
-        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
-                srcFormat, traceName, attrName, attrTag);
-    }
 
     /**
      * Helper function for processing incoming (outgoing) headers as trace attributes.
@@ -375,28 +355,6 @@ public abstract class TracerLib {
      */
     public void newTraceAttr(String traceName, String attrName, Object value) {
         tracer.getHandler().newAttr(symbolRegistry.symbolId(traceName), symbolRegistry.symbolId(attrName), value);
-    }
-
-    /**
-     * Adds trace attribute to trace record immediately. This is useful for programmatic attribute setting.
-     *
-     * @param attrName attribute name
-     * @param value    attribute value
-     */
-    public void newAttr(String attrName, String tag, Object value) {
-        tracer.getHandler().newAttr(-1, symbolRegistry.symbolId(attrName), new TaggedValue(symbolRegistry.symbolId(tag), value));
-    }
-
-    /**
-     * @param traceName
-     * @param attrName
-     * @param tag
-     * @param value
-     */
-    public void newTraceAttr(String traceName, String attrName, String tag, Object value) {
-        tracer.getHandler().newAttr(
-                symbolRegistry.symbolId(traceName), symbolRegistry.symbolId(attrName),
-                new TaggedValue(symbolRegistry.symbolId(tag), value));
     }
 
     public SpyProcessor procAttr(int flags, String prefix, String src, String...path) {
