@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.core.spy.ltracer;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -24,7 +23,6 @@ import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import com.jitlogic.zorka.core.integ.zabbix.ZabbixTraceOutput;
-import com.jitlogic.zorka.common.zico.ZicoTraceOutput;
 import com.jitlogic.zorka.core.spy.*;
 import com.jitlogic.zorka.core.spy.output.LTraceHttpOutput;
 import org.slf4j.Logger;
@@ -46,54 +44,6 @@ public class LTracerLib extends TracerLib {
      */
     public LTracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
         super(symbolRegistry, metricsRegistry, tracer, config);
-    }
-
-
-    /**
-     * Creates trace file writer object. Trace writer can receive traces and store them in a file.
-     *
-     * @param path     path to a file
-     * @param maxFiles maximum number of archived files
-     * @param maxSize  maximum file size
-     * @param compress output file will be compressed if true
-     * @return trace file writer
-     */
-    public ZorkaAsyncThread<SymbolicRecord> toFile(String path, int maxFiles, long maxSize, boolean compress) {
-        TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
-        FileTraceOutput output = new FileTraceOutput(writer, new File(config.formatCfg(path)), maxFiles, maxSize, compress);
-        output.start();
-        return output;
-    }
-
-
-    public ZorkaAsyncThread<SymbolicRecord> toFile(String path, int maxFiles, long maxSize) {
-        return toFile(path, maxFiles, maxSize, false);
-    }
-
-
-    public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth) throws IOException {
-        return toZico(addr, port, hostname, auth, 64, 8 * 1024 * 1024, 10, 125, 2, 60000);
-    }
-
-    /**
-     * Creates trace network sender using ZICO protocol and Fressian representation.
-     * It will receive traces and send them to remote collector.
-     *
-     * @param addr     collector host name or IP address
-     * @param port     collector port
-     * @param hostname agent name - this will be presented in collector console;
-     * @param auth
-     * @return
-     * @throws IOException
-     */
-    public ZorkaAsyncThread<SymbolicRecord> toZico(String addr, int port, String hostname, String auth,
-                                                   int qlen, long packetSize, int retries, long retryTime, long retryTimeExp,
-                                                   int timeout) throws IOException {
-        TraceWriter writer = new FressianTraceWriter(symbolRegistry, metricsRegistry);
-        ZicoTraceOutput output = new ZicoTraceOutput(writer, addr, port, hostname, auth, qlen, packetSize,
-                retries, retryTime, retryTimeExp, timeout);
-        output.start();
-        return output;
     }
 
     @Override

@@ -70,7 +70,6 @@
                                 <include>com.jitlogic.zorka:zorka-snmp</include>
                                 <include>com.jitlogic.zorka:zorka-core</include>
                                 <include>org.slf4j:slf4j-api</include>
-                                <include>org.fressian:fressian</include>
                             </includes>
                             <rules>
                                 <rule>
@@ -88,10 +87,6 @@
                                 <rule>
                                     <pattern>com.jitlogic.netkit.**</pattern>
                                     <result>com.jitlogic.zorka.deps.netkit.@1</result>
-                                </rule>
-                                <rule>
-                                    <pattern>org.fressian.**</pattern>
-                                    <result>com.jitlogic.zorka.deps.fressian.@1</result>
                                 </rule>
                                 <rule>
                                     <pattern>org.slf4j.**</pattern>
