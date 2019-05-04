@@ -255,4 +255,11 @@ public class CborDataWriter {
     public byte[] getBuf() {
         return buf;
     }
+
+    public byte[] toByteArray() {
+        if (pos == 0) return new byte[0];
+        byte[] rslt = new byte[pos];
+        System.arraycopy(buf, 0, rslt, 0, pos);
+        return rslt;
+    }
 }

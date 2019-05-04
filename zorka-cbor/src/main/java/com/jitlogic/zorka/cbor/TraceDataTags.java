@@ -32,4 +32,7 @@ public class TraceDataTags {
 
     public static final int TAG_TRACE_UP_ATTR = 0x26;
 
+    /** Chunk metadata structure (v1) */
+    public static final int TAG_CHUNK_METADATA = 0x41;
+
 }
