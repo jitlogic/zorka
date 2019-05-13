@@ -31,8 +31,10 @@ import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public abstract class TracerLib {
 
@@ -268,7 +270,7 @@ public abstract class TracerLib {
      */
     public SpyProcessor traceAttr(String traceName, String attrName, String srcField) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
-                srcField, traceName, attrName);
+                traceName, ZorkaUtil.<String, String>constMap(attrName, srcField));
     }
 
 
@@ -280,12 +282,25 @@ public abstract class TracerLib {
      * @return spy processor object adding new trace attribute
      */
     public SpyProcessor formatAttr(String attrName, String srcFormat) {
-        return formatAttr(attrName, null, srcFormat);
+        return formatTraceAttr(null, attrName, srcFormat);
+    }
+
+    public SpyProcessor traceAttrs(Map<String,String> cattrs, String...eattrs) {
+        return formatTraceAttrs(null, cattrs, eattrs);
+    }
+
+    public SpyProcessor formatTraceAttrs(String traceName, Map<String,String> cattrs, String...eattrs) {
+        Map<String,String> attrs = new TreeMap<String, String>(cattrs != null ? cattrs : Collections.EMPTY_MAP);
+        for (int i = 1; i < eattrs.length; i+=2) {
+            attrs.put(eattrs[i-1], eattrs[i]);
+        }
+        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
+            traceName, attrs);
     }
 
     public SpyProcessor formatTraceAttr(String traceName, String attrName, String srcFormat) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
-                srcFormat, traceName, attrName);
+                traceName, ZorkaUtil.<String, String>constMap(attrName, srcFormat));
     }
 
     /**
@@ -297,21 +312,7 @@ public abstract class TracerLib {
      */
     public SpyProcessor attr(String attrName, String srcField) {
         return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.FIELD_GETTING_PROCESSOR,
-                srcField, attrName);
-    }
-
-
-    /**
-     * Creates spy processor that formats a string and attaches it as tagged attribute to trace record.
-     *
-     * @param attrName  destination attribute name (in trace data)
-     * @param attrTag   attribute tag;
-     * @param srcFormat source field name (from spy record)
-     * @return spy processor object adding new trace attribute
-     */
-    public SpyProcessor formatAttr(String attrName, String attrTag, String srcFormat) {
-        return new TraceAttrProcessor(symbolRegistry, tracer, TraceAttrProcessor.STRING_FORMAT_PROCESSOR,
-                srcFormat, attrName, attrTag);
+                null, ZorkaUtil.<String, String>constMap(attrName, srcField));
     }
 
 

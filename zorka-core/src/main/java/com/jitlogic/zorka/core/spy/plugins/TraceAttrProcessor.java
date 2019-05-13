@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Adds custom attribute to current frame of collected call trace. Current method must be
@@ -58,51 +59,31 @@ public class TraceAttrProcessor implements SpyProcessor {
     private int type;
 
     /**
-     * source field name
-     */
-    private String srcVal;
-
-    /**
      * Trace ID (if any).
      */
     private int traceId;
 
-    /**
-     * Attribute ID (as taken from symbol registry)
-     */
-    private int attrId;
+    /** Map attr id -> value/name */
+    private Map<Integer,String> attrs = new TreeMap<Integer, String>();
 
 
     /**
-     * Creates custom attribute processor.
-     *
      * @param symbolRegistry agent's symbol registry
      * @param tracer         tracer object
      * @param type           processor type (field getting or string formatting)
-     * @param srcVal         source field name
-     * @param attrName       attribute ID
+     * @param attrs          map: name - value/src
+     * @param traceName      if processor works not on current record but on given trace
      */
     public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, int type,
-                              String srcVal, String attrName) {
+                              String traceName, Map<String,String> attrs) {
         this.tracer = tracer;
-        this.srcVal = srcVal;
         this.symbolRegistry = symbolRegistry;
         this.type = type;
-        this.traceId = -1;
-        this.attrId = symbolRegistry.symbolId(attrName);
-    }
 
-    /**
-     * @param symbolRegistry agent's symbol registry
-     * @param tracer         tracer object
-     * @param type           processor type (field getting or string formatting)
-     * @param srcVal         source field name
-     * @param traceName
-     * @param attrName       attribute ID
-     */
-    public TraceAttrProcessor(SymbolRegistry symbolRegistry, Tracer tracer, int type,
-                              String srcVal, String traceName, String attrName) {
-        this(symbolRegistry, tracer, type, srcVal, attrName);
+        for (Map.Entry<String,String> e : attrs.entrySet()) {
+            this.attrs.put(symbolRegistry.symbolId(e.getKey()), e.getValue());
+        }
+
         this.traceId = traceName == null ? 0 : symbolRegistry.symbolId(traceName);
     }
 
@@ -110,20 +91,21 @@ public class TraceAttrProcessor implements SpyProcessor {
     @Override
     public Map<String, Object> process(Map<String, Object> record) {
 
-        Object val = type == FIELD_GETTING_PROCESSOR ? record.get(srcVal)
-                : ObjectInspector.substitute(srcVal, record);
-
-        if (val != null) {
-            if (log.isDebugEnabled()) {
-                TraceRecord top = ((LTraceHandler)(tracer.getHandler())).realTop(); // TODO fix when STracer implementation appears
-                log.debug("Value: '" + val + "' stored as trace attribute "
-                        + symbolRegistry.symbolName(attrId) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
+        for (Map.Entry<Integer,String> e : attrs.entrySet()) {
+            Object val = type == FIELD_GETTING_PROCESSOR ? record.get(e.getValue())
+                : ObjectInspector.substitute(e.getValue(), record);
+            if (val != null) {
+                if (log.isDebugEnabled()) {
+                    TraceRecord top = ((LTraceHandler) (tracer.getHandler())).realTop(); // TODO fix when STracer implementation appears
+                    log.debug("Value: '" + val + "' stored as trace attribute "
+                        + symbolRegistry.symbolName(e.getKey()) + " (classId= " + top.getClassId() + " methodId=" + top.getMethodId()
                         + " signatureId=" + top.getSignatureId() + ")");
-            }
-            tracer.getHandler().newAttr(traceId, attrId, val);
-        } else {
-            if (log.isDebugEnabled()) {
-                log.debug("Null value received. ");
+                }
+                tracer.getHandler().newAttr(traceId, e.getKey(), val);
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("Null value received. ");
+                }
             }
         }
 

@@ -35,8 +35,8 @@ public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture 
     @Test
     public void testTraceUntaggedAttr() {
 
-        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.FIELD_GETTING_PROCESSOR, "SQL", null, "SQL").process(
-                ZorkaUtil.<String, Object>map("SQL", "select * from table"));
+        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.FIELD_GETTING_PROCESSOR, null, ZorkaUtil.<String, String>constMap("SQL", "SQL"))
+            .process(ZorkaUtil.<String, Object>map("SQL", "select * from table"));
 
         traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("SQL"));
         traceBuilder.check(0, "attrVal", "select * from table");
@@ -45,8 +45,9 @@ public class TraceAttrProcessingUnitTest extends BytecodeInstrumentationFixture 
 
     @Test
     public void testTraceFormattedAttr() {
-        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.STRING_FORMAT_PROCESSOR, "${SQL} GO", null, "SQL").process(
-                ZorkaUtil.<String, Object>map("SQL", "select 1"));
+        new TraceAttrProcessor(symbols, tracerObj, TraceAttrProcessor.STRING_FORMAT_PROCESSOR, null,
+            ZorkaUtil.<String, String>constMap("SQL", "${SQL} GO"))
+            .process(ZorkaUtil.<String, Object>map("SQL", "select 1"));
 
         traceBuilder.check(0, "action", "newAttr", "attrId", symbols.symbolId("SQL"));
         traceBuilder.check(0, "attrVal", "select 1 GO");
