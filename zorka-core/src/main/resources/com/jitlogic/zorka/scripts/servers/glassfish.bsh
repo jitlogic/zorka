@@ -32,8 +32,8 @@ __glassfish() {
       .onEnter(
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
           ejb._trace ? tracer.begin("ejb", zorka.longCfg("ejb.trace.time")) : null,
-          ejb._trace ? tracer.formatAttr("ejb.method", "${MDESC.name}") : null,
-          ejb._trace ? tracer.formatAttr("ejb.class", "${MDESC.declaringClass.name}") : null)
+          ejb._trace ? tracer.formatAttrs(_trace_attrs, "ejb.method", "${MDESC.name}",
+              "ejb.class", "${MDESC.declaringClass.name}", "span.kind", "COMPONENT") : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),

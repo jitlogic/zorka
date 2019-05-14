@@ -40,23 +40,6 @@ __spring() {
   _stats = zorka.boolCfg("spring.stats");
   _mbean = zorka.stringCfg("spring.stats.mbean");
 
-  sdefSpringAuthManager = spy.instrument("SPRING_SECURITY_AUTH_MANAGER")
-    .onEnter(spy.fetchArg("AUTH", 1), spy.get("USER", "AUTH", "name"), spy.get("DETAILS", "AUTH", "details"))
-    .onReturn(spy.fetchRetVal("AUTH"),
-      spy.get("USER", "AUTH", "name"),
-      spy.get("DETAILS", "AUTH", "details"),
-      spy.put("ACTION", "AUTHENTICATION_SUCCESS"),
-      spy.format("AUTHORITIES", "${AUTH.authorities}"),
-      _trace ? spy.subchain(
-        tracer.attr("USER", "USER"),
-        tracer.attr("DETAILS", "DETAILS"),
-        tracer.attr("AUTHORITIES", "AUTHORITIES")
-      ) : null)
-    .onError(spy.fetchError("ERR"), spy.put("ACTION", "AUTHENTICATION_FAILURE"))
-    .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "authentication", "ALL") : null)
-    .include(spy.byInterfaceAndMethod(0, "org.springframework.security.authentication.AuthenticationManager",
-      "authenticate", "org.springframework.security.core.Authentication", "org.springframework.security.core.Authentication"));
-
 
   // TODO org.springframework.security.access.AccessDecisionManager.decide()
   // TODO org.springframework.security.provisioning.UserDetailsManager: createUser(), updateUser(), deleteUser(),
@@ -147,10 +130,9 @@ __spring() {
       spy.get("ARGS", "INV", "arguments"),
       spy.get("ATTRS", "INV", "attributes"),
       _trace ? spy.subchain(
-        tracer.begin("SPRING", zorka.longCfg("spring.trace.time")),
-        tracer.formatAttr("SERVICE_URL", "${CFG.serviceUrl}"),
-        tracer.formatAttr("CODEBASE_URL", "${CFG.codebaseUrl}"),
-        tracer.formatAttr("METHOD", "${INV.methodName}"),
+        tracer.begin("remote", zorka.longCfg("spring.trace.time")),
+        tracer.formatAttrs(_trace_attrs, "remote.service.url", "${CFG.serviceUrl}",
+            "remote.code.url", "${CFG.codebaseUrl}", "span.kind", "CLIENT", "remote.method", "${INV.methodName}"),
         zorka.boolCfg("spring.fetch.remoting.args") ? __get_args("ARGS") : null,
         zorka.boolCfg("spring.fetch.remoting.attrs") ? __get_attrs("ATTRS") : null
       ) : null)
@@ -190,10 +172,10 @@ __spring() {
 
   spy.add(
     spy.instrument("SPRING_WEBFLOW_ACTION")
-      .onEnter(spy.fetchArg("CTX", 1),
-        tracer.formatAttr("STATE", "${CTX.currentState.id}"))
+      .onEnter(spy.fetchArg("CTX", 1))
       .onReturn(spy.fetchRetVal("RET"),
-        tracer.formatAttr("RESULT", "${RET.id}"))
+        tracer.formatAttr("webflow.state", "${CTX.currentState.id}")
+        tracer.formatAttr("webflow.result", "${RET.id}"))
       .onSubmit(
         zorka.boolCfg("spring.fetch.webflow.request.scope") ? __extract_webflow_scope("REQ__", "requestScope", false) : null,
         zorka.boolCfg("spring.fetch.webflow.flash.scope") ? __extract_webflow_scope("FLASH__", "flashScope", false) : null,
@@ -209,15 +191,11 @@ __spring() {
   spy.add(
     spy.instrument("SPRING_WEB_HTTP_CLIENT")
       .onEnter(spy.fetchArg("THIS", 0),
-        _trace ? spy.subchain(
-          tracer.begin("SPRING", zorka.longCfg("spring.trace.time")),
-          tracer.formatAttr("URI", "${THIS.URI}"),
-          tracer.formatAttr("METHOD", "${THIS.method}")
-        ) : null)
+        _trace ? tracer.begin("SPRING", zorka.longCfg("spring.trace.time")) : null)
       .onReturn(spy.fetchRetVal("RESP"),
         _trace ? spy.subchain(
-          tracer.formatAttr("STATUS", "${RESP.statusCode}"),
-          tracer.formatAttr("STATUS_TEXT", "${RESP.statusText}")
+          tracer.formatAttrs(_trace_attrs, "URI", "${THIS.URI}", "METHOD", "${THIS.method}",
+              "STATUS", "${RESP.statusCode}", "STATUS_TEXT", "${RESP.statusText}", "span.kind", "CLIENT")
         ) : null)
       .onSubmit(
         _stats ? spy.zorkaStats("java", _mbean, "httpClient", "ALL") : null,

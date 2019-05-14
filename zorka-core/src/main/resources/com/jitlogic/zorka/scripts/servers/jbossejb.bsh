@@ -29,9 +29,12 @@ __jbossejb() {
         spy.format("METHOD", "${INV.method.name}"),
         spy.format("CLASS", "${INV.method.declaringClass.name}"),
         spy.get("ARGS", "INV", "arguments"),
-        ejb._trace ? tracer.begin("ejb", zorka.longCfg("ejb.trace.time")) : null,
-        ejb._trace ? tracer.attr("ejb.method", "METHOD") : null,
-        ejb._trace ? tracer.attr("ejb.class", "CLASS") : null)
+        ejb._trace ? spy.subchain(
+          tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
+          tracer.formatAttrs(_trace_attrs,
+            "ejb.method", "${METHOD}",
+            "ejb.class", "${CLASS}",
+            "span.kind", "COMPONENT")) : null)
       .onError(
         ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
         spy.fetchError("ERR"),
@@ -51,9 +54,12 @@ __jbossejb() {
     spy.add(spy.instrument("JBOSS_EJB3")
       .onEnter(
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
-          ejb._trace ? tracer.begin("ejb", zorka.longCfg("ejb.trace.time")) : null,
-          ejb._trace ? tracer.formatAttr("ejb.method", "${MDESC.name}") : null,
-          ejb._trace ? tracer.formatAttr("ejb.class", "${MDESC.declaringClass.name}") : null)
+          ejb._trace ? spy.subchain(
+            tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
+            tracer.formatAttrs(_trace_attrs,
+              "ejb.class", "${MDESC.declaringClass.name}",
+              "ejb.method", "${MDESC.name}",
+              "span.kind", "COMPONENT")) : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),

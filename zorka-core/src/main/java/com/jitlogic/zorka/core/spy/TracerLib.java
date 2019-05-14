@@ -285,12 +285,12 @@ public abstract class TracerLib {
         return formatTraceAttr(null, attrName, srcFormat);
     }
 
-    public SpyProcessor traceAttrs(Map<String,String> cattrs, String...eattrs) {
+    public SpyProcessor formatAttrs(Map<String,String> cattrs, String...eattrs) {
         return formatTraceAttrs(null, cattrs, eattrs);
     }
 
     public SpyProcessor formatTraceAttrs(String traceName, Map<String,String> cattrs, String...eattrs) {
-        Map<String,String> attrs = new TreeMap<String, String>(cattrs != null ? cattrs : Collections.EMPTY_MAP);
+        Map<String,String> attrs = cattrs != null ? new TreeMap<String,String>(cattrs) : new TreeMap<String,String>();
         for (int i = 1; i < eattrs.length; i+=2) {
             attrs.put(eattrs[i-1], eattrs[i]);
         }

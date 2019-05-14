@@ -32,12 +32,9 @@ __axis2() {
         soap._fetch_xml_in ? spy.format("SERVICE", "${CTX.axisService}") : null,
         spy.format("XML_IN", "${CTX.envelope}"),
         spy.format("ACTION", "${CTX.soapAction}"),
-        soap._trace ? spy.subchain(
-          tracer.attr("soap.method", "METHOD"),
-          tracer.attr("soap.xml.in", "XML_IN"),
-          tracer.attr("soap.service", "SERVICE"),
-          tracer.attr("soap.action", "ACTION")
-        ) : null,
+        soap._trace ?
+          tracer.formatAttrs(_trace_attrs, "soap.url", "${SERVICE}", "soap.method", "${METHOD}",
+            "soap.xml.in", "${XML_IN}", "soap.action", "${ACTION}", "span.kind", "SERVER") : null,
         soap._stats ? spy.subchain(
           spy.zorkaStats("java", soap._mbean, "stats", "SVC"),
           spy.zorkaStats("java", soap._mbean, "svc", "${SERVICE}.${METHOD}")

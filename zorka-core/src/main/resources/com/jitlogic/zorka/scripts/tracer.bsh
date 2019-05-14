@@ -54,10 +54,6 @@ if (zorka.boolCfg("tracer")) {
     zorka.logInfo("Configuring CBOR output for tracer ...");
     cfg = zorka.mapCfg("tracer.net",
             util.map(
-              "hostname", zorka.stringCfg("zorka.hostname", zorka.getHostname()),
-              "app.name", "DSC",
-              "env.name", "TST",
-              "auth.key", "zorka",
               "http.url", "http://127.0.0.1:8640",
               "http.retries", "10",
               "http.retry.time", "125",
@@ -130,6 +126,7 @@ if (zorka.boolCfg("tracer")) {
 }
 
 _trace_enabled = zorka.boolCfg("tracer");
+_trace_attrs = zorka.mapCfg("tracer.attrs");
 _dtrace_enabled = _trace_enabled && zorka.boolCfg("tracer.distributed");
 
 _dtrace_input_flags = tracer.DFM_ZIPKIN;

@@ -78,7 +78,6 @@ __catalina() {
       http._trace ? spy.subchain(
         http._uriQualifier,
         tracer.begin("http", zorka.longCfg("http.trace.time")),
-        tracer.attr("http.url", "URI"),
         http._headers ? headers_in() : null,
         (_dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_SERVER) : null
       ) : null,
@@ -96,10 +95,10 @@ __catalina() {
       spy.get("USER", "REQ", "remoteUser"),
       http._trace ? spy.subchain(
         http._uriQualifier,
+        tracer.formatAttrs(_trace_attrs, "http.method", "${REQ.method}", "http.url", "${URI}", "span.kind", "SERVER"),
         tracer.attr("http.status_code", "STATUS"),
-        tracer.formatAttr("http.method", "${REQ.method}"),
-        tracer.filterBy("STATUS", null, http._errors, null, null),
         tracer.attr("http.user", "USER"),
+        tracer.filterBy("STATUS", null, http._errors, null, null),
         http._cookies ? http.cookies_processor(true, true) : spy.put("COOKIES", ""),
         http._headers ? headers_out() : null,
         http._params ? http.param_processor() : spy.put("PARAMS", "")

@@ -25,30 +25,26 @@ __hystrix() {
     .onEnter(
       spy.fetchArg("THIS", 0),
       _trace_enabled ? tracer.begin("breaker") : null,
-      _trace_enabled ? tracer.formatAttr("breaker.type", "hystrix") : null,
       _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
       _dtrace_enabled ? spy.shelve("HYSTRIX", 120000, true, "THIS", "DTRACE") : null)
     .onError(tracer.markError())
     .onSubmit(
-      tracer.formatAttr("breaker.group", "${THIS.commandGroup}"),
-      tracer.formatAttr("breaker.key", "${THIS.commandKey}"))
+      _trace_enabled ? tracer.formatAttrs(_trace_attrs, "breaker.type", "hystrix", "span.kind", "CLIENT",
+          "breaker.group", "${THIS.commandGroup}", "breaker.key", "${THIS.commandKey}") : null)
     .include(spy.byMethod("com.netflix.hystrix.HystrixCommand", "execute")));
 
   spy.add(spy.instrument("HYSTRIX_COMMAND_IN")
     .onEnter(
       spy.fetchArg("THIS", 0),
       _trace_enabled ? tracer.begin("breaker") : null,
-      _trace_enabled ? tracer.formatAttr("breaker.type", "hystrix") : null,
       _dtrace_enabled ? spy.unshelve("HYSTRIX", true, "THIS", "DTRACE") : null,
       _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null)
     .onError(tracer.markError())
     .onSubmit(
-      tracer.formatAttr("breaker.group", "${THIS.commandGroup}"),
-      tracer.formatAttr("breaker.key", "${THIS.commandKey}"))
+      _trace_enabled ? tracer.formatAttrs(_trace_attrs, "breaker.type", "hystrix", "span.kind", "SERVER",
+          "breaker.group", "${THIS.commandGroup}", "breaker.key", "${THIS.commandKey}") : null)
     .include(
-      spy.byMethod(0,
-        zorka.stringCfg("hystrix.command.class", "com.netflix.hystrix.contrib.javanica.command.GenericCommand"),
-        "run", null),
+      spy.byMethod(0, zorka.stringCfg("hystrix.command.class", "com.netflix.hystrix.contrib.javanica.command.GenericCommand"), "run", null),
       spy.byMethod(0, "org.springframework.cloud.openfeign.support.FallbackCommand", "run", null),
       spy.byMethod(0, "com.netflix.hystrix.contrib.javanica.command.BatchHystrixCommand", "run", null)));
 

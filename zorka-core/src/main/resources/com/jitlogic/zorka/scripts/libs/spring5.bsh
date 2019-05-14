@@ -56,9 +56,8 @@ __spring() {
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("ARGS", 1),
           spy.get("BT", "THIS", "beanType"),
           _trace ? spy.subchain(
-            tracer.begin("SPRING", _traceTime),
-            tracer.formatAttr("CLASS", "${BT.name}"),
-            tracer.formatAttr("METHOD", "${THIS.method.name}"),
+            tracer.begin("spring", _traceTime),
+            tracer.formatAttrs(_trace_attrs, "CLASS", "${BT.name}", "span.kind", "COMPONENT", "METHOD", "${THIS.method.name}"),
             __invokeArgsProcessor()
           ) : null)
         .onReturn(
@@ -123,7 +122,7 @@ __spring() {
             _trace ? spy.subchain(
               proc_headers("HDR_OUT", "http.header.out."),
               tracer.begin("http", _traceTime),
-              tracer.formatAttr("http.url", "${CONN.requestUri}"),
+              tracer.formatAttrs(_trace_attrs, "http.url", "${CONN.requestUri}", "span.kind", "CLIENT"),
               _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
               _dtrace_enabled ? dtrace_req() : null)
             : null)
@@ -175,14 +174,11 @@ __spring() {
               spy.get("HEADERS", "PROPS", "headers"),
               _trace ? spy.subchain(
                 tracer.begin("amqp"),
-                tracer.formatAttr("message.exchange", "${EXCH}"),
-                tracer.formatAttr("message.routing_key", "${RKEY}"),
-                tracer.formatAttr("message.delivery", "${PROPS.deliveryMode}"),
-                tracer.formatAttr("message.content_type", "${PROPS.contentType}"),
-                tracer.formatAttr("message.priority", "${PROPS.priority}"),
-                tracer.formatAttr("peer.port", "${CONN.port}"),
-                tracer.formatAttr("peer.ipv4", "${CONN.address}"),
-                tracer.formatAttr("message_bus.destination", "${CONN.id}"),
+                tracer.formatAttrs(_trace_attrs, "message.exchange", "${EXCH}",
+                  "message.routing_key", "${RKEY}", "message.delivery", "${PROPS.deliveryMode}",
+                  "message.content_type", "${PROPS.contentType}", "message.priority", "${PROPS.priority}",
+                  "peer.port", "${CONN.port}", "peer.ipv4", "${CONN.address}",
+                  "message_bus.destination", "${CONN.id}", "span.kind", "PRODUCER"),
                 _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
                 tracer.procAttr(tracer.PA_MAP_OF_ANY, "message.header.out.", "HEADERS"),
                 _dtrace_enabled ? dtrace_send() : null)
@@ -217,14 +213,10 @@ __spring() {
               spy.get("HEADERS", "PROPS", "headers"),
               _trace ? spy.subchain(
                 tracer.begin("amqp"),
-                //tracer.formatAttr("DELIVERY", "${PROPS.deliveryMode}"),
-                tracer.formatAttr("message.content_type", "${PROPS.contentType}"),
-                tracer.formatAttr("message.priority", "${PROPS.priority}"),
-                tracer.formatAttr("message.exchange", "${PROPS.receivedExchange}"),
-                tracer.formatAttr("message.routing_key", "${PROPS.receivedRoutingKey}"),
-                tracer.formatAttr("peer.port", "${CONN.port}"),
-                tracer.formatAttr("peer.ipv4", "${CONN.address}"),
-                tracer.formatAttr("message_bus.source", "${CONN.id}"),
+                tracer.formatAttrs(_trace_attrs, "message.content_type", "${PROPS.contentType}",
+                  "message.priority", "${PROPS.priority}", "message.exchange", "${PROPS.receivedExchange}",
+                  "message.routing_key", "${PROPS.receivedRoutingKey}", "message_bus.source", "${CONN.id}",
+                  "peer.port", "${CONN.port}", "peer.ipv4", "${CONN.address}", "span.kind", "CONSUMER"),
                 _dtrace_enabled ? dtrace_recv() : null,
                 _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null,
                 tracer.procAttr(tracer.PA_MAP_OF_ANY, "message.header.in.", "HEADERS"))

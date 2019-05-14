@@ -18,6 +18,7 @@
 zorka.require(
   "tracer.bsh",
   "jms.bsh",
+  "http.bsh",
   "libs/spring.bsh",
   "apache/cxf.bsh",
   "apache/camel.bsh",
@@ -44,8 +45,9 @@ __alfresco() {
       spy.add(spy.instrument("ALFRESCO_BATCH")
          .onEnter(spy.fetchArg("THIS", 0),
              _trace ? spy.subchain(
-                 tracer.begin("AF_BATCH", _traceTime),
-                 tracer.formatAttr("WORKER", "${THIS}")
+                 tracer.begin("job", _traceTime),
+                 tracer.formatAttrs(_trace_attrs, "job.worker", "${THIS}",
+                     "job.type", "alfresco.batch", "span.kind", "JOB")
              ) : null)
          .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
          .onSubmit(spy.zorkaStats("java", _mbean, "stats", "AF_BATCH"))
@@ -56,21 +58,22 @@ __alfresco() {
       spy.add(spy.instrument("ALFRESCO_IMPORT_FILE")
          .onEnter(spy.fetchArg("NODE_REF", 1),
              _trace ? spy.subchain(
-                 tracer.begin("AF_IMPORT", _importTime),
-                 tracer.formatAttr("NODE", "${NODE_REF}")
+                 tracer.begin("job", _importTime),
+                 tracer.formatAttrs(_trace_attrs, "alfresco.node", "${NODE_REF}",
+                     "job.type", "alfresco.import", "span.kind", "JOB")
              ) : null)
          .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
          .onSubmit(spy.zorkaStats("java", _mbean, "stats", "AF_IMPORT"))
          .include(spy.byMethod(0, "org.alfresco.repo.bulkimport.impl.AbstractNodeImporter", "importImportableItemFile", null)));
     }
 
-    if (_trace_enabled) {
+    if (http._trace) {
       spy.add(spy.instrument("ALFRESCO_WEBSURF_CALL")
-        .onEnter(spy.fetchArg("URI", 1))
+        .onEnter(spy.fetchArg("URI", 1), tracer.begin("http", zorka.longCfg("http.trace.time")))
         .onReturn(spy.fetchRetVal("RSLT"))
         .onSubmit(
-          tracer.formatAttr("URI", "${URI}"),
-          tracer.formatAttr("STATUS", "${RSLT.status.code}"))
+          tracer.formatAttrs(_trace_attrs, "http.url", "${URI}",
+              "http.status_code", "${RSLT.status.code}", "span.kind", "CLIENT"))
         .include(
           spy.byMethod(0, "org.springframework.extensions.webscripts.connector.HttpConnector", "call",
             "org.springframework.extensions.webscripts.connector.Response", "String")));

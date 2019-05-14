@@ -10,6 +10,18 @@ public class TraceAttributes {
     /** Old trace type, adjusted to OpenTracing convention */
     public static final String COMPONENT = "component";
 
+    public static final String C_BREAKER = "breaker";
+    public static final String C_CALL    = "call";
+    public static final String C_CAMEL   = "camel";
+    public static final String C_DB      = "db";
+    public static final String C_FLEX    = "flex";
+    public static final String C_JOB     = "job";
+    public static final String C_HTTP    = "http";
+    public static final String C_REMOTE  = "remote";
+    public static final String C_REST    = "rest";
+    public static final String C_SOAP    = "soap";
+    public static final String C_SPRING  = "spring";
+
     public static final String DB_INSTANCE = "db.instance";
     public static final String DB_STATEMENT = "db.statement";
     public static final String DB_TYPE = "db.type";
@@ -43,12 +55,13 @@ public class TraceAttributes {
     public static final String SPAN_KIND = "span.kind";
 
     // Standard values of span.kind attribute
-    public static final String JOB = "JOB";
-    public static final String BOOT = "BOOT";
-    public static final String CLIENT = "CLIENT";
-    public static final String SERVER = "SERVER";
-    public static final String PRODUCER = "PRODUCER";
-    public static final String CONSUMER = "CONSUMER";
+    public static final String SK_JOB = "JOB";
+    public static final String SK_BOOT = "BOOT";
+    public static final String SK_CLIENT = "CLIENT";
+    public static final String SK_SERVER = "SERVER";
+    public static final String SK_PRODUCER = "PRODUCER";
+    public static final String SK_CONSUMER = "CONSUMER";
+    public static final String SK_COMPONENT = "COMPONENT";
 
 
     /** Virtual attribute, generated on the fly when retrieving traces. */
