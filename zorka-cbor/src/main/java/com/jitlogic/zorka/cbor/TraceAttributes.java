@@ -34,13 +34,12 @@ public class TraceAttributes {
 
     public static final String ERROR = "error";
 
-    public static final String LOCAL_HOSTNAME = "local.hostname";
-    public static final String LOCAL_SERVICE = "local.service";
     public static final String LOCAL_ADDRESS = "local.address";
+    public static final String LOCAL_HOSTNAME = "local.hostname";
     public static final String LOCAL_IPV4 = "local.ipv4";
     public static final String LOCAL_IPV6 = "local.ipv6";
-    public static final String LOCAL_APP = "local.app";
-    public static final String LOCAL_ENV = "local.env";
+    public static final String LOCAL_PID = "local.pid";
+    public static final String LOCAL_SERVICE = "local.service";
 
     public static final String MSG_DESTINATION = "message_bus.destination";
 

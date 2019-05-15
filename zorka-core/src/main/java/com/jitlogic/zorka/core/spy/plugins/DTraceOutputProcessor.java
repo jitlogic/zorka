@@ -87,20 +87,8 @@ public class DTraceOutputProcessor implements SpyProcessor {
             ds.setParentId(ds.getSpanId());
             ds.setSpanId(rand.nextLong());
             ds.setFlags((ds.getFlags() & ~delFlags) | addFlags);
-            String tid = ds.getTraceIdHex();
-            String sid = ds.getSpanIdHex();
-            String pid = ds.getParentIdHex();
-
-            // TODO czy to w ogóle jest potrzebne ?
-            rec.put(DTRACE_STATE, ds);
-            rec.put(DT_TRACE_ID, tid);
-            rec.put(DT_SPAN_ID, sid);
-            rec.put(DT_PARENT_ID, pid);
 
             tracer.getHandler().setDTraceState(ds);
-            tracerLib.newAttr(DT_TRACE_ID, tid);
-            tracerLib.newAttr(DT_SPAN_ID, sid);
-            tracerLib.newAttr(DT_PARENT_ID, pid);
 
             int flags = ds.getFlags();
             switch (ds.getFlags() & DFM_MASK) {

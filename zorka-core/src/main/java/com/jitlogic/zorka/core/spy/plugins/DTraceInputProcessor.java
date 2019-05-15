@@ -210,8 +210,6 @@ public class DTraceInputProcessor implements SpyProcessor {
         if (ds != null) {
             ds = new DTraceContext(ds);
             ds.setTstart(System.currentTimeMillis());
-        } else if (rec.containsKey(DTRACE_STATE)) {
-            ds = new DTraceContext((DTraceContext)rec.get(DTRACE_STATE));
         } else if (rec.containsKey(DH_B3_TRACEID)) {
             ds = parseZipkinCtx(rec);
         } else if (rec.containsKey(DH_B3)) {
@@ -232,11 +230,7 @@ public class DTraceInputProcessor implements SpyProcessor {
         // TODO tutaj ew. decyzja samplera
         ds.setFlags(ds.getFlags()|addFlags);
 
-        rec.put(DTRACE_STATE, ds);
         tracer.getHandler().setDTraceState(ds);
-        tracerLib.newAttr(DT_TRACE_ID, ds.getTraceIdHex());
-        tracerLib.newAttr(DT_SPAN_ID, ds.getSpanIdHex());
-        if (ds.getParentId() != 0) tracerLib.newAttr(DT_PARENT_ID, ds.getParentIdHex());
 
         // TODO tutaj submit danych do odpowiednich backendów, np. zipkin, jaeger itd. (do zico idzie normalnym tracerem)
 

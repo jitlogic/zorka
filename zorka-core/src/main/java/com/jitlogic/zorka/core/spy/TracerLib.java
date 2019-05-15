@@ -66,8 +66,6 @@ public abstract class TracerLib {
     public static final int PA_TO_STRING      = 0x1000;
     public static final int PA_WARN_ON_NULL   = 0x2000;
 
-    public final static String DTRACE_STATE = "DTRACE";
-
     public final static String DH_B3_TRACEID = "x-b3-traceid";
     public final static String DH_B3_SPANID = "x-b3-spanid";
     public final static String DH_B3_PARENTID = "x-b3-parentspanid";
@@ -83,11 +81,6 @@ public abstract class TracerLib {
 
     public final static Set<String> CTX_HEADERS = ZorkaUtil.constSet(DH_B3_TRACEID, DH_B3_SPANID, DH_B3_PARENTID,
             DH_B3_FLAGS, DH_B3_SAMPLED, DH_B3, DH_UBER_TID, DH_W3_TRACEPARENT, DH_W3_TRACESTATE);
-
-    public final static String DT_TRACE_ID = "TRACE_ID";
-    public final static String DT_SPAN_ID  = "SPAN_ID";
-    public final static String DT_PARENT_ID = "PARENT_ID";
-
 
     public static final int F_SAMPLE      = 0x000001; // SAMPLE flag
     public static final int F_DEBUG       = 0x000100; // DEBUG flag

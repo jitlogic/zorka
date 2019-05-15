@@ -30,7 +30,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
 
         assertSame(r1, dti.process(r1));
 
-        DTraceContext ds1 = (DTraceContext)r1.get("DTRACE");
+        DTraceContext ds1 = th.getDTraceState();
         assertNotNull(ds1);
 
         assertNotEquals(0, ds1.getTraceId1());
@@ -42,9 +42,6 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         assertNotEquals(0, ds1.getTstart());
 
 
-        TraceRecord tr = th.realTop();
-        assertEquals(ds1.getTraceIdHex(), tr.getAttr(symbols.symbolId(DT_TRACE_ID)));
-        assertEquals(ds1.getSpanIdHex(), tr.getAttr(symbols.symbolId(DT_SPAN_ID)));
 
         SpyProcessor dto = tracer.dtraceOutput(0, 0);
         Map<String,Object> r2 = new HashMap<String, Object>();
@@ -53,7 +50,7 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         th.traceBegin(sid("HTTP_CLI"), 42L, 0);
         dto.process(r2);
 
-        DTraceContext ds2 = (DTraceContext)r2.get("DTRACE");
+        DTraceContext ds2 = th.getDTraceState();
         assertNotNull(ds2);
 
         String dh2 = (String)r2.get(DH_UBER_TID);
@@ -65,21 +62,22 @@ public class DTraceComponentsUnitTest extends ZorkaFixture {
         SpyProcessor dti = tracer.dtraceInput(-1, DFK_SERVER);
 
         Map<String,Object> rec = new HashMap<String, Object>();
-
         rec.put(DH_UBER_TID, "6e05fa04e3167fd5406bbcb9245dc73e:bb153ab2e12b8b15:aa153ab2e12b8b15:00");
+
+        LTraceHandler th = ((LTracer) (agentInstance.getTracer())).getLtHandler();
+        th.traceEnter(42, 42L);
+        th.traceBegin(sid("HTTP"), 24L, 0);
 
         assertSame(rec, dti.process(rec));
 
-        DTraceContext ds = (DTraceContext)rec.get("DTRACE");
+
+        DTraceContext ds = th.getDTraceState();
 
         assertNotNull(ds);
         assertEquals("6e05fa04e3167fd5406bbcb9245dc73e", ds.getTraceIdHex());
 
         TraceRecord tr = ((LTracer)(agentInstance.getTracer())).getLtHandler().realTop();
         assertNotNull(tr);
-        assertEquals(ds.getTraceIdHex(), tr.getAttr(symbols.symbolId(DT_TRACE_ID)));
-        assertEquals(ds.getSpanIdHex(), tr.getAttr(symbols.symbolId(DT_SPAN_ID)));
-        assertEquals(ds.getParentIdHex(), tr.getAttr(symbols.symbolId(DT_PARENT_ID)));
     }
 
     // TODO continuation dla zipkin
