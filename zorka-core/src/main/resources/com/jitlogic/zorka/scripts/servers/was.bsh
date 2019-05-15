@@ -175,7 +175,7 @@ __was() {
       http._trace ? spy.subchain(
         http._uriQualifier,
         tracer.begin("http", zorka.longCfg("http.trace.time")),
-        tracer.formatAttrs(_trace_attrs, "http.url", "URI", "span.kind", "SERVER")
+        tracer.formatAttrs(_trace_attrs, "http.url", "URI")
       ) : null,
       http._congestion ? spy.zorkaStats("java", http._mbean, "stats", "ALL", "T", null, spy.ACTION_ENTER) : null)
     .onReturn(spy.put("ERR", ""))
@@ -212,10 +212,8 @@ __was() {
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 4),
           ejb._trace ? spy.subchain(
             tracer.begin("ejb", zorka.longCfg("ejb.trace.time")) : null,
-            tracer.formatAttrs(_trace_attrs,
-              "ejb.class", "${MDESC.declaringClass.name}",
-              "ejb.method", "${MDESC.name}",
-              "span.kind", "COMPONENT")
+            _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
+            tracer.formatAttrs(_trace_attrs, "ejb.class", "${MDESC.declaringClass.name}", "ejb.method", "${MDESC.name}")
           ) : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,

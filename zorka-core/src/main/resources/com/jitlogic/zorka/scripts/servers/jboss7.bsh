@@ -266,8 +266,8 @@ __jboss7() {
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
           ejb._trace ? spy.subchain(
               tracer.begin("EJB", zorka.longCfg("ejb.trace.time")),
-              tracer.formatAttrs(_trace_attrs, "METHOD", "${MDESC.name}", "span.kind", "COMPONENT",
-                  "CLASS", "${MDESC.declaringClass.name}")
+              _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
+              tracer.formatAttrs(_trace_attrs, "METHOD", "${MDESC.name}", "CLASS", "${MDESC.declaringClass.name}")
           ) : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,

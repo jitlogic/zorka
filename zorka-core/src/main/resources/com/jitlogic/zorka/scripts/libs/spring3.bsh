@@ -131,8 +131,9 @@ __spring() {
       spy.get("ATTRS", "INV", "attributes"),
       _trace ? spy.subchain(
         tracer.begin("remote", zorka.longCfg("spring.trace.time")),
+        _dtrace_enabled ? tracer.dtraceOutput(_dtrace_input_flags, tracer.DFK_CLIENT) : null,
         tracer.formatAttrs(_trace_attrs, "remote.service.url", "${CFG.serviceUrl}",
-            "remote.code.url", "${CFG.codebaseUrl}", "span.kind", "CLIENT", "remote.method", "${INV.methodName}"),
+            "remote.code.url", "${CFG.codebaseUrl}", "remote.method", "${INV.methodName}"),
         zorka.boolCfg("spring.fetch.remoting.args") ? __get_args("ARGS") : null,
         zorka.boolCfg("spring.fetch.remoting.attrs") ? __get_attrs("ATTRS") : null
       ) : null)

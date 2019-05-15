@@ -27,7 +27,7 @@ __grizzly() {
           http._uriQualifier,
           tracer.begin("http", zorka.longCfg("http.trace.time")),
           tracer.attr("http.url", "URI"),
-          tracer.formatAttrs(_trace_attrs, "http.method", "${REQ.method}", "span.kind", "SERVER"),
+          tracer.formatAttrs(_trace_attrs, "http.method", "${REQ.method}"),
           http._headers ? http.headers_processor(true, false) : null,
           (_dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_SERVER) : null
         ) : null,

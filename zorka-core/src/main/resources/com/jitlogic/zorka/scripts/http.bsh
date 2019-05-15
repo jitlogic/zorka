@@ -256,7 +256,7 @@ __http() {
             _uriQualifier,
             tracer.begin("http", zorka.longCfg("http.trace.time")),
             tracer.attr("http.url", "URI"),
-            tracer.formatAttrs(_trace_attrs, "http.servlet.info", "${THIS.servletInfo}", "span.kind", "SERVER"),
+            tracer.formatAttrs(_trace_attrs, "http.servlet.info", "${THIS.servletInfo}"),
             _headers ? headers_processor(true, false) : null,
             (_dtrace_enabled && _headers) ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_SERVER) : null
           ) : null,

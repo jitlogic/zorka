@@ -16,6 +16,8 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.tracedata.DTraceContext;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
@@ -28,6 +30,7 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.jitlogic.zorka.cbor.TraceAttributes.*;
 import static com.jitlogic.zorka.core.spy.TracerLib.*;
 
 /**
@@ -231,6 +234,9 @@ public class DTraceInputProcessor implements SpyProcessor {
         ds.setFlags(ds.getFlags()|addFlags);
 
         tracer.getHandler().setDTraceState(ds);
+
+        String kind = SPAN_KINDS.get(addFlags & DFK_MASK);
+        if (kind != null) tracerLib.newAttr("span.kind", kind);
 
         // TODO tutaj submit danych do odpowiednich backendów, np. zipkin, jaeger itd. (do zico idzie normalnym tracerem)
 

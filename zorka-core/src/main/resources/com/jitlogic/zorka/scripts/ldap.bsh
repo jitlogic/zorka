@@ -39,9 +39,9 @@ __ldap() {
        .onEnter(spy.fetchArg("NAME", 1), spy.fetchArg("FILTER", 2),
            _trace ? spy.subchain(
                tracer.begin("db", _traceTime),
+               _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
                tracer.formatAttrs(_trace_attrs, "db.type", "ldap",
-                 "span.kind", "CLIENT", "db.instance", "${NAME}",
-                 "db.statement", "${FILTER}")
+                 "db.instance", "${NAME}", "db.statement", "${FILTER}")
            ) : null)
        .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))
@@ -76,7 +76,8 @@ __ldap() {
        .onEnter(spy.fetchArg("NAME", 1), spy.fetchArg("FILTER", 2), spy.fetchArg("ARGS", 3),
            _trace ? spy.subchain(
                tracer.begin("db", _traceTime),
-               tracer.formatAttrs(_trace_attrs, "db.type", "ldap", "span.kind", "CLIENT", "db.instance", "${NAME}"),
+               _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
+               tracer.formatAttrs(_trace_attrs, "db.type", "ldap", "db.instance", "${NAME}"),
                args_formatter()
            ) : null)
        .onSubmit(spy.zorkaStats("java", _mbean, "stats", "ALL"))

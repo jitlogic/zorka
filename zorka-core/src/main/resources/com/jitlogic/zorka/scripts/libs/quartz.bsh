@@ -43,7 +43,7 @@ __quartz() {
       spy.get("KEY", "DETAIL", "key"),
       _trace ? spy.subchain(
         tracer.begin("job", zorka.longCfg("quartz.trace.time")),
-        tracer.formatAttrs(_trace_attrs, "job.name", "${KEY.name|DETAIL.name}", "span.kind", "JOB",
+        tracer.formatAttrs(_trace_attrs, "job.name", "${KEY.name|DETAIL.name}",
           "job.group", "${KEY.group|DETAIL.group}", "job.refire.count", "${CTX.refireCount}",
           "job.fire.time", "${CTX.fireTime}", "job.scheduled.time", "${CTX.scheduledFireTime}",
           "job.next.time", "${CTX.nextFireTime}", "job.description", "${DETAIL.description}",
@@ -51,7 +51,7 @@ __quartz() {
           "job.persist", "${DETAIL.persistJobDataAfterExecution}", "job.volatile", "${DETAIL.volatile}",
           "job.synchronized", "${DETAIL.concurrentExecutionDisabled}", "job.stateful", "${DETAIL.stateful}",
           "job.recovering", "${CTX.recovering}", "job.type", "quartz"),
-        _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null
+        _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_JOB) : null
       ) : null)
     .onError(tracer.markError())
     .onSubmit(

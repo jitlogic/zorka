@@ -36,6 +36,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import static com.jitlogic.zorka.cbor.TraceAttributes.*;
+
 public abstract class TracerLib {
 
     private static final Logger log = LoggerFactory.getLogger(TracerLib.class);
@@ -99,6 +101,19 @@ public abstract class TracerLib {
     public static final int DFK_SERVER     = 0x200000; // Kind: server request handling
     public static final int DFK_PRODUCER   = 0x300000; // Kind: message send
     public static final int DFK_CONSUMER   = 0x400000; // Kind: message receive (& handling)
+    public static final int DFK_JOB        = 0x500000;
+    public static final int DFK_BOOT       = 0x600000;
+    public static final int DFK_COMPONENT  = 0x700000;
+
+    public static final Map<Integer,String> SPAN_KINDS = ZorkaUtil.constMap(
+        DFK_CLIENT, DSK_CLIENT,
+        DFK_SERVER, DSK_SERVER,
+        DFK_PRODUCER, DSK_PRODUCER,
+        DFK_CONSUMER, DSK_CONSUMER,
+        DFK_JOB, DSK_JOB,
+        DFK_BOOT, DSK_BOOT,
+        DFK_COMPONENT, DSK_COMPONENT
+    );
 
     protected Tracer tracer;
     protected ZorkaConfig config;

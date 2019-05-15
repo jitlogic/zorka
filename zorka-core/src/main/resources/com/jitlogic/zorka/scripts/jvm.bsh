@@ -94,7 +94,7 @@ __jvm() {
       .onEnter(spy.fetchArg("THIS", 0),
         _trace_enabled ? spy.subchain(
           tracer.begin("HTTP_CLI"),
-          tracer.formatAttrs(_trace_attrs, "span.kind", "CLIENT")
+          tracer.formatAttrs(_trace_attrs)
         ): null,
         _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
         sun_http_client_pre(),

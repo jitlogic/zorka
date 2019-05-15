@@ -17,9 +17,12 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.tracedata.DTraceContext;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
+import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 
 import java.util.Map;
 import java.util.Random;
@@ -89,6 +92,9 @@ public class DTraceOutputProcessor implements SpyProcessor {
             ds.setFlags((ds.getFlags() & ~delFlags) | addFlags);
 
             tracer.getHandler().setDTraceState(ds);
+
+            String kind = SPAN_KINDS.get(addFlags & DFK_MASK);
+            if (kind != null) tracerLib.newAttr("span.kind", kind);
 
             int flags = ds.getFlags();
             switch (ds.getFlags() & DFM_MASK) {

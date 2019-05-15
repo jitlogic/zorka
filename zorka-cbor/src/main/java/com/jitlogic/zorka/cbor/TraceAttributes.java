@@ -54,13 +54,13 @@ public class TraceAttributes {
     public static final String SPAN_KIND = "span.kind";
 
     // Standard values of span.kind attribute
-    public static final String SK_JOB = "JOB";
-    public static final String SK_BOOT = "BOOT";
-    public static final String SK_CLIENT = "CLIENT";
-    public static final String SK_SERVER = "SERVER";
-    public static final String SK_PRODUCER = "PRODUCER";
-    public static final String SK_CONSUMER = "CONSUMER";
-    public static final String SK_COMPONENT = "COMPONENT";
+    public static final String DSK_JOB = "JOB";
+    public static final String DSK_BOOT = "BOOT";
+    public static final String DSK_CLIENT = "CLIENT";
+    public static final String DSK_SERVER = "SERVER";
+    public static final String DSK_PRODUCER = "PRODUCER";
+    public static final String DSK_CONSUMER = "CONSUMER";
+    public static final String DSK_COMPONENT = "COMPONENT";
 
 
     /** Virtual attribute, generated on the fly when retrieving traces. */

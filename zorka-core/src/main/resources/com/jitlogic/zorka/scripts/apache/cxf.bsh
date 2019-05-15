@@ -294,7 +294,8 @@ __cxf() {
     .onEnter(spy.fetchArg("MDESC", 2),
       soap._trace ? spy.subchain(
         tracer.begin("soap", zorka.longCfg("soap.trace.time")),
-        tracer.formatAttrs(_trace_attrs, "span.kind", "CLIENT", "soap.method", "${MDESC.name}",
+        _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
+        tracer.formatAttrs(_trace_attrs, "soap.method", "${MDESC.name}",
           "soap.class.name", "${MDESC.declaringClass.name}")
       ) : null)
     .onSubmit(soap._trace ? _cxf_cli_submit() : null)

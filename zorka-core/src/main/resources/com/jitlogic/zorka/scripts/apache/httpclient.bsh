@@ -74,7 +74,7 @@ __apache_httpclient() {
       .onEnter(spy.fetchArg("METHOD", 2),
         _trace ? spy.subchain(
           tracer.begin("http", _traceTime),
-          tracer.formatAttrs(_trace_attrs, "span.kind", "CLIENT", "http.url", "${METHOD.URI}", "http.method", "${METHOD.name}"),
+          tracer.formatAttrs(_trace_attrs, "http.url", "${METHOD.URI}", "http.method", "${METHOD.name}"),
           _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
           _dtrace_enabled ? dtrace_req_3x() : null) : null)
       .onReturn(spy.fetchRetVal("RET"), _trace ? tracer.attr("RET", "RET") : null)
@@ -129,7 +129,7 @@ __apache_httpclient() {
         _trace ? spy.subchain(
           tracer.begin("http", _traceTime),
           tracer.formatAttrs(_trace_attrs, "http.method", "${REQ.requestLine.method}", "http.url", "${REQ.requestLine.uri}",
-              "peer.host", "${TGT.hostName}", "peer.port", "${TGT.port}", "span.kind", "CLIENT"),
+              "peer.host", "${TGT.hostName}", "peer.port", "${TGT.port}"),
           _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
           _dtrace_enabled ? dtrace_req_4x() : null
         ) : null)

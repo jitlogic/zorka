@@ -95,7 +95,7 @@ __catalina() {
       spy.get("USER", "REQ", "remoteUser"),
       http._trace ? spy.subchain(
         http._uriQualifier,
-        tracer.formatAttrs(_trace_attrs, "http.method", "${REQ.method}", "http.url", "${URI}", "span.kind", "SERVER"),
+        tracer.formatAttrs(_trace_attrs, "http.method", "${REQ.method}", "http.url", "${URI}"),
         tracer.attr("http.status_code", "STATUS"),
         tracer.attr("http.user", "USER"),
         tracer.filterBy("STATUS", null, http._errors, null, null),

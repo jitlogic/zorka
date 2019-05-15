@@ -53,8 +53,9 @@ __flex() {
     .onEnter(spy.fetchArg("MSG", 1),
       _trace ? spy.subchain(
         tracer.begin("flex", _traceTime),
+        _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
         tracer.formatAttrs(_trace_attrs, "flex.destination", "${MSG.destination}", "flex.client_id", "${MSG.clientId}",
-            "flex.message_id", "${MSG.messageId}", "span.kind", "COMPONENT"),
+            "flex.message_id", "${MSG.messageId}"),
         proc_headers("flex.header.in.")
       ) : null)
     .onError(tracer.flags(tracer.SUBMIT_TRACE))

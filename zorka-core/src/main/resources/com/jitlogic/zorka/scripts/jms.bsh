@@ -146,7 +146,7 @@ __javax_jms() {
         .onEnter(spy.fetchArg("MSG", 1),
           zorka.boolCfg("jms.trace") ? spy.subchain(
             tracer.begin("jms", zorka.longCfg("jms.trace.time")),
-            tracer.formatAttrs(_trace_attrs, "span.kind", "CONSUMER")
+            tracer.formatAttrs(_trace_attrs)
           ) : null,
           _jms_dtrace ? dtrace_resp() : null,
           _jms_dtrace ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_CONSUMER) : null,
@@ -160,7 +160,7 @@ __javax_jms() {
         .onEnter(
           zorka.boolCfg("jms.trace.comms") ? spy.subchain(
             tracer.begin("jms", zorka.longCfg("jms.trace.time")),
-            tracer.formatAttrs(_trace_attrs, "span.kind", "PRODUCER")
+            tracer.formatAttrs(_trace_attrs)
           ) : null,
           spy.fetchArg("MSG", 1),
           _jms_dtrace ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
@@ -173,7 +173,7 @@ __javax_jms() {
         .onEnter(
           zorka.boolCfg("jms.trace.comms") ? spy.subchain(
             tracer.begin("jms", zorka.longCfg("jms.trace.time")),
-            tracer.formatAttrs(_trace_attrs, "span.kind", "PRODUCER")
+            tracer.formatAttrs(_trace_attrs)
           ): null,
           spy.fetchArg("MSG", 2),
           _jms_dtrace ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
@@ -185,7 +185,7 @@ __javax_jms() {
       spy.add(spy.instrument("JAVAX_JMX_CONSUMER")
         .onEnter(zorka.boolCfg("jms.trace.comms") ? spy.subchain(
           tracer.begin("jms", zorka.longCfg("jms.trace.time")),
-          tracer.formatAttrs(_trace_attrs, "span.kind", "CONSUMER")
+          tracer.formatAttrs(_trace_attrs)
          ): null)
         .onReturn(spy.fetchRetVal("MSG"),
           _jms_dtrace ? dtrace_resp() : null,

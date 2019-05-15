@@ -32,7 +32,7 @@ __wls() {
       http._trace ? spy.subchain(
         http._uriQualifier,
         tracer.begin("http", zorka.longCfg("http.trace.time")),
-        tracer.formatAttrs(_trace_attrs, "span.kind", "SERVER", "http.method", "${REQ.method}", "http.url", "${URI}"),
+        tracer.formatAttrs(_trace_attrs, "http.method", "${REQ.method}", "http.url", "${URI}"),
         http._headers ? http.headers_processor(true, false) : null,
         (http._trace && _dtrace_enabled && http._headers) ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_SERVER) : null
       ) : null,
@@ -69,8 +69,9 @@ __wls() {
           spy.fetchArg("IWRAP", 2), spy.fetchArg("ARGS", 3),
           ejb._trace ? spy.subchain(
             tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
+            _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
             tracer.formatAttrs(_trace_attrs, "ejb.method", "${IWRAP.methodDescriptor.method.name}",
-              "ejb.class", "${IWRAP.methodDescriptor.method.declaringClass.name}", "span.kind", "COMPONENT")
+              "ejb.class", "${IWRAP.methodDescriptor.method.declaringClass.name}")
           ) : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,

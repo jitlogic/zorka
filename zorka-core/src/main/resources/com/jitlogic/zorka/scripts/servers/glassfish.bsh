@@ -18,6 +18,7 @@
 zorka.require(
   "jvm.bsh",
   "ejb.bsh",
+  "jms.bsh",
   "servers/grizzly.bsh",
   "libs/jersey.bsh"
 );
@@ -31,9 +32,11 @@ __glassfish() {
     spy.add(spy.instrument("GLASSFISH_EJB")
       .onEnter(
           spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
-          ejb._trace ? tracer.begin("ejb", zorka.longCfg("ejb.trace.time")) : null,
-          ejb._trace ? tracer.formatAttrs(_trace_attrs, "ejb.method", "${MDESC.name}",
-              "ejb.class", "${MDESC.declaringClass.name}", "span.kind", "COMPONENT") : null)
+          ejb._trace ? spy.subchain(
+            tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
+            _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
+            tracer.formatAttrs(_trace_attrs, "ejb.method", "${MDESC.name}", "ejb.class", "${MDESC.declaringClass.name}")
+          ) : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
           spy.fetchError("ERR"),

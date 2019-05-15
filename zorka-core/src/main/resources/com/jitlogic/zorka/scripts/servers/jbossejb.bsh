@@ -31,10 +31,9 @@ __jbossejb() {
         spy.get("ARGS", "INV", "arguments"),
         ejb._trace ? spy.subchain(
           tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
-          tracer.formatAttrs(_trace_attrs,
-            "ejb.method", "${METHOD}",
-            "ejb.class", "${CLASS}",
-            "span.kind", "COMPONENT")) : null)
+          _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
+          tracer.formatAttrs(_trace_attrs, "ejb.method", "${METHOD}", "ejb.class", "${CLASS}")
+        ) : null)
       .onError(
         ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
         spy.fetchError("ERR"),
@@ -53,27 +52,25 @@ __jbossejb() {
 
     spy.add(spy.instrument("JBOSS_EJB3")
       .onEnter(
-          spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
-          ejb._trace ? spy.subchain(
-            tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
-            tracer.formatAttrs(_trace_attrs,
-              "ejb.class", "${MDESC.declaringClass.name}",
-              "ejb.method", "${MDESC.name}",
-              "span.kind", "COMPONENT")) : null)
+        spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
+        ejb._trace ? spy.subchain(
+          tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
+          tracer.formatAttrs(_trace_attrs, "ejb.class", "${MDESC.declaringClass.name}", "ejb.method", "${MDESC.name}")
+        ) : null)
       .onError(
-          ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
-          spy.fetchError("ERR"),
-          spy.format("MSG", "${ERR.message}"))
+        ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
+        spy.fetchError("ERR"),
+        spy.format("MSG", "${ERR.message}"))
       .onReturn(
-          ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
+        ejb._params ? spy.fetchRetVal("RET") : spy.put("RET", ""))
       .onSubmit(
-          ejb._params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
-          ejb._trace ? tracer.attr("ejb.result", "RET") : null,
-          ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
-          ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null)
+        ejb._params ? (com.jitlogic.zorka.core.spy.SpyProcessor)(ejb.arg_processor()) : spy.put("PARAMS", ""),
+        ejb._trace ? tracer.attr("ejb.result", "RET") : null,
+        ejb._stats ? spy.zorkaStats("java", ejb._mbean, "byMethod", "${CLASS}.${METHOD}") : null,
+        ejb._stats ? spy.zorkaStats("java", ejb._mbean, "stats", "ALL") : null)
       .include(
-          spy.byMethod(0, "org.jboss.ejb3.proxy.impl.handler.session.SessionProxyInvocationHandlerBase", "invoke",
-              "Object", "Object", "java.lang.reflect.Method")
+        spy.byMethod(0, "org.jboss.ejb3.proxy.impl.handler.session.SessionProxyInvocationHandlerBase", "invoke",
+            "Object", "Object", "java.lang.reflect.Method")
       ));
 
   return this;

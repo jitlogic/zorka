@@ -28,8 +28,9 @@ __apache_camel() {
         .onEnter(spy.fetchArg("THIS", 0), spy.fetchArg("EXCH", 1),
             _trace ? spy.subchain(
                 tracer.begin("camel"),
+                _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
                 tracer.formatAttrs(_trace_attrs, "camel.component.class", "${THIS.class.name}",
-                    "camel.context.name", "${EXCH.context.name}", "span.kind", "COMPONENT")
+                    "camel.context.name", "${EXCH.context.name}")
             ) : null)
         .include(
             spy.byInterfaceAndMethod("org.apache.camel.Processor", "process"),
