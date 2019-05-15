@@ -119,7 +119,7 @@ public abstract class TracerLib {
     protected ZorkaConfig config;
     protected SymbolRegistry symbolRegistry;
     protected MetricsRegistry metricsRegistry;
-    protected int defaultTraceFlags = TraceMarker.DROP_INTERIM;
+    protected int defaultTraceFlags = TraceMarker.DROP_INTERIM | TraceMarker.THREAD_NAME_ATTR;
 
     public static final Map<String,String> OPENTRACING_TAGS = ZorkaUtil.constMap(
             "REMOTE_IP", "peer.ipv4",

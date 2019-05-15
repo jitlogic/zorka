@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.util.ObjectInspector;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
@@ -58,6 +59,10 @@ public class TraceBeginProcessor implements SpyProcessor {
 
     private int componentAttr;
 
+    private int threadIdAttr;
+
+    private int threadNameAttr;
+
     /**
      * Creates new trace begin marking processsor.
      *
@@ -72,6 +77,8 @@ public class TraceBeginProcessor implements SpyProcessor {
         this.minimumTraceTime = minimumTraceTime;
         this.flags = flags;
         this.componentAttr = symbolRegistry.symbolId("component");
+        this.threadIdAttr = symbolRegistry.symbolId("thread.id");
+        this.threadNameAttr = symbolRegistry.symbolId("thread.name");
     }
 
     @Override
@@ -80,6 +87,13 @@ public class TraceBeginProcessor implements SpyProcessor {
         String traceType = ObjectInspector.substitute(traceName, record);
         traceHandler.traceBegin(symbolRegistry.symbolId(traceType), System.currentTimeMillis(), flags);
         traceHandler.newAttr(-1, componentAttr, traceType);
+
+        Thread t = Thread.currentThread();
+        traceHandler.newAttr(-1, threadIdAttr, ""+t.getId());
+
+        if (0 != (flags & TraceMarker.THREAD_NAME_ATTR)) {
+            traceHandler.newAttr(-1, threadNameAttr, t.getName());
+        }
 
         if (minimumTraceTime >= 0) {
             traceHandler.setMinimumTraceTime(minimumTraceTime);

@@ -62,6 +62,9 @@ public class TraceMarker implements SymbolicRecord, Serializable {
      */
     public static final int SUBMIT_METHOD = 0x40;
 
+    /** Add thread name attribute */
+    public static final int THREAD_NAME_ATTR = 0x0100;
+
     /**
      * Trace error mark. This flag is used indicate that this trace ended with error condition (eg. HTTP/500).
      */
