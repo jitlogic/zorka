@@ -93,19 +93,19 @@ __jvm() {
     spy.add(spy.instrument("SUN_HTTP_CLIENT_CONNECT")
       .onEnter(spy.fetchArg("THIS", 0),
         _trace_enabled ? spy.subchain(
-          tracer.begin("HTTP_CLI"),
+          tracer.begin("http"),
           tracer.formatAttrs(_trace_attrs)
         ): null,
         _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
         sun_http_client_pre(),
-        tracer.procAttr(tracer.PA_MAP_OF_LISTS_1, "HdrOut__", "HDR_OUT"))
+        tracer.procAttr(tracer.PA_MAP_OF_LISTS_1, "http.header.out.", "HDR_OUT"))
       .onReturn(spy.fetchRetVal("STATUS"))
       .onError(tracer.markError())
       .onSubmit(
-        tracer.formatAttr("URL", "${THIS.URL}"),
-        tracer.formatAttr("URI", "${THIS.URL.path}"),
-        tracer.formatAttr("STATUS", "${STATUS}"),
-        tracer.formatAttr("METHOD", "${THIS.requestMethod}"))
+        tracer.formatAttr("http.url", "${THIS.URL}"),
+        tracer.formatAttr("http.path", "${THIS.URL.path}"),
+        tracer.formatAttr("http.status_code", "${STATUS}"),
+        tracer.formatAttr("http.method", "${THIS.requestMethod}"))
       .include(spy.byMethod(0, "sun.net.www.protocol.http.HttpURLConnection", "plainConnect0", null)));
 
     // TODO input headers cannot be fetched from connect()/plainConnect0() as it forces client to fetch results
