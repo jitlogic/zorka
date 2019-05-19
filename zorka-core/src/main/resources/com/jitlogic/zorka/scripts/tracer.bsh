@@ -126,7 +126,6 @@ if (zorka.boolCfg("tracer")) {
 }
 
 _trace_enabled = zorka.boolCfg("tracer");
-_trace_attrs = zorka.mapCfg("tracer.attrs");
 _dtrace_enabled = _trace_enabled && zorka.boolCfg("tracer.distributed");
 
 _dtrace_input_flags = tracer.DFM_ZIPKIN;
