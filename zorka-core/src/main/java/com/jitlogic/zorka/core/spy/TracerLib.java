@@ -80,6 +80,7 @@ public abstract class TracerLib {
 
     public final static String DH_W3_TRACEPARENT = "traceparent";
     public final static String DH_W3_TRACESTATE = "tracestate";
+    public final static String DTRACE = "DTRACE";
 
     public final static Set<String> CTX_HEADERS = ZorkaUtil.constSet(DH_B3_TRACEID, DH_B3_SPANID, DH_B3_PARENTID,
             DH_B3_FLAGS, DH_B3_SAMPLED, DH_B3, DH_UBER_TID, DH_W3_TRACEPARENT, DH_W3_TRACESTATE);

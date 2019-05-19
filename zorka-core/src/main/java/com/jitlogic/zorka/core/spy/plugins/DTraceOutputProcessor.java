@@ -82,7 +82,9 @@ public class DTraceOutputProcessor implements SpyProcessor {
 
     @Override
     public Map<String, Object> process(Map<String, Object> rec) {
-        DTraceContext ds = tracer.getHandler().parentDTraceState();
+
+        DTraceContext ds =  (DTraceContext) rec.get(DTRACE);
+        if (ds == null) ds = tracer.getHandler().parentDTraceState();
 
         if (ds != null) {
             ds = new DTraceContext(ds);
@@ -92,6 +94,7 @@ public class DTraceOutputProcessor implements SpyProcessor {
             ds.setFlags((ds.getFlags() & ~delFlags) | addFlags);
 
             tracer.getHandler().setDTraceState(ds);
+            rec.put(DTRACE, ds);
 
             String kind = SPAN_KINDS.get(addFlags & DFK_MASK);
             if (kind != null) tracerLib.newAttr("span.kind", kind);
