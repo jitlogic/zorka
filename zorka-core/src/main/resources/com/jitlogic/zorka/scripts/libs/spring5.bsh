@@ -180,9 +180,10 @@ __spring() {
                   "message.content_type", "${PROPS.contentType}", "message.priority", "${PROPS.priority}",
                   "peer.port", "${CONN.port}", "peer.ipv4", "${CONN.address}",
                   "message_bus.destination", "${CONN.id}"),
-                _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_PRODUCER) : null,
-                tracer.procAttr(tracer.PA_MAP_OF_ANY, "message.header.out.", "HEADERS"),
-                _dtrace_enabled ? dtrace_send() : null)
+                  _dtrace_enabled ? spy.subchain(
+                    tracer.dtraceOutput(0, tracer.DFK_PRODUCER), dtrace_send()
+                  ) : null,
+                tracer.procAttr(tracer.PA_MAP_OF_ANY, "message.header.out.", "HEADERS"))
               : null)
             .onError(tracer.flags(tracer.SUBMIT_TRACE))
             .onSubmit(_stats ? spy.zorkaStats("java", _mbean, "rabbit", "SEND") : null)
@@ -218,8 +219,9 @@ __spring() {
                   "message.priority", "${PROPS.priority}", "message.exchange", "${PROPS.receivedExchange}",
                   "message.routing_key", "${PROPS.receivedRoutingKey}", "message_bus.source", "${CONN.id}",
                   "peer.port", "${CONN.port}", "peer.ipv4", "${CONN.address}"),
-                _dtrace_enabled ? dtrace_recv() : null,
-                _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER) : null,
+                _dtrace_enabled ? spy.subchain(
+                  dtrace_recv(), tracer.dtraceInput(_dtrace_input_flags,tracer.DFK_CONSUMER)
+                ) : null,
                 tracer.procAttr(tracer.PA_MAP_OF_ANY, "message.header.in.", "HEADERS"))
               : null)
             .onError(tracer.flags(tracer.SUBMIT_TRACE))
