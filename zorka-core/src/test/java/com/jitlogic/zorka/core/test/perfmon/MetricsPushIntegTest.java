@@ -59,7 +59,7 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         zorka.require("ldap.bsh");
         zorka.require("apache/catalina.bsh");
         zorka.require("metrics.bsh");
-        //TestUtil.printLogs();
+        //CommonTestUtil.printLogs(ZorkaLogLevel.TRACE);
         assertNotNull(zorkaAgent.get("metrics")); // Some function to check if scripts loaded properly
     }
 

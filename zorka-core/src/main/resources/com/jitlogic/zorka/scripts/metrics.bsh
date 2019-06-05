@@ -17,7 +17,7 @@
 
 // Basic setup for collecting and submitting metrics to various monitoring systems
 
-zorka.require("jvm.bsh", "tracer.bsh");
+zorka.require("tracer.bsh", "jvm.bsh");
 
 __metrics() {
 
@@ -62,7 +62,7 @@ __metrics() {
     if (cfg.get("user") != null) params.put("u", cfg.get("user"));
     if (cfg.get("pass") != null) params.put("p", cfg.get("pass"));
     httpOut = perfmon.httpTextOutput("INFLUXDB-PUSH-HTTP", cfg, params, null);
-    influxOutput = perfmon.influxPushOutput(cfg, _traceAttrs, _attrFilter, _sampleFilter, httpOut);
+    influxOutput = perfmon.influxPushOutput(cfg, _agent_attrs, _attrFilter, _sampleFilter, httpOut);
     tracer.output(influxOutput);
   }
 
