@@ -29,7 +29,7 @@ __apache_camel() {
             _trace ? spy.subchain(
                 tracer.begin("camel"),
                 _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
-                tracer.formatAttrs(_trace_attrs, "camel.component.class", "${THIS.class.name}",
+                tracer.formatAttrs(_agent_attrs, "camel.component.class", "${THIS.class.name}",
                     "camel.context.name", "${EXCH.context.name}")
             ) : null)
         .include(

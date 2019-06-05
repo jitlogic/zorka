@@ -47,7 +47,7 @@ __alfresco() {
              _trace ? spy.subchain(
                  tracer.begin("job", _traceTime),
                  _dtrace_enabled ? tracer.dtraceOutput(_dtrace_input_flags, tracer.DFK_JOB) : null,
-                 tracer.formatAttrs(_trace_attrs, "job.worker", "${THIS}", "job.type", "alfresco.batch")
+                 tracer.formatAttrs(_agent_attrs, "job.worker", "${THIS}", "job.type", "alfresco.batch")
              ) : null)
          .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
          .onSubmit(spy.zorkaStats("java", _mbean, "stats", "AF_BATCH"))
@@ -60,7 +60,7 @@ __alfresco() {
              _trace ? spy.subchain(
                  tracer.begin("job", _importTime),
                  _dtrace_enabled ? tracer.dtraceOutput(_dtrace_input_flags, tracer.DFK_JOB) : null,
-                 tracer.formatAttrs(_trace_attrs, "alfresco.node", "${NODE_REF}", "job.type", "alfresco.import")
+                 tracer.formatAttrs(_agent_attrs, "alfresco.node", "${NODE_REF}", "job.type", "alfresco.import")
              ) : null)
          .onError(_trace ? tracer.flags(tracer.SUBMIT_TRACE) : null)
          .onSubmit(spy.zorkaStats("java", _mbean, "stats", "AF_IMPORT"))
@@ -76,7 +76,7 @@ __alfresco() {
         ) : null)
         .onReturn(spy.fetchRetVal("RSLT"))
         .onSubmit(
-          tracer.formatAttrs(_trace_attrs, "http.url", "${URI}",
+          tracer.formatAttrs(_agent_attrs, "http.url", "${URI}",
               "http.status_code", "${RSLT.status.code}"))
         .include(
           spy.byMethod(0, "org.springframework.extensions.webscripts.connector.HttpConnector", "call",

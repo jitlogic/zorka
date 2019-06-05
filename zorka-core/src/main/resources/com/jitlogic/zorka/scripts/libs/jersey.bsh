@@ -30,7 +30,7 @@ __jersey() {
     .onError(tracer.markError())
     .onSubmit(
       spy.get("SERVICE", "REQ", "baseUri"),
-      rest._trace ? tracer.formatAttrs(_trace_attrs, "rest.service", "SERVICE", "http.url", "${REQ.requestUri}",
+      rest._trace ? tracer.formatAttrs(_agent_attrs, "rest.service", "SERVICE", "http.url", "${REQ.requestUri}",
           "http.method", "${REQ.method}") : null,
       rest._stats ? spy.subchain(
         spy.zorkaStats("java", rest._mbean, "stats", "SVC")

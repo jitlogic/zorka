@@ -24,8 +24,8 @@ __jvm() {
           zorka.registerMbs("java", mbs);
           zorka.logInfo("Registered platform mbean server as 'java'");
           pdesc = java.lang.management.ManagementFactory.getRuntimeMXBean().getName().split("@");
-          _trace_attrs.put("local.pid", pdesc[0]);
-          _trace_attrs.put("local.host", pdesc[1]);
+          _agent_attrs.put("local.pid", pdesc[0]);
+          _agent_attrs.put("local.host", pdesc[1]);
       } else {
           zorka.logInfo("Platform mbean server already registered. Skipping.");
       }
@@ -98,7 +98,7 @@ __jvm() {
       .onEnter(spy.fetchArg("THIS", 0),
         _trace_enabled ? spy.subchain(
           tracer.begin("http"),
-          tracer.formatAttrs(_trace_attrs)
+          tracer.formatAttrs(_agent_attrs)
         ): null,
         _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
         sun_http_client_pre(),
@@ -164,6 +164,6 @@ __jvm() {
 }
 
 // Will be used in all tracing configurations
-_trace_attrs = zorka.mapCfg("tracer.attrs");
+_agent_attrs = zorka.mapCfg("agent.attrs");
 
 jvm = __jvm();

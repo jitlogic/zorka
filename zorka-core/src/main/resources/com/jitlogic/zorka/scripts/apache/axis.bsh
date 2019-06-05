@@ -57,7 +57,7 @@ __axis() {
         soap._fetch_xml ? spy.format("XML_IN",  "${CTX.requestMessage.SOAPEnvelope}") : null,
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
         soap._trace ? spy.subchain(
-          tracer.formatAttrs(_trace_attrs, "soap.url", "${SERVICE}", "soap.method", "${METHOD}"),
+          tracer.formatAttrs(_agent_attrs, "soap.url", "${SERVICE}", "soap.method", "${METHOD}"),
           soap._fetch_xml ? tracer.attr("soap.xml.in", "XML_IN") : null,
           soap._fetch_xml ? tracer.attr("soap.xml.out", "XML_OUT") : null
         ) : null,
@@ -102,7 +102,7 @@ __axis() {
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
         spy.strTime("TIME"),
         soap._trace ? spy.subchain(
-          tracer.formatAttrs(_trace_attrs, "span.client", "CLIENT", "soap.url", "${SERVICE}", "soap.method", "${METHOD}"),
+          tracer.formatAttrs(_agent_attrs, "span.client", "CLIENT", "soap.url", "${SERVICE}", "soap.method", "${METHOD}"),
           soap._fetch_xml ? tracer.attr("soap.xml.in", "XML_IN") : null,
           soap._fetch_xml ? tracer.attr("soap.xml.out", "XML_OUT") : null
         ) : null,
@@ -132,7 +132,7 @@ __axis() {
         soap._fetch_xml ? spy.format("XML_OUT", "${CTX.responseMessage.SOAPEnvelope}") : null,
         spy.strTime("TIME"),
         soap._trace ? spy.subchain(
-          tracer.formatAttrs(_trace_attrs, "soap.url", "${SERVICE}", "soap.method", "${METHOD}"),
+          tracer.formatAttrs(_agent_attrs, "soap.url", "${SERVICE}", "soap.method", "${METHOD}"),
           soap._fetch_xml ? tracer.attr("soap.xml.in", "XML_IN") : null,
           soap._fetch_xml ? tracer.attr("soap.xml.out", "XML_OUT") : null
         ) : null,

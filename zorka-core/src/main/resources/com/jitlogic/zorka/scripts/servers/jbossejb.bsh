@@ -32,7 +32,7 @@ __jbossejb() {
         ejb._trace ? spy.subchain(
           tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
           _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
-          tracer.formatAttrs(_trace_attrs, "ejb.method", "${METHOD}", "ejb.class", "${CLASS}")
+          tracer.formatAttrs(_agent_attrs, "ejb.method", "${METHOD}", "ejb.class", "${CLASS}")
         ) : null)
       .onError(
         ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
@@ -55,7 +55,7 @@ __jbossejb() {
         spy.fetchArg("MDESC", 2), spy.fetchArg("ARGS", 3),
         ejb._trace ? spy.subchain(
           tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
-          tracer.formatAttrs(_trace_attrs, "ejb.class", "${MDESC.declaringClass.name}", "ejb.method", "${MDESC.name}")
+          tracer.formatAttrs(_agent_attrs, "ejb.class", "${MDESC.declaringClass.name}", "ejb.method", "${MDESC.name}")
         ) : null)
       .onError(
         ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,

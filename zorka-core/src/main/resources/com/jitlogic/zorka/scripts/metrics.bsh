@@ -17,7 +17,7 @@
 
 // Basic setup for collecting and submitting metrics to various monitoring systems
 
-zorka.require("tracer.bsh");
+zorka.require("jvm.bsh", "tracer.bsh");
 
 __metrics() {
 
@@ -26,8 +26,7 @@ __metrics() {
   _interval = zorka.intCfg("metrics.interval", 10000);
   _delay = zorka.intCfg("metrics.delay", 10000);
 
-  _constAttrs = zorka.mapCfg("metrics.attr.set");
-  _attrFilter = perfmon.attrFilter(_constAttrs,
+  _attrFilter = perfmon.attrFilter(_agent_attrs,
       zorka.listCfg("metrics.attr.include"),
       zorka.listCfg("metrics.attr.exclude"));
   _sampleFilter = perfmon.sampleFilter(
@@ -63,7 +62,7 @@ __metrics() {
     if (cfg.get("user") != null) params.put("u", cfg.get("user"));
     if (cfg.get("pass") != null) params.put("p", cfg.get("pass"));
     httpOut = perfmon.httpTextOutput("INFLUXDB-PUSH-HTTP", cfg, params, null);
-    influxOutput = perfmon.influxPushOutput(cfg, _constAttrs, _attrFilter, _sampleFilter, httpOut);
+    influxOutput = perfmon.influxPushOutput(cfg, _traceAttrs, _attrFilter, _sampleFilter, httpOut);
     tracer.output(influxOutput);
   }
 
@@ -78,7 +77,7 @@ __metrics() {
     if ("summary".equals(report)) params.put("summary", "true");
     if ("detail".equals(report)) params.put("detail", "true");
     httpOut = perfmon.httpTextOutput("OPENTSDB-PUSH-HTTP", cfg, params, null);
-    tsdbOutput = perfmon.tsdbPushOutput(cfg, _constAttrs, _attrFilter, _sampleFilter, httpOut);
+    tsdbOutput = perfmon.tsdbPushOutput(cfg, _agent_attrs, _attrFilter, _sampleFilter, httpOut);
     tracer.output(tsdbOutput);
   }
 
@@ -89,7 +88,7 @@ __metrics() {
     zorka.logInfo("Enabling Graphite (TCP): sending data to:" + zorka.stringCfg("graphite.addr"));
     cfg = zorka.mapCfg("graphite");
     tcpOut = perfmon.tcpTextOutput("GRAPHITE-PUSH-TCP", cfg);
-    graphiteOutput = perfmon.graphitePushOutput(cfg, _constAttrs, _attrFilter, _sampleFilter, tcpOut);
+    graphiteOutput = perfmon.graphitePushOutput(cfg, _agent_attrs, _attrFilter, _sampleFilter, tcpOut);
     tracer.output(graphiteOutput);
   }
 
@@ -100,7 +99,7 @@ __metrics() {
       + zorka.stringCfg("prometheus.push.url"));
     _promPushCfg = zorka.mapCfg("prometheus.push");
     promPushHttp = perfmon.httpTextOutput("PROMETHEUS-PUSH-HTTP", _promPushCfg, null, null);
-    promPushOutput = perfmon.prometheusPushOutput(_promPushCfg, _constAttrs, _attrFilter, _sampleFilter, promPushHttp);
+    promPushOutput = perfmon.prometheusPushOutput(_promPushCfg, _agent_attrs, _attrFilter, _sampleFilter, promPushHttp);
     tracer.output(promPushOutput);
   }
 
@@ -113,7 +112,7 @@ __metrics() {
       _promCfg = zorka.mapCfg("prometheus");
       promHttpEndpoint = perfmon.httpTextEndpoint("/metrics");
       _httpService.addEndpoint(promHttpEndpoint);
-      promPushOutput = perfmon.prometheusPushOutput(_promCfg, _constAttrs, _attrFilter, _sampleFilter, promHttpEndpoint);
+      promPushOutput = perfmon.prometheusPushOutput(_promCfg, _agent_attrs, _attrFilter, _sampleFilter, promHttpEndpoint);
       tracer.output(promPushOutput);
     }
   }

@@ -43,7 +43,7 @@ __quartz() {
       spy.get("KEY", "DETAIL", "key"),
       _trace ? spy.subchain(
         tracer.begin("job", zorka.longCfg("quartz.trace.time")),
-        tracer.formatAttrs(_trace_attrs, "job.name", "${KEY.name|DETAIL.name}",
+        tracer.formatAttrs(_agent_attrs, "job.name", "${KEY.name|DETAIL.name}",
           "job.group", "${KEY.group|DETAIL.group}", "job.refire.count", "${CTX.refireCount}",
           "job.fire.time", "${CTX.fireTime}", "job.scheduled.time", "${CTX.scheduledFireTime}",
           "job.next.time", "${CTX.nextFireTime}", "job.description", "${DETAIL.description}",

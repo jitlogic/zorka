@@ -58,7 +58,7 @@ __spring() {
           _trace ? spy.subchain(
             tracer.begin("spring", _traceTime),
             _dtrace_enabled ? tracer.dtraceInput(0, tracer.DFK_CLIENT) : null,
-            tracer.formatAttrs(_trace_attrs, "CLASS", "${BT.name}", "METHOD", "${THIS.method.name}"),
+            tracer.formatAttrs(_agent_attrs, "CLASS", "${BT.name}", "METHOD", "${THIS.method.name}"),
             __invokeArgsProcessor()
           ) : null)
         .onReturn(
@@ -123,7 +123,7 @@ __spring() {
             _trace ? spy.subchain(
               proc_headers("HDR_OUT", "http.header.out."),
               tracer.begin("http", _traceTime),
-              tracer.formatAttrs(_trace_attrs, "http.url", "${CONN.requestUri}"),
+              tracer.formatAttrs(_agent_attrs, "http.url", "${CONN.requestUri}"),
               _dtrace_enabled ? tracer.dtraceOutput(0, tracer.DFK_CLIENT) : null,
               _dtrace_enabled ? dtrace_req() : null)
             : null)
@@ -175,7 +175,7 @@ __spring() {
               spy.get("HEADERS", "PROPS", "headers"),
               _trace ? spy.subchain(
                 tracer.begin("amqp"),
-                tracer.formatAttrs(_trace_attrs, "message.exchange", "${EXCH}",
+                tracer.formatAttrs(_agent_attrs, "message.exchange", "${EXCH}",
                   "message.routing_key", "${RKEY}", "message.delivery", "${PROPS.deliveryMode}",
                   "message.content_type", "${PROPS.contentType}", "message.priority", "${PROPS.priority}",
                   "peer.port", "${CONN.port}", "peer.ipv4", "${CONN.address}",
@@ -215,7 +215,7 @@ __spring() {
               spy.get("HEADERS", "PROPS", "headers"),
               _trace ? spy.subchain(
                 tracer.begin("amqp"),
-                tracer.formatAttrs(_trace_attrs, "message.content_type", "${PROPS.contentType}",
+                tracer.formatAttrs(_agent_attrs, "message.content_type", "${PROPS.contentType}",
                   "message.priority", "${PROPS.priority}", "message.exchange", "${PROPS.receivedExchange}",
                   "message.routing_key", "${PROPS.receivedRoutingKey}", "message_bus.source", "${CONN.id}",
                   "peer.port", "${CONN.port}", "peer.ipv4", "${CONN.address}"),

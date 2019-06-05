@@ -35,7 +35,7 @@ __glassfish() {
           ejb._trace ? spy.subchain(
             tracer.begin("ejb", zorka.longCfg("ejb.trace.time")),
             _dtrace_enabled ? tracer.dtraceInput(_dtrace_input_flags, tracer.DFK_COMPONENT) : null,
-            tracer.formatAttrs(_trace_attrs, "ejb.method", "${MDESC.name}", "ejb.class", "${MDESC.declaringClass.name}")
+            tracer.formatAttrs(_agent_attrs, "ejb.method", "${MDESC.name}", "ejb.class", "${MDESC.declaringClass.name}")
           ) : null)
       .onError(
           ejb._trace ? tracer.flags(tracer.SUBMIT_TRACE) : null,
