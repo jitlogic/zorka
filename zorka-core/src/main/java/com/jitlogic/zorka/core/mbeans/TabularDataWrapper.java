@@ -198,7 +198,7 @@ public class TabularDataWrapper<V> implements TabularData, Serializable {
         Object obj = extractor.get((String) key[0]);
 
         if (obj == null) {
-            log.warn("Cannot find element '" + key[0] + "'");
+            log.warn("Cannot find element '{}'", key[0]);
             return null;
         }
 

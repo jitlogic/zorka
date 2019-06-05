@@ -56,7 +56,7 @@ public class ZabbixActiveCleanerTask implements Runnable {
 			responseQueue.poll();
 		}
 		if (itemsCount > 0) {
-			log.debug("ZabbixActiveSender " + itemsCount + " items removed from cache");
+			log.debug("ZabbixActiveSender {} items removed from cache", itemsCount);
 		}
 	}
 

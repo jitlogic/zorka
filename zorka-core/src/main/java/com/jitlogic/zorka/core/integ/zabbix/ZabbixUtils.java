@@ -77,8 +77,8 @@ public final class ZabbixUtils {
 		}
 
 		long len = msg.length();
-		log.debug("Message: '" + msg + "'");
-		log.debug("Message length: " + len);
+		log.debug("Message: '{}'", msg);
+		log.debug("Message length: {}", len);
 
 		for (int i = 0; i < 8; i++) {
 			buf[i + ZabbixUtils._ZBX_HDR.length] = (byte) (len & 0xff);

@@ -43,8 +43,7 @@ public class TlsContextBuilder {
         if (keyStorePath != null) {
             File keyStoreFile = new File(keyStorePath);
             if (!keyStoreFile.exists()) {
-                log.error("Cannot initialize TLS for service '" + prefix + "': file " + keyStorePath
-                        + " is missing. Service " + prefix + " will not start properly.");
+                log.error("Cannot initialize TLS for service '{}': file {} is missing", prefix, keyStorePath);
                 return;
             }
 
@@ -62,7 +61,7 @@ public class TlsContextBuilder {
                 keyManagers = kmf.getKeyManagers();
                 trustManagers = tmf.getTrustManagers();
             } catch (Exception e) {
-                log.error("Cannot load TLS key for '" + prefix + "'", e);
+                log.error("Cannot load TLS key for '{}'", prefix, e);
             } finally {
                 ZorkaUtil.close(is);
             }
@@ -77,7 +76,7 @@ public class TlsContextBuilder {
 
             File trustStoreFile = new File(trustStorePath);
             if (!trustStoreFile.exists()) {
-                log.error("Cannot initialize TLS for client " + prefix + ": file " + trustStorePath + " is missing. Service " + prefix + " will not start.");
+                log.error("Cannot initialize TLS for client {}: file {} is missing.", prefix, trustStorePath);
                 return;
             }
 
@@ -102,7 +101,7 @@ public class TlsContextBuilder {
                     is = new FileInputStream(trustStoreFile);
                     localTS.load(is, trustStorePass.toCharArray());
                 } catch (IOException e) {
-                    log.error("Cannot load trust store file " + trustStoreFile, e);
+                    log.error("Cannot load trust store file {}", trustStoreFile, e);
                     return;
                 } finally {
                     ZorkaUtil.close(is);
@@ -126,7 +125,7 @@ public class TlsContextBuilder {
 
                 trustManagers = new TrustManager[] { new TlsTrustManager(defaultTM, localTM) };
             } catch (Exception e) {
-                log.error("Trust store for '" + prefix + "' did not configure properly", e);
+                log.error("Trust store for '{}' did not configure properly", prefix, e);
             }
         }
     }

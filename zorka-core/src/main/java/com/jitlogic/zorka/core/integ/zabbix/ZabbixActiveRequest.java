@@ -100,7 +100,7 @@ public class ZabbixActiveRequest {
 	 */
 	public void send(String message) throws IOException {
 		byte[] buf = ZabbixUtils.zbx_format(message);
-		log.debug("Zorka send: " + new String(buf));
+		log.debug("Zorka send: {}", new String(buf));
 
 		OutputStream out = socket.getOutputStream();
 		out.write(buf);
@@ -130,7 +130,7 @@ public class ZabbixActiveRequest {
 		String s = null;
 		if (reqs.isEmpty()) {
 			s = ZabbixUtils.decode(socket.getInputStream());
-			log.debug("Zorka get:" + s);
+			log.debug("Zorka get: {}", s);
 		}
 		return s;
 	} // getReq()

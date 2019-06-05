@@ -148,7 +148,7 @@ public class JmxScanner {
             Number val = metric.getValue(clock, result.getValue());
 
             if (val == null) {
-                log.debug("Obtained null value for metric '%s'. Skipping. ", metric);
+                log.debug("Obtained null value for metric '{}'. Skipping. ", metric);
                 AgentDiagnostics.inc(AgentDiagnostics.PMON_NULLS);
                 continue;
             }
@@ -175,7 +175,7 @@ public class JmxScanner {
                 sample.setAttrs(attrs);
             }
 
-            log.trace("Submitting sample: %s", sample);
+            log.trace("Submitting sample: {}", sample);
             smpl.add(sample);
         }
         return smpl;
@@ -189,7 +189,7 @@ public class JmxScanner {
             MetricTemplate template = lister.getMetricTemplate();
             if (template != null) {
 
-                log.debug("Scanning query: %s", lister);
+                log.debug("Scanning query: {}", lister);
                 AgentDiagnostics.inc(AgentDiagnostics.PMON_QUERIES);
 
                 samples.addAll(getPerfSamples(clock, lister));

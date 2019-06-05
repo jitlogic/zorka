@@ -112,7 +112,7 @@ public class AgentConfig extends ZorkaConfig {
 
         initNetkitLogger();
 
-        log.info("Starting ZORKA agent " + get("zorka.version"));
+        log.info("Starting ZORKA agent {}", get("zorka.version"));
     }
 
 

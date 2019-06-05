@@ -51,7 +51,7 @@ public class HttpService implements ZorkaService {
             sslContext = TlsContextBuilder.svrContext(keystore, keypass);
         }
 
-        log.info( (tlsEnabled ? "HTTPS" : "HTTP") + " service listening on port: " + listenPort);
+        log.info("{} service listening on port: {}", tlsEnabled ? "HTTPS" : "HTTP", listenPort);
 
         bufHandlerFactory = new BufHandlerFactory() {
             @Override
@@ -64,7 +64,7 @@ public class HttpService implements ZorkaService {
             server = new NetServer("ZORKA-http-" + prefix,
                     listenAddr, listenPort, bufHandlerFactory, sslContext);
         } catch (IOException e) {
-            log.error("Cannot start HTTP service '" + prefix + "'", e);
+            log.error("Cannot start HTTP service '{}'", prefix, e);
         }
     }
 

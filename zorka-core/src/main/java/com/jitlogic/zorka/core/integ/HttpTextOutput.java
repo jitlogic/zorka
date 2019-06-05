@@ -107,13 +107,13 @@ public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
 
                 // TODO what about 302 ?
                 if (res.getStatus() >= 400) {
-                    log.warn(url + ": error " + res.getStatus());
+                    log.warn("{}: error {}", url, res.getStatus());
                     if (log.isDebugEnabled()) {
-                        log.debug(url + ": request: '" + req.getBodyAsString() + "'");
-                        log.debug(url + ": response: '" + res.getBodyAsString() + "'");
+                        log.debug("{}: request: '{}'", url, req.getBodyAsString());
+                        log.debug("{}: response: '{}'", url, res.getBodyAsString());
                     }
                 } else if (log.isDebugEnabled()) {
-                    log.debug("HTTP: " + url + " -> " + res.getStatus());
+                    log.debug("HTTP: {} -> {}", url, res.getStatus());
                 }
             } catch (Exception e) {
                 log.error("Error sending HTTP request", e);

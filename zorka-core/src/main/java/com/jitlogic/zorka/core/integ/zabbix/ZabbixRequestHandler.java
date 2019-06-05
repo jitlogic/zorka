@@ -196,11 +196,11 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
     public void handleResult(Object rslt) {
         try {
             tStop = System.nanoTime();
-            log.debug("OK [t=" + (tStop - tStart) / 1000000L + "ms] '" + req + "' -> '" + rslt + "'");
+            log.debug("OK [t={}ms] '{}' -> '{}'", (tStop - tStart) / 1000000L, req, rslt);
             AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_TIME, tStop - tStart);
             send(serialize(rslt));
         } catch (IOException e) {
-            log.error("I/O error returning result: " + e.getMessage());
+            log.error("I/O error returning result: {}", e.getMessage());
         } finally {
             try {
                 socket.close();
@@ -229,11 +229,11 @@ public class ZabbixRequestHandler implements ZorkaRequestHandler {
         AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_ERRORS);
         try {
             this.tStop = System.nanoTime();
-            log.error("ERROR [t=" + (tStop - tStart) / 1000000L + "ms] + '" + req + "'", e);
+            log.error("ERROR [t={}ms] + '{}'", (tStop - tStart) / 1000000L, req, e);
             AgentDiagnostics.inc(AgentDiagnostics.ZABBIX_TIME, tStop - tStart);
             send(ZBX_NOTSUPPORTED);
         } catch (IOException e1) {
-            log.error("I/O Error returning (error) result: " + e.getMessage());
+            log.error("I/O Error returning (error) result: {}", e.getMessage());
         } finally {
             try {
                 socket.close();

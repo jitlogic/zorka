@@ -138,7 +138,7 @@ public class ZorkaLib implements ZorkaService {
         String conname = args.get(0).toString();
         MBeanServerConnection conn = mbsRegistry.lookup(conname);
         if (conn == null) {
-            log.error("MBean server named '" + args.get(0) + "' is not registered.");
+            log.error("MBean server named '{}' is not registered.", args.get(0));
             return objs;
         }
         ClassLoader cl0 = Thread.currentThread().getContextClassLoader(), cl1 = mbsRegistry.getClassLoader(conname);
@@ -157,9 +157,9 @@ public class ZorkaLib implements ZorkaService {
                 try {
                     obj = conn.getAttribute(name, args.get(2).toString());
                 } catch (AttributeNotFoundException e) {
-                    log.error("Object '" + conname + "|" + name + "' has no attribute '" + args.get(2) + "'.", e);
+                    log.error("Object '{}|{}' has no attribute '{}'.", conname, name, args.get(2), e);
                 } catch (Exception e) {
-                    log.error("Error getting attribute '" + args.get(2) + "' from '" + conname + "|" + name + "'", e);
+                    log.error("Error getting attribute '{}' from '{}|{}'", args.get(2), conname, name,  e);
                 }
 
                 if (args.size() > 3) {
@@ -220,7 +220,7 @@ public class ZorkaLib implements ZorkaService {
         MBeanServerConnection conn = mbsRegistry.lookup(conname);
 
         if (conn == null) {
-            log.error("MBean server named '" + argList.get(0) + "' is not registered.");
+            log.error("MBean server named '{}' is not registered.", argList.get(0));
             return null;
         }
 
@@ -245,10 +245,10 @@ public class ZorkaLib implements ZorkaService {
             }
             obj = conn.getAttribute(name, argList.get(2).toString());
         } catch (AttributeNotFoundException e) {
-            log.error("Object '" + conname + "|" + name + "' has no attribute '" + argList.get(2) + "'.", e);
+            log.error("Object '{}|{}' has no attribute '{}'.", conname, name, argList.get(2), e);
             return null;
         } catch (Exception e) {
-            log.error("Error getting attribute '" + argList.get(2) + "' from '" + conname + "|" + name + "'", e);
+            log.error("Error getting attribute '{}' from '{}|{}'", argList.get(2), conname, name, e);
         } finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
@@ -336,7 +336,7 @@ public class ZorkaLib implements ZorkaService {
         MBeanServerConnection conn = mbsRegistry.lookup(conname);
 
         if (conn == null) {
-            log.error("MBean server named '" + conname + "' is not registered.");
+            log.error("MBean server named '{}' is not registered.", conname);
             return null;
         }
 
@@ -358,7 +358,7 @@ public class ZorkaLib implements ZorkaService {
             }
             obj = conn.invoke(name, mname, coerceArgs(msign,args), parseSignature(msign));
         } catch (Exception e) {
-            log.error("Error invoking method '" + mname + "' from '" + conname + "|" + name + "'", e);
+            log.error("Error invoking method '{}' from '{}|{}'", mname, conname, name, e);
         } finally {
             if (cl1 != null) {
                 Thread.currentThread().setContextClassLoader(cl0);
@@ -388,7 +388,7 @@ public class ZorkaLib implements ZorkaService {
         MBeanServerConnection conn = mbsRegistry.lookup(mbsName);
 
         if (conn == null) {
-            log.error("MBean server named '" + mbsName + "' is not registered.");
+            log.error("MBean server named '{}' is not registered.", mbsName);
             return null;
         }
 
@@ -908,9 +908,9 @@ public class ZorkaLib implements ZorkaService {
         String path = ZorkaUtil.path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(config.getProperties(), path, false);
         if (props != null) {
-            log.info("Loaded property file: " + path);
+            log.info("Loaded property file: {}", path);
         } else {
-            log.info("Property file not found: " + path);
+            log.info("Property file not found: {}", path);
         }
         return props;
     }
@@ -920,9 +920,9 @@ public class ZorkaLib implements ZorkaService {
         String path = ZorkaUtil.path(config.getHomeDir(), fname);
         Properties props = config.loadCfg(properties, path, verbose);
         if (props != null) {
-            log.info("Loaded property file: " + path);
+            log.info("Loaded property file: {}", path);
         } else {
-            log.info("Property file not found: " + path);
+            log.info("Property file not found: {}", path);
         }
         return props;
     }

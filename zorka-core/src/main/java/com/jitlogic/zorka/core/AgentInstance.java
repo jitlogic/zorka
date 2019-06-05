@@ -600,9 +600,8 @@ public class AgentInstance implements ZorkaService {
         initBshLibs();
         getZorkaAgent().reloadScripts();
         long l = AgentDiagnostics.get(AgentDiagnostics.CONFIG_ERRORS);
-        log.info("Agent configuration scripts executed (" + l + " errors).");
-        log.info("Number of matchers in tracer configuration: "
-                + tracer.getMatcherSet().getMatchers().size());
+        log.info("Agent configuration scripts executed ({} errors).", l);
+        log.info("Number of matchers in tracer configuration: {}", tracer.getMatcherSet().getMatchers().size());
     }
 
     public void reload() {
@@ -627,14 +626,14 @@ public class AgentInstance implements ZorkaService {
         // Check for scripts to load automatically
         if (getConfig().boolCfg("scripts.auto", false)) {
             if (log.isDebugEnabled()) {
-                log.debug("Loaded scripts (before): " + bsh.getLoadedScripts());
+                log.debug("Loaded scripts (before): {}", bsh.getLoadedScripts());
             }
             Class[] allLoadedClasses = getRetransformer().getAllLoadedClasses();
-            log.info("Probing for BSH scripts (" + allLoadedClasses.length + " classes to be probed).");
+            log.info("Probing for BSH scripts ({} classes to be probed).", allLoadedClasses.length);
             bsh.probeSetup();
             for (Class c : allLoadedClasses) {
                 if (log.isTraceEnabled()) {
-                    log.trace("Probing class: " + c.getName());
+                    log.trace("Probing class: {}", c.getName());
                 }
                 bsh.probe(c.getName());
             }
@@ -651,7 +650,7 @@ public class AgentInstance implements ZorkaService {
                 removed++;
             }
         }
-        log.info("Number of sdefs removed: " + removed);
+        log.info("Number of sdefs removed: {}", removed);
 
     }
 }

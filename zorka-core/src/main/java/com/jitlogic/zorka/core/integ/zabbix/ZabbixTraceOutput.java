@@ -99,12 +99,8 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 		super("zabbix-output", qlen, 1, interval);
 
-		log.debug("Configured tracer output: host=" + hostname
-				+ ", addr=" + addr 
-				+ ", port=" + port
-				+ ", qlen=" + qlen 
-				+ ", packetSize=" + packetSize
-				+ ", interval=" + interval);
+		log.debug("Configured tracer output: host={}, addr={}, port={}, qlen={}, packetSize={}, interval={}",
+			hostname, addr, port, qlen, packetSize, interval);
 
 		this.symbolRegistry = symbolRegistry;
 		this.metricsRegistry = metricsRegistry;
@@ -163,7 +159,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 				/* Open Connection */
 				close();
-				log.debug("Opening connection to " + hostname + " -> " + serverAddr + ":" + serverPort);
+				log.debug("Opening connection to {} -> {}:{}", hostname, serverAddr, serverPort);
 				socket = new Socket(serverAddr, serverPort);
 
 				results.clear();
@@ -195,26 +191,26 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 			} catch (UnknownHostException e) {
 				/* Error caused by unkown host -> failure with no retries */
-				log.error("Error sending trace record: " + e + ". Trace will be lost.");
+				log.error("Error sending trace record: {}. Trace will be lost.", e.getMessage());
 				AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_LOST);
 				return;
 
 			} catch (InterruptedException e) {
 				/* Error while taking record from queue */
-				log.error("Error retrieving trace record: " + e + ". Trace will be lost.");
+				log.error("Error retrieving trace record: {}. Trace will be lost.", e.getMessage());
 				AgentDiagnostics.inc(AgentDiagnostics.ZICO_PACKETS_LOST);
 				return;
 
 			} catch (IOException e) {
 				/* Error while sending */
-				log.error("Error sending trace record: " + e + ". Resetting connection.");
+				log.error("Error sending trace record: {}. Resetting connection.", e.getMessage());
 				close();
 				AgentDiagnostics.inc(AgentDiagnostics.ZICO_RECONNECTS);
 			}
 
 			/* Wait before retry */
 			try {
-				log.debug("Will retry (wait=" + rt + ")");
+				log.debug("Will retry (wait={})", rt);
 				Thread.sleep(rt);
 			} catch (InterruptedException e) {
 				log.debug(e.getMessage());
@@ -253,7 +249,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		}
 
 		for (ActiveCheckResult result : list){
-			log.debug("### Data: " + result.toString());
+			log.debug("### Data: {}", result.toString());
 		}
 
 		return list;
@@ -339,7 +335,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		} else {
 			key = prefix + "." + keySuffix;
 		}
-		log.debug("### traceRecordToData: key=" + key);
+		log.debug("### traceRecordToData: key={}", key);
 		
 		
 		/* Time */
@@ -351,7 +347,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		result.setLastlogsize(0);
 		result.setClock(clock);
 		list.add(result);
-		log.debug("### traceRecordToData: data=" + result.toString());
+		log.debug("### traceRecordToData: data={}", result.toString());
 
 		/* Calls */
 		result = new ActiveCheckResult();
@@ -362,7 +358,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		result.setLastlogsize(0);
 		result.setClock(clock);
 		list.add(result);
-		log.debug("### traceRecordToData: data=" + result.toString());
+		log.debug("### traceRecordToData: data={}", result.toString());
 
 		/* Errors */
 		result = new ActiveCheckResult();
@@ -372,13 +368,13 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		result.setLastlogsize(0);
 		result.setClock(clock);
 		list.add(result);
-		log.debug("### traceRecordToData: data=" + result.toString());
+		log.debug("### traceRecordToData: data={}", result.toString());
 
 		/* Recursive check children */
 		if ((level <= 1) && (traceRecord.getChildren() != null)) {
-			log.debug("### traceRecordToData: children.size()=" + traceRecord.getChildren().size());
+			log.debug("### traceRecordToData: children.size()={}", traceRecord.getChildren().size());
 			for (TraceRecord child : traceRecord.getChildren()) {
-				log.debug("### traceRecordToData: child=" + child.toString());
+				log.debug("### traceRecordToData: child={}", child.toString());
 				list.addAll(traceRecordToData(child, key + ".backends", level+1));
 			}
 		}
@@ -392,8 +388,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 
 	@Override
 	public synchronized void close() {
-		log.debug("Closing connection: " + hostname
-				+ " -> " + serverAddr + ":" + serverPort);
+		log.debug("Closing connection: {} -> {}:{}", hostname, serverAddr, serverPort);
 
 		if (socket != null) {
 			try {

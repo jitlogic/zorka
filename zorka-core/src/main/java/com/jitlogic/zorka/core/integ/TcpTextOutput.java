@@ -59,7 +59,7 @@ public class TcpTextOutput extends ZorkaAsyncThread<String> {
                 if (pstr.matches("\\d+")) {
                     this.port = Integer.parseInt(pstr);
                 } else {
-                    log.error("Cannot parse TCP port number: '" + pstr + "'");
+                    log.error("Cannot parse TCP port number: '{}'", pstr);
                 }
             }
 
@@ -70,10 +70,10 @@ public class TcpTextOutput extends ZorkaAsyncThread<String> {
 
     @Override
     protected void process(List<String> msgs) {
-        log.debug("Received " + msgs.size() + " messages to send.");
+        log.debug("Received {} messages to send.", msgs.size());
         for (String msg : msgs) {
             if (log.isTraceEnabled()) {
-                log.trace("Sending data to " + host + ":" + port + ": " + msg);
+                log.trace("Sending data to {}:{}: {}", host, port, msg);
             }
             Socket socket = null;
             try {
@@ -84,14 +84,14 @@ public class TcpTextOutput extends ZorkaAsyncThread<String> {
                 os.flush();
                 // TODO AgentDiagnostics.inc(true, AgentDiagnostics.COUNTER_ID);
             } catch (IOException e) {
-                log.error("Error sending data to " + host + ":" + port, e);
+                log.error("Error sending data to {}:{}", host, port, e);
             } finally {
                 try {
                     if (socket != null) {
                         socket.close();
                     }
                 } catch (Exception e) {
-                    log.error("Error closing socket to " + host + ":" + port, e);
+                    log.error("Error closing socket to {}:{}", host, port, e);
                 }
             }
         }

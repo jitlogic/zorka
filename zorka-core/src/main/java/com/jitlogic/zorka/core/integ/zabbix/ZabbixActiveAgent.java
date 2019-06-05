@@ -139,7 +139,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		try {
 			activeAddr = InetAddress.getByName(activeIp.trim());
 		} catch (UnknownHostException e) {
-			log.error("Cannot parse " + prefix + ".server.addr in zorka.properties", e);
+			log.error("Cannot parse {}.server.addr in zorka.properties", prefix, e);
 			AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
 		}
 
@@ -150,15 +150,15 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		activeCheckInterval = config.intCfg(prefix + ".check.interval", 120);
 		agentHost = config.stringCfg("zorka.hostname", null);
 
-		log.info("ZabbixActive Agent (" + agentHost + ") will send Active Checks to " +
-				activeAddr + ":" + activePort + " every " + activeCheckInterval + " seconds");
+		log.info("ZabbixActive Agent ({}) will send Active Checks to {}:{} every {} seconds",
+			agentHost, activeAddr, activePort, activeCheckInterval);
 
 		senderInterval = config.intCfg(prefix + ".sender.interval", 60);
 		maxBatchSize = config.intCfg(prefix + ".batch.size", 10);
 		maxCacheSize = config.intCfg(prefix + ".cache.size", 150);
-		log.info("ZabbixActive Agent (" + agentHost + ") will send up to " + maxBatchSize + " metrics every " +
-				senderInterval + " seconds. Agent will persist up to " + maxCacheSize + " metrics per " + (senderInterval*2) + 
-				" seconds, exceeding records will be discarded.");
+		log.info("ZabbixActive Agent ({}) will send up to {} metrics every {} seconds. "
+				+ " Agent will persist up to {} metrics per {} seconds, exceeding records will be discarded.",
+			agentHost, maxBatchSize, senderInterval, maxCacheSize, (senderInterval*2));
 
 		/* scheduler's infra */
 		runningTasks = new HashMap<ActiveCheckQueryItem, ScheduledFuture<?>>();
@@ -214,12 +214,12 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 					}
 				}
 
-				log.warn("ZORKA-" + prefix + " thread didn't stop after 1000 milliseconds. Shutting down forcibly.");
+				log.warn("ZORKA-{} thread didn't stop after 1000 milliseconds. Shutting down forcibly.", prefix);
 
 				thread.stop();
 				thread = null;
 			} catch (IOException e) {
-				log.error("I/O error in zabbix core main loop: " + e.getMessage());
+				log.error("I/O error in zabbix core main loop: {}", e.getMessage());
 			}
 		}
 	}
@@ -234,7 +234,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 	@Override
 	public void shutdown() {
-		log.info("Shutting down " + prefix + " agent ...");
+		log.info("Shutting down {} agent ...", prefix);
 		stop();
 		close();
 	}
@@ -265,9 +265,9 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
         try {
 			socket = new Socket(activeAddr, activePort);
-			log.info("Successfuly connected to " + activeIpPort);
+			log.info("Successfuly connected to {}", activeIpPort);
 		} catch (IOException e) {
-			log.error("Failed to connect to " + activeIpPort + ". Will try to connect later.", e);
+			log.error("Failed to connect to {}. Will try to connect later.", activeIpPort, e);
 		} finally {
 			close();
 		}
@@ -287,7 +287,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 
 				// get requests for metrics
 				ActiveCheckResponse response = request.getActiveResponse();
-				log.debug("ZabbixActive response.toString() " + response.toString());
+				log.debug("ZabbixActive response.toString() {}", response.toString());
 
 				if(response.getData() == null) {
 				   response.setData(new ArrayList<ActiveCheckQueryItem>());
@@ -295,7 +295,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 				// Schedule all requests
 				scheduleTasks(response);
 			} catch (IOException e) {
-				log.error("Failed to connect to " + activeIpPort, e);
+				log.error("Failed to connect to {}", activeIpPort, e);
 			} finally {
 				close();
 			}
@@ -313,7 +313,7 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 		Set<ActiveCheckQueryItem> tasksToInsert = new HashSet<ActiveCheckQueryItem>(checkData.getData());
 		Set<ActiveCheckQueryItem> tasksToDelete = new HashSet<ActiveCheckQueryItem>(runningTasks.keySet());
 
-		log.debug("ZabbixActive - schedule Tasks: " + checkData.toString());
+		log.debug("ZabbixActive - schedule Tasks: {}", checkData.toString());
 
 		// Configuring: Insert = New - Running(=tasksToDelete antes da alteração)
 		tasksToInsert.removeAll(tasksToDelete);
@@ -332,12 +332,12 @@ public class ZabbixActiveAgent implements Runnable, ZorkaService {
 			if (translator.translate(task.key) != null) {
 				ZabbixActiveTask zabbixActiveTask = new ZabbixActiveTask(agentHost, task, agent, translator, resultsQueue);
 				ScheduledFuture<?> taskHandler = scheduler.scheduleAtFixedRate(zabbixActiveTask, 5, task.getDelay(), TimeUnit.SECONDS);
-				log.debug("ZabbixActive - task: " + task.toString());
+				log.debug("ZabbixActive - task: {}", task.toString());
 				runningTasks.put(task, taskHandler);
 			}
 		}
-		log.debug("ZabbixActive - new scheduled tasks: " + tasksToInsert.size());
-		log.debug("ZabbixActive - deleted old tasks: " + tasksToDelete.size());
+		log.debug("ZabbixActive - new scheduled tasks: {}", tasksToInsert.size());
+		log.debug("ZabbixActive - deleted old tasks: {}", tasksToDelete.size());
 		
 	}
 

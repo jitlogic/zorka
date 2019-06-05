@@ -84,7 +84,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
             if (ps.matches("\\d+")) {
                 chunkSize = Integer.parseInt(ps);
             } else {
-                log.error("Invalid value of *.chunk.size: '" + ps + "' (should be integer)");
+                log.error("Invalid value of *.chunk.size: '{}' (should be integer)", ps);
             }
         }
 
@@ -142,14 +142,14 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
         if (sr instanceof PerfRecord) {
             PerfRecord pr = (PerfRecord)sr;
             if (log.isTraceEnabled()) {
-                log.trace("Received data: " + pr);
+                log.trace("Received data: {}", pr);
             }
 
             StringBuilder sb = new StringBuilder(chunkSize);
             String chs = chunkStart;
             for (PerfSample ps : pr.getSamples()) {
                 if (ps.getMetric() == null) {
-                    log.error("Cannot submit sample (metric description missing): " + ps);
+                    log.error("Cannot submit sample (metric description missing): {}", ps);
                     continue;
                 }
                 if (filter.matches(ps)) {
@@ -186,7 +186,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                     if (sb.length()+rec.length() > chunkSize+chunkTrail) {
                         sb.append(chunkEnd);
                         if (log.isTraceEnabled()) {
-                            log.trace("Submit: '" + sb + "'");
+                            log.trace("Submit: '{}'", sb);
                         }
                         rslt &= output.submit(sb.toString().getBytes());
                         sb = new StringBuilder(chunkSize);
@@ -200,7 +200,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
             if (sb.length() > chunkLead) {
                 sb.append(chunkEnd);
                 if (log.isTraceEnabled()) {
-                    log.trace("Submit: '" + sb + "'");
+                    log.trace("Submit: '{}'", sb);
                 }
                 rslt &= output.submit(sb.toString().getBytes());
             }

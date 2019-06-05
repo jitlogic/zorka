@@ -105,7 +105,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         try {
             interpreter.set(name, obj);
         } catch (EvalError e) {
-            log.error("Error adding module '" + name + "' to global namespace", e);
+            log.error("Error adding module '{}' to global namespace", name, e);
         }
     }
 
@@ -129,7 +129,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         try {
             return "" + interpreter.eval(expr); // TODO proper object-to-string conversion
         } catch (EvalError e) {
-            log.error("Error evaluating '" + expr + "': ", e);
+            log.error("Error evaluating '{}': ", expr, e);
             return ObjectDumper.errorDump(e);
         }
     }
@@ -154,7 +154,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
      * @param callback callback object
      */
     public void exec(String expr, ZorkaCallback callback) {
-        log.debug("Processing request BSH expression: " + expr);
+        log.debug("Processing request BSH expression: {}", expr);
         ZorkaBshWorker worker = new ZorkaBshWorker(mainExecutor, timeout, this, expr, callback);
         connExecutor.execute(worker);
     }
@@ -170,28 +170,28 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
         Reader rdr = null;
         try {
             if (new File(path).canRead()) {
-                log.info("Executing script: " + path);
+                log.info("Executing script: {}", path);
                 interpreter.source(path);
                 loadedScripts.add(script);
             } else {
                 InputStream is = getClass().getResourceAsStream(
                         "/com/jitlogic/zorka/scripts"+(script.startsWith("/") ? "" : "/")+script);
                 if (is != null) {
-                    log.info("Executing internal script: " + script);
+                    log.info("Executing internal script: {}", script);
                     rdr = new InputStreamReader(is);
                     interpreter.eval(rdr, interpreter.getNameSpace(), script);
                     loadedScripts.add(script);
                 } else {
-                    log.error("Cannot find script: " + script);
+                    log.error("Cannot find script: {}", script);
                 }
             }
             return "OK";
         } catch (Exception e) {
-            log.error("Error loading script " + script, e);
+            log.error("Error loading script {}", script, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
             return "Error: " + e.getMessage();
         } catch (EvalError e) {
-            log.error("Error executing script " + script, e);
+            log.error("Error executing script {}", script, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
             return "Error: " + e.getMessage();
         } finally {
@@ -199,7 +199,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
                 try {
                     rdr.close();
                 } catch (IOException e) {
-                    log.error("Error closing script " + script, e);
+                    log.error("Error closing script {}", script, e);
                 }
             }
         }
@@ -210,7 +210,7 @@ public class ZorkaBshAgent implements ZorkaAgent, ZorkaService {
             return loadScript(script);
         } else {
             if (log.isDebugEnabled()) {
-                log.debug("Skipping already loaded script: " + script);
+                log.debug("Skipping already loaded script: {}", script);
             }
             return "Already loaded.";
         }

@@ -138,7 +138,7 @@ public class MBeanServerRegistry {
                 }
                 registerDeferred(mbsName);
             } else {
-                log.error("MBean server '" + mbsName + "' is already registered.");
+                log.error("MBean server '{}' is already registered.", mbsName);
             }
         }
     }
@@ -154,7 +154,7 @@ public class MBeanServerRegistry {
         classLoaders.remove(name);
 
         if (conns.remove(name) == null) {
-            log.error("Trying to unregister non-existent MBean server '" + name + "'");
+            log.error("Trying to unregister non-existent MBean server '{}'", name);
         }
 
     }
@@ -205,9 +205,9 @@ public class MBeanServerRegistry {
             } catch (IOException e) {
                 log.error("Error registering bean", e);
             } catch (MalformedObjectNameException e) {
-                log.error("Malformed object name: '" + beanName + "'");
+                log.error("Malformed object name: '{}'", beanName);
             } catch (ClassCastException e) {
-                log.error("Object '" + beanName + "'.'" + attrName + "' of invalid type'", e);
+                log.error("Object '{}'.'{}' of invalid type'", beanName, attrName, e);
             }
         } else {
             DeferredRegistration reg = new DeferredRegistration(mbsName, beanName, attrName, obj, desc);
@@ -243,7 +243,7 @@ public class MBeanServerRegistry {
         try {
             conn.setAttribute(new ObjectName(bean), new Attribute(attr, obj));
         } catch (Exception e) {
-            log.error("Error registering object '" + bean + "'.'" + attr + "'", e);
+            log.error("Error registering object '{}'.'{}'", bean, attr, e);
         }
         return obj;
     }
@@ -267,7 +267,7 @@ public class MBeanServerRegistry {
         try {
             mbs.registerMBean(mbean, new ObjectName(bean));
         } catch (Exception e) {
-            log.error("Error registering object '" + bean + "'.'" + attr + "'", e);
+            log.error("Error registering object '{}'.'{}'", bean, attr, e);
         }
         return obj;
     }

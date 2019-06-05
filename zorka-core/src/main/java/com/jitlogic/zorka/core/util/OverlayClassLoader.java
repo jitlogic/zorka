@@ -38,7 +38,7 @@ public class OverlayClassLoader extends ClassLoader {
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         if (pattern.matcher(name).matches()) {
-            log.info("Loading class " + name + " via overlay.");
+            log.info("Loading class {} via overlay.", name);
             return overlay.loadClass(name);
         } else {
             return super.loadClass(name, resolve);

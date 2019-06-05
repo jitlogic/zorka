@@ -122,20 +122,20 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
         try {
             listenAddr = InetAddress.getByName(la.trim());
         } catch (UnknownHostException e) {
-            log.error("Cannot parse " + prefix + ".listen.addr in zorka.properties", e);
+            log.error("Cannot parse {}.listen.addr in zorka.properties", prefix, e);
             AgentDiagnostics.inc(AgentDiagnostics.CONFIG_ERRORS);
         }
 
         listenPort = config.intCfg(prefix + ".listen.port", defaultPort);
 
-        log.info("Zorka will listen for " + prefix + " connections on " + listenAddr + ":" + listenPort);
+        log.info("Zorka will listen for {} connections on {}:{}", prefix, listenAddr, listenPort);
 
         for (String sa : config.listCfg(prefix + ".server.addr", "127.0.0.1")) {
             try {
-                log.info("Zorka will accept " + prefix + " connections from '" + sa.trim() + "'.");
+                log.info("Zorka will accept {} connections from '{}'", prefix, sa.trim());
                 allowedAddrs.add(InetAddress.getByName(sa.trim()));
             } catch (UnknownHostException e) {
-                log.error("Cannot parse " + prefix + ".server.addr in zorka.properties", e);
+                log.error("Cannot parse {}.server.addr in zorka.properties", prefix, e);
             }
         }
     }
@@ -153,9 +153,9 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
                 thread.setName("ZORKA-" + prefix + "-main");
                 thread.setDaemon(true);
                 thread.start();
-                log.info("ZORKA-" + prefix + " core is listening at " + listenAddr + ":" + listenPort + ".");
+                log.info("ZORKA-{} core is listening at {}:{}", prefix, listenAddr, listenPort);
             } catch (IOException e) {
-                log.error("I/O error while starting " + prefix + " core:" + e.getMessage());
+                log.error("I/O error while starting {} core:{}", prefix, e.getMessage());
             }
         }
     }
@@ -183,12 +183,12 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
                     }
                 }
 
-                log.warn("ZORKA-" + prefix + " thread didn't stop after 1000 milliseconds. Shutting down forcibly.");
+                log.warn("ZORKA-{} thread didn't stop after 1000 milliseconds. Shutting down forcibly.", prefix);
 
                 thread.stop();
                 thread = null;
             } catch (IOException e) {
-                log.error("I/O error in zabbix core main loop: " + e.getMessage());
+                log.error("I/O error in zabbix core main loop: {}", e.getMessage());
             }
         }
     }
@@ -200,7 +200,7 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
 
     @Override
     public void shutdown() {
-        log.info("Shutting down " + prefix + " agent ...");
+        log.info("Shutting down {} agent ...", prefix);
         stop();
         if (socket != null) {
             try {
@@ -228,7 +228,7 @@ public abstract class AbstractTcpAgent implements Runnable, ZorkaService {
             try {
                 sock = socket.accept();
                 if (!allowedAddr(sock)) {
-                    log.warn("Illegal connection attempt from '" + socket.getInetAddress() + "'.");
+                    log.warn("Illegal connection attempt from '{}'", socket.getInetAddress());
                     sock.close();
                 } else {
                     rh = newRequest(sock);

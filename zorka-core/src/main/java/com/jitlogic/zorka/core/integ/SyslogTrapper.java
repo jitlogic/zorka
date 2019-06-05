@@ -103,7 +103,7 @@ public class SyslogTrapper extends ZorkaAsyncThread<String> implements ZorkaTrap
 
         } catch (Exception e) {
             if (log != null) {
-                log.error("Cannot configure syslog to " + syslogServer, e);
+                log.error("Cannot configure syslog to {}", syslogServer, e);
             }
         }
 

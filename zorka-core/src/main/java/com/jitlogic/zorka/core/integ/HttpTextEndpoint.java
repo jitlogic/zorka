@@ -30,7 +30,7 @@ public class HttpTextEndpoint implements ZorkaSubmitter<String>, HttpListener, U
     @Override
     public synchronized boolean submit(String item) {
         if (log.isTraceEnabled()) {
-            log.trace("Submitted output:\n" + item + "\n--------------------------");
+            log.trace("Submitted output:\n{}\n--------------------------", item);
         }
 
         this.output = item.getBytes();

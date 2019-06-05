@@ -122,7 +122,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
                 final Object val = getAttribute(attr);
                 lst.add(val);
             } catch (Exception e) {
-                log.error("Error getting attribute '" + attr + "':", e);
+                log.error("Error getting attribute '{}':", attr, e);
             }
         }
 
@@ -139,7 +139,7 @@ public class ZorkaMappedMBean implements DynamicMBean {
                 setAttribute(attr);
                 lst.add(new Attribute(attr.getName(), attr.getValue()));
             } catch (Exception e) {
-                log.error("Error setting attribute '" + e + "'", e);
+                log.error("Error setting attribute '{}'", attr, e);
             }
         }
 

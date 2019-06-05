@@ -78,14 +78,14 @@ public class ZabbixActiveSenderTask implements Runnable {
 				results.add(iterator.next());
 			}
 
-			log.debug("ZabbixActiveSender " + endIndex + " items cached");
+			log.debug("ZabbixActiveSender {} items cached", endIndex);
 
 			if (results.size() > 0) {
 				/* send message */
 				String message = ZabbixUtils.createAgentData(results, clock);
 
 				request.send(message);
-				log.debug("ZabbixActiveSender message sent: " + message);
+				log.debug("ZabbixActiveSender message sent: {}", message);
 
 				/* verify OK */
 				String response = request.getReq();
@@ -94,15 +94,15 @@ public class ZabbixActiveSenderTask implements Runnable {
 					for (int count = 0; count < endIndex; count++) {
 						responseQueue.poll();
 					}
-					log.debug("ZabbixActiveSender " + endIndex + " items removed from cache");
+					log.debug("ZabbixActiveSender {} items removed from cache", endIndex);
 				}
 			}
 		} catch (IOException e) {
 			if (log.isDebugEnabled()) {
-				log.debug("Failed to run ZabbixActiveSenderTask, IO Exception " + e.getMessage(), e);
+				log.debug("Failed to run ZabbixActiveSenderTask, IO Exception {}", e.getMessage(), e);
 			}
 			else {
-				log.warn("Failed to run ZabbixActiveSenderTask, IO Exception " + e.getMessage());
+				log.warn("Failed to run ZabbixActiveSenderTask, IO Exception {}", e.getMessage());
 			}
 		} catch (Exception e) {
 			log.error("Failed to run ZabbixActiveSenderTask", e);
@@ -112,7 +112,7 @@ public class ZabbixActiveSenderTask implements Runnable {
 				try {
 					socket.close();
 				} catch (IOException e) {
-					log.error("Erro closing socket: ", e);
+					log.error("Error closing socket: ", e);
 				} finally {
 					socket = null;
 				}

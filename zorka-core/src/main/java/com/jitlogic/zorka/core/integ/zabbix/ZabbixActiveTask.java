@@ -51,11 +51,11 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 	@Override
 	public void run() {
 		String key = item.getKey();
-		log.debug("Running task: " + key);
+		log.debug("Running task: {}", key);
 		try {
 			
 			String expr = translator.translate(key);
-			log.debug("Translated task: " + expr);
+			log.debug("Translated task: {}", expr);
 			
 			clock = (new Date()).getTime() / 1000L;
 			if (expr != null) {
@@ -65,7 +65,7 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 			}
 		}
 		catch (Exception ex ) {
-			log.error("Failed to run ZabbixActiveTask key : " + key, ex);
+			log.error("Failed to run ZabbixActiveTask key : {}", key, ex);
 		}
 	}
 	
@@ -78,7 +78,7 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 	public void handleResult(Object rslt) {
 		String key = item.getKey();
 		String value = serialize(rslt);
-		log.debug("Task response: " + key + " -> " + value);
+		log.debug("Task response: {} -> {}", key, value);
 		
 		if (!value.equals(ZabbixActiveRequest.ZBX_NOTSUPPORTED)) { // TODO  && !value.equals("{\"data\":[]}")
 			ActiveCheckResult response = new ActiveCheckResult();
@@ -89,7 +89,7 @@ public class ZabbixActiveTask implements Runnable, ZorkaRequestHandler {
 			response.setClock(clock);
 			
 			responseQueue.offer(response);
-			log.debug("Cache size: " + responseQueue.size());
+			log.debug("Cache size: {}", responseQueue.size());
 		}
 	}
 	
