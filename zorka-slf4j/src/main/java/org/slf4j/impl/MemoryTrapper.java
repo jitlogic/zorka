@@ -59,7 +59,7 @@ public class MemoryTrapper implements ZorkaTrapper {
 
         @Override
         public String toString() {
-            return String.valueOf(logLevel) + ' ' + tag + ' ' + String.format(msg, args) + ' ' + e;
+            return String.valueOf(logLevel) + ' ' + tag + ' ' + msg + ' ' + e;
         }
     }
 

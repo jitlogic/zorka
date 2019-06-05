@@ -18,6 +18,8 @@ package org.slf4j.impl;
 import org.slf4j.helpers.MarkerIgnoringBase;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.slf4j.spi.LocationAwareLogger.*;
 
@@ -241,12 +243,14 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
         }
     }
 
+    private static final Object[] EMPTY = new Object[0];
+
     private void trapVarags(ZorkaLogLevel level, String msg, Object...args) {
         if (args.length > 0 && args[0] instanceof Throwable) {
             Throwable e = (Throwable)args[0];
-            trapper.trap(level, shortName, msg, e, Arrays.copyOfRange(args, 1, args.length));
+            trapper.trap(level, shortName, format(msg, Arrays.copyOfRange(args, 1, args.length)), e, EMPTY);
         } else {
-            trapper.trap(level, shortName, msg, null, args);
+            trapper.trap(level, shortName, format(msg, args), null, EMPTY);
         }
 
     }
@@ -256,5 +260,22 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
         if (logLevel <= ERROR_INT) {
             trapper.trap(ZorkaLogLevel.ERROR, shortName, msg, e);
         }
+    }
+
+    private static final Pattern RE = Pattern.compile("\\{}");
+
+    public static String format(String msg, Object...args) {
+        Matcher m = RE.matcher(msg);
+        int i = 0;
+        StringBuffer sb = new StringBuffer();
+
+        while (m.find()) {
+            m.appendReplacement(sb, i < args.length ? ""+args[i] : "");
+            i++;
+        }
+
+        m.appendTail(sb);
+
+        return sb.toString();
     }
 }

@@ -113,4 +113,11 @@ public class ZorkaLoggerUnitTest {
         Assert.assertEquals(1, mt.drain().size());
     }
 
+    @Test
+    public void testFormatSlfArgs() {
+        Assert.assertEquals("foo", ZorkaTrapperLogger.format("foo"));
+        Assert.assertEquals("a1b2c3d", ZorkaTrapperLogger.format("a{}b{}c{}d", 1, 2, 3));
+        Assert.assertEquals("a1b2cd", ZorkaTrapperLogger.format("a{}b{}c{}d", 1, 2));
+    }
+
 }
