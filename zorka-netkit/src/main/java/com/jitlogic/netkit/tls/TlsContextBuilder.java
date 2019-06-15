@@ -64,7 +64,7 @@ public class TlsContextBuilder {
 
             InputStream is = null;
             try {
-                KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
+                KeyStore keystore = KeyStore.getInstance(props.getProperty("keystore.type", "jks"));
                 is = new FileInputStream(keyStoreFile);
                 keystore.load(is, keyStorePass.toCharArray());
                 KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
@@ -87,6 +87,8 @@ public class TlsContextBuilder {
 
         if (trustStorePath != null) {
 
+            log.debug("Loading TLS trust store from: " + trustStorePath);
+
             File trustStoreFile = new File(trustStorePath);
             if (!trustStoreFile.exists()) {
                 log.error("Cannot initialize TLS for client : file " + trustStorePath + " is missing. Service  will not start.");
@@ -101,7 +103,7 @@ public class TlsContextBuilder {
 
                 X509TrustManager defaultTM = lookupTM(tmf);
 
-                KeyStore localTS = KeyStore.getInstance(KeyStore.getDefaultType());
+                KeyStore localTS = KeyStore.getInstance(props.getProperty("truststore.type", "jks"));
 
                 FileInputStream is = null;
                 try {

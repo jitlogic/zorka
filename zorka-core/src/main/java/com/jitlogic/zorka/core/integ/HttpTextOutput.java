@@ -17,10 +17,12 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.netkit.http.*;
+import com.jitlogic.netkit.tls.TlsContextBuilder;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import javax.net.ssl.SSLContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +63,14 @@ public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
             this.headers = new String[0];
         }
 
-        this.client = new HttpStreamClient(new HttpConfig(), this.url);
+        HttpConfig config = new HttpConfig();
+
+        if (url.toLowerCase().startsWith("https:")) {
+            SSLContext ctx = TlsContextBuilder.fromMap("", conf);
+            config.setSslContext(ctx);
+        }
+
+        this.client = new HttpStreamClient(config, this.url);
 
         parseUrl();
     }
