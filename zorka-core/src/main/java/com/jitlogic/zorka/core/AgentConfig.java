@@ -110,31 +110,8 @@ public class AgentConfig extends ZorkaConfig {
         // Finish main logger configuration
         ZorkaLoggerFactory.getInstance().configure(this.getProperties());
 
-        initNetkitLogger();
 
         log.info("Starting ZORKA agent {}", get("zorka.version"));
-    }
-
-
-    private void initNetkitLogger() {
-
-        Properties props = this.getProperties();
-
-        // Configure netkit logging
-        NetkitTrapperLoggerOutput netkitLogger = new NetkitTrapperLoggerOutput();
-        //TODO simplify netkit logging StaticLoggerBinder.getSingleton().getLoggerFactory().swapInput(netkitLogger);
-
-        List<String> levels = com.jitlogic.netkit.log.LoggerFactory.LEVELS;
-        String level = props.getProperty("log.com.jitlogic.netkit", "INFO");
-
-        for (int i = 0; i < levels.size(); i++) {
-            if (levels.get(i).equals(level)) {
-                com.jitlogic.netkit.log.LoggerFactory.setLevel(i);
-                break;
-            }
-        }
-
-        com.jitlogic.netkit.log.LoggerFactory.setOutput(netkitLogger);
     }
 
 

@@ -30,7 +30,7 @@ public class ZorkaLoggerFactory implements ILoggerFactory {
     private ConcurrentMap<String, ZorkaTrapperLogger> loggerMap = new ConcurrentHashMap<String, ZorkaTrapperLogger>();
     private ZorkaTrapper trapper = new MemoryTrapper();
 
-    /** Additional inputs (from external APIs integrations, eg. netkit). */
+    /** Additional inputs (from external APIs integrations). */
     private List<ZorkaLoggerInput> inputs = new CopyOnWriteArrayList<ZorkaLoggerInput>();
 
     /** Predefined log level names */

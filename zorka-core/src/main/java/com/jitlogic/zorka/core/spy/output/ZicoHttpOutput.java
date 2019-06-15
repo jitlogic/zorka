@@ -16,10 +16,9 @@
 
 package com.jitlogic.zorka.core.spy.output;
 
-import com.jitlogic.netkit.http.HttpConfig;
-import com.jitlogic.netkit.http.HttpMessage;
-import com.jitlogic.netkit.http.HttpMessageClient;
-import com.jitlogic.netkit.http.HttpStreamClient;
+import com.jitlogic.zorka.common.http.HttpConfig;
+import com.jitlogic.zorka.common.http.HttpMessage;
+import com.jitlogic.zorka.common.http.HttpClient;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
@@ -70,7 +69,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.httpConfig = new HttpConfig();
         httpConfig.setKeepAliveTimeout(timeout);
 
-        this.httpClient = HttpStreamClient.fromMap(conf);
+        this.httpClient = HttpClient.fromMap(conf);
 
         this.sessionID = String.format("%016x", rand.nextLong());
     }

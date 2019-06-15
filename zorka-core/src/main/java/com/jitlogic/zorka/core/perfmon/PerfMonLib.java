@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.core.perfmon;
 
-import com.jitlogic.netkit.http.UrlEndpoint;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.ZorkaLib;

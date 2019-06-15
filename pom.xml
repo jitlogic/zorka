@@ -51,7 +51,6 @@
         <module>zorka-cbor</module>
         <module>zorka-common</module>
         <module>zorka-core</module>
-        <module>zorka-netkit</module>
         <module>zorka-agent</module>
         <module>zorka-dist</module>
     </modules>

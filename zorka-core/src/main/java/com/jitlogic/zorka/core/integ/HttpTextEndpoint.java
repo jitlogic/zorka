@@ -1,8 +1,10 @@
 package com.jitlogic.zorka.core.integ;
 
-import com.jitlogic.netkit.http.UrlEndpoint;
-import com.jitlogic.netkit.http.*;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.http.HttpConfig;
+import com.jitlogic.zorka.common.http.HttpEncoder;
+import com.jitlogic.zorka.common.http.HttpMethod;
+import com.jitlogic.zorka.common.http.HttpProtocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

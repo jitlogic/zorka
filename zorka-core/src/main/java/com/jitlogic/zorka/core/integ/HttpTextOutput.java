@@ -16,8 +16,9 @@
 
 package com.jitlogic.zorka.core.integ;
 
-import com.jitlogic.netkit.http.*;
-import com.jitlogic.netkit.tls.TlsContextBuilder;
+import com.jitlogic.zorka.common.http.*;
+import com.jitlogic.zorka.common.util.TlsContextBuilder;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
@@ -28,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-import static com.jitlogic.netkit.http.HttpProtocol.REG_URL_PATH;
-import static com.jitlogic.netkit.http.HttpProtocol.REG_URL_QSTR;
+import static com.jitlogic.zorka.common.http.HttpProtocol.REG_URL_PATH;
+import static com.jitlogic.zorka.common.http.HttpProtocol.REG_URL_QSTR;
 
 
 /**
@@ -42,9 +43,10 @@ public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
     private Map<String,String> urlParams;
     private String[] headers;
 
-    private HttpMessageClient client;
+    private HttpClient client;
 
-    public HttpTextOutput(String name, Map<String,String> conf, Map<String,String> urlParams, Map<String,String> headers) {
+    public HttpTextOutput(String name, Map<String,String> conf, Map<String,String> urlParams,
+                          Map<String,String> headers, MethodCallStatistics stats) {
         super(name);
 
         this.url = conf.get("url");
@@ -70,7 +72,7 @@ public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
             config.setSslContext(ctx);
         }
 
-        this.client = new HttpStreamClient(config, this.url);
+        this.client = new HttpClient(config, this.url, stats);
 
         parseUrl();
     }
@@ -112,7 +114,7 @@ public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
         for (byte[] msg : msgs) {
             try {
                 HttpMessage req = HttpMessage.POST(uri, msg, headers);
-                HttpMessage res = client.exec(req);
+                HttpMessage res = client.handle(req);
 
                 // TODO what about 302 ?
                 if (res.getStatus() >= 400) {

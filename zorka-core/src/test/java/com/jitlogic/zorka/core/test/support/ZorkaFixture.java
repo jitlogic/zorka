@@ -15,7 +15,6 @@
  */
 package com.jitlogic.zorka.core.test.support;
 
-import com.jitlogic.netkit.test.support.TestHttpMessageClient;
 import com.jitlogic.zorka.common.test.support.CommonFixture;
 import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;

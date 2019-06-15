@@ -1,8 +1,8 @@
 package com.jitlogic.zorka.core.integ;
 
-import com.jitlogic.netkit.*;
-import com.jitlogic.netkit.http.*;
-import com.jitlogic.netkit.tls.TlsContextBuilder;
+import com.jitlogic.zorka.common.http.HttpConfig;
+import com.jitlogic.zorka.common.http.HttpProtocol;
+import com.jitlogic.zorka.common.util.TlsContextBuilder;
 import com.jitlogic.zorka.common.ZorkaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

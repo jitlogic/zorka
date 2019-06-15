@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.ZorkaService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
+import com.jitlogic.zorka.common.util.TlsContextBuilder;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +92,7 @@ public class TcpService implements Runnable, ZorkaService {
         }
 
         if (config.boolCfg(prefix + ".tls", false)) {
-            SSLContext ctx = new TlsContextBuilder(config, prefix).build();
+            SSLContext ctx = TlsContextBuilder.fromMap("tls", config.mapCfg(prefix));
             if (ctx != null) {
                 socketFactory = ctx.getServerSocketFactory();
             } else {
