@@ -1,19 +1,14 @@
 package com.jitlogic.netkit.test.integ;
 
 import com.jitlogic.netkit.*;
-import com.jitlogic.netkit.log.Logger;
-import com.jitlogic.netkit.log.LoggerFactory;
 import com.jitlogic.netkit.test.support.EchoHandler;
 import com.jitlogic.netkit.test.support.EchoRequest;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.*;
 
@@ -30,12 +25,12 @@ public class EchoServerTest {
                     public BufHandler create(SocketChannel ch) {
                         return new EchoHandler(true);
                     }
-                }, null);
+                }, null, new MethodCallStatistics());
         server.start();
 
         client = new NetClient("test-client",
                 NetCtxFactory.DEFAULT,
-                null);
+                null, new MethodCallStatistics());
         client.start();
     }
 
@@ -54,7 +49,6 @@ public class EchoServerTest {
 
     @Test
     public void testStartServer() throws Exception {
-        LoggerFactory.setLevel(LoggerFactory.TRACE_LEVEL);
         EchoRequest request = new EchoRequest("127.0.0.1", 19005);
         client.submit(request);
         assertEquals("HELO\n", request.getReply());

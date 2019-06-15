@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 
 import com.jitlogic.netkit.*;
-import com.jitlogic.netkit.log.Logger;
-import com.jitlogic.netkit.log.LoggerFactory;
 import com.jitlogic.netkit.util.TextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.jitlogic.netkit.http.HttpProtocol.*;
 import static com.jitlogic.netkit.util.TextUtil.CR;

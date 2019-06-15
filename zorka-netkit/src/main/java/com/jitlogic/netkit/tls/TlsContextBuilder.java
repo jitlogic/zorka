@@ -16,9 +16,9 @@
 
 package com.jitlogic.netkit.tls;
 
-import com.jitlogic.netkit.log.Logger;
-import com.jitlogic.netkit.log.LoggerFactory;
 import com.jitlogic.netkit.util.NetkitUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.*;
 import java.io.File;

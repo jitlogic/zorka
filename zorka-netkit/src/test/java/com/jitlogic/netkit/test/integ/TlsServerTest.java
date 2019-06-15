@@ -4,8 +4,8 @@ import com.jitlogic.netkit.BufHandler;
 import com.jitlogic.netkit.BufHandlerFactory;
 import com.jitlogic.netkit.NetServer;
 import com.jitlogic.netkit.tls.TlsContextBuilder;
-import com.jitlogic.netkit.log.LoggerFactory;
 import com.jitlogic.netkit.test.support.EchoHandler;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,7 +27,6 @@ public class TlsServerTest {
 
     @BeforeClass
     public static void startServer() throws Exception {
-        LoggerFactory.setLevel(LoggerFactory.TRACE_LEVEL);
         //System.setProperty("javax.net.debug", "all");
         sslctx = TlsContextBuilder.svrContext("src/test/resources/tls/localhost.jks", "changeit");
         server = new NetServer("test-server", "127.0.0.1", 19007, new BufHandlerFactory() {
@@ -35,7 +34,7 @@ public class TlsServerTest {
             public BufHandler create(SocketChannel ch) {
                 return handler;
             }
-        }, sslctx);
+        }, sslctx, new MethodCallStatistics());
         server.start();
     }
 

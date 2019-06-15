@@ -18,11 +18,11 @@ package com.jitlogic.netkit.http;
 
 import com.jitlogic.netkit.ArgumentException;
 import com.jitlogic.netkit.NetException;
-import com.jitlogic.netkit.log.EventSink;
-import com.jitlogic.netkit.log.LoggerFactory;
 import com.jitlogic.netkit.tls.TlsContextBuilder;
 import com.jitlogic.netkit.util.BufStreamOutput;
 import com.jitlogic.netkit.util.NetkitUtil;
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 
 import javax.net.SocketFactory;
 import java.io.Closeable;
@@ -60,15 +60,17 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient,
 
     private HttpMessage result;
 
-    private static EventSink evtConnects = LoggerFactory.getSink("http.client.connects");
-    private static EventSink evtCalls = LoggerFactory.getSink("http.client.calls");
+    private MethodCallStatistic evtConnects, evtCalls;
 
 
-    public HttpStreamClient(HttpConfig config, String baseUrl) {
+    public HttpStreamClient(HttpConfig config, String baseUrl, MethodCallStatistics stats) {
         this.config = config;
 
         Matcher m = RE_URL.matcher(baseUrl);
         if (!m.matches()) throw new NetException("Invalid URL: " + baseUrl);
+
+        this.evtCalls = stats.getMethodCallStatistic("NetKitClientCalls");
+        this.evtConnects = stats.getMethodCallStatistic("NetKitClientConnects");
 
         this.tls = "https".equalsIgnoreCase(m.group(REG_URL_PROTO));
         String pstr = m.group(HttpProtocol.REG_URL_PORT);
@@ -105,7 +107,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient,
                 output.submit(new HttpEncoder(config, stream), null, req);
                 socket.getOutputStream().flush();
                 input.run();
-                evtCalls.call();
+                evtCalls.logCall();
                 return result;
             } catch (Exception e1) {
                 e = e1;
@@ -141,9 +143,9 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient,
             input = new HttpStreamInput(config, this, HttpDecoderState.READ_RESP_LINE, socket.getInputStream());
             stream = new BufStreamOutput(socket.getOutputStream());
             output = new HttpMessageHandler(config, null);
-            evtConnects.call();
+            evtConnects.logCall();
         } catch (IOException e) {
-            evtConnects.error();
+            evtConnects.logError(1);
             throw new NetException("Cannot connect to " + addr + ":" + port, e);
         }
     }
@@ -155,7 +157,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient,
     }
 
 
-    public static HttpStreamClient fromMap(Map<String,String> conf) {
+    public static HttpStreamClient fromMap(Map<String,String> conf, MethodCallStatistics stats) {
         String url = conf.get("http.url");
 
         Matcher m = RE_URL.matcher(url);
@@ -170,7 +172,7 @@ public class HttpStreamClient implements HttpMessageListener, HttpMessageClient,
             httpConfig.setSslContext(TlsContextBuilder.fromMap("http.", conf));
         }
 
-        return new HttpStreamClient(httpConfig, url);
+        return new HttpStreamClient(httpConfig, url, stats);
     }
 
 }

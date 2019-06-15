@@ -2,9 +2,10 @@
 
 package com.jitlogic.netkit;
 
-import com.jitlogic.netkit.log.EventSink;
-import com.jitlogic.netkit.log.Logger;
-import com.jitlogic.netkit.log.LoggerFactory;
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -35,8 +36,8 @@ public abstract class NetEngine implements Runnable, BufHandler {
     protected NetCtxFactory ctxFactory;
     protected SSLContext sslContext;
 
-    protected EventSink evtLoops = LoggerFactory.getSink(LoggerFactory.EV_LOOPS);
-    protected EventSink evtIllegalOps = LoggerFactory.getSink(LoggerFactory.EV_ILLEGAL_OPS);
+    protected MethodCallStatistic evtLoops;
+    protected MethodCallStatistic evtIllegalOps;
 
     protected Executor sslExecutor;
 
@@ -46,11 +47,14 @@ public abstract class NetEngine implements Runnable, BufHandler {
     // shared, single thread
     protected ByteBuffer buffer = ByteBuffer.allocateDirect(1024 * 64 - 1);
 
-    public NetEngine(String threadName, NetCtxFactory ctxFactory, SSLContext context) throws IOException {
+    public NetEngine(String threadName, NetCtxFactory ctxFactory, SSLContext context, MethodCallStatistics stats) throws IOException {
         this.sslContext = context;
         this.threadName = threadName;
         this.selector = Selector.open();
         this.ctxFactory = ctxFactory;
+
+        this.evtLoops = stats.getMethodCallStatistic("NetKitNioEngineLoops");
+        this.evtIllegalOps = stats.getMethodCallStatistic("NetKitNioEngineIllegalOps");
 
         if (sslContext != null) {
             sslExecutor = Executors.newSingleThreadExecutor();
@@ -111,7 +115,6 @@ public abstract class NetEngine implements Runnable, BufHandler {
         SocketChannel ch = (SocketChannel) key.channel();
         NetCtx atta = (NetCtx)key.attachment();
 
-        log.traceNio(key, "sslDataRead()", "ENTER");
 
         TlsContext tctx = atta.getTlsContext();
 
@@ -130,9 +133,7 @@ public abstract class NetEngine implements Runnable, BufHandler {
                 tctx.getSslNetBuf().flip();
                 while (tctx.getSslNetBuf().hasRemaining()) {
                     buffer.clear();
-                    log.traceNio(key, "sslDataRead()->unwrap()", "BEFORE");
                     SSLEngineResult result = tctx.getSslEngine().unwrap(tctx.getSslNetBuf(), buffer);
-                    log.traceNio(key, "sslDataRead()->unwrap()", result.getStatus().toString());
                     switch (result.getStatus()) {
                         case OK:
                             buffer.flip();
@@ -193,7 +194,6 @@ public abstract class NetEngine implements Runnable, BufHandler {
         SSLEngineResult.HandshakeStatus handshakeStatus;
         SSLEngineResult result;
 
-        log.traceNio(key, "sslHandshake()", "ENTER");
 
         if (tctx.getSslAppBuf() == null) {
             tctx.setSslAppBuf(ByteBuffer.allocate(engine.getSession().getApplicationBufferSize()));
@@ -220,9 +220,7 @@ public abstract class NetEngine implements Runnable, BufHandler {
                         }
                         tctx.getSslNetBuf().flip();
                         try {
-                            log.traceNio(key, "sslHandshake()->unwrap()", "BEFORE");
                             result = engine.unwrap(tctx.getSslNetBuf(), tctx.getSslAppBuf());
-                            log.traceNio(key, "sslHandshake()->unwrap()", "AFTER");
                             tctx.getSslNetBuf().compact();
                             handshakeStatus = result.getHandshakeStatus();
                         } catch (SSLException e) {
@@ -234,13 +232,11 @@ public abstract class NetEngine implements Runnable, BufHandler {
                     } catch (ClosedChannelException e) {
                         clientClose(key);
                         tctx.setSslState(CLOSED);
-                        log.traceNio(key, "sslHandshake()->unwrap()", "CLOSED");
                         return;
                     } catch (IOException e) {
                         log.error("at sslHandshake", e);
                         clientClose(key);
                         tctx.setSslState(ERROR);
-                        log.traceNio(key, "sslHandshake()->unwrap()", "ERROR");
                         return;
                     }
                     switch (result.getStatus()) {
@@ -248,11 +244,9 @@ public abstract class NetEngine implements Runnable, BufHandler {
                             break;
                         case BUFFER_OVERFLOW:
                             tctx.setSslAppBuf(extendBuf(tctx.getSslAppBuf(), engine.getSession().getApplicationBufferSize(), 0, false));
-                            log.traceNio(key, "sslHandshake()->unwrap()", "OVERFLOW");
                             break;
                         case BUFFER_UNDERFLOW: {
                             tctx.setSslNetBuf(extendBuf(tctx.getSslNetBuf(), engine.getSession().getPacketBufferSize(), 0, true));
-                            log.traceNio(key, "sslHandshake->unwrap()", "UNDERFLOW");
                             return;
                         }
                         case CLOSED: {
@@ -275,9 +269,7 @@ public abstract class NetEngine implements Runnable, BufHandler {
                 case NEED_WRAP:
                     tctx.getSslNetBuf().clear();
                     try {
-                        log.traceNio(key, "sslHandshake()->wrap()", "BEFORE");
                         result = engine.wrap(tctx.getSslAppBuf(), tctx.getSslNetBuf());
-                        log.traceNio(key, "sslHandshake()->wrap()", "AFTER");
                         handshakeStatus = result.getHandshakeStatus();
                     } catch (IOException e) {
                         log.error("at sslHandshake, wrap() failed", e);
@@ -323,7 +315,6 @@ public abstract class NetEngine implements Runnable, BufHandler {
                 case NEED_TASK:
                     Runnable task;
                     while ((task = engine.getDelegatedTask()) != null) {
-                        log.traceNio(key, "sslHandshake()->runTask()", "BEGIN");
                         final Runnable t = task;
                         sslExecutor.execute(
                                 new Runnable() {
@@ -351,7 +342,6 @@ public abstract class NetEngine implements Runnable, BufHandler {
 
 
     protected void clientClose(final SelectionKey key) {
-        log.traceNio(key,"clientClose()", "ENTER");
         try {
             key.channel().close();
         } catch (Exception ignore) {
@@ -549,16 +539,15 @@ public abstract class NetEngine implements Runnable, BufHandler {
     protected abstract long getTimeout();
 
     protected void accept(SelectionKey key) {
-        evtIllegalOps.error();
+        evtIllegalOps.logError(1);
     }
 
     protected void connect(SelectionKey key) {
-        evtIllegalOps.error();
+        evtIllegalOps.logError(1);
     }
 
     public void run() {
         while (running) {
-            long t0 = evtLoops.time();
             try {
                 processNew();
                 processPending();
@@ -567,14 +556,12 @@ public abstract class NetEngine implements Runnable, BufHandler {
 
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
                 for (SelectionKey key : selectedKeys) {
-                    log.traceNio(key, "run", "SELECTOR" + String.format("%02x",key.interestOps()));
                     if (!key.isValid()) continue;
                     if (key.isAcceptable()) {
                         accept(key);
                     } else if (key.isConnectable()) {
                         connect(key);
                     } else if (key.isReadable()) {
-                        log.traceNio(key, "run", "SELECTOR/isReadable()");
                         NetCtx a = (NetCtx)key.attachment();
                         TlsContext tctx = a.getTlsContext();
                         if (tctx == null) {
@@ -595,7 +582,6 @@ public abstract class NetEngine implements Runnable, BufHandler {
                             }
                         }
                     } else if (key.isWritable()) {
-                        log.traceNio(key, "run", "SELECTOR/isWritable()");
                         NetCtx a = (NetCtx)key.attachment();
                         TlsContext tctx = a.getTlsContext();
                         if (tctx == null) {
@@ -618,14 +604,12 @@ public abstract class NetEngine implements Runnable, BufHandler {
                     }
                 }
                 selectedKeys.clear();
-                evtLoops.call(t0);
             } catch (ClosedSelectorException ignore) {
                 return; // stopped
                 // do not exits the while IO event loop. if exits, then will not process any IO event
                 // jvm can catch any exception, including OOM
             } catch (Throwable e) { // catch any exception(including OOM), print it
                 log.error("http server loop error, should not happen", e);
-                evtLoops.error(t0);
             }
         }
     }

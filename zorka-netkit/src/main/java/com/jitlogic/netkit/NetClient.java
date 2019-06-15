@@ -1,6 +1,8 @@
 package com.jitlogic.netkit;
 
 
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
+
 import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
@@ -18,12 +20,12 @@ public class NetClient extends NetEngine implements NetRequestListener {
 
     private ConcurrentLinkedQueue<NetRequest> newQueue = new ConcurrentLinkedQueue<NetRequest>();
 
-    public NetClient(String threadName, SSLContext context) throws IOException {
-        this(threadName, NetCtxFactory.DEFAULT, context);
+    public NetClient(String threadName, SSLContext context, MethodCallStatistics stats) throws IOException {
+        this(threadName, NetCtxFactory.DEFAULT, context, stats);
     }
 
-    public NetClient(String threadName, NetCtxFactory ctxFactory, SSLContext context) throws IOException {
-        super(threadName, ctxFactory, context);
+    public NetClient(String threadName, NetCtxFactory ctxFactory, SSLContext context, MethodCallStatistics stats) throws IOException {
+        super(threadName, ctxFactory, context, stats);
     }
 
     @Override

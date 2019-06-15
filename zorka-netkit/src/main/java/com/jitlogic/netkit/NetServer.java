@@ -12,33 +12,34 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
-import com.jitlogic.netkit.log.EventSink;
-import com.jitlogic.netkit.log.LoggerFactory;
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 
 import javax.net.ssl.SSLContext;
 
 public class NetServer extends NetEngine implements Runnable {
 
-    private final EventSink evtAccepts = LoggerFactory.getSink(LoggerFactory.EV_ACCEPTS);
+    private final MethodCallStatistic evtAccepts;
 
     private final ServerSocketChannel serverChannel;
 
-    public NetServer(String threadName, String ip, int port, final BufHandlerFactory svhFactory, SSLContext sslContext) throws IOException {
+    public NetServer(String threadName, String ip, int port, final BufHandlerFactory svhFactory, SSLContext sslContext, MethodCallStatistics stats) throws IOException {
         this(threadName, ip, port, new NetCtxFactory() {
             @Override
             public NetCtx create(SocketChannel ch, BufHandler in, BufHandler out) {
                 return new NetCtx(ch, svhFactory.create(ch), out);
             }
-        }, sslContext);
+        }, sslContext, stats);
     }
 
-    public NetServer(String threadName, String ip, int port, NetCtxFactory ctxFactory, SSLContext sslContext) throws IOException {
-        super(threadName, ctxFactory, sslContext);
+    public NetServer(String threadName, String ip, int port, NetCtxFactory ctxFactory, SSLContext sslContext, MethodCallStatistics stats) throws IOException {
+        super(threadName, ctxFactory, sslContext, stats);
 
         this.serverChannel = ServerSocketChannel.open();
         serverChannel.configureBlocking(false);
         serverChannel.socket().bind(new InetSocketAddress(ip, port));
         serverChannel.register(selector, OP_ACCEPT);
+        this.evtAccepts = stats.getMethodCallStatistic("NetKitServerAccepts");
     }
 
     protected void accept(SelectionKey key) {
@@ -46,11 +47,9 @@ public class NetServer extends NetEngine implements Runnable {
         SocketChannel s;
         try {
             while ((s = ch.accept()) != null) {
-                long t0 = evtAccepts.time();
                 s.configureBlocking(false);
                 NetCtx atta = ctxFactory.create(s, null,this);
                 s.register(selector, OP_READ, atta);
-                log.traceNio(key, "accept()", "AFTER");
                 if (sslContext != null) {
                     TlsContext tctx = new TlsContext();
                     tctx.setSslEngine(sslContext.createSSLEngine());
@@ -58,14 +57,12 @@ public class NetServer extends NetEngine implements Runnable {
                     tctx.getSslEngine().beginHandshake();
                     tctx.setSslState(HANDSHAKE);
                     atta.setTlsContext(tctx);
-                    log.traceNio(key, "accept()", "SSL");
                 }
-                evtAccepts.call(t0);
+                evtAccepts.logCall();
             }
         } catch (Exception e) {
             // eg: too many open files. do not quit
             log.error("accept incoming request", e);
-            evtAccepts.error();
         }
     }
 
