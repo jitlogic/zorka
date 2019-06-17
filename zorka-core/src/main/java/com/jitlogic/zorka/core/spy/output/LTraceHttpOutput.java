@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.cbor.CBOR;
 import com.jitlogic.zorka.cbor.CborDataWriter;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.cbor.CborResendException;
@@ -50,8 +51,8 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
     private CborDataWriter awriter = new CborDataWriter(ABUFSZ, ABUFSZ), twriter = new CborDataWriter(TBUFSZ, TBUFSZ);
 
-    public LTraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry) {
-        super(config, conf, registry);
+    public LTraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, MethodCallStatistics stats) {
+        super(config, conf, registry, stats);
     }
 
     private static long cms2key(int classId, int methodId, int signatureId) {

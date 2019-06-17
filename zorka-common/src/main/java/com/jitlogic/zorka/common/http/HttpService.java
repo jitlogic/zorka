@@ -1,31 +1,26 @@
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.common.http;
 
-import com.jitlogic.zorka.common.http.HttpConfig;
-import com.jitlogic.zorka.common.http.HttpProtocol;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.util.TlsContextBuilder;
 import com.jitlogic.zorka.common.ZorkaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
-import java.io.IOException;
-import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 import static com.jitlogic.zorka.common.util.ZorkaConfig.*;
 
-public class HttpService implements ZorkaService {
+public class HttpService implements ZorkaService, HttpHandler {
 
     private static final Logger log = LoggerFactory.getLogger(HttpService.class);
 
-    private volatile List<UrlEndpoint> endpoints = Collections.EMPTY_LIST;
+    private volatile Map<String,HttpHandler> endpoints = Collections.EMPTY_MAP;
 
     private HttpConfig httpconf = new HttpConfig();
-    private NetServer server;
-    private BufHandlerFactory bufHandlerFactory;
+    private HttpServer server;
     private SSLContext sslContext = null;
 
     private String prefix;
@@ -34,7 +29,7 @@ public class HttpService implements ZorkaService {
     private boolean tlsEnabled;
 
 
-    public HttpService(String prefix, Map<String,String> config) {
+    public HttpService(String prefix, Map<String,String> config, Executor executor, MethodCallStatistics stats) {
         this.prefix = prefix;
         listenAddr = parseStr(config.get("listen.addr"), HttpProtocol.RE_IPV4_ADDR, "0.0.0.0",
                 prefix + ".listen.addr listen address should be in IPv4 form.");
@@ -51,40 +46,30 @@ public class HttpService implements ZorkaService {
             sslContext = TlsContextBuilder.svrContext(keystore, keypass);
         }
 
+        this.server = new HttpServer(prefix, listenAddr, listenPort, new HttpConfig(), this, executor);
+
         log.info("{} service listening on port: {}", tlsEnabled ? "HTTPS" : "HTTP", listenPort);
-
-        bufHandlerFactory = new BufHandlerFactory() {
-            @Override
-            public BufHandler create(SocketChannel ch) {
-                return new HttpProtocolHandler(httpconf, new UriDispatcher(httpconf, endpoints));
-            }
-        };
-
-        try {
-            server = new NetServer("ZORKA-http-" + prefix,
-                    listenAddr, listenPort, bufHandlerFactory, sslContext);
-        } catch (IOException e) {
-            log.error("Cannot start HTTP service '{}'", prefix, e);
-        }
     }
 
     public void start() {
         server.start();
     }
 
-    public synchronized void addEndpoint(UrlEndpoint endpoint) {
-        List<UrlEndpoint> ep = new ArrayList<UrlEndpoint>(endpoints.size()+1);
-        ep.addAll(endpoints);
-        ep.add(endpoint);
-        endpoints = ep;
+    public synchronized void addEndpoint(String path, HttpHandler handler) {
+        endpoints.put(path, handler);
     }
 
     public synchronized void clearEndpoints() {
-        endpoints = Collections.EMPTY_LIST;
+        endpoints.clear();
     }
 
     @Override
     public void shutdown() {
-        server.stop(1000);
+        server.stop();
+    }
+
+    @Override
+    public HttpMessage handle(HttpMessage message) {
+        return null;
     }
 }

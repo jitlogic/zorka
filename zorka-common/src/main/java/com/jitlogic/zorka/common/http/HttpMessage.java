@@ -159,8 +159,9 @@ public class HttpMessage {
         return StatusLine;
     }
 
-    public void setStatusLine(String statusLine) {
+    public HttpMessage setStatusLine(String statusLine) {
         StatusLine = statusLine;
+        return this;
     }
 
     public byte[] getBody() {

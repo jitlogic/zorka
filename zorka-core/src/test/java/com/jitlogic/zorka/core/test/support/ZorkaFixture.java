@@ -15,6 +15,7 @@
  */
 package com.jitlogic.zorka.core.test.support;
 
+import com.jitlogic.zorka.common.http.HttpHandler;
 import com.jitlogic.zorka.common.test.support.CommonFixture;
 import com.jitlogic.zorka.common.test.support.TestJmx;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
@@ -72,7 +73,7 @@ public class ZorkaFixture extends CommonFixture {
 
     protected QueryTranslator translator;
 
-    protected TestHttpMessageClient httpClient;
+    protected HttpHandler httpClient;
 
     protected String tmpDir;
 
@@ -138,7 +139,7 @@ public class ZorkaFixture extends CommonFixture {
         ZorkaUtil.rmrf(tmpDir);
         assertTrue(new File(tmpDir).mkdirs());
 
-        httpClient = new TestHttpMessageClient();
+        httpClient = new TestHttpClient();
 
         SpyClassLookup.INSTANCE = new SpyClassLookup();
     }

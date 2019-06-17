@@ -2,6 +2,9 @@
 
 package com.jitlogic.zorka.common.http;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Date;
@@ -11,6 +14,8 @@ import java.util.Map;
 import static com.jitlogic.zorka.common.http.HttpProtocol.*;
 
 public class HttpEncoder implements HttpHandler {
+
+    private Logger log = LoggerFactory.getLogger(HttpEncoder.class);
 
     private static final int REQ_LINE_SENT       = 0x01;
     private static final int RESP_LINE_SENT      = 0x02;
@@ -70,12 +75,19 @@ public class HttpEncoder implements HttpHandler {
         sb.append(method).append(SP).append(uriPrefix).append(url);
         if (query != null) sb.append("?").append(query);
         sb.append(SP).append(httpVersion).append(CRLF);
+        if (log.isDebugEnabled()) {
+            log.debug("REQ: " + sb.toString());
+        }
         write(sb.toString());
         state |= REQ_LINE_SENT;
     }
 
     private void responseLine(String httpVersion, int status, String statusMessage) {
-        write(httpVersion + " " + status + " " + statusMessage + CRLF);
+        String respLine = httpVersion + " " + status + " " + statusMessage;
+        write(respLine + CRLF);
+        if (log.isDebugEnabled()) {
+            log.debug("RES: " + respLine);
+        }
         state |= RESP_LINE_SENT;
         chki(emptyBodyExpected(status), CONTENT_LENGTH_SENT);
     }
@@ -93,7 +105,13 @@ public class HttpEncoder implements HttpHandler {
             state |= CONNECTION_CLOSE;
         }
 
-        write(TextUtil.camelCase(name) + ": " + value + CRLF);
+        String hdr = TextUtil.camelCase(name) + ": " + value;
+
+        if (log.isDebugEnabled()) {
+            log.debug("HDR: " + hdr);
+        }
+
+        write(hdr + CRLF);
     }
 
     private void body(byte[] b) {
@@ -146,7 +164,7 @@ public class HttpEncoder implements HttpHandler {
         if (m.isResponse()) {
             responseLine(m.getVersion(), m.getStatus(), m.getStatusLine());
         } else {
-            requestLine(m.getVersion(), m.getMethod(), m.getUri(), m.getQuery());
+            requestLine(m.getVersion(), m.getMethod(), uriPrefix + m.getUri(), m.getQuery());
         }
 
         for (Map.Entry<String, List<String>> e : m.getHeaders().entrySet()) {

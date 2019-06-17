@@ -1,6 +1,7 @@
 package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.cbor.*;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
@@ -34,8 +35,8 @@ public class STraceHttpOutput extends ZicoHttpOutput {
         return buf;
     }
 
-    public STraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry) {
-        super(config, conf, registry);
+    public STraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, MethodCallStatistics stats) {
+        super(config, conf, registry, stats);
         scanner = new SymbolsScanner(registry);
     }
 

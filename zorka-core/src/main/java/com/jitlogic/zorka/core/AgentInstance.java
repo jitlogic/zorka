@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core;
 
 import com.jitlogic.zorka.common.ZorkaService;
+import com.jitlogic.zorka.common.http.HttpService;
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.stats.ValGetter;
@@ -472,9 +473,9 @@ public class AgentInstance implements ZorkaService {
 
         if (tracerLib == null) {
             if (tracer instanceof LTracer) {
-                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
+                tracerLib = new LTracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config, stats);
             } else {
-                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config);
+                tracerLib = new STracerLib(getSymbolRegistry(), getMetricsRegistry(), getTracer(), config, stats);
             }
         }
 
@@ -490,7 +491,7 @@ public class AgentInstance implements ZorkaService {
 
         if (perfMonLib == null) {
             perfMonLib = new PerfMonLib(getSymbolRegistry(), getMetricsRegistry(),
-                    getTracer(), getMBeanServerRegistry(), getZorkaLib());
+                    getTracer(), getMBeanServerRegistry(), getZorkaLib(), stats);
         }
 
         return perfMonLib;
@@ -524,7 +525,8 @@ public class AgentInstance implements ZorkaService {
     public synchronized HttpService getHttpService() {
         if (httpService == null && config.boolCfg("zorka.http", false)) {
             httpService = new HttpService("http",
-                    config.mapCfg("zorka.http", "tls", "no"));
+                    config.mapCfg("zorka.http", "tls", "no"),
+                    getMainExecutor(), stats);
             httpService.start();
         }
         return httpService;
@@ -536,7 +538,8 @@ public class AgentInstance implements ZorkaService {
     public synchronized HttpService getHttpsService() {
         if (httpsService == null && config.boolCfg("zorka.https", false)) {
             httpsService = new HttpService("https",
-                    config.mapCfg("zorka.https", "tls", "yes"));
+                    config.mapCfg("zorka.https", "tls", "yes"),
+                    getMainExecutor(), stats);
             httpsService.start();
         }
         return httpsService;

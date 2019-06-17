@@ -89,6 +89,10 @@ public final class Base64
     private Base64() {
     }
 
+    public static String encode(String s) {
+        return encode(s.getBytes(), false);
+    }
+
     /** Encodes a raw byte array into a BASE64 <code>String</code> representation i accordance with RFC 2045.
      * @param sArr The bytes to convert. If <code>null</code> or length 0 an empty array will be returned.
      * @param lineSep Optional "\r\n" after 76 characters, unless end of file.<br>

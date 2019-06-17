@@ -42,6 +42,7 @@ public class HttpDecoder {
 
     private void parseResponseLine() {
         String line = reader.readLine();
+        if (log.isDebugEnabled()) log.debug("RES: " + line);
         Matcher m = RE_RESP_LINE.matcher(line);
         if (m.matches()) {
             httpMessage.setVersion(m.group(1));
@@ -54,6 +55,7 @@ public class HttpDecoder {
 
     private void parseRequestLine() {
         String line = reader.readLine();
+        if (log.isDebugEnabled()) log.debug("REQ: " + line);
         if (line.isEmpty()) throw new HttpClosedException();
         Matcher m = RE_REQ_LINE.matcher(line);
         if (m.matches()) {
@@ -98,6 +100,7 @@ public class HttpDecoder {
         String cl = null;
 
         while (line != null && !line.isEmpty()) {
+            if (log.isDebugEnabled()) log.debug("HDR: " + line);
             Matcher m = RE_HEADER.matcher(line);
             if (m.matches()) {
                 String k = m.group(1), v = m.group(2);

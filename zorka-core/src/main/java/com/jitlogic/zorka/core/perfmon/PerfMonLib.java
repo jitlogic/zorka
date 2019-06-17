@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.ZorkaLib;
 import com.jitlogic.zorka.core.integ.*;
@@ -44,13 +45,16 @@ public class PerfMonLib {
 
     private MBeanServerRegistry mbsRegistry;
 
+    private MethodCallStatistics stats;
+
     public PerfMonLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer,
-                      MBeanServerRegistry mbsRegistry, ZorkaLib zorkaLib) {
+                      MBeanServerRegistry mbsRegistry, ZorkaLib zorkaLib, MethodCallStatistics stats) {
         this.tracer = tracer;
         this.mbsRegistry = mbsRegistry;
         this.symbolRegistry = symbolRegistry;
         this.metricsRegistry = metricsRegistry;
         this.zorkaLib = zorkaLib;
+        this.stats = stats;
     }
 
 
@@ -150,13 +154,9 @@ public class PerfMonLib {
 
 
     public HttpTextOutput httpTextOutput(String name, Map<String,String> config, Map<String,String> urlParams, Map<String,String> headers) {
-        HttpTextOutput httpOutput = new HttpTextOutput(name, config, urlParams, headers);
+        HttpTextOutput httpOutput = new HttpTextOutput(name, config, urlParams, headers, stats);
         httpOutput.start();
         return httpOutput;
-    }
-
-    public UrlEndpoint httpTextEndpoint(String uri) {
-        return new HttpTextEndpoint(uri);
     }
 
     public InfluxPushOutput influxPushOutput(

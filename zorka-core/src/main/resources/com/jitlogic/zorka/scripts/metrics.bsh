@@ -82,8 +82,8 @@ __metrics() {
       .metric(perfmon.metric("java.lang", "jvm.fd_max", "Maximum File Descriptors", "fd")),
     zorka.query("java", "java.lang:type=OperatingSystem", "type").get("ProcessCpuTime")
       .metric(perfmon.timedDelta("java.lang", "jvm.cpu_util", "JVM process CPU utilization", "%").divide(1000000)),
-    zorka.query("java", "java.lang:type=OperatingSystem", "type").get("CommitedVirtualMemorySize")
-      .metric(perfmon.metric("java.lang", "jvm.vm_size", "Commited Virtual Memory", "B")),
+    //zorka.query("java", "java.lang:type=OperatingSystem", "type").get("CommitedVirtualMemorySize")
+    //  .metric(perfmon.metric("java.lang", "jvm.vm_size", "Commited Virtual Memory", "B")),
     zorka.query("java", "java.lang:type=OperatingSystem", "type").get("ProcessCpuLoad")
       .metric(perfmon.metric("java.lang", "jvm.load", "JVM Process CPU Load", ".")),
     zorka.query("java", "java.lang:type=Runtime", "type").get("Uptime")

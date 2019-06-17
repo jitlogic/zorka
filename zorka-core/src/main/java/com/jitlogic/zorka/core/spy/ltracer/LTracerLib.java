@@ -19,6 +19,8 @@ package com.jitlogic.zorka.core.spy.ltracer;
 import java.io.IOException;
 import java.util.Map;
 
+import com.jitlogic.zorka.common.stats.MethodCallStatistic;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -37,19 +39,22 @@ public class LTracerLib extends TracerLib {
 
     public static final Logger log = LoggerFactory.getLogger(LTracerLib.class);
 
+    private MethodCallStatistics stats;
+
     /**
      * Creates tracer library object.
      *
      * @param tracer reference to spy instance
      */
-    public LTracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
+    public LTracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config, MethodCallStatistics stats) {
         super(symbolRegistry, metricsRegistry, tracer, config);
+        this.stats = stats;
     }
 
     @Override
     public ZorkaAsyncThread<SymbolicRecord> toCbor(Map<String, String> config) {
 
-        return new LTraceHttpOutput(this.config, config, symbolRegistry);
+        return new LTraceHttpOutput(this.config, config, symbolRegistry, stats);
     }
 
     /**

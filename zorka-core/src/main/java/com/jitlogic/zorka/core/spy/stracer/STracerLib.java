@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy.stracer;
 
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
@@ -33,13 +34,16 @@ public class STracerLib extends TracerLib {
 
     public static final Logger log = LoggerFactory.getLogger(STracerLib.class);
 
-    public STracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
+    private MethodCallStatistics stats;
+
+    public STracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config, MethodCallStatistics stats) {
         super(symbolRegistry, metricsRegistry, tracer, config);
+        this.stats = stats;
     }
 
 
     public ZorkaAsyncThread<SymbolicRecord> toCbor(Map<String, String> config) {
-        return new STraceHttpOutput(this.config, config, symbolRegistry);
+        return new STraceHttpOutput(this.config, config, symbolRegistry, stats);
     }
 
 

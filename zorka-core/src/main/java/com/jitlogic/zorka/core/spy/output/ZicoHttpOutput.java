@@ -19,10 +19,10 @@ package com.jitlogic.zorka.core.spy.output;
 import com.jitlogic.zorka.common.http.HttpConfig;
 import com.jitlogic.zorka.common.http.HttpMessage;
 import com.jitlogic.zorka.common.http.HttpClient;
+import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Random;
@@ -46,11 +46,11 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
     protected ZorkaConfig config;
 
     protected HttpConfig httpConfig;
-    protected HttpMessageClient httpClient;
+    protected HttpClient httpClient;
 
     protected Random rand = new Random();
 
-    public ZicoHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry) {
+    public ZicoHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, MethodCallStatistics stats) {
         super("ZORKA-CBOR-OUTPUT", parseInt(conf.get("http.qlen"), 64, "tracer.http.qlen"), 1);
 
         this.config = config;
@@ -69,20 +69,20 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.httpConfig = new HttpConfig();
         httpConfig.setKeepAliveTimeout(timeout);
 
-        this.httpClient = HttpClient.fromMap(conf);
+        this.httpClient = HttpClient.fromMap(conf, stats);
 
         this.sessionID = String.format("%016x", rand.nextLong());
     }
 
     protected void send(byte[] body, int bodyLength, String uri, long traceId1, long traceId2, boolean reset) {
-        HttpMessage req = HttpMessage.POST(uri, ByteBuffer.wrap(body, 0, bodyLength),
+        HttpMessage req = HttpMessage.POST(uri, ZorkaUtil.clipArray(body, 0, bodyLength),  // TODO this is inefficient
                 HDR_ZORKA_SESSION_ID, sessionID,
                 HDR_ZORKA_SESSION_RESET, ""+reset,
                 "Content-Type", ZORKA_CBOR_CONTENT_TYPE);
         if (traceId1 != 0 && traceId2 != 0) {
             req.header("X-Zorka-Trace-ID", ZorkaUtil.hex(traceId1, traceId2));
         }
-        HttpMessage res = httpClient.exec(req);
+        HttpMessage res = httpClient.handle(req);
         if (res.getStatus() < 300) {
             if (log.isTraceEnabled()) log.trace("Submitted: " + uri + " : " + ZorkaUtil.hex(traceId1, traceId2));
         } else if (res.getStatus() == 412) {
