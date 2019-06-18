@@ -55,6 +55,10 @@ public class HttpServer implements Runnable {
         }
     }
 
+    public int getLocalPort() {
+        return socket != null ? socket.getLocalPort() : 0;
+    }
+
     public synchronized void stop() {
         if (running) {
             running = false;

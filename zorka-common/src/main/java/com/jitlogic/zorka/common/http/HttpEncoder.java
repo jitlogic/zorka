@@ -164,7 +164,7 @@ public class HttpEncoder implements HttpHandler {
         if (m.isResponse()) {
             responseLine(m.getVersion(), m.getStatus(), m.getStatusLine());
         } else {
-            requestLine(m.getVersion(), m.getMethod(), uriPrefix + m.getUri(), m.getQuery());
+            requestLine(m.getVersion(), m.getMethod(), m.getUri(), m.getQuery());
         }
 
         for (Map.Entry<String, List<String>> e : m.getHeaders().entrySet()) {

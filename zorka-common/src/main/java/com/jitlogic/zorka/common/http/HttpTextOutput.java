@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.core.integ;
+package com.jitlogic.zorka.common.http;
 
-import com.jitlogic.zorka.common.http.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 
@@ -28,6 +27,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 
 import static com.jitlogic.zorka.common.http.HttpProtocol.REG_URL_QSTR;
+import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
 
 
 /**
@@ -44,7 +44,7 @@ public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
 
     public HttpTextOutput(String name, Map<String,String> conf, Map<String,String> urlParams,
                           Map<String,String> headers, MethodCallStatistics stats) {
-        super(name);
+        super(name, parseInt(conf.get("qlen"), 256, name + "qlen should be a number."), 2);
 
         this.url = conf.get("url");
 

@@ -78,7 +78,6 @@ public class TlsContextBuilder {
                 ZorkaUtil.close(is);
             }
         }
-
     }
 
     private void setupTrustStore() {

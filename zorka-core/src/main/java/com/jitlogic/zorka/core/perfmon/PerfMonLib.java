@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.perfmon;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.http.HttpTextOutput;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.ZorkaLib;
