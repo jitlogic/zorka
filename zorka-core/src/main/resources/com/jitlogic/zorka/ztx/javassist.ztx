@@ -3,28 +3,87 @@ javassist.bytecode
  ByteArray
   readU16bit|([BI)I
  ByteVector
-  add|(I)V
+  add
+   (I)V
+   (II)V
   addGap|(I)V
+  copy|()[B
  Bytecode
-  add|(I)V
+  add
+   (I)V
+   (II)V
+  addAload|(I)V
+  addAnewarray|(Ljava/lang/String;)V
+  addAstore|(I)V
   addGap|(I)V
+  addGetfield|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  addGetstatic|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  addIconst|(I)V
+  addIndex|(I)V
+  addInvokespecial|(ZILjava/lang/String;Ljava/lang/String;)V
+  addInvokestatic|(ILjava/lang/String;Ljava/lang/String;)V
+  addLdc
+   (I)V
+   (Ljava/lang/String;)V
+  addOpcode|(I)V
   growStack|(I)V
+  toCodeAttribute|()Ljavassist/bytecode/CodeAttribute;
+ ClassFile
+  addMethod|(Ljavassist/bytecode/MethodInfo;)V
  ClassInfo
   getClassName|(Ljavassist/bytecode/ConstPool;)Ljava/lang/String;
+ CodeAttribute
+  length|()I
  ConstPool
   addClassInfo|(Ljava/lang/String;)I
+  addFieldrefInfo
+   (II)I
+   (ILjava/lang/String;Ljava/lang/String;)I
+  addInterfaceMethodrefInfo|(II)I
+  addMethodrefInfo
+   (II)I
+   (ILjava/lang/String;Ljava/lang/String;)I
+  addNameAndTypeInfo
+   (II)I
+   (Ljava/lang/String;Ljava/lang/String;)I
+  addStringInfo|(Ljava/lang/String;)I
   addUtf8Info|(Ljava/lang/String;)I
   getUtf8Info|(I)Ljava/lang/String;
  Descriptor
   dataSize|(Ljava/lang/String;)I
   numOfParameters|(Ljava/lang/String;)I
+  paramSize|(Ljava/lang/String;)I
   toJavaName|(Ljava/lang/String;)Ljava/lang/String;
+  toJvmName|(Ljava/lang/String;)Ljava/lang/String;
+ ExceptionTable
+  size|()I
  FieldInfo
   getAttribute|(Ljava/lang/String;)Ljavassist/bytecode/AttributeInfo;
  LongVector
-  addElement|(Ljava/lang/Object;)V
-  elementAt|(I)Ljava/lang/Object;
+  addElement
+   (Ljava/lang/Object;)V
+   (Ljavassist/bytecode/ConstInfo;)V
+  elementAt
+   (I)Ljava/lang/Object;
+   (I)Ljavassist/bytecode/ConstInfo;
  MemberrefInfo
   write|(Ljava/io/DataOutputStream;)V
+ MethodInfo
+  removeCodeAttribute|()V
  NameAndTypeInfo
   write|(Ljava/io/DataOutputStream;)V
+ StringInfo
+  write|(Ljava/io/DataOutputStream;)V
+ Utf8Info
+  write|(Ljava/io/DataOutputStream;)V
+javassist.util.proxy
+ ProxyFactory$3
+  compare|(Ljava/lang/Object;Ljava/lang/Object;)I
+ RuntimeSupport
+  findMethod|(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/reflect/Method;
+  findSuperClassMethod|(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/reflect/Method;
+  makeDescriptor
+   (Ljava/lang/reflect/Method;)Ljava/lang/String;
+   ([Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/String;
+ RuntimeSupport$DefaultMethodHandler
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;

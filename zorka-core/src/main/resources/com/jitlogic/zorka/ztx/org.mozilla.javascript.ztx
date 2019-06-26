@@ -38,6 +38,8 @@ org.mozilla.javascript
    (Ljava/lang/String;Lorg/mozilla/javascript/Scriptable;Ljava/lang/Object;)V
  NativeContinuation
   isContinuationConstructor|(Lorg/mozilla/javascript/IdFunctionObject;)Z
+ NativeDate
+  execIdCall|(Lorg/mozilla/javascript/IdFunctionObject;Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;Lorg/mozilla/javascript/Scriptable;[Ljava/lang/Object;)Ljava/lang/Object;
  NativeFunction
   initScriptFunction|(Lorg/mozilla/javascript/Context;Lorg/mozilla/javascript/Scriptable;)V
  NativeGlobal

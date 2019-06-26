@@ -1,42 +1,116 @@
 javax.crypto
  Cipher
+  doFinal|()[B
+  getInstance|(Ljava/lang/String;)Ljavax/crypto/Cipher;
+  init|(ILjava/security/Key;Ljava/security/spec/AlgorithmParameterSpec;Ljava/security/SecureRandom;)V
   update|([BII[BI)I
+ KeyAgreement
+  doPhase|(Ljava/security/Key;Z)Ljava/security/Key;
+  getInstance|(Ljava/lang/String;)Ljavax/crypto/KeyAgreement;
+  init|(Ljava/security/Key;Ljava/security/SecureRandom;)V
+ KeyGenerator
+  generateKey|()Ljavax/crypto/SecretKey;
+  getInstance|(Ljava/lang/String;)Ljavax/crypto/KeyGenerator;
+  init
+   (Ljava/security/spec/AlgorithmParameterSpec;)V
+   (Ljava/security/spec/AlgorithmParameterSpec;Ljava/security/SecureRandom;)V
  Mac
   doFinal
    ()[B
    ([BI)V
+  getInstance|(Ljava/lang/String;)Ljavax/crypto/Mac;
+  init|(Ljava/security/Key;)V
   update
    ([B)V
    ([BII)V
 javax.el
  ArrayELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  BeanELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  BeanELResolver$BeanProperties
   getBeanProperty|(Ljava/lang/String;)Ljavax/el/BeanELResolver$BeanProperty;
  BeanELResolver$ConcurrentCache
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  CompositeELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  ELContext
   getContext|(Ljava/lang/Class;)Ljava/lang/Object;
+  notifyPropertyResolved|(Ljava/lang/Object;Ljava/lang/Object;)V
  ListELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  MapELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  ResourceBundleELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+javax.faces.application
+ FacesMessage$Severity
+  compareTo|(Ljava/lang/Object;)I
+ ResourceHandlerWrapper
+  createViewResource|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljavax/faces/application/ViewResource;
+  isResourceRequest|(Ljavax/faces/context/FacesContext;)Z
 javax.faces.component
+ ComponentStateHelper
+  add|(Ljava/io/Serializable;Ljava/lang/Object;)V
+  eval
+   (Ljava/io/Serializable;)Ljava/lang/Object;
+   (Ljava/io/Serializable;Ljava/lang/Object;)Ljava/lang/Object;
+  get|(Ljava/io/Serializable;)Ljava/lang/Object;
+  getTransient|(Ljava/lang/Object;)Ljava/lang/Object;
+  put
+   (Ljava/io/Serializable;Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/io/Serializable;Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+  remove|(Ljava/io/Serializable;Ljava/lang/Object;)Ljava/lang/Object;
+  saveState|(Ljavax/faces/context/FacesContext;)Ljava/lang/Object;
  UIComponent
+  getContainerClientId|(Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+  getTransientStateHelper|(Z)Ljavax/faces/component/TransientStateHelper;
   getValueExpression|(Ljava/lang/String;)Ljavax/el/ValueExpression;
+  initialStateMarked|()Z
+  isCompositeComponent|(Ljavax/faces/component/UIComponent;)Z
+  markInitialState|()V
+  popComponentFromEL|(Ljavax/faces/context/FacesContext;)V
+  processEvent|(Ljavax/faces/event/ComponentSystemEvent;)V
+  pushComponentToEL|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
+  visitTree|(Ljavax/faces/component/visit/VisitContext;Ljavax/faces/component/visit/VisitCallback;)Z
  UIComponentBase
+  decode|(Ljavax/faces/context/FacesContext;)V
+  encodeBegin|(Ljavax/faces/context/FacesContext;)V
+  encodeEnd|(Ljavax/faces/context/FacesContext;)V
+  getClientId|(Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+  getFacet|(Ljava/lang/String;)Ljavax/faces/component/UIComponent;
+  getListenersForEventClass|(Ljava/lang/Class;)Ljava/util/List;
+  getPassThroughAttributes|(Z)Ljava/util/Map;
   getValueBinding|(Ljava/lang/String;)Ljavax/faces/el/ValueBinding;
+  markInitialState|()V
+  processDecodes|(Ljavax/faces/context/FacesContext;)V
+  processUpdates|(Ljavax/faces/context/FacesContext;)V
+  processValidators|(Ljavax/faces/context/FacesContext;)V
+  saveState|(Ljavax/faces/context/FacesContext;)Ljava/lang/Object;
  UIComponentBase$AttributesMap
+  containsKey|(Ljava/lang/Object;)Z
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put
+   (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+  remove|(Ljava/lang/Object;)Ljava/lang/Object;
  UIComponentBase$ChildrenList
+  add
+   (Ljava/lang/Object;)Z
+   (Ljavax/faces/component/UIComponent;)Z
   iterator|()Ljava/util/Iterator;
+  remove|(Ljava/lang/Object;)Z
  UIComponentBase$ChildrenListIterator
+  next
+   ()Ljava/lang/Object;
+   ()Ljavax/faces/component/UIComponent;
+ UIComponentBase$FacetsAndChildrenIterator
   next
    ()Ljava/lang/Object;
    ()Ljavax/faces/component/UIComponent;
@@ -44,13 +118,72 @@ javax.faces.component
   values|()Ljava/util/Collection;
  UIComponentBase$FacetsMapValues
   iterator|()Ljava/util/Iterator;
+  size|()I
+ UIComponentBase$FacetsMapValuesIterator
+  next
+   ()Ljava/lang/Object;
+   ()Ljavax/faces/component/UIComponent;
+ UIData
+  encodeBegin|(Ljavax/faces/context/FacesContext;)V
+  getClientId|(Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+ UIForm
+  getContainerClientId|(Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+ UIGraphic
+  getValueExpression|(Ljava/lang/String;)Ljavax/el/ValueExpression;
+ UINamingContainer
+  getSeparatorChar|(Ljavax/faces/context/FacesContext;)C
+ UIOutput
+  markInitialState|()V
+  saveState|(Ljavax/faces/context/FacesContext;)Ljava/lang/Object;
+ UIViewRoot
+  createUniqueId|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/lang/String;
+  getViewListenersForEventClass|(Ljava/lang/Class;)Ljava/util/List;
+  getViewMap|(Z)Ljava/util/Map;
+javax.faces.context
+ FacesContext
+  isProjectStage|(Ljavax/faces/application/ProjectStage;)Z
+ FacesContextWrapper
+  isProjectStage|(Ljavax/faces/application/ProjectStage;)Z
+ ResponseWriter
+  writeText|(Ljava/lang/Object;Ljavax/faces/component/UIComponent;Ljava/lang/String;)V
+ ResponseWriterWrapper
+  endElement|(Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljavax/faces/component/UIComponent;)V
+  write|([CII)V
+  writeAttribute|(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;)V
+  writeComment|(Ljava/lang/Object;)V
+  writeText
+   (Ljava/lang/Object;Ljava/lang/String;)V
+   (Ljava/lang/Object;Ljavax/faces/component/UIComponent;Ljava/lang/String;)V
+javax.faces.convert
+ DateTimeConverter
+  getAsString|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;Ljava/lang/Object;)Ljava/lang/String;
+ LongConverter
+  getAsString|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;Ljava/lang/Object;)Ljava/lang/String;
 javax.faces.event|PhaseId|compareTo|(Ljava/lang/Object;)I
+javax.faces.render
+ RenderKitWrapper
+  getRenderer|(Ljava/lang/String;Ljava/lang/String;)Ljavax/faces/render/Renderer;
+ Renderer
+  convertClientId|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/lang/String;
+javax.faces.view.facelets
+ ComponentHandler
+  createComponent|(Ljavax/faces/view/facelets/FaceletContext;)Ljavax/faces/component/UIComponent;
+  onComponentCreated|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;Ljavax/faces/component/UIComponent;)V
+  onComponentPopulated|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;Ljavax/faces/component/UIComponent;)V
+ CompositeFaceletHandler
+  apply|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+ DelegatingMetaTagHandler
+  apply|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+  applyNextHandler|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
 javax.management
  ImmutableDescriptor
   getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
   union|([Ljavax/management/Descriptor;)Ljavax/management/ImmutableDescriptor;
  ObjectName
   apply|(Ljavax/management/ObjectName;)Z
+  getInstance|(Ljavax/management/ObjectName;)Ljavax/management/ObjectName;
+  getKeyProperty|(Ljava/lang/String;)Ljava/lang/String;
 javax.management.modelmbean|DescriptorSupport|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
 javax.management.openmbean
  ArrayType
@@ -74,6 +207,8 @@ javax.media.jai
   tileYToY|(III)I
 javax.naming
  CompositeName
+  add|(Ljava/lang/String;)Ljavax/naming/Name;
+  clone|()Ljava/lang/Object;
   get|(I)Ljava/lang/String;
  NameImpl
   get|(I)Ljava/lang/String;
@@ -107,6 +242,16 @@ javax.naming.ldap
   size|()I
   toAttributes|()Ljavax/naming/directory/Attributes;
   unescapeValue|(Ljava/lang/String;)Ljava/lang/Object;
+javax.net.ssl
+ SSLContext
+  getInstance|(Ljava/lang/String;)Ljavax/net/ssl/SSLContext;
+  init|([Ljavax/net/ssl/KeyManager;[Ljavax/net/ssl/TrustManager;Ljava/security/SecureRandom;)V
+ TrustManagerFactory
+  getInstance|(Ljava/lang/String;)Ljavax/net/ssl/TrustManagerFactory;
+ TrustManagerFactory$1
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/lang/String;
 javax.security.auth
  Subject$SecureSet
   iterator|()Ljava/util/Iterator;
@@ -157,6 +302,7 @@ javax.xml.parsers
   run|()Ljava/lang/Object;
  SecuritySupport$2
   run|()Ljava/lang/Object;
+javax.xml.stream.util|StreamReaderDelegate|next|()I
 javax.xml.transform
  FactoryFinder$1
   run|()Ljava/lang/Object;

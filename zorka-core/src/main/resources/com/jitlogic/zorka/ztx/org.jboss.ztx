@@ -282,27 +282,79 @@ org.jboss.dmr
    (Lorg/jboss/dmr/ModelNode;)Lorg/jboss/dmr/ModelNode;
    (Z)Lorg/jboss/dmr/ModelNode;
 org.jboss.ejb3.kernel|JNDIKernelRegistryPlugin|getEntry|(Ljava/lang/Object;)Lorg/jboss/kernel/spi/registry/KernelRegistryEntry;
-org.jboss.el|ValueExpressionImpl|getValue|(Ljavax/el/ELContext;)Ljava/lang/Object;
+org.jboss.el
+ ExpressionFactoryImpl
+  coerceToType|(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+  createValueExpression|(Ljavax/el/ELContext;Ljava/lang/String;Ljava/lang/Class;)Ljavax/el/ValueExpression;
+ ValueExpressionImpl
+  getType|(Ljavax/el/ELContext;)Ljava/lang/Class;
+  getValue|(Ljavax/el/ELContext;)Ljava/lang/Object;
+ ValueExpressionLiteral
+  getValue|(Ljavax/el/ELContext;)Ljava/lang/Object;
 org.jboss.el.lang
  ELArithmetic
+  isNumber|(Ljava/lang/Object;)Z
   isNumberType|(Ljava/lang/Class;)Z
  ELSupport
+  coerceToBoolean|(Ljava/lang/Object;)Ljava/lang/Boolean;
+  coerceToNumber|(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Number;
   coerceToString|(Ljava/lang/Object;)Ljava/lang/String;
   coerceToType|(Ljava/lang/Object;Ljava/lang/Class;)Ljava/lang/Object;
+  isBigDecimalOp|(Ljava/lang/Object;Ljava/lang/Object;)Z
+  isBigIntegerOp|(Ljava/lang/Object;Ljava/lang/Object;)Z
+  isDoubleOp|(Ljava/lang/Object;Ljava/lang/Object;)Z
+  isLongOp|(Ljava/lang/Object;Ljava/lang/Object;)Z
  EvaluationContext
   getContext|(Ljava/lang/Class;)Ljava/lang/Object;
  ExpressionBuilder
+  createValueExpression|(Ljava/lang/Class;)Ljavax/el/ValueExpression;
   visit|(Lorg/jboss/el/parser/Node;)V
+ FunctionMapperFactory
+  create|()Ljavax/el/FunctionMapper;
+ FunctionMapperImpl
+  resolveFunction|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/reflect/Method;
+ VariableMapperFactory
+  create|()Ljavax/el/VariableMapper;
+  resolveVariable|(Ljava/lang/String;)Ljavax/el/ValueExpression;
 org.jboss.el.parser
+ AstAnd
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstBracketSuffix
+  getValue
+   (Ljava/lang/Object;Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+   (Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstDeferredExpression
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstEqual
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstFunction
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
  AstIdentifier
   getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstInteger
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstLiteralExpression
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstNot
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstNotEqual
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
  AstPropertySuffix
+  getType|(Ljava/lang/Object;Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Class;
   getValue|(Ljava/lang/Object;Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
+ AstString
+  getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
  AstValue
+  getType|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Class;
   getValue|(Lorg/jboss/el/lang/EvaluationContext;)Ljava/lang/Object;
  SimpleNode
   accept|(Lorg/jboss/el/parser/NodeVisitor;)V
   jjtGetNumChildren|()I
+org.jboss.el.util
+ ConcurrentCache
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ReflectionUtil
+  invokeMethod|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
 org.jboss.invocation.proxy|MethodIdentifier|getIdentifierForMethod|(Ljava/lang/reflect/Method;)Lorg/jboss/invocation/proxy/MethodIdentifier;
 org.jboss.jandex
  ClassInfo

@@ -6,6 +6,11 @@ jxl.biff
   getTwoBytes|(I[BI)V
  SheetRangeImpl
   intersects|(Ljxl/biff/SheetRangeImpl;)Z
+ StringHelper
+  getUnicodeBytes
+   (Ljava/lang/String;)[B
+   (Ljava/lang/String;[BI)V
+jxl.common|Assert|verify|(Z)V
 jxl.format
  Colour
   getInternalColour|(I)Ljxl/format/Colour;
@@ -21,6 +26,13 @@ jxl.write.biff
  RowRecord
   addCell|(Ljxl/write/biff/CellValue;)V
   getCell|(I)Ljxl/write/biff/CellValue;
+  write|(Ljxl/write/biff/File;)V
+  writeCells|(Ljxl/write/biff/File;)V
+ SSTRecord
+  add|(Ljava/lang/String;)I
+ SharedStrings
+  get|(I)Ljava/lang/String;
+  getIndex|(Ljava/lang/String;)I
  Styles
   getFormat|(Ljxl/biff/XFRecord;)Ljxl/biff/XFRecord;
  WritableSheetImpl

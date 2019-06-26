@@ -2,8 +2,10 @@ org.xml.sax.helpers
  AttributesImpl
   addAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
   clear|()V
+  getIndex|(Ljava/lang/String;)I
   getLocalName|(I)Ljava/lang/String;
   getQName|(I)Ljava/lang/String;
+  getType|(I)Ljava/lang/String;
   getURI|(I)Ljava/lang/String;
   getValue
    (I)Ljava/lang/String;
@@ -14,3 +16,5 @@ org.xml.sax.helpers
   startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
  XMLFilterImpl
   characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V

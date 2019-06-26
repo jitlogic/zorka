@@ -7,15 +7,20 @@ freemarker.core
   AddSubExpression|(Lfreemarker/core/Expression;)Lfreemarker/core/Expression;
   AdditiveExpression|()Lfreemarker/core/Expression;
   AndExpression|()Lfreemarker/core/Expression;
+  Content|()Lfreemarker/core/TemplateElement;
+  DotVariable|(Lfreemarker/core/Expression;)Lfreemarker/core/Expression;
   EqualityExpression|()Lfreemarker/core/Expression;
   Expression|()Lfreemarker/core/Expression;
+  FreemarkerDirective|()Lfreemarker/core/TemplateElement;
   Identifier|()Lfreemarker/core/Identifier;
   MultiplicativeExpression|()Lfreemarker/core/Expression;
+  OptionalBlock|()Lfreemarker/core/TemplateElement;
   OrExpression|()Lfreemarker/core/Expression;
   PCData|()Lfreemarker/core/TextBlock;
   PrimaryExpression|()Lfreemarker/core/Expression;
   RangeExpression|()Lfreemarker/core/Expression;
   RelationalExpression|()Lfreemarker/core/Expression;
+  StringOutput|()Lfreemarker/core/DollarVariable;
   UnaryExpression|()Lfreemarker/core/Expression;
  FMParserTokenManager
   SwitchTo|(I)V

@@ -63,7 +63,10 @@ org.dom4j.tree
   get|(Ljava/lang/Object;)Ljava/lang/Object;
  DefaultElement
   add|(Lorg/dom4j/Attribute;)V
-  attribute|(Ljava/lang/String;)Lorg/dom4j/Attribute;
+  attribute
+   (I)Lorg/dom4j/Attribute;
+   (Ljava/lang/String;)Lorg/dom4j/Attribute;
+   (Lorg/dom4j/QName;)Lorg/dom4j/Attribute;
   attributeCount|()I
   attributeIterator|()Ljava/util/Iterator;
   element|(Ljava/lang/String;)Lorg/dom4j/Element;

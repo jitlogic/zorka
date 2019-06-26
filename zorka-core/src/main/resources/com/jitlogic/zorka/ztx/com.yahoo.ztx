@@ -1,9 +1,15 @@
 com.yahoo.platform.yui.javascript
+ Kit
+  xDigitToInt|(II)I
  Node
   addChildToBack|(Lcom/yahoo/platform/yui/javascript/Node;)V
+  addChildrenToBack|(Lcom/yahoo/platform/yui/javascript/Node;)V
+  newNumber|(D)Lcom/yahoo/platform/yui/javascript/Node;
   newString
    (ILjava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node;
    (Ljava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node;
+  newTarget|()Lcom/yahoo/platform/yui/javascript/Node;
+  putIntProp|(II)V
  Node$Scope
   getDefiningScope|(Ljava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node$Scope;
   putSymbol|(Ljava/lang/String;Lcom/yahoo/platform/yui/javascript/Node$Symbol;)V
@@ -16,6 +22,8 @@ com.yahoo.platform.yui.javascript
  ScriptOrFnNode
   getDefiningScope|(Ljava/lang/String;)Lcom/yahoo/platform/yui/javascript/Node$Scope;
   putSymbol|(Ljava/lang/String;Lcom/yahoo/platform/yui/javascript/Node$Symbol;)V
+ ScriptRuntime
+  numberToString|(DI)Ljava/lang/String;
 com.yahoo.platform.yui.mozilla.javascript
  Node
   addChildToBack|(Lcom/yahoo/platform/yui/mozilla/javascript/Node;)V

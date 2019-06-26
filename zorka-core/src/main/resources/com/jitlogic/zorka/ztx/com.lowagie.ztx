@@ -3,6 +3,7 @@ com.lowagie.text
   type|()I
  DocWriter
   getISOBytes|(Ljava/lang/String;)[B
+  open|()V
  FontFactory
   getFont|(Ljava/lang/String;Ljava/lang/String;ZFILjava/awt/Color;)Lcom/lowagie/text/Font;
  FontFactoryImp
@@ -63,6 +64,8 @@ com.lowagie.text.pdf
   isSplitCharacter|(III[C[Lcom/lowagie/text/pdf/PdfChunk;)Z
  ExtendedColor
   getType|(Ljava/awt/Color;)I
+ IntHashtable
+  put|(II)I
  OutputStreamCounter
   write
    (I)V
@@ -107,6 +110,12 @@ com.lowagie.text.pdf
   toPdf|(Ljava/io/OutputStream;)V
  RandomAccessFileOrArray
   read|()I
+  readChar|()C
+  readInt|()I
+  readLine|()Ljava/lang/String;
+  readShort|()S
+  readUnsignedShort|()I
+  seek|(I)V
  Type1Font
   getFontDescriptor|(IF)F
 com.lowagie.text.pdf.internal|PdfXConformanceImp|checkPDFXConformance|(Lcom/lowagie/text/pdf/PdfWriter;ILjava/lang/Object;)V

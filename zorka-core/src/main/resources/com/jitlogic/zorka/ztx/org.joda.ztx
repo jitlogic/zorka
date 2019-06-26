@@ -1,4 +1,6 @@
 org.joda.time
+ DateTime
+  plusDays|(I)Lorg/joda/time/DateTime;
  DateTimeFieldType$StandardDateTimeFieldType
   getField|(Lorg/joda/time/Chronology;)Lorg/joda/time/DateTimeField;
  DateTimeUtils
@@ -8,7 +10,13 @@ org.joda.time
 org.joda.time.base|AbstractInstant|isBefore|(J)Z
 org.joda.time.chrono
  AssembledChronology
+  dayOfMonth|()Lorg/joda/time/DateTimeField;
+  hourOfDay|()Lorg/joda/time/DateTimeField;
+  minuteOfHour|()Lorg/joda/time/DateTimeField;
+  monthOfYear|()Lorg/joda/time/DateTimeField;
   months|()Lorg/joda/time/DurationField;
+  secondOfDay|()Lorg/joda/time/DateTimeField;
+  secondOfMinute|()Lorg/joda/time/DateTimeField;
   year|()Lorg/joda/time/DateTimeField;
   years|()Lorg/joda/time/DurationField;
  BasicDayOfMonthDateTimeField
@@ -16,7 +24,16 @@ org.joda.time.chrono
  BasicMonthOfYearDateTimeField
   set|(JI)J
  BasicYearDateTimeField
+  get|(J)I
   set|(JI)J
+ ISOChronology
+  getInstance|(Lorg/joda/time/DateTimeZone;)Lorg/joda/time/chrono/ISOChronology;
+  withUTC|()Lorg/joda/time/Chronology;
+org.joda.time.convert
+ AbstractConverter
+  getChronology|(Ljava/lang/Object;Lorg/joda/time/DateTimeZone;)Lorg/joda/time/Chronology;
+ ConverterManager
+  getInstantConverter|(Ljava/lang/Object;)Lorg/joda/time/convert/InstantConverter;
 org.joda.time.field
  BaseDurationField
   compareTo

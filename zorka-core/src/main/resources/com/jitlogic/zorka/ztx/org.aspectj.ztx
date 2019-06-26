@@ -1,4 +1,13 @@
-org.aspectj.apache.bcel.classfile|ConstantPool|getConstant|(I)Lorg/aspectj/apache/bcel/classfile/Constant;
+org.aspectj.apache.bcel.classfile
+ Attribute
+  readAttribute|(Ljava/io/DataInputStream;Lorg/aspectj/apache/bcel/classfile/ConstantPool;)Lorg/aspectj/apache/bcel/classfile/Attribute;
+ AttributeUtils
+  readAttributes|(Ljava/io/DataInputStream;Lorg/aspectj/apache/bcel/classfile/ConstantPool;)[Lorg/aspectj/apache/bcel/classfile/Attribute;
+ ConstantPool
+  getConstant
+   (I)Lorg/aspectj/apache/bcel/classfile/Constant;
+   (IB)Lorg/aspectj/apache/bcel/classfile/Constant;
+  getConstantUtf8|(I)Lorg/aspectj/apache/bcel/classfile/ConstantUtf8;
 org.aspectj.lang.reflect|AjTypeSystem|getAjType|(Ljava/lang/Class;)Lorg/aspectj/lang/reflect/AjType;
 org.aspectj.runtime.internal
  AroundClosure
@@ -9,6 +18,7 @@ org.aspectj.runtime.internal
 org.aspectj.runtime.reflect
  Factory
   makeJP
+   (Lorg/aspectj/lang/JoinPoint$StaticPart;Ljava/lang/Object;Ljava/lang/Object;)Lorg/aspectj/lang/JoinPoint;
    (Lorg/aspectj/lang/JoinPoint$StaticPart;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Lorg/aspectj/lang/JoinPoint;
    (Lorg/aspectj/lang/JoinPoint$StaticPart;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Lorg/aspectj/lang/JoinPoint;
    (Lorg/aspectj/lang/JoinPoint$StaticPart;Ljava/lang/Object;Ljava/lang/Object;[Ljava/lang/Object;)Lorg/aspectj/lang/JoinPoint;
@@ -17,41 +27,179 @@ org.aspectj.runtime.reflect
 org.aspectj.util
  FuzzyBoolean
   fromBoolean|(Z)Lorg/aspectj/util/FuzzyBoolean;
- FuzzyBoolean$NoFuzzyBoolean
+ FuzzyBoolean$MaybeFuzzyBoolean
+  alwaysFalse|()Z
+  alwaysTrue|()Z
+  and|(Lorg/aspectj/util/FuzzyBoolean;)Lorg/aspectj/util/FuzzyBoolean;
   maybeTrue|()Z
+ FuzzyBoolean$NoFuzzyBoolean
+  alwaysFalse|()Z
+  alwaysTrue|()Z
+  maybeTrue|()Z
+ FuzzyBoolean$YesFuzzyBoolean
+  alwaysTrue|()Z
 org.aspectj.weaver
+ AbstractReferenceTypeDelegate
+  ensureConsistent|()V
+ Iterators
+  append1|(Ljava/util/Iterator;Ljava/util/Iterator;)Ljava/util/Iterator;
+  array|([Ljava/lang/Object;)Ljava/util/Iterator;
+  mapOver|(Ljava/util/Iterator;Lorg/aspectj/weaver/Iterators$Getter;)Ljava/util/Iterator;
+  one|(Ljava/lang/Object;)Ljava/util/Iterator;
+  snoc|(Ljava/util/Iterator;Ljava/lang/Object;)Ljava/util/Iterator;
+ Iterators$2
+  next|()Ljava/lang/Object;
+ Iterators$4
+  next|()Ljava/lang/Object;
+ Iterators$6
+  next|()Ljava/lang/Object;
+ Iterators$7
+  next|()Ljava/lang/Object;
+ Iterators$8
+  next|()Ljava/lang/Object;
+ Iterators$ResolvedTypeArrayIterator
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/aspectj/weaver/ResolvedType;
+ JoinPointSignatureIterator
+  next|()Lorg/aspectj/weaver/JoinPointSignature;
+  reset|()V
  MemberImpl
+  getJoinPointSignatures|(Lorg/aspectj/weaver/World;)Lorg/aspectj/weaver/JoinPointSignatureIterator;
   typesToSignature|(Lorg/aspectj/weaver/UnresolvedType;[Lorg/aspectj/weaver/UnresolvedType;Z)Ljava/lang/String;
  ReferenceType
   ensureConsistent|()V
+  findDerivativeType|([Lorg/aspectj/weaver/ResolvedType;)Lorg/aspectj/weaver/ReferenceType;
+  isAssignableFrom|(Lorg/aspectj/weaver/ResolvedType;Z)Z
+ ResolvedMemberImpl
+  appendSigWithTypeVarBoundsRemoved|(Lorg/aspectj/weaver/UnresolvedType;Ljava/lang/StringBuffer;Ljava/util/Set;)V
+  matches|(Lorg/aspectj/weaver/ResolvedMember;Z)Z
+  parameterizedWith
+   ([Lorg/aspectj/weaver/UnresolvedType;Lorg/aspectj/weaver/ResolvedType;Z)Lorg/aspectj/weaver/ResolvedMemberImpl;
+   ([Lorg/aspectj/weaver/UnresolvedType;Lorg/aspectj/weaver/ResolvedType;ZLjava/util/List;)Lorg/aspectj/weaver/ResolvedMemberImpl;
+ ResolvedType
+  getHierarchy|(ZZ)Ljava/util/Iterator;
+  getMethodsIncludingIntertypeDeclarations|(ZZ)Ljava/util/Iterator;
+  lookupResolvedMember|(Lorg/aspectj/weaver/ResolvedMember;ZZ)Lorg/aspectj/weaver/ResolvedMember;
+  parameterize|(Ljava/util/Map;)Lorg/aspectj/weaver/UnresolvedType;
+ ResolvedType$2
+  get
+   (Ljava/lang/Object;)Ljava/util/Iterator;
+   (Lorg/aspectj/weaver/ResolvedType;)Ljava/util/Iterator;
+ ResolvedType$MethodGetterIncludingItds
+  get
+   (Ljava/lang/Object;)Ljava/util/Iterator;
+   (Lorg/aspectj/weaver/ResolvedType;)Ljava/util/Iterator;
+ ResolvedType$SuperClassWalker
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/aspectj/weaver/ResolvedType;
+ ResolvedType$SuperInterfaceWalker
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/aspectj/weaver/ResolvedType;
+  push|(Lorg/aspectj/weaver/ResolvedType;)V
  Shadow$Kind
   isSet|(I)Z
  TypeFactory
+  createParameterizedType|(Lorg/aspectj/weaver/ResolvedType;[Lorg/aspectj/weaver/UnresolvedType;Lorg/aspectj/weaver/World;)Lorg/aspectj/weaver/ReferenceType;
   createTypeFromSignature|(Ljava/lang/String;)Lorg/aspectj/weaver/UnresolvedType;
+ TypeVariable
+  resolve|(Lorg/aspectj/weaver/World;)Lorg/aspectj/weaver/TypeVariable;
+ TypeVariableReferenceType
+  resolve|(Lorg/aspectj/weaver/World;)Lorg/aspectj/weaver/ResolvedType;
  UnresolvedType
+  forGenericTypeVariables|(Ljava/lang/String;[Lorg/aspectj/weaver/TypeVariable;)Lorg/aspectj/weaver/UnresolvedType;
+  forName|(Ljava/lang/String;)Lorg/aspectj/weaver/UnresolvedType;
+  forSignature|(Ljava/lang/String;)Lorg/aspectj/weaver/UnresolvedType;
   needsModifiableDelegate|()Z
+  resolve|(Lorg/aspectj/weaver/World;)Lorg/aspectj/weaver/ResolvedType;
  World
+  forgetTypeVariablesCurrentlyBeingProcessed|(Ljava/lang/Class;)V
+  getTypeVariablesCurrentlyBeingProcessed|(Ljava/lang/Class;)[Lorg/aspectj/weaver/TypeVariable;
+  recordTypeVariablesCurrentlyBeingProcessed|(Ljava/lang/Class;[Lorg/aspectj/weaver/TypeVariable;)V
   resolve
+   (Ljava/lang/String;)Lorg/aspectj/weaver/ResolvedType;
    (Lorg/aspectj/weaver/ResolvedType;)Lorg/aspectj/weaver/ResolvedType;
+   (Lorg/aspectj/weaver/UnresolvedType;)Lorg/aspectj/weaver/ResolvedType;
    (Lorg/aspectj/weaver/UnresolvedType;Z)Lorg/aspectj/weaver/ResolvedType;
+   ([Lorg/aspectj/weaver/UnresolvedType;)[Lorg/aspectj/weaver/ResolvedType;
  World$TypeMap
   checkq|()V
+  get|(Ljava/lang/String;)Lorg/aspectj/weaver/ResolvedType;
   put|(Ljava/lang/String;Lorg/aspectj/weaver/ResolvedType;)Lorg/aspectj/weaver/ResolvedType;
+org.aspectj.weaver.ast|Literal|accept|(Lorg/aspectj/weaver/ast/ITestVisitor;)V
+org.aspectj.weaver.internal.tools
+ PointcutExpressionImpl
+  couldMatchJoinPointsInType|(Ljava/lang/Class;)Z
+  matchesMethodExecution|(Ljava/lang/reflect/Method;)Lorg/aspectj/weaver/tools/ShadowMatch;
 org.aspectj.weaver.patterns
+ AndPointcut
+  couldMatchKinds|()I
+  fastMatch|(Lorg/aspectj/weaver/patterns/FastMatchInfo;)Lorg/aspectj/util/FuzzyBoolean;
+ AnyAnnotationTypePattern
+  resolve|(Lorg/aspectj/weaver/World;)V
+ ArgsPointcut
+  fastMatch|(Lorg/aspectj/weaver/patterns/FastMatchInfo;)Lorg/aspectj/util/FuzzyBoolean;
+ BasicTokenSource
+  peek|()Lorg/aspectj/weaver/patterns/IToken;
  ExactAnnotationTypePattern
   resolve|(Lorg/aspectj/weaver/World;)V
+ KindedPointcut
+  couldMatchKinds|()I
+  fastMatch|(Lorg/aspectj/weaver/patterns/FastMatchInfo;)Lorg/aspectj/util/FuzzyBoolean;
+ ModifiersPattern
+  matches|(I)Z
  NamePattern
-  matches|([C)Z
+  matches
+   (Ljava/lang/String;)Z
+   ([C)Z
+ NotPointcut
+  couldMatchKinds|()I
+ PatternNode
+  traverse|(Lorg/aspectj/weaver/patterns/PatternNodeVisitor;Ljava/lang/Object;)Ljava/lang/Object;
+ Pointcut
+  match|(Lorg/aspectj/weaver/Shadow;)Lorg/aspectj/util/FuzzyBoolean;
+ PointcutEvaluationExpenseComparator
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Lorg/aspectj/weaver/patterns/Pointcut;Lorg/aspectj/weaver/patterns/Pointcut;)I
+ SignaturePattern
+  matches|(Lorg/aspectj/weaver/Member;Lorg/aspectj/weaver/World;Z)Z
+ ThrowsPattern
+  matches|([Lorg/aspectj/weaver/UnresolvedType;Lorg/aspectj/weaver/World;)Z
+ TypePattern
+  matchesStatically|(Lorg/aspectj/weaver/ResolvedType;)Z
  TypePatternList
   size|()I
  WithinAnnotationPointcut
   couldMatchKinds|()I
 org.aspectj.weaver.reflect
+ Java15GenericSignatureInformationProvider
+  getGenericParameterTypes|(Lorg/aspectj/weaver/reflect/ReflectionBasedResolvedMemberImpl;)[Lorg/aspectj/weaver/UnresolvedType;
+  getGenericReturnType|(Lorg/aspectj/weaver/reflect/ReflectionBasedResolvedMemberImpl;)Lorg/aspectj/weaver/UnresolvedType;
+  isBridge|(Lorg/aspectj/weaver/reflect/ReflectionBasedResolvedMemberImpl;)Z
+  isVarArgs|(Lorg/aspectj/weaver/reflect/ReflectionBasedResolvedMemberImpl;)Z
  Java15ReflectionBasedReferenceTypeDelegate
   initialize|(Lorg/aspectj/weaver/ReferenceType;Ljava/lang/Class;Ljava/lang/ClassLoader;Lorg/aspectj/weaver/World;)V
+ JavaLangTypeToResolvedTypeConverter
+  fromType|(Ljava/lang/reflect/Type;)Lorg/aspectj/weaver/ResolvedType;
+  fromTypes|([Ljava/lang/reflect/Type;)[Lorg/aspectj/weaver/ResolvedType;
+ JoinPointMatchImpl
+  matches|()Z
  ReflectionBasedReferenceTypeDelegate
   ensureConsistent|()V
   initialize|(Lorg/aspectj/weaver/ReferenceType;Ljava/lang/Class;Ljava/lang/ClassLoader;Lorg/aspectj/weaver/World;)V
+ ReflectionBasedReferenceTypeDelegateFactory
+  createDelegate|(Lorg/aspectj/weaver/ReferenceType;Lorg/aspectj/weaver/World;Ljava/lang/ClassLoader;)Lorg/aspectj/weaver/reflect/ReflectionBasedReferenceTypeDelegate;
+  createResolvedMember|(Ljava/lang/reflect/Member;Lorg/aspectj/weaver/World;)Lorg/aspectj/weaver/ResolvedMember;
+  createResolvedMethod|(Ljava/lang/reflect/Method;Lorg/aspectj/weaver/World;)Lorg/aspectj/weaver/ResolvedMember;
+ ReflectionShadow
+  makeExecutionShadow|(Lorg/aspectj/weaver/World;Ljava/lang/reflect/Member;Lorg/aspectj/weaver/tools/MatchingContext;)Lorg/aspectj/weaver/Shadow;
+ ReflectionWorld
+  resolve
+   (Ljava/lang/Class;)Lorg/aspectj/weaver/ResolvedType;
+   (Lorg/aspectj/weaver/World;Ljava/lang/Class;)Lorg/aspectj/weaver/ResolvedType;
  ShadowMatchImpl
   alwaysMatches|()Z
   maybeMatches|()Z

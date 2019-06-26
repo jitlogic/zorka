@@ -8,6 +8,59 @@ org.apache.abdera.i18n.text
  CodepointIterator
   position|()I
   remaining|()I
+org.apache.axiom.om.impl
+ MTOMXMLStreamWriter
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+  writeCharacters|(Ljava/lang/String;)V
+  writeEndElement|()V
+  writeStartElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+org.apache.axiom.om.impl.builder
+ SAXOMBuilder
+  characterData|([CIII)V
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+ StAXOMBuilder
+  next|()I
+org.apache.axiom.om.impl.llom
+ OMDocumentImpl
+  buildNext|()V
+ OMElementImpl
+  addChild|(Lorg/apache/axiom/om/OMNode;)V
+  buildNext|()V
+  findNamespaceURI|(Ljava/lang/String;)Lorg/apache/axiom/om/OMNamespace;
+  internalSerialize|(Ljavax/xml/stream/XMLStreamWriter;Z)V
+ OMSourcedElementImpl
+  addChild|(Lorg/apache/axiom/om/OMNode;)V
+ OMTextImpl
+  internalSerialize|(Ljavax/xml/stream/XMLStreamWriter;Z)V
+ SwitchingWrapper
+  next|()I
+org.apache.axiom.om.impl.llom.factory
+ OMLinkedListImplFactory
+  createOMElement|(Ljava/lang/String;Lorg/apache/axiom/om/OMNamespace;Lorg/apache/axiom/om/OMContainer;Lorg/apache/axiom/om/OMXMLParserWrapper;)Lorg/apache/axiom/om/OMElement;
+  createOMText|(Lorg/apache/axiom/om/OMContainer;Ljava/lang/String;I)Lorg/apache/axiom/om/OMText;
+org.apache.axiom.om.impl.traverse|OMAbstractIterator|next|()Ljava/lang/Object;
+org.apache.axiom.om.impl.util
+ OMSerializerUtil
+  generateSetPrefix|(Ljava/lang/String;Ljava/lang/String;Ljavax/xml/stream/XMLStreamWriter;Z)Ljava/lang/String;
+  isAssociated|(Ljava/lang/String;Ljava/lang/String;Ljavax/xml/stream/XMLStreamWriter;)Z
+  serializeChildren|(Lorg/apache/axiom/om/OMContainer;Ljavax/xml/stream/XMLStreamWriter;Z)V
+  serializeEndpart|(Ljavax/xml/stream/XMLStreamWriter;)V
+  serializeStartpart
+   (Lorg/apache/axiom/om/OMElement;Ljava/lang/String;Ljavax/xml/stream/XMLStreamWriter;)V
+   (Lorg/apache/axiom/om/OMElement;Ljavax/xml/stream/XMLStreamWriter;)V
+org.apache.axiom.util.base64|AbstractBase64DecodingWriter|write|(I)V
+org.apache.axiom.util.blob|MemoryBlob$OutputStreamImpl|write|([BII)V
+org.apache.axiom.util.stax.dialect|DisallowDoctypeDeclStreamReaderWrapper|next|()I
+org.apache.axiom.util.stax.wrapper
+ XMLStreamReaderWrapper
+  next|()I
+ XMLStreamWriterWrapper
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+  writeCharacters|(Ljava/lang/String;)V
+  writeEndElement|()V
+  writeStartElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
 org.apache.axis
  Constants
   getValue
@@ -54,6 +107,40 @@ org.apache.axis.utils
   getPrefix|(Ljava/lang/String;Z)Ljava/lang/String;
   pop|()V
   push|()V
+org.apache.axis2.builder
+ BuilderUtil
+  getCharSetEncoding
+   (Ljava/io/PushbackInputStream;Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;)Ljava/lang/String;
+  getEnvelopeNamespace|(Ljava/lang/String;)Ljava/lang/String;
+  validateSOAPVersion|(Ljava/lang/String;Lorg/apache/axiom/soap/SOAPEnvelope;)V
+org.apache.axis2.context
+ AbstractContext
+  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
+ MessageContext
+  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
+org.apache.axis2.description
+ AxisDescription
+  getParameter|(Ljava/lang/String;)Lorg/apache/axis2/description/Parameter;
+ ParameterIncludeImpl
+  getParameter|(Ljava/lang/String;)Lorg/apache/axis2/description/Parameter;
+org.apache.axis2.transport|TransportUtils|createDocumentElement|(Ljava/lang/String;Lorg/apache/axis2/context/MessageContext;Ljava/io/InputStream;)Lorg/apache/axiom/om/OMElement;
+org.apache.axis2.util
+ JavaUtils
+  hasUpperCase|(Ljava/lang/String;)Z
+  isFalseExplicitly
+   (Ljava/lang/Object;)Z
+   (Ljava/lang/Object;Z)Z
+  isJavaKeyword|(Ljava/lang/String;)Z
+  isTrue|(Ljava/lang/Object;Z)Z
+  isTrueExplicitly|(Ljava/lang/Object;Z)Z
+  xmlNameToJava|(Ljava/lang/String;)Ljava/lang/String;
+  xmlNameToJavaIdentifier|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.axis2.wsdl.util
+ WSDLDefinitionWrapper
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+ WSDLWrapperBasicImpl
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
 org.apache.beehive.netui.pageflow.scoping
  ScopedServletUtils
   getOuterRequest|(Ljavax/servlet/http/HttpServletRequest;)Ljavax/servlet/http/HttpServletRequest;
@@ -96,9 +183,11 @@ org.apache.catalina.connector
  Request
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
+  getHeaders|(Ljava/lang/String;)Ljava/util/Enumeration;
   getParameter|(Ljava/lang/String;)Ljava/lang/String;
   getParameterValues|(Ljava/lang/String;)[Ljava/lang/String;
   getSession|(Z)Ljavax/servlet/http/HttpSession;
+  getSessionInternal|(Z)Lorg/apache/catalina/Session;
   removeAttribute|(Ljava/lang/String;)V
  Request$1
   get|(Lorg/apache/catalina/connector/Request;Ljava/lang/String;)Ljava/lang/Object;
@@ -112,8 +201,10 @@ org.apache.catalina.connector
   getSession|(Z)Ljavax/servlet/http/HttpSession;
   removeAttribute|(Ljava/lang/String;)V
  Response
+  encodeURL|(Ljava/lang/String;)Ljava/lang/String;
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
  ResponseFacade
+  encodeURL|(Ljava/lang/String;)Ljava/lang/String;
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
 org.apache.catalina.core
  ApplicationContext
@@ -135,14 +226,22 @@ org.apache.catalina.core
  ContainerBase
   backgroundProcess|()V
   findChildren|()[Lorg/apache/catalina/Container;
+  fireContainerEvent|(Ljava/lang/String;Ljava/lang/Object;)V
   logAccess|(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;JZ)V
  NamingContextListener
   lifecycleEvent|(Lorg/apache/catalina/LifecycleEvent;)V
+ StandardContext
+  backgroundProcess|()V
+  bind|(ZLjava/lang/ClassLoader;)Ljava/lang/ClassLoader;
+  findFilterConfig|(Ljava/lang/String;)Ljavax/servlet/FilterConfig;
+  unbind|(ZLjava/lang/ClassLoader;)V
  StandardContext$1
   bind|()V
   unbind|()V
  StandardContext$ContextFilterMaps
   asArray|()[Lorg/apache/tomcat/util/descriptor/web/FilterMap;
+ StandardContext$NoPluggabilityServletContext
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
  StandardContextValve
   invoke|(Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;)V
  StandardEngine
@@ -174,13 +273,18 @@ org.apache.catalina.loader
    (Ljava/lang/String;)Ljava/lang/Class;
    (Ljava/lang/String;Z)Ljava/lang/Class;
  WebappClassLoaderBase
-  loadClass|(Ljava/lang/String;Z)Ljava/lang/Class;
+  loadClass
+   (Ljava/lang/String;)Ljava/lang/Class;
+   (Ljava/lang/String;Z)Ljava/lang/Class;
  WebappLoader
   backgroundProcess|()V
   closeJARs|(Z)V
 org.apache.catalina.mapper
  Mapper
   map|(Lorg/apache/tomcat/util/buf/MessageBytes;Lorg/apache/tomcat/util/buf/MessageBytes;Ljava/lang/String;Lorg/apache/catalina/mapper/MappingData;)V
+ MapperListener
+  containerEvent|(Lorg/apache/catalina/ContainerEvent;)V
+  lifecycleEvent|(Lorg/apache/catalina/LifecycleEvent;)V
  MappingData
   recycle|()V
 org.apache.catalina.realm|RealmBase|backgroundProcess|()V
@@ -188,8 +292,14 @@ org.apache.catalina.session
  ManagerBase
   backgroundProcess|()V
   findSessions|()[Lorg/apache/catalina/Session;
+  remove|(Lorg/apache/catalina/Session;Z)V
+  updateSessionMaxAliveTime|(I)V
  StandardSession
+  fireSessionEvent|(Ljava/lang/String;Ljava/lang/Object;)V
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+  removeAttribute
+   (Ljava/lang/String;)V
+   (Ljava/lang/String;Z)V
  StandardSessionFacade
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
 org.apache.catalina.startup
@@ -216,6 +326,8 @@ org.apache.catalina.util
  TLSUtil
   isTLSRequestAttribute|(Ljava/lang/String;)Z
 org.apache.catalina.valves
+ AbstractAccessLogValve$StringElement
+  addElement|(Ljava/io/CharArrayWriter;Ljava/util/Date;Lorg/apache/catalina/connector/Request;Lorg/apache/catalina/connector/Response;J)V
  AccessLogValve
   backgroundProcess|()V
  AccessLogValve$StringElement
@@ -225,8 +337,16 @@ org.apache.catalina.valves
  ValveBase
   backgroundProcess|()V
 org.apache.catalina.webresources
+ AbstractArchiveResource
+  exists|()Z
+ AbstractArchiveResource$JarInputStreamWrapper
+  close|()V
+  read|([BII)I
  AbstractArchiveResourceSet
+  gc|()V
   getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
+ AbstractFileResourceSet
+  gc|()V
  Cache$EvictionOrder
   compare
    (Ljava/lang/Object;Ljava/lang/Object;)I
@@ -235,7 +355,11 @@ org.apache.catalina.webresources
   getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
  EmptyResource
   exists|()Z
+ FileResource
+  exists|()Z
  StandardRoot
+  backgroundProcess|()V
+  gc|()V
   getResource|(Ljava/lang/String;)Lorg/apache/catalina/WebResource;
 org.apache.chemistry.opencmis.commons.enums|BaseTypeId|value|()Ljava/lang/String;
 org.apache.chemistry.opencmis.commons.impl.dataobjects|AbstractTypeDefinition|addPropertyDefinition|(Lorg/apache/chemistry/opencmis/commons/definitions/PropertyDefinition;)V
@@ -257,17 +381,25 @@ org.apache.coyote
   getNote|(I)Ljava/lang/Object;
   method|()Lorg/apache/tomcat/util/buf/MessageBytes;
   protocol|()Lorg/apache/tomcat/util/buf/MessageBytes;
+  queryString|()Lorg/apache/tomcat/util/buf/MessageBytes;
   requestURI|()Lorg/apache/tomcat/util/buf/MessageBytes;
   scheme|()Lorg/apache/tomcat/util/buf/MessageBytes;
   serverName|()Lorg/apache/tomcat/util/buf/MessageBytes;
  Response
   action|(Lorg/apache/coyote/ActionCode;Ljava/lang/Object;)V
   getNote|(I)Ljava/lang/Object;
+  recycle|()V
 org.apache.coyote.http11
+ AbstractHttp11Processor
+  action|(Lorg/apache/coyote/ActionCode;Ljava/lang/Object;)V
+ AbstractNioInputBuffer$HeaderParseData
+  recycle|()V
  AbstractOutputBuffer
   sendHeader|(Lorg/apache/tomcat/util/buf/MessageBytes;Lorg/apache/tomcat/util/buf/MessageBytes;)V
  Http11InputBuffer$HeaderParseData
   recycle|()V
+ Http11NioProtocol$Http11ConnectionHandler
+  release|(Lorg/apache/tomcat/util/net/SocketWrapper;)V
  Http11OutputBuffer
   flush|()V
   sendHeader|(Lorg/apache/tomcat/util/buf/MessageBytes;Lorg/apache/tomcat/util/buf/MessageBytes;)V
@@ -281,6 +413,8 @@ org.apache.coyote.http11
   doRead|(Lorg/apache/tomcat/util/buf/ByteChunk;Lorg/apache/coyote/Request;)I
  InternalAprInputBuffer$SocketInputBuffer
   doRead|(Lorg/apache/tomcat/util/buf/ByteChunk;Lorg/apache/coyote/Request;)I
+ InternalNioOutputBuffer$SocketOutputBuffer
+  doWrite|(Lorg/apache/tomcat/util/buf/ByteChunk;Lorg/apache/coyote/Response;)I
 org.apache.coyote.http11.filters
  ChunkedOutputFilter
   flush|()V
@@ -392,6 +526,7 @@ org.apache.ibatis.builder
 org.apache.ibatis.builder.xml|XMLIncludeTransformer|applyIncludes|(Lorg/w3c/dom/Node;)V
 org.apache.ibatis.cache
  CacheKey
+  clone|()Lorg/apache/ibatis/cache/CacheKey;
   update|(Ljava/lang/Object;)V
  TransactionalCacheManager
   commit|()V
@@ -484,6 +619,7 @@ org.apache.ibatis.reflection
   getGetInvoker|(Ljava/lang/String;)Lorg/apache/ibatis/reflection/invoker/Invoker;
   getGetterType|(Ljava/lang/String;)Ljava/lang/Class;
   getSetInvoker|(Ljava/lang/String;)Lorg/apache/ibatis/reflection/invoker/Invoker;
+  getSetterType|(Ljava/lang/String;)Ljava/lang/Class;
   hasGetter|(Ljava/lang/String;)Z
  MetaObject
   forObject|(Ljava/lang/Object;Lorg/apache/ibatis/reflection/factory/ObjectFactory;Lorg/apache/ibatis/reflection/wrapper/ObjectWrapperFactory;)Lorg/apache/ibatis/reflection/MetaObject;
@@ -495,16 +631,20 @@ org.apache.ibatis.reflection
   getGetInvoker|(Ljava/lang/String;)Lorg/apache/ibatis/reflection/invoker/Invoker;
   getGetterType|(Ljava/lang/String;)Ljava/lang/Class;
   getSetInvoker|(Ljava/lang/String;)Lorg/apache/ibatis/reflection/invoker/Invoker;
+  getSetterType|(Ljava/lang/String;)Ljava/lang/Class;
   hasGetter|(Ljava/lang/String;)Z
 org.apache.ibatis.reflection.factory
  DefaultObjectFactory
   create
    (Ljava/lang/Class;)Ljava/lang/Object;
    (Ljava/lang/Class;Ljava/util/List;Ljava/util/List;)Ljava/lang/Object;
+  isCollection|(Ljava/lang/Class;)Z
 org.apache.ibatis.reflection.invoker|MethodInvoker|invoke|(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.ibatis.reflection.wrapper
  BeanWrapper
   get|(Lorg/apache/ibatis/reflection/property/PropertyTokenizer;)Ljava/lang/Object;
+  getSetterType|(Ljava/lang/String;)Ljava/lang/Class;
+  instantiatePropertyValue|(Ljava/lang/String;Lorg/apache/ibatis/reflection/property/PropertyTokenizer;Lorg/apache/ibatis/reflection/factory/ObjectFactory;)Lorg/apache/ibatis/reflection/MetaObject;
  DefaultObjectWrapperFactory
   hasWrapperFor|(Ljava/lang/Object;)Z
  MapWrapper
@@ -514,6 +654,7 @@ org.apache.ibatis.scripting.defaults|RawSqlSource|getBoundSql|(Ljava/lang/Object
 org.apache.ibatis.scripting.xmltags
  DynamicContext
   appendSql|(Ljava/lang/String;)V
+  bind|(Ljava/lang/String;Ljava/lang/Object;)V
  DynamicContext$ContextAccessor
   getProperty|(Ljava/util/Map;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  DynamicContext$ContextMap
@@ -521,6 +662,8 @@ org.apache.ibatis.scripting.xmltags
   put|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
  ExpressionEvaluator
   evaluateBoolean|(Ljava/lang/String;Ljava/lang/Object;)Z
+ ForEachSqlNode$PrefixedContext
+  bind|(Ljava/lang/String;Ljava/lang/Object;)V
  IfSqlNode
   apply|(Lorg/apache/ibatis/scripting/xmltags/DynamicContext;)Z
  MixedSqlNode
@@ -538,6 +681,7 @@ org.apache.ibatis.session
   getMappedStatement
    (Ljava/lang/String;)Lorg/apache/ibatis/mapping/MappedStatement;
    (Ljava/lang/String;Z)Lorg/apache/ibatis/mapping/MappedStatement;
+  getResultMap|(Ljava/lang/String;)Lorg/apache/ibatis/mapping/ResultMap;
   newMetaObject|(Ljava/lang/Object;)Lorg/apache/ibatis/reflection/MetaObject;
   newParameterHandler|(Lorg/apache/ibatis/mapping/MappedStatement;Ljava/lang/Object;Lorg/apache/ibatis/mapping/BoundSql;)Lorg/apache/ibatis/executor/parameter/ParameterHandler;
   newResultSetHandler|(Lorg/apache/ibatis/executor/Executor;Lorg/apache/ibatis/mapping/MappedStatement;Lorg/apache/ibatis/session/RowBounds;Lorg/apache/ibatis/executor/parameter/ParameterHandler;Lorg/apache/ibatis/session/ResultHandler;Lorg/apache/ibatis/mapping/BoundSql;)Lorg/apache/ibatis/executor/resultset/ResultSetHandler;
@@ -547,6 +691,18 @@ org.apache.ibatis.session
 org.apache.ibatis.type
  BaseTypeHandler
   getResult|(Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
+ BooleanTypeHandler
+  getNullableResult
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Boolean;
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
+ DoubleTypeHandler
+  getNullableResult
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Double;
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
+ FloatTypeHandler
+  getNullableResult
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Float;
+   (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Object;
  IntegerTypeHandler
   getNullableResult
    (Ljava/sql/ResultSet;Ljava/lang/String;)Ljava/lang/Integer;
@@ -663,6 +819,7 @@ org.apache.log4j
   doAppend|(Lorg/apache/log4j/spi/LoggingEvent;)V
   isAsSevereAsThreshold|(Lorg/apache/log4j/Priority;)Z
  Category
+  callAppenders|(Lorg/apache/log4j/spi/LoggingEvent;)V
   isEnabledFor|(Lorg/apache/log4j/Priority;)Z
   log|(Ljava/lang/String;Lorg/apache/log4j/Priority;Ljava/lang/Object;Ljava/lang/Throwable;)V
  Hierarchy
@@ -677,6 +834,10 @@ org.apache.log4j
  WriterAppender
   append|(Lorg/apache/log4j/spi/LoggingEvent;)V
 org.apache.log4j.helpers
+ AppenderAttachableImpl
+  appendLoopOnAppenders|(Lorg/apache/log4j/spi/LoggingEvent;)I
+ CountingQuietWriter
+  write|(Ljava/lang/String;)V
  PatternConverter
   format|(Ljava/lang/StringBuffer;Lorg/apache/log4j/spi/LoggingEvent;)V
   spacePad|(Ljava/lang/StringBuffer;I)V
@@ -686,6 +847,8 @@ org.apache.log4j.helpers
   convert|(Lorg/apache/log4j/spi/LoggingEvent;)Ljava/lang/String;
  PatternParser$LiteralPatternConverter
   format|(Ljava/lang/StringBuffer;Lorg/apache/log4j/spi/LoggingEvent;)V
+ PatternParser$LocationPatternConverter
+  convert|(Lorg/apache/log4j/spi/LoggingEvent;)Ljava/lang/String;
  PatternParser$NamedPatternConverter
   convert|(Lorg/apache/log4j/spi/LoggingEvent;)Ljava/lang/String;
  QuietWriter
@@ -704,6 +867,28 @@ org.apache.logging.slf4j
    (Lorg/apache/logging/log4j/Level;Lorg/apache/logging/log4j/Marker;Ljava/lang/String;)Z
  SLF4JLoggerContext
   getLogger|(Ljava/lang/String;)Lorg/apache/logging/log4j/spi/ExtendedLogger;
+org.apache.myfaces.component.html.ext|HtmlDataTableHack|getContainerClientId|(Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+org.apache.myfaces.component.html.util|HtmlComponentUtils|getClientId|(Ljavax/faces/component/UIComponent;Ljavax/faces/render/Renderer;Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+org.apache.myfaces.custom.crosstable
+ UIColumns
+  getClientId|(Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+ UIColumns$EditableValueHolderState
+  restoreState|(Ljavax/faces/component/EditableValueHolder;)V
+org.apache.myfaces.shared_tomahawk.renderkit
+ RendererUtils
+  getBooleanValue|(Ljava/lang/String;Ljava/lang/Object;Z)Z
+  isDefaultAttributeValue|(Ljava/lang/Object;)Z
+  isRendered|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)Z
+  renderChild|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
+  renderChildren|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
+org.apache.myfaces.shared_tomahawk.renderkit.html
+ HtmlRenderer
+  getChildCount|(Ljavax/faces/component/UIComponent;)I
+  getChildren|(Ljavax/faces/component/UIComponent;)Ljava/util/List;
+ HtmlRendererUtils
+  renderHTMLAttribute
+   (Ljavax/faces/context/ResponseWriter;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)Z
+   (Ljavax/faces/context/ResponseWriter;Ljavax/faces/component/UIComponent;Ljava/lang/String;Ljava/lang/String;)Z
 org.apache.naming
  NamingContextBindingsEnumeration
   nextElement
@@ -777,6 +962,8 @@ org.apache.poi.ss.util
   formatAsString|()Ljava/lang/String;
   isColumnWithnRange|(Ljava/lang/String;Lorg/apache/poi/ss/SpreadsheetVersion;)Z
   isRowWithnRange|(Ljava/lang/String;Lorg/apache/poi/ss/SpreadsheetVersion;)Z
+ SheetUtil
+  getCellWidth|(Lorg/apache/poi/ss/usermodel/Cell;ILorg/apache/poi/ss/usermodel/DataFormatter;Z)D
 org.apache.poi.util
  BitField
   clear|(I)I
@@ -791,26 +978,42 @@ org.apache.poi.util
 org.apache.poi.xssf.model
  CalculationChain
   removeItem|(ILjava/lang/String;)V
+ SharedStringsTable
+  addEntry|(Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTRst;)I
+  getEntryAt|(I)Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTRst;
  StylesTable
   getBorderAt|(I)Lorg/apache/poi/xssf/usermodel/extensions/XSSFCellBorder;
   getCellStyleXfAt|(I)Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTXf;
   getCellXfAt|(I)Lorg/openxmlformats/schemas/spreadsheetml/x2006/main/CTXf;
   getFillAt|(I)Lorg/apache/poi/xssf/usermodel/extensions/XSSFCellFill;
+  getFontAt|(I)Lorg/apache/poi/xssf/usermodel/XSSFFont;
   getStyleAt|(I)Lorg/apache/poi/xssf/usermodel/XSSFCellStyle;
  ThemesTable
   inheritFromThemeAsRequired|(Lorg/apache/poi/xssf/usermodel/XSSFColor;)V
 org.apache.poi.xssf.usermodel
+ XSSFRichTextString
+  numFormattingRuns|()I
  XSSFRow
+  createCell
+   (I)Lorg/apache/poi/ss/usermodel/Cell;
+   (I)Lorg/apache/poi/xssf/usermodel/XSSFCell;
+   (II)Lorg/apache/poi/xssf/usermodel/XSSFCell;
   getCell
    (I)Lorg/apache/poi/ss/usermodel/Cell;
    (I)Lorg/apache/poi/xssf/usermodel/XSSFCell;
    (ILorg/apache/poi/ss/usermodel/Row$MissingCellPolicy;)Lorg/apache/poi/xssf/usermodel/XSSFCell;
  XSSFSheet
+  createRow
+   (I)Lorg/apache/poi/ss/usermodel/Row;
+   (I)Lorg/apache/poi/xssf/usermodel/XSSFRow;
   getRow|(I)Lorg/apache/poi/xssf/usermodel/XSSFRow;
  XSSFWorkbook
   getCellStyleAt
    (S)Lorg/apache/poi/ss/usermodel/CellStyle;
    (S)Lorg/apache/poi/xssf/usermodel/XSSFCellStyle;
+  getFontAt
+   (S)Lorg/apache/poi/ss/usermodel/Font;
+   (S)Lorg/apache/poi/xssf/usermodel/XSSFFont;
   getNameAt|(I)Lorg/apache/poi/xssf/usermodel/XSSFName;
 org.apache.poi.xssf.usermodel.extensions|XSSFCellBorder|getBorderColor|(Lorg/apache/poi/xssf/usermodel/extensions/XSSFCellBorder$BorderSide;)Lorg/apache/poi/xssf/usermodel/XSSFColor;
 org.apache.poi.xssf.util
@@ -921,10 +1124,56 @@ org.apache.tomcat.dbcp.dbcp
   getString|(I)Ljava/lang/String;
   next|()Z
   wasNull|()Z
+org.apache.tomcat.dbcp.dbcp2
+ DelegatingConnection
+  clearWarnings|()V
+  close|()V
+  commit|()V
+  prepareStatement|(Ljava/lang/String;)Ljava/sql/PreparedStatement;
+ DelegatingPreparedStatement
+  executeUpdate|()I
+ DelegatingResultSet
+  close|()V
+  getBigDecimal|(Ljava/lang/String;)Ljava/math/BigDecimal;
+  getBoolean|(Ljava/lang/String;)Z
+  getDate|(Ljava/lang/String;)Ljava/sql/Date;
+  getInt|(Ljava/lang/String;)I
+  getLong
+   (I)J
+   (Ljava/lang/String;)J
+  getShort|(Ljava/lang/String;)S
+  getString|(Ljava/lang/String;)Ljava/lang/String;
+  getTimestamp|(Ljava/lang/String;)Ljava/sql/Timestamp;
+  next|()Z
+  wasNull|()Z
+  wrapResultSet|(Ljava/sql/Statement;Ljava/sql/ResultSet;)Ljava/sql/ResultSet;
+ DelegatingStatement
+  close|()V
+ PoolableConnection
+  close|()V
+ PoolableConnectionFactory
+  activateObject|(Lorg/apache/tomcat/dbcp/pool2/PooledObject;)V
+  passivateObject|(Lorg/apache/tomcat/dbcp/pool2/PooledObject;)V
+ PoolingDataSource$PoolGuardConnectionWrapper
+  close|()V
+org.apache.tomcat.dbcp.pool2.impl
+ BaseGenericObjectPool$StatsStore
+  add|(J)V
+ DefaultPooledObject
+  allocate|()Z
+  deallocate|()Z
+ GenericObjectPool
+  returnObject|(Ljava/lang/Object;)V
+ LinkedBlockingDeque
+  addFirst|(Ljava/lang/Object;)V
+  offerFirst|(Ljava/lang/Object;)Z
+  pollFirst|()Ljava/lang/Object;
+  size|()I
 org.apache.tomcat.util
  ExceptionUtils
   handleThrowable|(Ljava/lang/Throwable;)V
  IntrospectionUtils
+  findMethods|(Ljava/lang/Class;)[Ljava/lang/reflect/Method;
   replaceProperties|(Ljava/lang/String;Ljava/util/Hashtable;[Lorg/apache/tomcat/util/IntrospectionUtils$PropertySource;)Ljava/lang/String;
 org.apache.tomcat.util.bcel.classfile
  AnnotationEntry
@@ -978,7 +1227,13 @@ org.apache.tomcat.util.buf
    (C)V
    (Ljava/lang/String;II)V
    ([CII)V
+  endsWith|(Ljava/lang/String;)Z
   equalsIgnoreCase|(Ljava/lang/String;)Z
+  indexOf
+   (C)I
+   (CI)I
+   (Ljava/lang/String;III)I
+   ([CIIC)I
   makeSpace|(I)V
   recycle|()V
   startsWith|(Ljava/lang/String;)Z
@@ -993,6 +1248,10 @@ org.apache.tomcat.util.buf
   toBytes|()V
   toChars|()V
  UDecoder
+  URLDecode
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+   (Ljava/lang/String;Ljava/lang/String;Z)Ljava/lang/String;
+   ([BLjava/lang/String;Z)Ljava/lang/String;
   convert|(Lorg/apache/tomcat/util/buf/ByteChunk;Z)V
 org.apache.tomcat.util.collections
  ConcurrentCache
@@ -1006,8 +1265,12 @@ org.apache.tomcat.util.collections
   push|(Ljava/lang/Object;)Z
 org.apache.tomcat.util.digester
  ArrayStack
+  peek|(I)Ljava/lang/Object;
   pop|()Ljava/lang/Object;
   push|(Ljava/lang/Object;)Ljava/lang/Object;
+ CallMethodRule
+  begin|(Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+  body|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
  Digester
   characters|([CII)V
   endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
@@ -1030,11 +1293,13 @@ org.apache.tomcat.util.http
   recycle|()V
  MimeHeaders
   addValue|([BII)Lorg/apache/tomcat/util/buf/MessageBytes;
+  clear|()V
   getHeader|(Ljava/lang/String;)Ljava/lang/String;
   getName|(I)Lorg/apache/tomcat/util/buf/MessageBytes;
   getValue
    (I)Lorg/apache/tomcat/util/buf/MessageBytes;
    (Ljava/lang/String;)Lorg/apache/tomcat/util/buf/MessageBytes;
+  recycle|()V
   setValue|(Ljava/lang/String;)Lorg/apache/tomcat/util/buf/MessageBytes;
   size|()I
   values|(Ljava/lang/String;)Ljava/util/Enumeration;
@@ -1043,13 +1308,18 @@ org.apache.tomcat.util.http
   getParameter|(Ljava/lang/String;)Ljava/lang/String;
   getParameterValues|(Ljava/lang/String;)[Ljava/lang/String;
   handleQueryParameters|()V
+  recycle|()V
  RequestUtil
   normalize
    (Ljava/lang/String;)Ljava/lang/String;
    (Ljava/lang/String;Z)Ljava/lang/String;
  Rfc6265CookieProcessor
   parseCookieHeader|(Lorg/apache/tomcat/util/http/MimeHeaders;Lorg/apache/tomcat/util/http/ServerCookies;)V
+ ServerCookie
+  recycle|()V
  ServerCookies
+  addCookie|()Lorg/apache/tomcat/util/http/ServerCookie;
+  getCookie|(I)Lorg/apache/tomcat/util/http/ServerCookie;
   recycle|()V
  ValuesEnumerator
   nextElement|()Ljava/lang/String;
@@ -1070,6 +1340,11 @@ org.apache.tomcat.util.http.parser
   mayContinue|()Z
  MediaTypeCache
   parse|(Ljava/lang/String;)[Ljava/lang/String;
+org.apache.tomcat.util.log
+ SystemLogHandler
+  flush|()V
+  println|(Ljava/lang/String;)V
+  write|([BII)V
 org.apache.tomcat.util.modeler|BaseModelMBean|getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
 org.apache.tomcat.util.net
  AbstractEndpoint
@@ -1081,18 +1356,41 @@ org.apache.tomcat.util.net
   write|(Ljava/nio/ByteBuffer;Lorg/apache/tomcat/util/net/NioChannel;J)I
  NioBlockingSelector$BlockPoller
   countDown|(Ljava/util/concurrent/CountDownLatch;)V
-  remove|(Lorg/apache/tomcat/util/net/NioEndpoint$NioSocketWrapper;I)V
+  events|()Z
+  remove
+   (Lorg/apache/tomcat/util/net/NioEndpoint$KeyAttachment;I)V
+   (Lorg/apache/tomcat/util/net/NioEndpoint$NioSocketWrapper;I)V
   wakeup|()V
+ NioBlockingSelector$BlockPoller$2
+  run|()V
+ NioBlockingSelector$BlockPoller$3
+  run|()V
  NioBlockingSelector$BlockPoller$RunnableRemove
   run|()V
  NioChannel
+  close|()V
   flush|(ZLjava/nio/channels/Selector;J)Z
+  reset|()V
+  write|(Ljava/nio/ByteBuffer;)I
+ NioEndpoint$KeyAttachment
+  interestOps
+   ()I
+   (I)I
  NioEndpoint$NioSocketWrapper
   interestOps|(I)I
   updateLastRead|()V
   updateLastWrite|()V
+ NioEndpoint$Poller
+  events|()Z
+  register|(Lorg/apache/tomcat/util/net/NioChannel;)V
  NioEndpoint$PollerEvent
-  reset|(Lorg/apache/tomcat/util/net/NioChannel;Lorg/apache/tomcat/util/net/NioEndpoint$NioSocketWrapper;I)V
+  reset
+   ()V
+   (Lorg/apache/tomcat/util/net/NioChannel;Lorg/apache/tomcat/util/net/NioEndpoint$KeyAttachment;I)V
+   (Lorg/apache/tomcat/util/net/NioChannel;Lorg/apache/tomcat/util/net/NioEndpoint$NioSocketWrapper;I)V
+  run|()V
+ NioEndpoint$SocketProcessor
+  reset|(Lorg/apache/tomcat/util/net/NioEndpoint$KeyAttachment;Lorg/apache/tomcat/util/net/SocketStatus;)V
  NioSelectorPool
   put|(Ljava/nio/channels/Selector;)V
   write|(Ljava/nio/ByteBuffer;Lorg/apache/tomcat/util/net/NioChannel;Ljava/nio/channels/Selector;JZ)I
@@ -1102,18 +1400,40 @@ org.apache.tomcat.util.net
   configureWriteBufferForWrite|()V
  SocketProcessorBase
   reset|(Lorg/apache/tomcat/util/net/SocketWrapperBase;Lorg/apache/tomcat/util/net/SocketEvent;)V
+ SocketWrapper
+  access
+   ()V
+   (J)V
  SocketWrapperBase
   flush|(Z)Z
   write|(ZLjava/nio/ByteBuffer;)V
-org.apache.tomcat.util.scan|FileUrlJar|nextEntry|()V
+ URL
+  isSchemeChar|(C)Z
+org.apache.tomcat.util.scan
+ FileUrlJar
+  nextEntry|()V
+ JarFileUrlJar
+  nextEntry|()V
 org.apache.tomcat.util.threads
  LimitLatch
   countDown|()J
+  countUpOrAwait|()V
  TaskQueue
-  offer|(Ljava/lang/Runnable;)Z
+  offer
+   (Ljava/lang/Object;)Z
+   (Ljava/lang/Runnable;)Z
  ThreadPoolExecutor
-  execute|(Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)V
-org.apache.tomcat.websocket.server|WsFilter|doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V
+  execute
+   (Ljava/lang/Runnable;)V
+   (Ljava/lang/Runnable;JLjava/util/concurrent/TimeUnit;)V
+org.apache.tomcat.websocket.server
+ WsFilter
+  doFilter|(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V
+ WsServerContainer
+  closeAuthenticatedSession|(Ljava/lang/String;)V
+ WsSessionListener
+  sessionCreated|(Ljavax/servlet/http/HttpSessionEvent;)V
+  sessionDestroyed|(Ljavax/servlet/http/HttpSessionEvent;)V
 org.apache.velocity.runtime|RuntimeInstance|getBoolean|(Ljava/lang/String;Z)Z
 org.apache.velocity.runtime.parser
  JJTParserState
@@ -1160,6 +1480,11 @@ org.apache.velocity.runtime.visitor
    (Lorg/apache/velocity/runtime/parser/node/ASTIdentifier;Ljava/lang/Object;)Ljava/lang/Object;
    (Lorg/apache/velocity/runtime/parser/node/ASTReference;Ljava/lang/Object;)Ljava/lang/Object;
    (Lorg/apache/velocity/runtime/parser/node/ASTText;Ljava/lang/Object;)Ljava/lang/Object;
+org.apache.ws.commons.schema
+ DocumentFragmentNodeList
+  item|(I)Lorg/w3c/dom/Node;
+ XmlSchemaObjectCollection
+  getItem|(I)Lorg/apache/ws/commons/schema/XmlSchemaObject;
 org.apache.xml.dtm.ref
  DTMDefaultBase
   getNextSibling|(I)I
@@ -1201,8 +1526,12 @@ org.apache.xml.utils
 org.apache.xmlbeans
  QNameCache
   getName|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljavax/xml/namespace/QName;
+ QNameSet
+  contains|(Ljavax/xml/namespace/QName;)Z
  StringEnumAbstractBase
   intValue|()I
+ StringEnumAbstractBase$Table
+  forInt|(I)Lorg/apache/xmlbeans/StringEnumAbstractBase;
  XmlOptions
   get|(Ljava/lang/Object;)Ljava/lang/Object;
   hasOption|(Ljava/lang/Object;)Z
@@ -1211,6 +1540,13 @@ org.apache.xmlbeans
    (Ljava/lang/Object;)V
    (Ljava/lang/Object;Ljava/lang/Object;)V
 org.apache.xmlbeans.impl.common
+ GlobalLock
+  acquire|()V
+  release|()V
+ Mutex
+  acquire|()V
+  release|()V
+  tryToAcquire|()Z
  QNameHelper
   suggestPrefix|(Ljava/lang/String;)Ljava/lang/String;
  XMLChar
@@ -1252,13 +1588,26 @@ org.apache.xmlbeans.impl.piccolo.xml
 org.apache.xmlbeans.impl.schema
  SchemaAttributeModelImpl
   getAttribute|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/SchemaLocalAttribute;
+ SchemaParticleImpl
+  canStartWithElement|(Ljavax/xml/namespace/QName;)Z
+  getParticleChild|(I)Lorg/apache/xmlbeans/SchemaParticle;
  SchemaTypeImpl
   createAttributeType|(Ljavax/xml/namespace/QName;Lorg/apache/xmlbeans/SchemaTypeLoader;)Lorg/apache/xmlbeans/XmlObject;
   createElementType|(Ljavax/xml/namespace/QName;Ljavax/xml/namespace/QName;Lorg/apache/xmlbeans/SchemaTypeLoader;)Lorg/apache/xmlbeans/XmlObject;
   createTypeStoreUser|()Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
   getAttributeProperty|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/SchemaProperty;
+  getElementProperty|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/SchemaProperty;
+  getFacet|(I)Lorg/apache/xmlbeans/XmlAnySimpleType;
+ SchemaTypeLoaderBase
+  newInstance|(Lorg/apache/xmlbeans/SchemaType;Lorg/apache/xmlbeans/XmlOptions;)Lorg/apache/xmlbeans/XmlObject;
  SchemaTypeLoaderImpl$SchemaTypeLoaderCache
   getFromTypeLoaderCache|(Ljava/lang/ClassLoader;)Lorg/apache/xmlbeans/SchemaTypeLoader;
+ SchemaTypeVisitorImpl
+  visit
+   (Ljavax/xml/namespace/QName;)Z
+   (Ljavax/xml/namespace/QName;Z)Z
+ SchemaTypeVisitorImpl$VisitorState
+  copy|(Lorg/apache/xmlbeans/impl/schema/SchemaTypeVisitorImpl$VisitorState;)V
 org.apache.xmlbeans.impl.store
  CharUtil
   getChars|([CILjava/lang/Object;II)V
@@ -1277,6 +1626,7 @@ org.apache.xmlbeans.impl.store
  Locale
   enter|()V
   exit|()V
+  newInstance|(Lorg/apache/xmlbeans/SchemaTypeLoader;Lorg/apache/xmlbeans/SchemaType;Lorg/apache/xmlbeans/XmlOptions;)Lorg/apache/xmlbeans/XmlObject;
   noSync|()Z
  Locale$DefaultQNameFactory
   getQName
@@ -1316,6 +1666,7 @@ org.apache.xmlbeans.impl.store
   tempCur|()Lorg/apache/xmlbeans/impl/store/Cur;
   validate_on_set|()Z
 org.apache.xmlbeans.impl.util|XsTypeConverter|lexLong|(Ljava/lang/CharSequence;)J
+org.apache.xmlbeans.impl.validator|Validator|nextEvent|(ILorg/apache/xmlbeans/impl/common/ValidatorListener$Event;)V
 org.apache.xmlbeans.impl.values
  JavaBooleanHolder
   booleanValue|()Z
@@ -1333,9 +1684,11 @@ org.apache.xmlbeans.impl.values
   pop|()V
   push|(Lorg/apache/xmlbeans/impl/values/NamespaceContext;)V
  XmlComplexContentImpl
+  get_elementflags|(Ljavax/xml/namespace/QName;)I
   schemaType|()Lorg/apache/xmlbeans/SchemaType;
  XmlObjectBase
   attach_store|(Lorg/apache/xmlbeans/impl/values/TypeStore;)V
+  build_nil|()Z
   build_text|(Lorg/apache/xmlbeans/impl/values/NamespaceManager;)Ljava/lang/String;
   check_dated|()V
   copy|()Lorg/apache/xmlbeans/XmlObject;
@@ -1343,6 +1696,7 @@ org.apache.xmlbeans.impl.values
   create_element_user|(Ljavax/xml/namespace/QName;Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/impl/values/TypeStoreUser;
   disconnect_store|()V
   get_attributeflags|(Ljavax/xml/namespace/QName;)I
+  get_element_ending_delimiters|(Ljavax/xml/namespace/QName;)Lorg/apache/xmlbeans/QNameSet;
   init_flags|(Lorg/apache/xmlbeans/SchemaProperty;)V
   invalidate_value|()V
   monitor|()Ljava/lang/Object;

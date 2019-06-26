@@ -2,6 +2,8 @@ antlr
  ANTLRStringBuffer
   append|(C)V
   length|()I
+ ASTFactory
+  addASTChild|(Lantlr/ASTPair;Lantlr/collections/AST;)V
  ASTPair
   advanceChildToEnd|()V
  CharBuffer
@@ -14,10 +16,16 @@ antlr
   LA|(I)C
   append|(C)V
   consume|()V
+  matchRange|(CC)V
+  resetText|()V
   toLower|(C)C
  InputBuffer
   LA|(I)C
   consume|()V
+ LLkParser
+  LA|(I)I
+ TokenBuffer
+  LA|(I)I
  TokenQueue
   elementAt|(I)Lantlr/Token;
 antlr.collections.impl|BitSet|member|(I)Z

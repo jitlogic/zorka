@@ -11,6 +11,7 @@ org.apache.xerces.dom
  DeferredDocumentImpl
   appendChild|(II)V
   createDeferredAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
+  createDeferredCDATASection|(Ljava/lang/String;)I
   createDeferredElement|(Ljava/lang/String;Ljava/lang/String;)I
   createDeferredTextNode|(Ljava/lang/String;Z)I
   getLastChild
@@ -56,6 +57,7 @@ org.apache.xerces.dom
   item|(I)Lorg/w3c/dom/Node;
 org.apache.xerces.impl
  XMLDTDScannerImpl
+  getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
   getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
  XMLDocumentFragmentScannerImpl
   getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
@@ -77,6 +79,7 @@ org.apache.xerces.impl
   readAndBuffer|()I
  XMLEntityScanner
   peekChar|()I
+  reset|(Lorg/apache/xerces/util/SymbolTable;Lorg/apache/xerces/impl/XMLEntityManager;Lorg/apache/xerces/impl/XMLErrorReporter;)V
   scanChar|()I
   scanContent|(Lorg/apache/xerces/xni/XMLString;)I
   scanData|(Ljava/lang/String;Lorg/apache/xerces/util/XMLStringBuffer;)Z
@@ -87,6 +90,8 @@ org.apache.xerces.impl
   skipChar|(I)Z
   skipSpaces|()Z
   skipString|(Ljava/lang/String;)Z
+ XMLErrorReporter
+  putMessageFormatter|(Ljava/lang/String;Lorg/apache/xerces/util/MessageFormatter;)V
  XMLScanner
   endEntity|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
   startEntity|(Ljava/lang/String;Lorg/apache/xerces/xni/XMLResourceIdentifier;Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
@@ -151,6 +156,8 @@ org.apache.xerces.impl.dtd.models
  DFAContentModel
   validate|([Lorg/apache/xerces/xni/QName;II)I
 org.apache.xerces.impl.dv
+ SecuritySupport$3
+  run|()Ljava/lang/Object;
  ValidatedInfo
   copyFrom|(Lorg/apache/xerces/xs/XSValue;)V
   reset|()V
@@ -175,6 +182,8 @@ org.apache.xerces.impl.validation
   needFacetChecking|()Z
   needToNormalize|()Z
 org.apache.xerces.impl.xs
+ ElementPSVImpl
+  reset|()V
  SchemaGrammar
   getGlobalElementDecl|(Ljava/lang/String;)Lorg/apache/xerces/impl/xs/XSElementDecl;
   getGlobalTypeDecl|(Ljava/lang/String;)Lorg/apache/xerces/xs/XSTypeDefinition;
@@ -183,6 +192,8 @@ org.apache.xerces.impl.xs
  SubstitutionGroupHandler
   getMatchingElemDecl|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/impl/xs/XSElementDecl;)Lorg/apache/xerces/impl/xs/XSElementDecl;
   getSubstitutionGroup|(Lorg/apache/xerces/impl/xs/XSElementDecl;)[Lorg/apache/xerces/impl/xs/XSElementDecl;
+ XMLSchemaValidator
+  characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
  XMLSchemaValidator$XPathMatcherStack
   getMatcherAt|(I)Lorg/apache/xerces/impl/xs/identity/XPathMatcher;
  XMLSchemaValidator$XSIErrorReporter
@@ -213,7 +224,9 @@ org.apache.xerces.impl.xs.opti
  SchemaDOMParser
   characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   emptyElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;Lorg/apache/xerces/xni/Augmentations;)V
+  endCDATA|(Lorg/apache/xerces/xni/Augmentations;)V
   endElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/Augmentations;)V
+  startCDATA|(Lorg/apache/xerces/xni/Augmentations;)V
   startElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;Lorg/apache/xerces/xni/Augmentations;)V
 org.apache.xerces.impl.xs.traversers
  XSAttributeChecker
@@ -231,13 +244,16 @@ org.apache.xerces.impl.xs.util
  XIntPool
   getXInt|(I)Lorg/apache/xerces/impl/xs/util/XInt;
  XSObjectListImpl
+  addXSObject|(Lorg/apache/xerces/xs/XSObject;)V
   item|(I)Lorg/apache/xerces/xs/XSObject;
 org.apache.xerces.parsers
  AbstractDOMParser
   attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
   characters|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
+  endCDATA|(Lorg/apache/xerces/xni/Augmentations;)V
   endElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/Augmentations;)V
   ignorableWhitespace|(Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
+  startCDATA|(Lorg/apache/xerces/xni/Augmentations;)V
   startElement|(Lorg/apache/xerces/xni/QName;Lorg/apache/xerces/xni/XMLAttributes;Lorg/apache/xerces/xni/Augmentations;)V
  AbstractSAXParser
   attributeDecl|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;Ljava/lang/String;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/XMLString;Lorg/apache/xerces/xni/Augmentations;)V
@@ -267,7 +283,13 @@ org.apache.xerces.parsers
   startAttlist|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
   startContentModel|(Ljava/lang/String;Lorg/apache/xerces/xni/Augmentations;)V
   startGroup|(Lorg/apache/xerces/xni/Augmentations;)V
+ SecuritySupport$1
+  run|()Ljava/lang/Object;
+ SecuritySupport$2
+  run|()Ljava/lang/Object;
  SecuritySupport$3
+  run|()Ljava/lang/Object;
+ SecuritySupport$4
   run|()Ljava/lang/Object;
  XIncludeAwareParserConfiguration
   getFeature|(Ljava/lang/String;)Z
@@ -283,6 +305,7 @@ org.apache.xerces.util
   getItem|(Ljava/lang/Object;)Ljava/lang/Object;
   putItem|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  DOMUtil
+  getAnnotation|(Lorg/w3c/dom/Node;)Ljava/lang/String;
   getAttr|(Lorg/w3c/dom/Element;Ljava/lang/String;)Lorg/w3c/dom/Attr;
   getAttrs|(Lorg/w3c/dom/Element;)[Lorg/w3c/dom/Attr;
   getDocument|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Document;

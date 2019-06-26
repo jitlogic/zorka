@@ -38,14 +38,129 @@ com.sun.facelets.util
    (I)V
    (Ljava/lang/String;)V
    ([CII)V
+com.sun.faces.application
+ ApplicationAssociate
+  getResourceBundle|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/util/ResourceBundle;
+ ApplicationImpl
+  createComponent|(Ljavax/faces/context/FacesContext;Ljava/lang/String;Ljava/lang/String;)Ljavax/faces/component/UIComponent;
+  createConverter|(Ljava/lang/Class;)Ljavax/faces/convert/Converter;
+  getResourceBundle|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/util/ResourceBundle;
+  publishEvent
+   (Ljavax/faces/context/FacesContext;Ljava/lang/Class;Ljava/lang/Class;Ljava/lang/Object;)V
+   (Ljavax/faces/context/FacesContext;Ljava/lang/Class;Ljava/lang/Object;)V
+ ApplicationImpl$ReentrantLisneterInvocationGuard
+  clearGuard|(Ljavax/faces/context/FacesContext;Ljava/lang/Class;)V
+  isGuardSet|(Ljavax/faces/context/FacesContext;Ljava/lang/Class;)Z
+ ApplicationImpl$SystemEventHelper
+  getEventInfo
+   (Ljava/lang/Class;Ljava/lang/Class;)Lcom/sun/faces/application/ApplicationImpl$EventInfo;
+   (Ljava/lang/Class;Ljava/lang/Object;Ljava/lang/Class;Z)Lcom/sun/faces/application/ApplicationImpl$EventInfo;
+ ApplicationImpl$SystemEventInfo
+  getEventInfo|(Ljava/lang/Class;)Lcom/sun/faces/application/ApplicationImpl$EventInfo;
+ ApplicationResourceBundle
+  getResourceBundle|(Ljava/util/Locale;)Ljava/util/ResourceBundle;
+ WebappLifecycleListener
+  attributeRemoved
+   (Ljavax/servlet/ServletRequestAttributeEvent;)V
+   (Ljavax/servlet/http/HttpSessionBindingEvent;)V
+  attributeReplaced|(Ljavax/servlet/ServletRequestAttributeEvent;)V
+  sessionDestroyed|(Ljavax/servlet/http/HttpSessionEvent;)V
+com.sun.faces.application.annotation
+ AnnotationManager
+  applyComponentAnnotations|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
+  applyConverterAnnotations|(Ljavax/faces/context/FacesContext;Ljavax/faces/convert/Converter;)V
+  applyRendererAnnotations|(Ljavax/faces/context/FacesContext;Ljavax/faces/render/Renderer;Ljavax/faces/component/UIComponent;)V
+ ResourceDependencyHandler
+  apply|(Ljavax/faces/context/FacesContext;[Ljava/lang/Object;)V
+com.sun.faces.application.resource|ResourceHelper$ELEvaluatingInputStream|read|()I
+com.sun.faces.application.view
+ FaceletPartialStateManagementStrategy$2
+  visit|(Ljavax/faces/component/visit/VisitContext;Ljavax/faces/component/UIComponent;)Ljavax/faces/component/visit/VisitResult;
+ FaceletPartialStateManagementStrategy$3
+  visit|(Ljavax/faces/component/visit/VisitContext;Ljavax/faces/component/UIComponent;)Ljavax/faces/component/visit/VisitResult;
+ ViewScopeContextManager
+  sessionDestroyed|(Ljavax/servlet/http/HttpSessionEvent;)V
+ ViewScopeManager
+  sessionDestroyed|(Ljavax/servlet/http/HttpSessionEvent;)V
+ WriteBehindStateWriter
+  write
+   (I)V
+   (Ljava/lang/String;)V
+   ([CII)V
+com.sun.faces.component|CompositeComponentStackManager|getManager|(Ljavax/faces/context/FacesContext;)Lcom/sun/faces/component/CompositeComponentStackManager;
+com.sun.faces.component.behavior|AjaxBehaviors|getAjaxBehaviors|(Ljavax/faces/context/FacesContext;Z)Lcom/sun/faces/component/behavior/AjaxBehaviors;
+com.sun.faces.component.visit
+ FullVisitContext
+  invokeVisitCallback|(Ljavax/faces/component/UIComponent;Ljavax/faces/component/visit/VisitCallback;)Ljavax/faces/component/visit/VisitResult;
+ PartialVisitContext
+  invokeVisitCallback|(Ljavax/faces/component/UIComponent;Ljavax/faces/component/visit/VisitCallback;)Ljavax/faces/component/visit/VisitResult;
+com.sun.faces.config
+ ConfigureListener
+  attributeAdded|(Ljavax/servlet/ServletRequestAttributeEvent;)V
+  attributeRemoved
+   (Ljavax/servlet/ServletRequestAttributeEvent;)V
+   (Ljavax/servlet/http/HttpSessionBindingEvent;)V
+  attributeReplaced|(Ljavax/servlet/ServletRequestAttributeEvent;)V
+  sessionDestroyed|(Ljavax/servlet/http/HttpSessionEvent;)V
+ FaceletsConfiguration
+  getInstance|(Ljavax/faces/context/FacesContext;)Lcom/sun/faces/config/FaceletsConfiguration;
+  isEscapeInlineText|(Ljavax/faces/context/FacesContext;)Z
+ WebConfiguration
+  getInstance|(Ljavax/faces/context/ExternalContext;)Lcom/sun/faces/config/WebConfiguration;
+  isOptionEnabled|(Lcom/sun/faces/config/WebConfiguration$BooleanWebContextInitParameter;)Z
 com.sun.faces.context
  ApplicationMap
+  containsKey|(Ljava/lang/Object;)Z
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ExternalContextImpl
+  getSession|(Z)Ljava/lang/Object;
+ FacesContextImpl$ComponentMessagesIterator
+  next
+   ()Ljava/lang/Object;
+   ()Ljavax/faces/application/FacesMessage;
  RequestMap
+  containsKey|(Ljava/lang/Object;)Z
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put
+   (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+ RequestParameterMap
+  containsKey|(Ljava/lang/Object;)Z
+  get
+   (Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/Object;)Ljava/lang/String;
  SessionMap
+  containsKey|(Ljava/lang/Object;)Z
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+  remove|(Ljava/lang/Object;)Ljava/lang/Object;
+ StateContext
+  componentAddedDynamically|(Ljavax/faces/component/UIComponent;)Z
+  getStateContext|(Ljavax/faces/context/FacesContext;)Lcom/sun/faces/context/StateContext;
+  hasOneOrMoreDynamicChild|(Ljavax/faces/component/UIComponent;)Z
+  isPartialStateSaving|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Z
+com.sun.faces.context.flash
+ FlashELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
 com.sun.faces.el
+ ChainAwareVariableResolver
+  resolveVariable|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/lang/Object;
+ CompositeComponentAttributesELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ DemuxCompositeELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ DummyPropertyResolverImpl
+  getType|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
+  getValue
+   (Ljava/lang/Object;I)Ljava/lang/Object;
+   (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ELContextImpl$VariableMapperImpl
+  resolveVariable|(Ljava/lang/String;)Ljavax/el/ValueExpression;
+ ELUtils
+  isCompositeComponentExpr|(Ljava/lang/String;)Z
  FacesCompositeELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  FacesResourceBundleELResolver
@@ -54,29 +169,202 @@ com.sun.faces.el
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  ManagedBeanELResolver
   getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ PropertyResolverChainWrapper
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ResourceELResolver
+  getType|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Class;
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ ScopedAttributeELResolver
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ VariableResolverChainWrapper
+  getValue|(Ljavax/el/ELContext;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+com.sun.faces.facelets.compiler
+ AbstractUIHandler
+  addComponent|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;Ljavax/faces/component/UIComponent;)V
+ CompilationUnit$1
+  apply|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+ EndElementInstruction
+  write|(Ljavax/faces/context/FacesContext;)V
+ LiteralCommentInstruction
+  write|(Ljavax/faces/context/FacesContext;)V
+ LiteralTextInstruction
+  apply|(Ljavax/el/ExpressionFactory;Ljavax/el/ELContext;)Lcom/sun/faces/facelets/compiler/Instruction;
+  write|(Ljavax/faces/context/FacesContext;)V
+ StartElementInstruction
+  apply|(Ljavax/el/ExpressionFactory;Ljavax/el/ELContext;)Lcom/sun/faces/facelets/compiler/Instruction;
+  write|(Ljavax/faces/context/FacesContext;)V
+ UIInstructionHandler
+  apply|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+ UIInstructions
+  encodeBegin|(Ljavax/faces/context/FacesContext;)V
+ UILeaf
+  encodeAll|(Ljavax/faces/context/FacesContext;)V
+  encodeChildren|(Ljavax/faces/context/FacesContext;)V
+  encodeEnd|(Ljavax/faces/context/FacesContext;)V
+  getValueExpression|(Ljava/lang/String;)Ljavax/el/ValueExpression;
+  processDecodes|(Ljavax/faces/context/FacesContext;)V
+  processUpdates|(Ljavax/faces/context/FacesContext;)V
+  processValidators|(Ljavax/faces/context/FacesContext;)V
+com.sun.faces.facelets.el
+ TagValueExpression
+  getType|(Ljavax/el/ELContext;)Ljava/lang/Class;
+  getValue|(Ljavax/el/ELContext;)Ljava/lang/Object;
+ VariableMapperWrapper
+  resolveVariable|(Ljava/lang/String;)Ljavax/el/ValueExpression;
+com.sun.faces.facelets.impl
+ DefaultFaceletCache
+  getFacelet|(Ljava/net/URL;)Lcom/sun/faces/facelets/impl/DefaultFacelet;
+  getViewMetadataFacelet|(Ljava/net/URL;)Lcom/sun/faces/facelets/impl/DefaultFacelet;
+ DefaultFaceletContext
+  generateUniqueId|(Ljava/lang/String;)Ljava/lang/String;
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
+ IdMapper
+  getAliasedId|(Ljava/lang/String;)Ljava/lang/String;
+  getMapper|(Ljavax/faces/context/FacesContext;)Lcom/sun/faces/facelets/impl/IdMapper;
+com.sun.faces.facelets.tag
+ AbstractTagLibrary
+  containsFunction|(Ljava/lang/String;Ljava/lang/String;)Z
+  containsTagHandler|(Ljava/lang/String;Ljava/lang/String;)Z
+ BeanPropertyTagRule$LiteralPropertyMetadata
+  applyMetadata|(Ljavax/faces/view/facelets/FaceletContext;Ljava/lang/Object;)V
+ MetadataImpl
+  applyMetadata|(Ljavax/faces/view/facelets/FaceletContext;Ljava/lang/Object;)V
+ TagAttributeImpl
+  getValue|(Ljavax/faces/view/facelets/FaceletContext;)Ljava/lang/String;
+  getValueExpression
+   (Ljavax/faces/view/facelets/FaceletContext;Ljava/lang/Class;)Ljavax/el/ValueExpression;
+   (Ljavax/faces/view/facelets/FaceletContext;Ljava/lang/String;Ljava/lang/Class;)Ljavax/el/ValueExpression;
+ TagAttributesImpl
+  getAll|(Ljava/lang/String;)[Ljavax/faces/view/facelets/TagAttribute;
+com.sun.faces.facelets.tag.jsf
+ ComponentRule$LiteralAttributeMetadata
+  applyMetadata|(Ljavax/faces/view/facelets/FaceletContext;Ljava/lang/Object;)V
+ ComponentRule$ValueExpressionMetadata
+  applyMetadata|(Ljavax/faces/view/facelets/FaceletContext;Ljava/lang/Object;)V
+ ComponentSupport
+  addComponent|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;Ljavax/faces/component/UIComponent;)V
+  copyPassthroughAttributes|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;Ljavax/faces/view/facelets/Tag;)V
+  finalizeForDeletion|(Ljavax/faces/component/UIComponent;)V
+  findChildByTagId|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;Ljava/lang/String;)Ljavax/faces/component/UIComponent;
+  findUIInstructionChildByTagId|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;Ljava/lang/String;)Ljavax/faces/component/UIComponent;
+  getFacetName|(Ljavax/faces/component/UIComponent;)Ljava/lang/String;
+  getViewRoot|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)Ljavax/faces/component/UIViewRoot;
+  isBuildingNewComponentTree|(Ljavax/faces/context/FacesContext;)Z
+  markForDeletion|(Ljavax/faces/component/UIComponent;)V
+  suppressViewModificationEvents|(Ljavax/faces/context/FacesContext;)Z
+ ComponentTagHandlerDelegateImpl
+  apply|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+ IterationIdManager
+  registerLiteralId|(Ljavax/faces/view/facelets/FaceletContext;Ljava/lang/String;)Z
+ ValueHolderRule$DynamicValueExpressionMetadata
+  applyMetadata|(Ljavax/faces/view/facelets/FaceletContext;Ljava/lang/Object;)V
+com.sun.faces.facelets.tag.jsf.core
+ VerbatimHandler
+  applyNextHandler|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+  onComponentCreated|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;Ljavax/faces/component/UIComponent;)V
+com.sun.faces.facelets.tag.ui
+ CompositionHandler
+  apply
+   (Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+   (Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;Ljava/lang/String;)Z
+ IncludeHandler
+  apply|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+ InsertHandler
+  apply|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+ ParamHandler
+  apply|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
+com.sun.faces.facelets.util|FunctionLibrary|containsFunction|(Ljava/lang/String;Ljava/lang/String;)Z
 com.sun.faces.io
  FastStringWriter
+  reset|()V
   write
    (Ljava/lang/String;)V
    ([CII)V
-com.sun.faces.renderkit|RenderKitImpl|getRenderer|(Ljava/lang/String;Ljava/lang/String;)Ljavax/faces/render/Renderer;
+com.sun.faces.lifecycle|RestoreViewPhase$1|visit|(Ljavax/faces/component/visit/VisitContext;Ljavax/faces/component/UIComponent;)Ljavax/faces/component/visit/VisitResult;
+com.sun.faces.mgbean
+ BeanBuilder
+  destroy|(Lcom/sun/faces/spi/InjectionProvider;Ljava/lang/Object;)V
+ BeanManager
+  destroy|(Ljava/lang/String;Ljava/lang/Object;)V
+  getBuilder|(Ljava/lang/String;)Lcom/sun/faces/mgbean/BeanBuilder;
+  isManaged|(Ljava/lang/String;)Z
+ BeanManager$ScopeManager$SessionScopeHandler
+  getFromScope|(Ljava/lang/String;Ljavax/faces/context/FacesContext;)Ljava/lang/Object;
+  handle|(Ljava/lang/String;Ljava/lang/Object;Ljavax/faces/context/FacesContext;)V
+ BeanManager$ScopeManager$ViewScopeHandler
+  getFromScope|(Ljava/lang/String;Ljavax/faces/context/FacesContext;)Ljava/lang/Object;
+  handle|(Ljava/lang/String;Ljava/lang/Object;Ljavax/faces/context/FacesContext;)V
+com.sun.faces.renderkit
+ Attribute
+  attr|(Ljava/lang/String;)Lcom/sun/faces/renderkit/Attribute;
+  compareTo
+   (Lcom/sun/faces/renderkit/Attribute;)I
+   (Ljava/lang/Object;)I
+ RenderKitImpl
+  getRenderer|(Ljava/lang/String;Ljava/lang/String;)Ljavax/faces/render/Renderer;
+ RenderKitUtils
+  renderPassThruAttributes
+   (Ljavax/faces/context/FacesContext;Ljavax/faces/context/ResponseWriter;Ljavax/faces/component/UIComponent;[Lcom/sun/faces/renderkit/Attribute;)V
+   (Ljavax/faces/context/FacesContext;Ljavax/faces/context/ResponseWriter;Ljavax/faces/component/UIComponent;[Lcom/sun/faces/renderkit/Attribute;Ljava/util/Map;)V
+ SelectItemsIterator
+  next
+   ()Ljava/lang/Object;
+   ()Ljavax/faces/model/SelectItem;
+ SelectItemsIterator$IterableItemIterator
+  next
+   ()Ljava/lang/Object;
+   ()Ljavax/faces/model/SelectItem;
 com.sun.faces.renderkit.html_basic
+ GroupRenderer
+  encodeBegin|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
+  encodeEnd|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
+ HtmlBasicRenderer
+  convertClientId|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/lang/String;
+  decode|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
+  encodeEnd|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
  HtmlResponseWriter
   endElement|(Ljava/lang/String;)V
   startElement|(Ljava/lang/String;Ljavax/faces/component/UIComponent;)V
   write
    (I)V
    (Ljava/lang/String;)V
+   ([CII)V
   writeAttribute|(Ljava/lang/String;Ljava/lang/Object;Ljava/lang/String;)V
+  writeComment|(Ljava/lang/Object;)V
+  writeText|(Ljava/lang/Object;Ljava/lang/String;)V
+ TextRenderer
+  encodeBegin|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
+  encodeChildren|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)V
 com.sun.faces.util
+ Cache
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
  HtmlUtils
+  isEmptyElement|(Ljava/lang/String;)Z
   writeAttribute
    (Ljava/io/Writer;ZZ[CLjava/lang/String;[CZ)V
    (Ljava/io/Writer;ZZ[C[CIIZ)V
+  writeText
+   (Ljava/io/Writer;ZZ[CLjava/lang/String;[C)V
+   (Ljava/io/Writer;ZZ[C[CII)V
+ MetadataWrapperMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ReflectionUtils
+  lookupConstructor|(Ljava/lang/Class;[Ljava/lang/Class;)Ljava/lang/reflect/Constructor;
+ ReflectionUtils$MetaData
+  lookupConstructor|([Ljava/lang/Class;)Ljava/lang/reflect/Constructor;
  RequestStateManager
+  get|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/lang/Object;
+  getStateMap|(Ljavax/faces/context/FacesContext;)Ljava/util/Map;
   remove|(Ljavax/faces/context/FacesContext;Ljava/lang/String;)Ljava/lang/Object;
  Util
+  checkIdUniqueness|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;Ljava/util/Set;)V
+  componentIsDisabledOrReadonly|(Ljavax/faces/component/UIComponent;)Z
+  getConverterForClass|(Ljava/lang/Class;Ljavax/faces/context/FacesContext;)Ljavax/faces/convert/Converter;
+  getCurrentLoader|(Ljava/lang/Object;)Ljava/lang/ClassLoader;
+  isCDIAvailable|(Ljavax/servlet/ServletContext;)Z
   notNull|(Ljava/lang/String;Ljava/lang/Object;)V
+com.sun.faces.vendor|WebContainerInjectionProvider|invokePreDestroy|(Ljava/lang/Object;)V
 com.sun.imageio.plugins.png
  IDATOutputStream
   deflate|()V
@@ -101,6 +389,7 @@ com.sun.jersey.core.reflection
 com.sun.jmx.interceptor
  DefaultMBeanServerInterceptor
   getAttribute|(Ljavax/management/ObjectName;Ljava/lang/String;)Ljava/lang/Object;
+  getMBeanInfo|(Ljavax/management/ObjectName;)Ljavax/management/MBeanInfo;
   queryNames|(Ljavax/management/ObjectName;Ljavax/management/QueryExp;)Ljava/util/Set;
 com.sun.jmx.mbeanserver
  DefaultMXBeanMappingFactory$NonNullMXBeanMapping
@@ -164,6 +453,7 @@ com.sun.org.apache.xalan.internal.utils
  SecuritySupport$4
   run|()Ljava/lang/Object;
  XMLSecurityManager$Limit
+  equalsAPIPropertyName|(Ljava/lang/String;)Z
   values|()[Lcom/sun/org/apache/xalan/internal/utils/XMLSecurityManager$Limit;
  XMLSecurityManager$NameMap
   values|()[Lcom/sun/org/apache/xalan/internal/utils/XMLSecurityManager$NameMap;
@@ -172,6 +462,11 @@ com.sun.org.apache.xalan.internal.utils
 com.sun.org.apache.xerces.internal.dom
  AttributeMap
   setNamedItem|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
+ CoreDocumentImpl
+  createAttribute|(Ljava/lang/String;)Lorg/w3c/dom/Attr;
+  createElementNS|(Ljava/lang/String;Ljava/lang/String;)Lorg/w3c/dom/Element;
+  createTextNode|(Ljava/lang/String;)Lorg/w3c/dom/Text;
+  isXMLName|(Ljava/lang/String;Z)Z
  DeferredDocumentImpl
   appendChild|(II)V
   createDeferredAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)I
@@ -202,6 +497,7 @@ com.sun.org.apache.xerces.internal.dom
   hasAttribute|(Ljava/lang/String;)Z
  NamedNodeMapImpl
   getNamedItem|(Ljava/lang/String;)Lorg/w3c/dom/Node;
+  item|(I)Lorg/w3c/dom/Node;
  NodeImpl
   appendChild|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Node;
   needsSyncChildren|(Z)V
@@ -228,6 +524,7 @@ com.sun.org.apache.xerces.internal.impl
   next|()I
  XMLDocumentScannerImpl
   getFeatureDefault|(Ljava/lang/String;)Ljava/lang/Boolean;
+  getPropertyDefault|(Ljava/lang/String;)Ljava/lang/Object;
   next|()I
  XMLDocumentScannerImpl$PrologDriver
   next|()I
@@ -247,7 +544,9 @@ com.sun.org.apache.xerces.internal.impl
    ([BII)I
  XMLEntityScanner
   arrangeCapacity|(IZ)Z
+  invokeListeners|(I)V
   peekChar|()I
+  reset|(Lcom/sun/org/apache/xerces/internal/util/SymbolTable;Lcom/sun/org/apache/xerces/internal/impl/XMLEntityManager;Lcom/sun/org/apache/xerces/internal/impl/XMLErrorReporter;)V
   scanChar|()I
   scanContent|(Lcom/sun/org/apache/xerces/internal/xni/XMLString;)I
   scanLiteral|(ILcom/sun/org/apache/xerces/internal/xni/XMLString;)I
@@ -346,7 +645,9 @@ com.sun.org.apache.xerces.internal.impl.xs.opti
   startElement|(Lcom/sun/org/apache/xerces/internal/xni/QName;Lcom/sun/org/apache/xerces/internal/xni/XMLAttributes;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
 com.sun.org.apache.xerces.internal.impl.xs.traversers
  XSAttributeChecker
-  checkAttributes|(Lorg/w3c/dom/Element;ZLcom/sun/org/apache/xerces/internal/impl/xs/traversers/XSDocumentInfo;Z)[Ljava/lang/Object;
+  checkAttributes
+   (Lorg/w3c/dom/Element;ZLcom/sun/org/apache/xerces/internal/impl/xs/traversers/XSDocumentInfo;)[Ljava/lang/Object;
+   (Lorg/w3c/dom/Element;ZLcom/sun/org/apache/xerces/internal/impl/xs/traversers/XSDocumentInfo;Z)[Ljava/lang/Object;
   resolveNamespace|(Lorg/w3c/dom/Element;[Lorg/w3c/dom/Attr;Lcom/sun/org/apache/xerces/internal/impl/xs/SchemaNamespaceSupport;)V
   returnAttrArray|([Ljava/lang/Object;Lcom/sun/org/apache/xerces/internal/impl/xs/traversers/XSDocumentInfo;)V
 com.sun.org.apache.xerces.internal.impl.xs.util
@@ -363,9 +664,12 @@ com.sun.org.apache.xerces.internal.parsers
  AbstractSAXParser
   characters|(Lcom/sun/org/apache/xerces/internal/xni/XMLString;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
   endElement|(Lcom/sun/org/apache/xerces/internal/xni/QName;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
+  getFeature|(Ljava/lang/String;)Z
   startElement|(Lcom/sun/org/apache/xerces/internal/xni/QName;Lcom/sun/org/apache/xerces/internal/xni/XMLAttributes;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
  AbstractSAXParser$AttributesProxy
   getLocalName|(I)Ljava/lang/String;
+  getQName|(I)Ljava/lang/String;
+  getURI|(I)Ljava/lang/String;
   getValue
    (I)Ljava/lang/String;
    (Ljava/lang/String;)Ljava/lang/String;
@@ -373,6 +677,7 @@ com.sun.org.apache.xerces.internal.parsers
   emptyElement|(Lcom/sun/org/apache/xerces/internal/xni/QName;Lcom/sun/org/apache/xerces/internal/xni/XMLAttributes;Lcom/sun/org/apache/xerces/internal/xni/Augmentations;)V
  XIncludeAwareParserConfiguration
   getFeature|(Ljava/lang/String;)Z
+  getFeatureState|(Ljava/lang/String;)Lcom/sun/org/apache/xerces/internal/util/FeatureState;
  XML11Configuration
   cleanup|()V
   getPropertyState|(Ljava/lang/String;)Lcom/sun/org/apache/xerces/internal/util/PropertyState;
@@ -383,10 +688,13 @@ com.sun.org.apache.xerces.internal.parsers
   parse|(Lcom/sun/org/apache/xerces/internal/xni/parser/XMLInputSource;)V
 com.sun.org.apache.xerces.internal.util
  AugmentationsImpl
+  getItem|(Ljava/lang/String;)Ljava/lang/Object;
+  putItem|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
   removeAllItems|()V
  AugmentationsImpl$SmallContainer
   clear|()V
   getItem|(Ljava/lang/Object;)Ljava/lang/Object;
+  putItem|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
  DOMUtil
   getAttrs|(Lorg/w3c/dom/Element;)[Lorg/w3c/dom/Attr;
   getFirstChildElement|(Lorg/w3c/dom/Node;)Lorg/w3c/dom/Element;
@@ -401,11 +709,19 @@ com.sun.org.apache.xerces.internal.util
   getURI|(Ljava/lang/String;)Ljava/lang/String;
   popContext|()V
   pushContext|()V
+ NamespaceSupport$Prefixes
+  nextElement|()Ljava/lang/Object;
  ParserConfigurationSettings
   addRecognizedFeatures|([Ljava/lang/String;)V
   addRecognizedProperties|([Ljava/lang/String;)V
-  getFeature|(Ljava/lang/String;)Z
-  getProperty|(Ljava/lang/String;)Ljava/lang/Object;
+  getFeature
+   (Ljava/lang/String;)Z
+   (Ljava/lang/String;Z)Z
+  getFeatureState|(Ljava/lang/String;)Lcom/sun/org/apache/xerces/internal/util/FeatureState;
+  getProperty
+   (Ljava/lang/String;)Ljava/lang/Object;
+   (Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+  getPropertyState|(Ljava/lang/String;)Lcom/sun/org/apache/xerces/internal/util/PropertyState;
  PropertyState
   is|(Ljava/lang/Object;)Lcom/sun/org/apache/xerces/internal/util/PropertyState;
  SAXMessageFormatter
@@ -443,10 +759,12 @@ com.sun.org.apache.xerces.internal.util
   isInvalid|(I)Z
   isNCName|(I)Z
   isNCNameStart|(I)Z
+  isName|(I)Z
   isNameStart|(I)Z
   isSpace|(I)Z
   isValid|(I)Z
   isValidNCName|(Ljava/lang/String;)Z
+  trim|(Ljava/lang/String;)Ljava/lang/String;
  XMLResourceIdentifierImpl
   clear|()V
  XMLStringBuffer
@@ -482,7 +800,13 @@ com.sun.org.apache.xerces.internal.utils
   getTotalValue|(I)I
   startEntity|(Ljava/lang/String;)V
  XMLSecurityManager
-  isOverLimit|(ILcom/sun/org/apache/xerces/internal/utils/XMLLimitAnalyzer;)Z
+  getIndex|(Ljava/lang/String;)I
+  getLimit|(Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityManager$Limit;)I
+  isNoLimit|(I)Z
+  isOverLimit
+   (ILcom/sun/org/apache/xerces/internal/utils/XMLLimitAnalyzer;)Z
+   (Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityManager$Limit;Lcom/sun/org/apache/xerces/internal/utils/XMLLimitAnalyzer;)Z
+  setLimit|(Ljava/lang/String;Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityManager$State;Ljava/lang/Object;)Z
  XMLSecurityManager$Limit
   equalsAPIPropertyName|(Ljava/lang/String;)Z
   values|()[Lcom/sun/org/apache/xerces/internal/utils/XMLSecurityManager$Limit;
@@ -503,16 +827,29 @@ com.sun.org.apache.xerces.internal.xni
 com.sun.org.apache.xml.internal.dtm.ref|DTMDefaultBaseTraversers$AllFromRootTraverser|first|(I)I
 com.sun.org.apache.xml.internal.dtm.ref.sax2dtm|SAX2DTM2|_exptype2|(I)I
 com.sun.org.apache.xml.internal.serializer
+ AttributesImplSerializer
+  addAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  clear|()V
+  getIndex|(Ljava/lang/String;)I
  EncodingInfo$EncodingImpl
   isInEncoding|(C)Z
+ SerializerBase
+  addAttribute|(Ljava/lang/String;Ljava/lang/String;)V
+  getNamespaceURI|(Ljava/lang/String;Z)Ljava/lang/String;
  ToStream
+  addAttributeAlways|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Z)Z
   characters|([CII)V
   endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  processAttributes|(Ljava/io/Writer;I)V
   startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
   startPrefixMapping|(Ljava/lang/String;Ljava/lang/String;Z)Z
+  writeAttrString|(Ljava/io/Writer;Ljava/lang/String;Ljava/lang/String;)V
  ToStream$BoolStack
   peekOrFalse|()Z
+  pop|()Z
+  push|(Z)Z
  ToUnknownStream
+  addAttribute|(Ljava/lang/String;Ljava/lang/String;)V
   characters
    (Ljava/lang/String;)V
    ([CII)V
@@ -537,6 +874,8 @@ com.sun.org.apache.xml.internal.utils
   isWhiteSpace|(C)Z
 com.sun.org.apache.xpath.internal.compiler|OpMapVector|elementAt|(I)I
 com.sun.xml.bind
+ AccessorFactoryImpl
+  createFieldAccessor|(Ljava/lang/Class;Ljava/lang/reflect/Field;Z)Lcom/sun/xml/bind/v2/runtime/reflect/Accessor;
  WhiteSpaceProcessor
   isWhiteSpace
    (C)Z
@@ -550,54 +889,163 @@ com.sun.xml.bind.unmarshaller|DOMScanner|visit|(Lorg/w3c/dom/Element;)V
 com.sun.xml.bind.v2|ClassFactory|create0|(Ljava/lang/Class;)Ljava/lang/Object;
 com.sun.xml.bind.v2.bytecode
  ClassTailor
+  tailor|(Ljava/io/InputStream;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)[B
   toVMClassName|(Ljava/lang/Class;)Ljava/lang/String;
   toVMTypeName|(Ljava/lang/Class;)Ljava/lang/String;
 com.sun.xml.bind.v2.model.annotation
  LocatableAnnotation
   create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
  RuntimeInlineAnnotationReader
-  getClassAnnotation|(Ljava/lang/Class;Ljava/lang/Class;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+  getAllFieldAnnotations
+   (Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)[Ljava/lang/annotation/Annotation;
+   (Ljava/lang/reflect/Field;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)[Ljava/lang/annotation/Annotation;
+  getAllMethodAnnotations
+   (Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)[Ljava/lang/annotation/Annotation;
+   (Ljava/lang/reflect/Method;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)[Ljava/lang/annotation/Annotation;
+  getClassAnnotation
+   (Ljava/lang/Class;Ljava/lang/Class;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+   (Ljava/lang/Class;Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
   getFieldAnnotation
    (Ljava/lang/Class;Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
    (Ljava/lang/Class;Ljava/lang/reflect/Field;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+  getMethodAnnotation
+   (Ljava/lang/Class;Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+   (Ljava/lang/Class;Ljava/lang/reflect/Method;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
   getPackageAnnotation
    (Ljava/lang/Class;Ljava/lang/Class;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
    (Ljava/lang/Class;Ljava/lang/Object;Lcom/sun/xml/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
+  hasClassAnnotation
+   (Ljava/lang/Class;Ljava/lang/Class;)Z
+   (Ljava/lang/Object;Ljava/lang/Class;)Z
   hasFieldAnnotation
    (Ljava/lang/Class;Ljava/lang/Object;)Z
    (Ljava/lang/Class;Ljava/lang/reflect/Field;)Z
+  hasMethodAnnotation
+   (Ljava/lang/Class;Ljava/lang/Object;)Z
+   (Ljava/lang/Class;Ljava/lang/reflect/Method;)Z
+ XmlElementRefQuick
+  annotationType|()Ljava/lang/Class;
+ XmlSchemaQuick
+  attributeFormDefault|()Ljavax/xml/bind/annotation/XmlNsForm;
+  namespace|()Ljava/lang/String;
 com.sun.xml.bind.v2.model.impl
  ElementPropertyInfoImpl
   kind|()Lcom/sun/xml/bind/v2/model/core/PropertyKind;
   ref|()Ljava/util/List;
  ElementPropertyInfoImpl$1
-  get|(I)Lcom/sun/xml/bind/v2/model/core/TypeInfo;
+  get
+   (I)Lcom/sun/xml/bind/v2/model/core/TypeInfo;
+   (I)Ljava/lang/Object;
   size|()I
  FieldPropertySeed
+  hasAnnotation|(Ljava/lang/Class;)Z
   readAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
  PropertyInfoImpl
   id|()Lcom/sun/xml/bind/v2/model/core/ID;
+  parent
+   ()Lcom/sun/xml/bind/v2/model/core/TypeInfo;
+   ()Lcom/sun/xml/bind/v2/model/impl/ClassInfoImpl;
+ ReferencePropertyInfoImpl
+  kind|()Lcom/sun/xml/bind/v2/model/core/PropertyKind;
+  ref|()Ljava/util/Set;
  RuntimeBuiltinLeafInfoImpl$1
   parse
    (Ljava/lang/CharSequence;)Ljava/lang/Object;
    (Ljava/lang/CharSequence;)Ljava/lang/String;
+ RuntimeClassInfoImpl$RuntimePropertySeed
+  hasAnnotation|(Ljava/lang/Class;)Z
+  readAnnotation|(Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+ RuntimeElementPropertyInfoImpl
+  ref
+   ()Ljava/util/Collection;
+   ()Ljava/util/List;
+ RuntimeReferencePropertyInfoImpl
+  ref
+   ()Ljava/util/Collection;
+   ()Ljava/util/Set;
+ RuntimeTypeInfoSetImpl
+  getClassInfo
+   (Ljava/lang/Class;)Lcom/sun/xml/bind/v2/model/runtime/RuntimeNonElement;
+   (Ljava/lang/Object;)Lcom/sun/xml/bind/v2/model/core/NonElement;
+  getTypeInfo|(Ljava/lang/reflect/Type;)Lcom/sun/xml/bind/v2/model/runtime/RuntimeNonElement;
+ TypeInfoSetImpl
+  getClassInfo|(Ljava/lang/Object;)Lcom/sun/xml/bind/v2/model/core/NonElement;
+  getTypeInfo|(Ljava/lang/Object;)Lcom/sun/xml/bind/v2/model/core/NonElement;
 com.sun.xml.bind.v2.model.nav
  ReflectionNavigator
-  asDecl|(Ljava/lang/Class;)Ljava/lang/Class;
-  erasure|(Ljava/lang/reflect/Type;)Ljava/lang/Class;
+  asDecl
+   (Ljava/lang/Class;)Ljava/lang/Class;
+   (Ljava/lang/Class;)Ljava/lang/Object;
+   (Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/reflect/Type;)Ljava/lang/Class;
+  erasure
+   (Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/reflect/Type;)Ljava/lang/Class;
+  getBaseClass
+   (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/reflect/Type;Ljava/lang/Class;)Ljava/lang/reflect/Type;
   getFieldName
    (Ljava/lang/Object;)Ljava/lang/String;
    (Ljava/lang/reflect/Field;)Ljava/lang/String;
   getFieldType
    (Ljava/lang/Object;)Ljava/lang/Object;
    (Ljava/lang/reflect/Field;)Ljava/lang/reflect/Type;
-  getMethodParameters|(Ljava/lang/reflect/Method;)[Ljava/lang/reflect/Type;
-  isSameType|(Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)Z
-  ref|(Ljava/lang/Class;)Ljava/lang/Class;
+  getMethodName
+   (Ljava/lang/Object;)Ljava/lang/String;
+   (Ljava/lang/reflect/Method;)Ljava/lang/String;
+  getMethodParameters
+   (Ljava/lang/Object;)[Ljava/lang/Object;
+   (Ljava/lang/reflect/Method;)[Ljava/lang/reflect/Type;
+  getReturnType
+   (Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/reflect/Method;)Ljava/lang/reflect/Type;
+  getSuperClass
+   (Ljava/lang/Class;)Ljava/lang/Class;
+   (Ljava/lang/Object;)Ljava/lang/Object;
+  isArray
+   (Ljava/lang/Object;)Z
+   (Ljava/lang/reflect/Type;)Z
+  isArrayButNotByteArray
+   (Ljava/lang/Object;)Z
+   (Ljava/lang/reflect/Type;)Z
+  isBridgeMethod
+   (Ljava/lang/Object;)Z
+   (Ljava/lang/reflect/Method;)Z
+  isSameType
+   (Ljava/lang/Object;Ljava/lang/Object;)Z
+   (Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)Z
+  isStaticField
+   (Ljava/lang/Object;)Z
+   (Ljava/lang/reflect/Field;)Z
+  isStaticMethod
+   (Ljava/lang/Object;)Z
+   (Ljava/lang/reflect/Method;)Z
+  isSubClassOf
+   (Ljava/lang/Object;Ljava/lang/Object;)Z
+   (Ljava/lang/reflect/Type;Ljava/lang/reflect/Type;)Z
+  isTransient
+   (Ljava/lang/Object;)Z
+   (Ljava/lang/reflect/Field;)Z
+  ref
+   (Ljava/lang/Class;)Ljava/lang/Class;
+   (Ljava/lang/Class;)Ljava/lang/Object;
+  use
+   (Ljava/lang/Class;)Ljava/lang/Class;
+   (Ljava/lang/Object;)Ljava/lang/Object;
+ ReflectionNavigator$1
+  onClass
+   (Ljava/lang/Class;Ljava/lang/Class;)Ljava/lang/reflect/Type;
+   (Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
+  onParameterizdType
+   (Ljava/lang/reflect/ParameterizedType;Ljava/lang/Class;)Ljava/lang/reflect/Type;
+   (Ljava/lang/reflect/ParameterizedType;Ljava/lang/Object;)Ljava/lang/Object;
  ReflectionNavigator$3
   onClass
    (Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
    (Ljava/lang/Class;Ljava/lang/Void;)Ljava/lang/Class;
+  onParameterizdType
+   (Ljava/lang/reflect/ParameterizedType;Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/reflect/ParameterizedType;Ljava/lang/Void;)Ljava/lang/Class;
  TypeVisitor
   visit|(Ljava/lang/reflect/Type;Ljava/lang/Object;)Ljava/lang/Object;
 com.sun.xml.bind.v2.runtime
@@ -605,14 +1053,29 @@ com.sun.xml.bind.v2.runtime
   createInstance|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext;)Ljava/lang/Object;
  JaxBeanInfo
   lookForLifecycleMethods|()Z
-com.sun.xml.bind.v2.runtime.property|ArrayERProperty$ReceiverImpl|receive|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Ljava/lang/Object;)V
+ NameBuilder
+  createElementName
+   (Ljava/lang/String;Ljava/lang/String;)Lcom/sun/xml/bind/v2/runtime/Name;
+   (Ljavax/xml/namespace/QName;)Lcom/sun/xml/bind/v2/runtime/Name;
+com.sun.xml.bind.v2.runtime.property
+ ArrayERProperty$ReceiverImpl
+  receive|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/UnmarshallingContext$State;Ljava/lang/Object;)V
+ PropertyImpl
+  wrapUp|()V
 com.sun.xml.bind.v2.runtime.reflect
+ Accessor$FieldReflection
+  optimize|(Lcom/sun/xml/bind/v2/runtime/JAXBContextImpl;)Lcom/sun/xml/bind/v2/runtime/reflect/Accessor;
  Lister$CollectionLister
   addToPack
    (Ljava/lang/Object;Ljava/lang/Object;)V
    (Ljava/util/Collection;Ljava/lang/Object;)V
  TransducedAccessor$CompositeTransducedAccessorImpl
   parse|(Ljava/lang/Object;Ljava/lang/CharSequence;)V
+com.sun.xml.bind.v2.runtime.reflect.opt
+ AccessorInjector
+  prepare|(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;[Ljava/lang/String;)Ljava/lang/Class;
+ OptimizedAccessorFactory
+  get|(Ljava/lang/reflect/Field;)Lcom/sun/xml/bind/v2/runtime/reflect/Accessor;
 com.sun.xml.bind.v2.runtime.unmarshaller
  InterningXmlVisitor
   endElement|(Lcom/sun/xml/bind/v2/runtime/unmarshaller/TagName;)V
@@ -646,10 +1109,20 @@ com.sun.xml.bind.v2.runtime.unmarshaller
   text|(Ljava/lang/CharSequence;)V
  ValidatingUnmarshaller
   expectText|()Z
+com.sun.xml.bind.v2.schemagen
+ XmlSchemaGenerator$1
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Ljava/lang/String;Ljava/lang/String;)I
 com.sun.xml.bind.v2.util
+ FlattenIterator
+  next|()Ljava/lang/Object;
  QNameMap
   get|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;
-  put|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V
+  put
+   (Lcom/sun/xml/bind/v2/runtime/Name;Ljava/lang/Object;)V
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V
+   (Ljavax/xml/namespace/QName;Ljava/lang/Object;)V
 com.sun.xml.internal.bind|WhiteSpaceProcessor|isWhiteSpace|(Ljava/lang/CharSequence;)Z
 com.sun.xml.internal.bind.v2.model.annotation|LocatableAnnotation|create|(Ljava/lang/annotation/Annotation;Lcom/sun/xml/internal/bind/v2/model/annotation/Locatable;)Ljava/lang/annotation/Annotation;
 com.sun.xml.internal.bind.v2.model.impl
@@ -713,24 +1186,66 @@ com.sun.xml.internal.stream.util
  BufferAllocator
   getCharBuffer|(I)[C
   returnCharBuffer|([C)V
-com.sun.xml.stream.buffer|AttributesHolder|addAttributeWithPrefix|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-com.sun.xml.stream.buffer.sax|SAXBufferCreator|characters|([CII)V
+com.sun.xml.stream.buffer
+ AttributesHolder
+  addAttributeWithPrefix|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  clear|()V
+com.sun.xml.stream.buffer.sax
+ SAXBufferCreator
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
 com.sun.xml.stream.buffer.stax|StreamReaderBufferProcessor|next|()I
 com.sun.xml.txw2
+ ContainerElement
+  _attribute
+   (Ljava/lang/String;Ljava/lang/Object;)V
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V
+  _cast|(Ljava/lang/Class;)Lcom/sun/xml/txw2/TypedXmlWriter;
+  _element|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Class;)Lcom/sun/xml/txw2/TypedXmlWriter;
+  invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+ Content
+  written|()V
  DatatypeWriter$1$1
-  print|(Ljava/lang/String;Lcom/sun/xml/txw2/NamespaceResolver;Ljava/lang/StringBuilder;)V
+  print
+   (Ljava/lang/Object;Lcom/sun/xml/txw2/NamespaceResolver;Ljava/lang/StringBuilder;)V
+   (Ljava/lang/String;Lcom/sun/xml/txw2/NamespaceResolver;Ljava/lang/StringBuilder;)V
+ DatatypeWriter$1$5
+  print
+   (Ljava/lang/Object;Lcom/sun/xml/txw2/NamespaceResolver;Ljava/lang/StringBuilder;)V
+   (Ljavax/xml/namespace/QName;Lcom/sun/xml/txw2/NamespaceResolver;Ljava/lang/StringBuilder;)V
+ Document$1
+  onEndTag|()V
+  onStartTag|(Ljava/lang/String;Ljava/lang/String;Lcom/sun/xml/txw2/Attribute;Lcom/sun/xml/txw2/NamespaceDecl;)V
  NamespaceSupport
   getPrefix|(Ljava/lang/String;)Ljava/lang/String;
   getURI|(Ljava/lang/String;)Ljava/lang/String;
+  popContext|()V
+  pushContext|()V
  StartTag
+  addAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/Object;)V
   addNamespaceDecl|(Ljava/lang/String;Ljava/lang/String;Z)Lcom/sun/xml/txw2/NamespaceDecl;
-com.sun.xml.txw2.output|SaxSerializer|writeAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/StringBuilder;)V
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+  written|()V
+com.sun.xml.txw2.output
+ IndentingXMLFilter
+  characters|([CII)V
+  endElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  startElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lorg/xml/sax/Attributes;)V
+ SaxSerializer
+  beginStartTag|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  endStartTag|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  endTag|()V
+  writeAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/StringBuilder;)V
 com.sun.xml.ws.message
  SAX2DOMWriterEx
   writeCharacters|([CII)V
   writeEndElement|()V
   writeStartElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
-com.sun.xml.ws.streaming|XMLStreamReaderUtil|next|(Ljavax/xml/stream/XMLStreamReader;)I
+com.sun.xml.ws.streaming
+ XMLStreamReaderUtil
+  next|(Ljavax/xml/stream/XMLStreamReader;)I
+  nextContent|(Ljavax/xml/stream/XMLStreamReader;)I
 com.sun.xml.ws.util.xml
  XMLStreamReaderFilter
   getTextCharacters|(I[CII)I

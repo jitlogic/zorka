@@ -1,7 +1,9 @@
 org.json
  JSONArray
+  get|(I)Ljava/lang/Object;
   join|(Ljava/lang/String;)Ljava/lang/String;
   length|()I
+  opt|(I)Ljava/lang/Object;
   put|(Ljava/lang/Object;)Lorg/json/JSONArray;
  JSONObject
   keys|()Ljava/util/Iterator;

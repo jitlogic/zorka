@@ -48,3 +48,11 @@ com.ibm.icu.text
   charAt|([CIII)I
   getCharCount|(I)I
   isSurrogate|(C)Z
+com.ibm.wsdl|DefinitionImpl|getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+com.ibm.wsdl.util.xml
+ DOMUtils
+  cleanString|(Ljava/lang/String;)Ljava/lang/String;
+  getPrefix|(Ljava/lang/String;Ljavax/wsdl/Definition;)Ljava/lang/String;
+  getQualifiedValue|(Ljava/lang/String;Ljava/lang/String;Ljavax/wsdl/Definition;)Ljava/lang/String;
+  printAttribute|(Ljava/lang/String;Ljava/lang/String;Ljava/io/PrintWriter;)V
+  printQualifiedAttribute|(Ljava/lang/String;Ljavax/xml/namespace/QName;Ljavax/wsdl/Definition;Ljava/io/PrintWriter;)V

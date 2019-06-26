@@ -1,4 +1,89 @@
-sun.font|FontLineMetrics|clone|()Ljava/lang/Object;
+sun.font
+ AttributeValues
+  anyDefined|(I)Z
+  anyNonDefault|(I)Z
+  defineAll|(I)V
+  fromMap
+   (Ljava/util/Map;)Lsun/font/AttributeValues;
+   (Ljava/util/Map;I)Lsun/font/AttributeValues;
+  getBaselineTransform|(Ljava/util/Map;)Ljava/awt/geom/AffineTransform;
+  getJustification|(Ljava/util/Map;)F
+  getNumericShaping|(Ljava/util/Map;)Ljava/awt/font/NumericShaper;
+  merge|(Ljava/util/Map;I)Lsun/font/AttributeValues;
+ CharToGlyphMapper
+  canDisplay|(C)Z
+ CompositeFont
+  canDisplay|(C)Z
+  getSlotFont|(I)Lsun/font/PhysicalFont;
+  getStyleMetrics|(F[FI)V
+ CompositeGlyphMapper
+  charToGlyph
+   (C)I
+   (I)I
+  charsToGlyphs|(I[C[I)V
+ CoreMetrics
+  effectiveBaselineOffset|([F)F
+  get|(Ljava/awt/font/LineMetrics;)Lsun/font/CoreMetrics;
+ Decoration
+  getDecoration|(Lsun/font/AttributeValues;)Lsun/font/Decoration;
+  getVisualBounds|(Lsun/font/Decoration$Label;)Ljava/awt/geom/Rectangle2D;
+ EAttribute
+  forAttribute|(Ljava/text/AttributedCharacterIterator$Attribute;)Lsun/font/EAttribute;
+ ExtendedTextSourceLabel
+  getVisualBounds|(FF)Ljava/awt/geom/Rectangle2D;
+  handleGetVisualBounds|()Ljava/awt/geom/Rectangle2D;
+ Font2D
+  charToGlyph|(I)I
+  getFontMetrics|(Ljava/awt/Font;Ljava/awt/geom/AffineTransform;Ljava/lang/Object;Ljava/lang/Object;[F)V
+  getItalicAngle|(Ljava/awt/Font;Ljava/awt/geom/AffineTransform;Ljava/lang/Object;Ljava/lang/Object;)F
+  getStrike|(Ljava/awt/Font;Ljava/awt/geom/AffineTransform;II)Lsun/font/FontStrike;
+ FontFamily
+  getFamily|(Ljava/lang/String;)Lsun/font/FontFamily;
+  getLocaleFamily|(Ljava/lang/String;)Lsun/font/FontFamily;
+ FontLineMetrics
+  clone|()Ljava/lang/Object;
+ FontRunIterator
+  init|(Lsun/font/CompositeFont;[CII)V
+  next|(II)Z
+ FontStrikeDesc
+  getAAHintIntVal|(Ljava/lang/Object;Lsun/font/Font2D;I)I
+  getFMHintIntVal|(Ljava/lang/Object;)I
+ FontUtilities
+  getFont2D|(Ljava/awt/Font;)Lsun/font/Font2D;
+  isComplexText|([CII)Z
+ GlyphLayout
+  done|(Lsun/font/GlyphLayout;)V
+  get|(Lsun/font/GlyphLayout$LayoutEngineFactory;)Lsun/font/GlyphLayout;
+  layout|(Ljava/awt/Font;Ljava/awt/font/FontRenderContext;[CIIILsun/font/StandardGlyphVector;)Lsun/font/StandardGlyphVector;
+ GlyphLayout$GVData
+  createGlyphVector|(Ljava/awt/Font;Ljava/awt/font/FontRenderContext;Lsun/font/StandardGlyphVector;)Lsun/font/StandardGlyphVector;
+  init|(I)V
+ GlyphLayout$SDCache
+  get|(Ljava/awt/Font;Ljava/awt/font/FontRenderContext;)Lsun/font/GlyphLayout$SDCache;
+ ScriptRun
+  init|([CII)V
+  next|()Z
+ ScriptRunData
+  getScript|(I)I
+ StandardGlyphVector
+  getGlyphVisualBounds|(I)Ljava/awt/Shape;
+  initGlyphVector|(Ljava/awt/Font;Ljava/awt/font/FontRenderContext;[I[F[II)V
+ SunFontManager
+  findFont2D|(Ljava/lang/String;II)Lsun/font/Font2D;
+  getDefaultLogicalFont|(I)Lsun/font/Font2D;
+  usingPerAppContextComposites|()Z
+ SunLayoutEngine
+  getEngine|(Lsun/font/GlyphLayout$LayoutEngineKey;)Lsun/font/GlyphLayout$LayoutEngine;
+  instance|()Lsun/font/GlyphLayout$LayoutEngineFactory;
+  layout|(Lsun/font/FontStrikeDesc;[FIILsun/font/TextRecord;ILjava/awt/geom/Point2D$Float;Lsun/font/GlyphLayout$GVData;)V
+ TextLabelFactory
+  createExtended|(Ljava/awt/Font;Lsun/font/CoreMetrics;Lsun/font/Decoration;II)Lsun/font/ExtendedTextLabel;
+ TextRecord
+  init|([CIIII)V
+ TrueTypeFont
+  getStyleMetrics|(F[FI)V
+ TrueTypeGlyphMapper
+  charToGlyph|(I)I
 sun.java2d
  StateTrackableDelegate
   createInstance|(Lsun/java2d/StateTrackable$State;)Lsun/java2d/StateTrackableDelegate;
@@ -51,6 +136,8 @@ sun.net.www.http
   put|(Ljava/net/URL;Ljava/lang/Object;Lsun/net/www/http/HttpClient;)V
  KeepAliveStream
   close|()V
+ PosterOutputStream
+  write|(I)V
 sun.net.www.protocol.http
  AuthCacheImpl
   get|(Ljava/lang/String;Ljava/lang/String;)Lsun/net/www/protocol/http/AuthCacheValue;
@@ -92,22 +179,45 @@ sun.nio.ch
   normalize
    (I)I
    (J)J
+ Net
+  localAddress|(Ljava/io/FileDescriptor;)Ljava/net/InetSocketAddress;
  SelectionKeyImpl
+  channel|()Ljava/nio/channels/SelectableChannel;
+  interestOps
+   ()I
+   (I)Ljava/nio/channels/SelectionKey;
+  nioInterestOps
+   ()I
+   (I)Ljava/nio/channels/SelectionKey;
+  nioReadyOps
+   ()I
+   (I)V
   readyOps|()I
   selector|()Ljava/nio/channels/Selector;
  SelectorImpl
+  keys|()Ljava/util/Set;
   select|(J)I
+  selectNow|()I
   selectedKeys|()Ljava/util/Set;
  SelectorProviderImpl
   openSocketChannel|()Ljava/nio/channels/SocketChannel;
  SocketAdaptor
+  close|()V
   create|(Lsun/nio/ch/SocketChannelImpl;)Ljava/net/Socket;
  SocketChannelImpl
   connect|(Ljava/net/SocketAddress;)Z
   finishConnect|()Z
   kill|()V
   options|()Lsun/nio/ch/SocketOpts;
+  setOption|(Ljava/net/SocketOption;Ljava/lang/Object;)Ljava/nio/channels/SocketChannel;
   socket|()Ljava/net/Socket;
+  supportedOptions|()Ljava/util/Set;
+  translateAndSetInterestOps|(ILsun/nio/ch/SelectionKeyImpl;)V
+  translateAndSetReadyOps|(ILsun/nio/ch/SelectionKeyImpl;)Z
+  translateReadyOps|(IILsun/nio/ch/SelectionKeyImpl;)Z
+  write|(Ljava/nio/ByteBuffer;)I
+ SocketOptionRegistry
+  findOption|(Ljava/net/SocketOption;Ljava/net/ProtocolFamily;)Lsun/nio/ch/OptionKey;
  SocketOptsImpl
   keepAlive|(Z)Lsun/nio/ch/SocketOpts;
   receiveBufferSize|(I)Lsun/nio/ch/SocketOpts;
@@ -128,14 +238,22 @@ sun.nio.cs
   decode|([BII[C)I
  ISO_8859_1$Encoder
   encode|([CII[B)I
+  isLegalReplacement|([B)Z
  MS1250
+  historicalName|()Ljava/lang/String;
   newDecoder|()Ljava/nio/charset/CharsetDecoder;
+  newEncoder|()Ljava/nio/charset/CharsetEncoder;
  MS1252
   newEncoder|()Ljava/nio/charset/CharsetEncoder;
  SingleByte$Decoder
   decode
    (I)C
    ([BII[C)I
+ SingleByte$Encoder
+  encode
+   (C)I
+   ([CII[B)I
+  isLegalReplacement|([B)Z
  Surrogate
   is|(I)Z
  ThreadLocalCoders
@@ -143,30 +261,103 @@ sun.nio.cs
   encoderFor|(Ljava/lang/Object;)Ljava/nio/charset/CharsetEncoder;
  US_ASCII$Decoder
   decode|([BII[C)I
+ US_ASCII$Encoder
+  encode|([CII[B)I
+  isLegalReplacement|([B)Z
+sun.security.ec
+ ECKeyFactory
+  toECKey|(Ljava/security/Key;)Ljava/security/interfaces/ECKey;
+ ECKeyPairGenerator
+  initialize
+   (ILjava/security/SecureRandom;)V
+   (Ljava/security/spec/AlgorithmParameterSpec;Ljava/security/SecureRandom;)V
 sun.security.jca
  GetInstance
   checkSuperClass|(Ljava/security/Provider$Service;Ljava/lang/Class;Ljava/lang/Class;)V
   getInstance
    (Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;)Lsun/security/jca/GetInstance$Instance;
+   (Ljava/lang/String;Ljava/lang/Class;Ljava/lang/String;Ljava/lang/String;)Lsun/security/jca/GetInstance$Instance;
    (Ljava/security/Provider$Service;Ljava/lang/Class;)Lsun/security/jca/GetInstance$Instance;
+  getService
+   (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Ljava/security/Provider$Service;
+   (Ljava/lang/String;Ljava/lang/String;Ljava/security/Provider;)Ljava/security/Provider$Service;
+  getServices
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/util/List;
+   (Ljava/util/List;)Ljava/util/List;
  GetInstance$Instance
   toArray|()[Ljava/lang/Object;
  ProviderList
+  getIndex|(Ljava/lang/String;)I
+  getProvider|(Ljava/lang/String;)Ljava/security/Provider;
   getService|(Ljava/lang/String;Ljava/lang/String;)Ljava/security/Provider$Service;
+  getServices
+   (Ljava/lang/String;Ljava/lang/String;)Ljava/util/List;
+   (Ljava/util/List;)Ljava/util/List;
+ ProviderList$ServiceList
+  iterator|()Ljava/util/Iterator;
+ ProviderList$ServiceList$1
+  next
+   ()Ljava/lang/Object;
+   ()Ljava/security/Provider$Service;
 sun.security.provider
+ DigestBase
+  clone|()Ljava/lang/Object;
  IdentityDatabase
   identities|()Ljava/util/Enumeration;
+ JavaKeyStore
+  engineAliases|()Ljava/util/Enumeration;
+  engineLoad|(Ljava/io/InputStream;[C)V
+ JavaKeyStore$JKS
+  engineAliases|()Ljava/util/Enumeration;
+  engineLoad|(Ljava/io/InputStream;[C)V
+ KeyStoreDelegator$1
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/lang/String;
  PolicyFile$8
   run|()Ljava/lang/Object;
+ SHA5
+  clone|()Ljava/lang/Object;
+ SHA5$SHA384
+  clone|()Ljava/lang/Object;
  SecureRandom
   engineNextBytes|([B)V
+ X509Factory
+  engineGenerateCertificate|(Ljava/io/InputStream;)Ljava/security/cert/Certificate;
+sun.security.provider.certpath|AlgorithmChecker|check|(Ljava/security/cert/Certificate;Ljava/util/Collection;)V
+sun.security.rsa
+ RSACore
+  getByteLength
+   (Ljava/math/BigInteger;)I
+   (Ljava/security/interfaces/RSAKey;)I
+ RSAKeyFactory
+  toRSAKey|(Ljava/security/Key;)Ljava/security/interfaces/RSAKey;
+ RSAPadding
+  getInstance|(IILjava/security/SecureRandom;)Lsun/security/rsa/RSAPadding;
+  unpad|([B)[B
+ RSASignature
+  decodeSignature|(Lsun/security/util/ObjectIdentifier;[B)[B
 sun.security.ssl
  AppInputStream
   read|([BII)I
  AppOutputStream
   write|([BII)V
+ BaseSSLSocketImpl
+  close|()V
+ DummyX509KeyManager
+  chooseClientAlias|([Ljava/lang/String;[Ljava/security/Principal;Ljava/net/Socket;)Ljava/lang/String;
  HandshakeInStream
-  read|()I
+  available|()I
+  mark|(I)V
+  read
+   ()I
+   ([BII)I
+ HandshakeOutStream
+  flush|()V
+  putBytes16|([B)V
+  write
+   (I)V
+   ([BII)V
  InputRecord
   close|()V
  OutputRecord
@@ -176,36 +367,83 @@ sun.security.ssl
    (Ljava/lang/Object;)I
    (Lsun/security/ssl/ProtocolVersion;)I
  SSLAlgorithmConstraints
-  permits|(Ljava/util/Set;Ljava/lang/String;Ljava/security/AlgorithmParameters;)Z
+  permits
+   (Ljava/util/Set;Ljava/lang/String;Ljava/security/AlgorithmParameters;)Z
+   (Ljava/util/Set;Ljava/lang/String;Ljava/security/Key;Ljava/security/AlgorithmParameters;)Z
+   (Ljava/util/Set;Ljava/security/Key;)Z
+ SSLAlgorithmConstraints$SupportedSignatureAlgorithmConstraints
+  permits
+   (Ljava/util/Set;Ljava/lang/String;Ljava/security/AlgorithmParameters;)Z
+   (Ljava/util/Set;Ljava/lang/String;Ljava/security/Key;Ljava/security/AlgorithmParameters;)Z
+   (Ljava/util/Set;Ljava/security/Key;)Z
  SSLAlgorithmDecomposer
   decompose|(Ljava/lang/String;)Ljava/util/Set;
+ SSLSessionContextImpl$1
+  run
+   ()Ljava/lang/Object;
+   ()Ljava/lang/String;
  SSLSessionImpl
   invalidate|()V
+ SSLSocketFactoryImpl
+  createSocket|(Ljava/net/Socket;Ljava/lang/String;IZ)Ljava/net/Socket;
  SSLSocketImpl
   close|()V
 sun.security.util
+ Cache
+  newSoftMemoryCache|(II)Lsun/security/util/Cache;
  DerInputStream
   available|()I
+  getBytes|([B)V
+  getSequence|(I)[Lsun/security/util/DerValue;
+  getSet|(I)[Lsun/security/util/DerValue;
+  reset|()V
+  toByteArray|()[B
+ DerOutputStream
+  putLength|(I)V
  DerValue
+  encode|(Lsun/security/util/DerOutputStream;)V
   isPrintableStringChar|(C)Z
+  toByteArray|()[B
+ ECUtil
+  decodePoint|([BLjava/security/spec/EllipticCurve;)Ljava/security/spec/ECPoint;
+  encodeECParameterSpec|(Ljava/security/Provider;Ljava/security/spec/ECParameterSpec;)[B
+  encodePoint|(Ljava/security/spec/ECPoint;Ljava/security/spec/EllipticCurve;)[B
+  trimZeroes|([B)[B
  KeyUtil
-  getKeySize|(Ljava/security/AlgorithmParameters;)I
+  getKeySize
+   (Ljava/security/AlgorithmParameters;)I
+   (Ljava/security/Key;)I
  ManifestEntryVerifier
   update
    (B)V
    ([BII)V
   verify|(Ljava/util/Hashtable;Ljava/util/Hashtable;)[Ljava/security/CodeSigner;
+ MemoryCache
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)V
+ MemoryCache$SoftCacheEntry
+  isValid|(J)Z
  SignatureFileVerifier
   isBlockOrSF|(Ljava/lang/String;)Z
 sun.security.x509
+ AlgorithmId
+  parse|(Lsun/security/util/DerValue;)Lsun/security/x509/AlgorithmId;
+ CertificateExtensions
+  get|(Ljava/lang/String;)Lsun/security/x509/Extension;
  CertificateIssuerName
   get|(Ljava/lang/String;)Ljava/lang/Object;
  CertificateSubjectName
   get|(Ljava/lang/String;)Ljava/lang/Object;
  CertificateX509Key
-  get|(Ljava/lang/String;)Ljava/lang/Object;
+  get
+   (Ljava/lang/String;)Ljava/lang/Object;
+   (Ljava/lang/String;)Ljava/security/PublicKey;
+ OIDMap
+  getName|(Lsun/security/util/ObjectIdentifier;)Ljava/lang/String;
  X509CertImpl
+  get|(Ljava/lang/String;)Ljava/lang/Object;
   getEncodedInternal|(Ljava/security/cert/Certificate;)[B
+  toImpl|(Ljava/security/cert/X509Certificate;)Lsun/security/x509/X509CertImpl;
  X509CertInfo
   get|(Ljava/lang/String;)Ljava/lang/Object;
 sun.text
@@ -216,6 +454,7 @@ sun.text
   next|()I
  UCompactIntArray
   elementAt|(I)I
+sun.text.bidi|BidiBase|requiresBidi|([CII)Z
 sun.text.normalizer
  CharTrie
   getCodePointValue|(I)C
@@ -235,6 +474,10 @@ sun.text.normalizer
  ReplaceableUCharacterIterator
   current|()I
   next|()I
+ UBiDiProps
+  getClass|(I)I
+ UCharacter
+  getDirection|(I)I
  UCharacterIterator
   moveIndex|(I)I
  UTF16
@@ -245,7 +488,25 @@ sun.util
   nextElement
    ()Ljava/lang/Object;
    ()Ljava/lang/String;
-sun.util.calendar|JulianCalendar|getFixedDate|(IIILsun/util/calendar/BaseCalendar$Date;)J
+sun.util.calendar
+ JulianCalendar
+  getCalendarDateFromFixedDate|(Lsun/util/calendar/CalendarDate;J)V
+  getFixedDate|(IIILsun/util/calendar/BaseCalendar$Date;)J
+  newCalendarDate
+   (Ljava/util/TimeZone;)Lsun/util/calendar/CalendarDate;
+   (Ljava/util/TimeZone;)Lsun/util/calendar/JulianCalendar$Date;
+sun.util.locale
+ InternalLocaleBuilder
+  clearExtensions|()Lsun/util/locale/InternalLocaleBuilder;
+ StringTokenIterator
+  current|()Ljava/lang/String;
+  currentEnd|()I
+  next|()Ljava/lang/String;
+sun.util.locale.provider
+ RuleBasedBreakIterator
+  clone|()Ljava/lang/Object;
+ TimeZoneNameUtility
+  retrieveDisplayName|(Ljava/lang/String;ZILjava/util/Locale;)Ljava/lang/String;
 sun.util.logging
  LoggingSupport
   isLoggable|(Ljava/lang/Object;Ljava/lang/Object;)Z

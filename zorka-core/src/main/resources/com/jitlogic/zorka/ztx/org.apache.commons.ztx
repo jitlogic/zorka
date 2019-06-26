@@ -6,11 +6,16 @@ org.apache.commons.beanutils
   lookup|(Ljava/lang/Class;)Lorg/apache/commons/beanutils/Converter;
  MethodUtils
   getAccessibleMethod|(Ljava/lang/Class;Ljava/lang/reflect/Method;)Ljava/lang/reflect/Method;
+ PropertyUtils
+  getProperty|(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
  PropertyUtilsBean
+  getNestedProperty|(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
+  getProperty|(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
   getPropertyDescriptor|(Ljava/lang/Object;Ljava/lang/String;)Ljava/beans/PropertyDescriptor;
   getPropertyDescriptors
    (Ljava/lang/Class;)[Ljava/beans/PropertyDescriptor;
    (Ljava/lang/Object;)[Ljava/beans/PropertyDescriptor;
+  getSimpleProperty|(Ljava/lang/Object;Ljava/lang/String;)Ljava/lang/Object;
  WeakFastHashMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.commons.beanutils.converters
@@ -21,9 +26,11 @@ org.apache.commons.beanutils.converters
 org.apache.commons.beanutils.expression
  DefaultResolver
   getProperty|(Ljava/lang/String;)Ljava/lang/String;
+  hasNested|(Ljava/lang/String;)Z
   isIndexed|(Ljava/lang/String;)Z
   isMapped|(Ljava/lang/String;)Z
   next|(Ljava/lang/String;)Ljava/lang/String;
+  remove|(Ljava/lang/String;)Ljava/lang/String;
 org.apache.commons.betwixt
  IntrospectionConfiguration
   useBeanInfoSearchPath|()Z
@@ -100,14 +107,22 @@ org.apache.commons.collections
   next|()Ljava/lang/Object;
 org.apache.commons.collections.map
  AbstractHashedMap
+  clear|()V
   containsKey|(Ljava/lang/Object;)Z
   get|(Ljava/lang/Object;)Ljava/lang/Object;
   put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
   remove|(Ljava/lang/Object;)Ljava/lang/Object;
+  size|()I
  AbstractLinkedMap$KeySetIterator
   next|()Ljava/lang/Object;
  AbstractReferenceMap
+  clear|()V
   get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  size|()I
+  values|()Ljava/util/Collection;
+ AbstractReferenceMap$ReferenceValuesIterator
+  next|()Ljava/lang/Object;
  LRUMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
 org.apache.commons.configuration
@@ -142,6 +157,11 @@ org.apache.commons.dbcp
   clearParameters|()V
  DelegatingResultSet
   close|()V
+  getBigDecimal|(Ljava/lang/String;)Ljava/math/BigDecimal;
+  getBinaryStream|(Ljava/lang/String;)Ljava/io/InputStream;
+  getBoolean|(Ljava/lang/String;)Z
+  getDouble|(Ljava/lang/String;)D
+  getFloat|(Ljava/lang/String;)F
   getInt|(Ljava/lang/String;)I
   getLong|(Ljava/lang/String;)J
   getObject|(I)Ljava/lang/Object;
@@ -211,6 +231,7 @@ org.apache.commons.lang
   isBlank|(Ljava/lang/String;)Z
   isEmpty|(Ljava/lang/String;)Z
   isNotBlank|(Ljava/lang/String;)Z
+  isNumeric|(Ljava/lang/String;)Z
   join|(Ljava/util/Iterator;C)Ljava/lang/String;
   trim|(Ljava/lang/String;)Ljava/lang/String;
 org.apache.commons.lang.builder
@@ -232,6 +253,11 @@ org.apache.commons.lang.text
   isMatch|([CIII)I
  StrSubstitutor
   replace|(Ljava/lang/String;)Ljava/lang/String;
+org.apache.commons.lang.time
+ DateUtils
+  isSameDay
+   (Ljava/util/Calendar;Ljava/util/Calendar;)Z
+   (Ljava/util/Date;Ljava/util/Date;)Z
 org.apache.commons.lang3|StringUtils|stripToNull|(Ljava/lang/String;)Ljava/lang/String;
 org.apache.commons.lang3.text.translate
  AggregateTranslator
@@ -291,3 +317,7 @@ org.apache.commons.pool.impl
  GenericKeyedObjectPool
   borrowObject|(Ljava/lang/Object;)Ljava/lang/Object;
   returnObject|(Ljava/lang/Object;Ljava/lang/Object;)V
+ GenericKeyedObjectPool$ObjectTimestampPair
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/apache/commons/pool/impl/GenericKeyedObjectPool$ObjectTimestampPair;)I

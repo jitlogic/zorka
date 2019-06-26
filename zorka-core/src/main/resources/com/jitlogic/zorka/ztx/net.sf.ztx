@@ -1,4 +1,22 @@
+net.sf.acegisecurity
+ AbstractAuthenticationManager
+  authenticate|(Lnet/sf/acegisecurity/Authentication;)Lnet/sf/acegisecurity/Authentication;
+ ConfigAttributeDefinition
+  addConfigAttribute|(Lnet/sf/acegisecurity/ConfigAttribute;)V
+  size|()I
+net.sf.acegisecurity.afterinvocation|AfterInvocationProviderManager|decide|(Lnet/sf/acegisecurity/Authentication;Ljava/lang/Object;Lnet/sf/acegisecurity/ConfigAttributeDefinition;Ljava/lang/Object;)Ljava/lang/Object;
+net.sf.acegisecurity.intercept.method|AbstractMethodDefinitionSource|getAttributes|(Ljava/lang/Object;)Lnet/sf/acegisecurity/ConfigAttributeDefinition;
+net.sf.acegisecurity.intercept.method.aopalliance|MethodSecurityInterceptor|obtainObjectDefinitionSource|()Lnet/sf/acegisecurity/intercept/ObjectDefinitionSource;
+net.sf.acegisecurity.providers
+ NullConcurrentSessionController
+  afterAuthentication|(Lnet/sf/acegisecurity/Authentication;Lnet/sf/acegisecurity/Authentication;)V
+  beforeAuthentication|(Lnet/sf/acegisecurity/Authentication;)V
+ ProviderManager
+  doAuthentication|(Lnet/sf/acegisecurity/Authentication;)Lnet/sf/acegisecurity/Authentication;
+net.sf.acegisecurity.runas|NullRunAsManager|buildRunAs|(Lnet/sf/acegisecurity/Authentication;Ljava/lang/Object;Lnet/sf/acegisecurity/ConfigAttributeDefinition;)Lnet/sf/acegisecurity/Authentication;
 net.sf.acegisecurity.vote
+ AffirmativeBased
+  decide|(Lnet/sf/acegisecurity/Authentication;Ljava/lang/Object;Lnet/sf/acegisecurity/ConfigAttributeDefinition;)V
  RoleVoter
   supports|(Lnet/sf/acegisecurity/ConfigAttribute;)Z
   vote|(Lnet/sf/acegisecurity/Authentication;Ljava/lang/Object;Lnet/sf/acegisecurity/ConfigAttributeDefinition;)I
@@ -93,6 +111,7 @@ net.sf.cglib.proxy
   getImplSignature|(Lnet/sf/cglib/core/MethodInfo;)Lnet/sf/cglib/core/Signature;
  MethodProxy
   find|(Ljava/lang/Class;Lnet/sf/cglib/core/Signature;)Lnet/sf/cglib/proxy/MethodProxy;
+net.sf.jasperreports.components.headertoolbar|HeaderToolbarConditionalStyleProvider|getStyle|(B)Lnet/sf/jasperreports/engine/JRStyle;
 net.sf.jasperreports.data.cache
  BlockColumnStore
   addValue|(Ljava/lang/Object;)V
@@ -125,7 +144,9 @@ net.sf.jasperreports.engine
  JRAbstractObjectFactory
   put|(Ljava/lang/Object;Ljava/lang/Object;)V
  JRAbstractScriptlet
+  callAfterDetailEval|()V
   callAfterGroupInit|()V
+  callBeforeDetailEval|()V
   callBeforeGroupInit|()V
  JRDefaultScriptlet
   afterDetailEval|()V
@@ -149,9 +170,11 @@ net.sf.jasperreports.engine
   getProperty
    (Ljava/lang/String;)Ljava/lang/String;
    (Lnet/sf/jasperreports/engine/JRPropertiesHolder;Ljava/lang/String;)Ljava/lang/String;
+  transferProperties|(Lnet/sf/jasperreports/engine/JRPropertiesMap;Lnet/sf/jasperreports/engine/JRPropertiesHolder;Ljava/util/List;)V
  JRStyledTextAttributeSelector
   getAllSelector|(Lnet/sf/jasperreports/engine/JasperReportsContext;)Lnet/sf/jasperreports/engine/JRStyledTextAttributeSelector;
   getNoBackcolorSelector|(Lnet/sf/jasperreports/engine/JasperReportsContext;)Lnet/sf/jasperreports/engine/JRStyledTextAttributeSelector;
+  getNoneSelector|(Lnet/sf/jasperreports/engine/JasperReportsContext;)Lnet/sf/jasperreports/engine/JRStyledTextAttributeSelector;
   getTextLocale|(Lnet/sf/jasperreports/engine/JRPrintText;)Ljava/util/Locale;
  JRStyledTextAttributeSelector$AllSelector
   getStyledTextAttributes|(Lnet/sf/jasperreports/engine/JRPrintText;)Ljava/util/Map;
@@ -183,15 +206,24 @@ net.sf.jasperreports.engine.base
   clone|(Lnet/sf/jasperreports/engine/JRBoxContainer;)Lnet/sf/jasperreports/engine/JRLineBox;
  JRBasePen
   clone|(Lnet/sf/jasperreports/engine/JRPenContainer;)Lnet/sf/jasperreports/engine/JRPen;
+ JRBasePrintPage
+  addElement|(Lnet/sf/jasperreports/engine/JRPrintElement;)V
  VirtualizableElementList
   get
    (I)Ljava/lang/Object;
    (I)Lnet/sf/jasperreports/engine/JRPrintElement;
   size|()I
+net.sf.jasperreports.engine.data
+ JRAbstractBeanDataSource$2
+  getPropertyName|(Lnet/sf/jasperreports/engine/JRField;)Ljava/lang/String;
+ JRBeanCollectionDataSource
+  getFieldValue|(Lnet/sf/jasperreports/engine/JRField;)Ljava/lang/Object;
+  next|()Z
 net.sf.jasperreports.engine.export
  AbstractPdfTextRenderer
   initialize|(Lnet/sf/jasperreports/engine/export/JRPdfExporter;Lcom/lowagie/text/pdf/PdfContentByte;Lnet/sf/jasperreports/engine/JRPrintText;II)V
  AbstractTextRenderer
+  getLineHeight|(ZLnet/sf/jasperreports/engine/JRParagraph;FF)F
   initialize|(Lnet/sf/jasperreports/engine/JRPrintText;II)V
  Cut
   getProperty|(Ljava/lang/String;)Ljava/lang/Object;
@@ -207,6 +239,8 @@ net.sf.jasperreports.engine.export
   isCutSpanned|(I)Z
   size|()I
   use|()V
+ DefaultHyperlinkProducerFactory
+  getHandler|(Ljava/lang/String;)Lnet/sf/jasperreports/engine/export/JRHyperlinkProducer;
  ExporterFilterContainer
   isToExport|(Lnet/sf/jasperreports/engine/JRPrintElement;)Z
  Grid
@@ -219,7 +253,10 @@ net.sf.jasperreports.engine.export
   getIgnoreHyperlink|(Ljava/lang/String;Lnet/sf/jasperreports/engine/JRPrintHyperlink;)Ljava/lang/Boolean;
  JExcelApiExporter
   exportHyperlink|(Lnet/sf/jasperreports/engine/JRPrintHyperlink;Ljava/lang/String;Lnet/sf/jasperreports/engine/export/JRExporterGridCell;II)V
+  exportText|(Lnet/sf/jasperreports/engine/JRPrintText;Lnet/sf/jasperreports/engine/export/JRExporterGridCell;II)V
   getTextAlignHolder|(Lnet/sf/jasperreports/engine/JRPrintText;)Lnet/sf/jasperreports/engine/export/JRXlsAbstractExporter$TextAlignHolder;
+ JExcelApiExporter$CellTextValueHandler
+  handle|(Lnet/sf/jasperreports/engine/export/data/StringTextValue;)V
  JExcelApiExporterNature
   isToExport|(Lnet/sf/jasperreports/engine/JRPrintElement;)Z
  JRAbstractCsvExporter
@@ -232,7 +269,9 @@ net.sf.jasperreports.engine.export
  JRGridLayout
   getElement|(Lnet/sf/jasperreports/engine/export/PrintElementIndex;I)Lnet/sf/jasperreports/engine/JRPrintElement;
   getMaxRowHeight|(I)I
-  getRowHeight|(I)I
+  getRowHeight
+   (I)I
+   (Lnet/sf/jasperreports/engine/export/GridRow;)I
  JROriginExporterFilter
   isToExport|(Lnet/sf/jasperreports/engine/JRPrintElement;)Z
   match|(Lnet/sf/jasperreports/engine/JROrigin;Lnet/sf/jasperreports/engine/JROrigin;)Z
@@ -340,6 +379,12 @@ net.sf.jasperreports.engine.export.ooxml
   getFormat|(Ljava/lang/String;)I
  XlsxParagraphHelper
   getHorizontalAlignment|(Lnet/sf/jasperreports/engine/type/HorizontalAlignEnum;)Ljava/lang/String;
+ XlsxRunHelper
+  export|(Lnet/sf/jasperreports/engine/JRStyle;Ljava/util/Map;Ljava/lang/String;Ljava/util/Locale;Ljava/lang/String;)V
+  exportProps|(Ljava/util/Map;Ljava/util/Map;Ljava/util/Locale;)V
+ XlsxSheetHelper
+  exportMergedCells|(IIII)V
+  exportRow|(ILnet/sf/jasperreports/engine/export/Cut;Lnet/sf/jasperreports/engine/export/XlsRowLevelInfo;)V
  XlsxStyleHelper
   getCellStyle|(Lnet/sf/jasperreports/engine/export/JRExporterGridCell;Ljava/lang/String;Ljava/util/Locale;ZZZ)I
 net.sf.jasperreports.engine.export.tabulator
@@ -407,27 +452,78 @@ net.sf.jasperreports.engine.fill
   increment|(Lnet/sf/jasperreports/engine/fill/JRFillVariable;Ljava/lang/Object;Lnet/sf/jasperreports/engine/fill/AbstractValueProvider;)Ljava/lang/Object;
  JRAbstractLRUVirtualizer
   touch|(Lnet/sf/jasperreports/engine/JRVirtualizable;)V
+ JRBaseFiller
+  getNumberFormat|(Ljava/lang/String;)Ljava/text/Format;
  JRCalculator
-  evaluate|(Lnet/sf/jasperreports/engine/JRExpression;)Ljava/lang/Object;
+  calculateVariables|()V
+  estimateGroupRuptures|()V
+  estimateVariables|()V
+  evaluate
+   (Lnet/sf/jasperreports/engine/JRExpression;)Ljava/lang/Object;
+   (Lnet/sf/jasperreports/engine/JRExpression;B)Ljava/lang/Object;
   evaluateEstimated|(Lnet/sf/jasperreports/engine/JRExpression;)Ljava/lang/Object;
   initializeVariables|(Lnet/sf/jasperreports/engine/type/ResetTypeEnum;Lnet/sf/jasperreports/engine/type/IncrementTypeEnum;)V
  JRDefaultSystemIncrementer
   increment|(Lnet/sf/jasperreports/engine/fill/JRCalculable;Ljava/lang/Object;Lnet/sf/jasperreports/engine/fill/AbstractValueProvider;)Ljava/lang/Object;
+ JREvaluationTime
+  getBandEvaluationTime|(Lnet/sf/jasperreports/engine/fill/JRFillBand;)Lnet/sf/jasperreports/engine/fill/JREvaluationTime;
  JREvaluator
   evaluate|(Lnet/sf/jasperreports/engine/JRExpression;)Ljava/lang/Object;
   evaluateEstimated|(Lnet/sf/jasperreports/engine/JRExpression;)Ljava/lang/Object;
+ JRFillContext
+  ensureMasterPageAvailable|()V
+ JRFillDataset
+  next|()Z
  JRFillDatasetScriptlet
   afterDetailEval|()V
   beforeDetailEval|()V
+ JRFillElement
+  evaluateExpression|(Lnet/sf/jasperreports/engine/JRExpression;B)Ljava/lang/Object;
  JRFillElementContainer
+  fillElements|(Lnet/sf/jasperreports/engine/JRPrintElementContainer;)V
   getEvaluatedConditionalStyle|(Lnet/sf/jasperreports/engine/JRStyle;)Lnet/sf/jasperreports/engine/JRStyle;
+  willOverflow|()Z
+ JRFillField$getValue
+  call|(Ljava/lang/Object;)Ljava/lang/Object;
+ JRFillHyperlinkHelper
+  evaluateHyperlinkParameters|(Lnet/sf/jasperreports/engine/JRHyperlink;Lnet/sf/jasperreports/engine/fill/JRFillExpressionEvaluator;B)Lnet/sf/jasperreports/engine/JRPrintHyperlinkParameters;
+ JRFillObjectFactory
+  visitStaticText|(Lnet/sf/jasperreports/engine/JRStaticText;)V
+  visitTextField|(Lnet/sf/jasperreports/engine/JRTextField;)V
+ JRFillTextField
+  evaluate|(B)V
+  fill|()Lnet/sf/jasperreports/engine/JRPrintElement;
+  prepare|(IZ)Z
  JRIntegerCountIncrementer
   increment|(Lnet/sf/jasperreports/engine/fill/JRCalculable;Ljava/lang/Object;Lnet/sf/jasperreports/engine/fill/AbstractValueProvider;)Ljava/lang/Object;
  JRIntegerSumIncrementer
   increment|(Lnet/sf/jasperreports/engine/fill/JRCalculable;Ljava/lang/Object;Lnet/sf/jasperreports/engine/fill/AbstractValueProvider;)Ljava/lang/Object;
+ JRPrintBand
+  addElement|(Lnet/sf/jasperreports/engine/JRPrintElement;)V
+  iterateElements|()Ljava/util/Iterator;
+ JRPrintBand$ElementsIterator
+  next
+   ()Ljava/lang/Object;
+   ()Lnet/sf/jasperreports/engine/JRPrintElement;
  JRTemplatePrintText
   accept|(Lnet/sf/jasperreports/engine/PrintElementVisitor;Ljava/lang/Object;)V
   getFullStyledText|(Lnet/sf/jasperreports/engine/JRStyledTextAttributeSelector;)Lnet/sf/jasperreports/engine/util/JRStyledText;
+ SimpleTextLineWrapper
+  maxFontSize|(II)I
+  nextLine|(FIZ)Lnet/sf/jasperreports/engine/fill/TextLine;
+  paragraphEnd|()I
+  paragraphPosition|()I
+  start|(Lnet/sf/jasperreports/engine/util/JRStyledText;)Z
+  startParagraph|(IIZ)V
+ SimpleTextLineWrapper$ElementFontInfo
+  charWidthEstimate|()D
+  recordMeasurement|(D)V
+ SimpleTextLineWrapper$FontStatistics
+  recordMeasurement|(D)V
+ TextMeasurer
+  measure|(Lnet/sf/jasperreports/engine/util/JRStyledText;IIZ)Lnet/sf/jasperreports/engine/fill/JRMeasuredText;
+ TextMeasurer$TextMeasuredState
+  cloneState|()Lnet/sf/jasperreports/engine/fill/TextMeasurer$TextMeasuredState;
 net.sf.jasperreports.engine.fonts
  FontExtensionsRegistry
   getExtensions|(Ljava/lang/Class;)Ljava/util/List;
@@ -448,6 +544,11 @@ net.sf.jasperreports.engine.type
 net.sf.jasperreports.engine.util
  Bounds
   grow|(IIII)V
+ DefaultFormatFactory
+  createNumberFormat|(Ljava/lang/String;Ljava/util/Locale;)Ljava/text/NumberFormat;
+ FileBufferedOutputStream
+  checkClosed|()V
+  write|([BII)V
  FileBufferedWriter
   write|([CII)V
  JRBoxUtil
@@ -457,6 +558,8 @@ net.sf.jasperreports.engine.util
   getCssColor|(Ljava/awt/Color;)Ljava/lang/String;
  JRDataUtils
   getLocale|(Ljava/lang/String;)Ljava/util/Locale;
+  getLocaleCode|(Ljava/util/Locale;)Ljava/lang/String;
+  getTimeZoneId|(Ljava/util/TimeZone;)Ljava/lang/String;
  JRProperties
   asBoolean|(Ljava/lang/String;)Z
   asFloat|(Ljava/lang/String;)F
@@ -466,6 +569,8 @@ net.sf.jasperreports.engine.util
   getIntegerProperty|(Ljava/lang/String;)I
   getProperty|(Ljava/lang/String;)Ljava/lang/String;
  JRStringUtil
+  getTabIndexes|(Ljava/lang/String;)Ljava/util/List;
+  replaceCRwithLF|(Ljava/lang/String;)Ljava/lang/String;
   xmlEncode|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  JRStyleResolver
   getBackcolor
@@ -477,6 +582,9 @@ net.sf.jasperreports.engine.util
   getFontName
    (Lnet/sf/jasperreports/engine/JRFont;)Ljava/lang/String;
    (Lnet/sf/jasperreports/engine/JRStyle;)Ljava/lang/String;
+  getFontSize
+   (Lnet/sf/jasperreports/engine/JRFont;)I
+   (Lnet/sf/jasperreports/engine/JRStyle;)Ljava/lang/Integer;
   getFontsize
    (Lnet/sf/jasperreports/engine/JRFont;)F
    (Lnet/sf/jasperreports/engine/JRStyle;)Ljava/lang/Float;
@@ -497,6 +605,7 @@ net.sf.jasperreports.engine.util
    (Lnet/sf/jasperreports/engine/JRStyle;)Ljava/lang/String;
   getMode|(Lnet/sf/jasperreports/engine/JRCommonElement;Lnet/sf/jasperreports/engine/type/ModeEnum;)Lnet/sf/jasperreports/engine/type/ModeEnum;
   getModeValue|(Lnet/sf/jasperreports/engine/JRStyle;)Lnet/sf/jasperreports/engine/type/ModeEnum;
+  getPattern|(Lnet/sf/jasperreports/engine/JRTextField;)Ljava/lang/String;
   getPdfEncoding
    (Lnet/sf/jasperreports/engine/JRFont;)Ljava/lang/String;
    (Lnet/sf/jasperreports/engine/JRStyle;)Ljava/lang/String;
@@ -540,9 +649,15 @@ net.sf.jasperreports.engine.util
   getTruncatedText|(Lnet/sf/jasperreports/engine/JRPrintText;)Ljava/lang/String;
  LocalJasperReportsContext
   getExtensions|(Ljava/lang/Class;)Ljava/util/List;
+ ObjectUtils$HashCode
+  add|(Ljava/lang/Object;)V
  Pair
   first|()Ljava/lang/Object;
   second|()Ljava/lang/Object;
+ ParagraphUtil
+  getLeftX|(Lnet/sf/jasperreports/engine/TabStop;F)F
+  getRightX|(Lnet/sf/jasperreports/engine/TabStop;F)F
+  getSegmentOffset|(Lnet/sf/jasperreports/engine/TabStop;F)F
  SortedIntList
   add|(I)Z
   get|(I)I
@@ -567,6 +682,8 @@ net.sf.jasperreports.extensions
  DefaultExtensionsRegistryFactory$2
   getExtensions|(Ljava/lang/Class;)Ljava/util/List;
  ListExtensionRegistry
+  getExtensions|(Ljava/lang/Class;)Ljava/util/List;
+ ListExtensionsRegistry
   getExtensions|(Ljava/lang/Class;)Ljava/util/List;
  SingletonExtensionRegistry
   getExtensions|(Ljava/lang/Class;)Ljava/util/List;

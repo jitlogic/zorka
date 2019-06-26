@@ -3,6 +3,10 @@ com.ctc.wstx.dtd
   validateElementAndAttributes|()I
   validateElementEnd|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
   validateElementStart|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+com.ctc.wstx.io
+ CharsetNames
+  findEncodingFor|(Ljava/io/Writer;)Ljava/lang/String;
+  normalize|(Ljava/lang/String;)Ljava/lang/String;
 com.ctc.wstx.sr
  AttributeCollector
   reset|()V
@@ -27,9 +31,30 @@ com.ctc.wstx.sr
   push|(Ljava/lang/String;Ljava/lang/String;)V
   resolveAndValidateElement|()I
   validateEndElement|()I
+com.ctc.wstx.sw
+ BaseNsStreamWriter
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
+  writeEndElement|()V
+  writeStartElement|(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+ BaseStreamWriter
+  writeCharacters|(Ljava/lang/String;)V
+ BufferingXmlWriter
+  writeCharacters
+   (Ljava/lang/String;)V
+   ([CII)V
+  writeEndTag|(Ljava/lang/String;Ljava/lang/String;)V
+  writeRaw|([CII)V
+  writeStartTagEnd|()V
+  writeStartTagStart|(Ljava/lang/String;Ljava/lang/String;)V
+ SimpleOutputElement
+  getPrefix|(Ljava/lang/String;)Ljava/lang/String;
 com.ctc.wstx.util
+ BijectiveNsMap
+  findPrefixByUri|(Ljava/lang/String;)Ljava/lang/String;
  PrefixedName
   reset|(Ljava/lang/String;Ljava/lang/String;)Lcom/ctc/wstx/util/PrefixedName;
+ StringUtil
+  equalEncodings|(Ljava/lang/String;Ljava/lang/String;)Z
  StringVector
   clear|(Z)V
   findLastFromMap|(Ljava/lang/String;)Ljava/lang/String;

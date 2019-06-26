@@ -1,14 +1,118 @@
 net.sf.ehcache
+ Cache
+  get|(Ljava/lang/Object;)Lnet/sf/ehcache/Element;
+  isExpired|(Lnet/sf/ehcache/Element;)Z
+  put
+   (Lnet/sf/ehcache/Element;)V
+   (Lnet/sf/ehcache/Element;Z)V
  Cache$CacheStatus
   checkAlive|(Lnet/sf/ehcache/config/CacheConfiguration;)V
  CacheManager
   getCache|(Ljava/lang/String;)Lnet/sf/ehcache/Cache;
-net.sf.ehcache.event|RegisteredEventListeners|notifyElementRemoved|(Lnet/sf/ehcache/Element;Z)V
+ DefaultElementEvictionData
+  resetLastAccessTime|(Lnet/sf/ehcache/Element;)V
+  updateLastAccessTime|(JLnet/sf/ehcache/Element;)V
+ Element
+  isExpired|(Lnet/sf/ehcache/config/CacheConfiguration;)Z
+  resetAccessStatistics|()V
+  updateAccessStatistics|()V
+  updateUpdateStatistics|()V
+net.sf.ehcache.concurrent
+ ConcurrencyUtil
+  hash|(Ljava/lang/Object;)I
+  selectLock|(Ljava/lang/Object;I)I
+ ReadWriteLockSync
+  lock|(Lnet/sf/ehcache/concurrent/LockType;)V
+  unlock|(Lnet/sf/ehcache/concurrent/LockType;)V
+ StripedReadWriteLockSync
+  getLockForKey|(Ljava/lang/Object;)Ljava/util/concurrent/locks/ReadWriteLock;
+  getSyncForKey
+   (Ljava/lang/Object;)Lnet/sf/ehcache/concurrent/ReadWriteLockSync;
+   (Ljava/lang/Object;)Lnet/sf/ehcache/concurrent/Sync;
+net.sf.ehcache.event
+ NotificationScope
+  shouldDeliver|(Z)Z
+ RegisteredEventListeners
+  notifyElementRemoved|(Lnet/sf/ehcache/Element;Z)V
+  notifyElementUpdated|(Lnet/sf/ehcache/Element;Z)V
+net.sf.ehcache.hibernate
+ AbstractEhcacheRegionFactory
+  nextTimestamp|()J
+ EhCacheRegionFactory
+  nextTimestamp|()J
+net.sf.ehcache.hibernate.nonstop|NonstopAwareEntityRegionAccessStrategy|get|(Ljava/lang/Object;J)Ljava/lang/Object;
+net.sf.ehcache.hibernate.regions
+ EhcacheDataRegion
+  nextTimestamp|()J
+ EhcacheGeneralDataRegion
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)V
+ EhcacheQueryResultsRegion
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ EhcacheTimestampsRegion
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)V
+ EhcacheTransactionalDataRegion
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  locksAreIndependentOfCache|()Z
+  readLock|(Ljava/lang/Object;)V
+  readUnlock|(Ljava/lang/Object;)V
+net.sf.ehcache.hibernate.strategy
+ AbstractReadWriteEhcacheAccessStrategy
+  get|(Ljava/lang/Object;J)Ljava/lang/Object;
+ AbstractReadWriteEhcacheAccessStrategy$Item
+  isReadable|(J)Z
+ ReadOnlyEhcacheEntityRegionAccessStrategy
+  get|(Ljava/lang/Object;J)Ljava/lang/Object;
+net.sf.ehcache.pool.impl
+ UnboundedPool$UnboundedPoolAccessor
+  add|(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Z)J
+  delete|(J)J
+net.sf.ehcache.statistics
+ LiveCacheStatisticsWrapper
+  notifyElementUpdated|(Lnet/sf/ehcache/Ehcache;Lnet/sf/ehcache/Element;)V
+ NullLiveCacheStatisticsData
+  notifyElementUpdated|(Lnet/sf/ehcache/Ehcache;Lnet/sf/ehcache/Element;)V
 net.sf.ehcache.store
+ FrontEndCacheTier
+  bufferFull|()Z
+  getLockFor|(Ljava/lang/Object;)Ljava/util/concurrent/locks/ReadWriteLock;
+  getQuiet|(Ljava/lang/Object;)Lnet/sf/ehcache/Element;
+  put|(Lnet/sf/ehcache/Element;)Z
+ FrontEndCacheTier$Fault
+  complete|(Lnet/sf/ehcache/Element;)V
+ LruPolicy
+  compare|(Lnet/sf/ehcache/Element;Lnet/sf/ehcache/Element;)Z
  MemoryStore
+  bufferFull|()Z
   get|(Ljava/lang/Object;)Lnet/sf/ehcache/Element;
+  getQuiet|(Ljava/lang/Object;)Lnet/sf/ehcache/Element;
+  isPinned|(Ljava/lang/Object;)Z
+  put|(Lnet/sf/ehcache/Element;)Z
   remove|(Ljava/lang/Object;)Lnet/sf/ehcache/Element;
+ NullStore
+  bufferFull|()Z
+  fill|(Lnet/sf/ehcache/Element;)V
+  getQuiet|(Ljava/lang/Object;)Lnet/sf/ehcache/Element;
+  put|(Lnet/sf/ehcache/Element;)Z
+net.sf.ehcache.store.chm
+ ConcurrentHashMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ SelectableConcurrentHashMap
+  isPinned|(Ljava/lang/Object;)Z
+  put|(Ljava/lang/Object;Lnet/sf/ehcache/Element;J)Lnet/sf/ehcache/Element;
+  quickSize|()I
+  storedObject|(Lnet/sf/ehcache/Element;)Ljava/lang/Object;
+ SelectableConcurrentHashMap$MemoryStoreSegment
+  isPinned|(Ljava/lang/Object;I)Z
+  unpinAll|()V
 net.sf.ehcache.util
+ TimeProviderLoader$1
+  currentTimeMillis|()J
  TimeUtil
   convertTimeToInt|(J)I
   toMillis|(I)J
+ Timestamper
+  next|()J
+net.sf.ehcache.util.lang|VicariousThreadLocal|remove|()V
+net.sf.ehcache.util.ratestatistics|AtomicRateStatistic|event|()V
