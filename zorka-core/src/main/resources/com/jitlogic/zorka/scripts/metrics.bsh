@@ -37,37 +37,33 @@ __metrics() {
 
     // Memory Pools
     zorka.query("java", "java.lang:type=MemoryPool,*", "type", "name").get("Usage").get("used")
-      .metric(perfmon.metric("java.lang", "jvm.mp_used", "Memory pool ${ATTR.name} usage", "B")),
-    zorka.query("java", "java.lang:type=MemoryPool,*", "type", "name").get("Usage")
-      .metric(perfmon.util("java.lang", "jvm.mp_util", "Memory pool ${ATTR.name} utilization", "%", "used", "max")),
+      .metric(perfmon.metric("java.lang", "jvm.mp.used", "Memory pool ${ATTR.name} usage", "B")),
     zorka.query("java", "java.lang:type=MemoryPool,*", "type", "name").get("Usage").get("max")
-      .metric(perfmon.metric("java.lang", "jvm.mp_max", "Memory pool ${ATTR.name} limit", "B").divide(1048576)),
+      .metric(perfmon.metric("java.lang", "jvm.mp.max", "Memory pool ${ATTR.name} limit", "B").divide(1048576)),
 
     // Garbage Collectors
     zorka.query("java", "java.lang:type=GarbageCollector,*", "type", "name").get("CollectionCount")
-      .metric(perfmon.timedDelta("java.lang", "jvm.gc_cycles", "GC cycle frequency", "cycles/min").divide(1000).multiply(60)),
+      .metric(perfmon.metric("java.lang", "jvm.gc.cycles", "GC cycle frequency", "cycles")),
     zorka.query("java", "java.lang:type=GarbageCollector,*", "type", "name").get("CollectionTime")
-      .metric(perfmon.timedDelta("java.lang", "jvm.gc_util", "GC CPU time", "%CPU").divide(10)),
+      .metric(perfmon.metric("java.lang", "jvm.gc.util", "GC CPU time", "ms")),
 
     // Threading
     zorka.query("java", "java.lang:type=Threading", "type").get("ThreadCount")
-      .metric(perfmon.metric("java.lang", "jvm.threads", "JVM threads total", "threads")),
+      .metric(perfmon.metric("java.lang", "jvm.threads.total", "JVM threads total", "threads")),
     zorka.query("java", "java.lang:type=Threading", "type").get("DaemonThreadCount")
-      .metric(perfmon.metric("java.lang", "jvm.threads_deamon", "JVM daemon threads", "threads")),
+      .metric(perfmon.metric("java.lang", "jvm.threads.deamon", "JVM daemon threads", "threads")),
     zorka.query("java", "java.lang:type=Threading", "type").get("TotalStartedThreadCount")
-      .metric(perfmon.timedDelta("java.lang", "jvm.threads_new", "JVM threads creation", "threads/min").multiply(60)),
-    zorka.query("java", "java.lang:type=Threading", "type").get("CurrentThreadCpuTime")
-      .metric(perfmon.timedDelta("java.lang", "thread.cpu_util", "JVM threads creation", "%").divide(10)),
+      .metric(perfmon.metric("java.lang", "jvm.threads.new", "JVM threads creation", "threads")),
 
     // Class Loaders
     zorka.query("java", "java.lang:type=ClassLoading", "type").get("LoadedClassCount")
       .metric(perfmon.metric("java.lang", "jvm.class_count", "Loaded Class Count", "classes")),
     zorka.query("java", "java.lang:type=ClassLoading", "type").get("UnloadedClassCount")
-      .metric(perfmon.timedDelta("java.lang", "jvm.class_unloads", "Unloaded Classes", "cl/min").multiply(60)),
+      .metric(perfmon.metric("java.lang", "jvm.class_unloads", "Unloaded Classes", "cl/min")),
     zorka.query("java", "java.lang:type=ClassLoading", "type").get("TotalLoadedClassCount")
-      .metric(perfmon.timedDelta("java.lang", "jvm.class_loads", "Loaded Classes", "cl/min").multiply(60)),
+      .metric(perfmon.metric("java.lang", "jvm.class_loads", "Loaded Classes", "cl/min")),
     zorka.query("java", "java.lang:type=Compilation", "type").get("TotalCompilationTime")
-      .metric(perfmon.timedDelta("java.lang", "jvm.jit_util", "JIT Compilator CPU utilization", "%CPU").divide(10)),
+      .metric(perfmon.metric("java.lang", "jvm.jit_util", "JIT Compilator CPU utilization", "ns")),
 
     // Memory Heap
     zorka.query("java", "java.lang:type=Memory", "type").get("HeapMemoryUsage").get("used")
@@ -77,13 +73,11 @@ __metrics() {
 
     // Operating System, Runtime
     zorka.query("java", "java.lang:type=OperatingSystem", "type").get("OpenFileDescriptorCount")
-      .metric(perfmon.metric("java.lang", "jvm.fd_open", "File Descriptors Open", "fd")),
+      .metric(perfmon.metric("java.lang", "jvm.fd.open", "File Descriptors Open", "fd")),
     zorka.query("java", "java.lang:type=OperatingSystem", "type").get("MaxFileDescriptorCount")
-      .metric(perfmon.metric("java.lang", "jvm.fd_max", "Maximum File Descriptors", "fd")),
+      .metric(perfmon.metric("java.lang", "jvm.fd.max", "Maximum File Descriptors", "fd")),
     zorka.query("java", "java.lang:type=OperatingSystem", "type").get("ProcessCpuTime")
-      .metric(perfmon.timedDelta("java.lang", "jvm.cpu_util", "JVM process CPU utilization", "%").divide(1000000)),
-    //zorka.query("java", "java.lang:type=OperatingSystem", "type").get("CommitedVirtualMemorySize")
-    //  .metric(perfmon.metric("java.lang", "jvm.vm_size", "Commited Virtual Memory", "B")),
+      .metric(perfmon.metric("java.lang", "jvm.cpu.time", "JVM process CPU time", "ns")),
     zorka.query("java", "java.lang:type=OperatingSystem", "type").get("ProcessCpuLoad")
       .metric(perfmon.metric("java.lang", "jvm.load", "JVM Process CPU Load", ".")),
     zorka.query("java", "java.lang:type=Runtime", "type").get("Uptime")
@@ -97,16 +91,16 @@ __metrics() {
   _zorkaStatsScanner = perfmon.scanner("ZORKA_STATS",
     zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
       .listAs("**", "section").listAs("**", "tag").get("calls")
-      .metric(perfmon.timedDelta("zorka", "calls", "Calls", "calls/min").multiply(60)),
+      .metric(perfmon.metric("zorka", "stats.calls", "Calls", "calls total")),
+    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
+      .listAs("**", "section").listAs("**", "tag").get("time")
+      .metric(perfmon.metric("zorka", "stats.time", "Time", "ns")),
     zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
       .listAs("**", "section").listAs("**", "tag").get("errors")
-      .metric(perfmon.timedDelta("zorka", "errors", "Errors", "err/min").multiply(60)),
-    zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
-      .listAs("**", "section").listAs("**", "tag").get("maxTimeCLR")
-      .metric(perfmon.metric("zorka", "peak", "Peak time", "s").multiply(0.001)),
+      .metric(perfmon.metric("zorka", "stats.errors", "Errors", "err total")),
     zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
       .listAs("**", "section").listAs("**", "tag")
-      .metric(perfmon.rate("zorka", "avg", "Average time", "s", "time", "calls").multiply(0.001)));
+      .metric(perfmon.rate("zorka", "stats.avg", "Average time", "s", "time", "calls")));
 
   _zorkaStatsScanner.setAttachResults(true);
   zorka.schedule(_zorkaStatsScanner, _interval, _delay);
