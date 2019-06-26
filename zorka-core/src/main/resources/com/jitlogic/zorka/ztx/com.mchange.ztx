@@ -1,4 +1,0 @@
-com.mchange.v2.c3p0.impl
- NewProxyResultSet
-  getLong|(I)J
-  next|()Z

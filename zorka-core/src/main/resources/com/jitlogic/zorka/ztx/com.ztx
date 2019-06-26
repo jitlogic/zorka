@@ -1,0 +1,38 @@
+com.businessobjects.foundation.logging.log4j
+ Log4jLogger
+  assertNotNull|(Ljava/lang/Object;Ljava/lang/String;)V
+  assertTrue|(ZLjava/lang/String;)V
+com.certicom.security.asn1
+ DERDefiniteLengthInputStream
+  available|()I
+  read|([BII)I
+com.germinus.easyconf|ComponentProperties|getString|(Ljava/lang/String;)Ljava/lang/String;
+com.hazelcast.impl.partition|PartitionInfo|getReplicaAddress|(I)Lcom/hazelcast/nio/Address;
+com.hazelcast.nio|FastByteArrayOutputStream|write|(I)V
+com.hazelcast.util
+ Clock
+  currentTimeMillis|()J
+ ThreadWatcher
+  addWait|(JJ)V
+  incrementRunCount|()J
+com.mchange.v2.c3p0.impl
+ NewProxyResultSet
+  getLong|(I)J
+  next|()Z
+com.octetstring.vde|Entry|get|(Lcom/octetstring/vde/syntax/DirectoryString;)Ljava/util/Vector;
+com.octetstring.vde.backend.standard|KeyPtr|compareTo|(Lcom/octetstring/vde/backend/standard/KeyPtr;)I
+com.octetstring.vde.syntax|DirectoryString|indexOf|(Lcom/octetstring/vde/syntax/DirectoryString;)I
+com.oracle.jrockit.jfr
+ DurationEvent
+  begin|()V
+  end|()V
+ InstantEvent
+  commit|()V
+  shouldWrite|()Z
+ TimedEvent
+  shouldWrite|()Z
+com.werken.saxpath
+ XPathLexer
+  nextToken|()Lcom/werken/saxpath/Token;
+ XPathReader
+  parse|(Ljava/lang/String;)V

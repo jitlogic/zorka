@@ -1,3 +1,0 @@
-com.octetstring.vde|Entry|get|(Lcom/octetstring/vde/syntax/DirectoryString;)Ljava/util/Vector;
-com.octetstring.vde.backend.standard|KeyPtr|compareTo|(Lcom/octetstring/vde/backend/standard/KeyPtr;)I
-com.octetstring.vde.syntax|DirectoryString|indexOf|(Lcom/octetstring/vde/syntax/DirectoryString;)I

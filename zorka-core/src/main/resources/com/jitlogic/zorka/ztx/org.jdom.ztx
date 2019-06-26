@@ -1,2 +1,0 @@
-org.jdom|Verifier|isXMLCharacter|(I)Z
-org.jdom.output|Format$DefaultEscapeStrategy|shouldEscape|(C)Z

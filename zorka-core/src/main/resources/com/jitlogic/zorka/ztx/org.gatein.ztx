@@ -1,7 +1,0 @@
-org.gatein.common.text
- CharToByteEncoder$Generic
-  encode|(C)[B
- TextTools
-  isAlphaNumeric|(C)Z
-  toHex|(I)C
-org.gatein.pc.portlet.impl.jsr168|ContentBuffer$ClosableOutputStream|write|(I)V

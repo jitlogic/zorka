@@ -1,0 +1,214 @@
+org.LatencyUtils
+ TimeCappedMovingAverageIntervalEstimator
+  recordInterval|(J)V
+ TimeServices
+  nanoTime|()J
+org.antlr.runtime
+ ANTLRStringStream
+  LA|(I)I
+ BitSet
+  lengthInLongWords|()I
+ BufferedTokenStream
+  LA|(I)I
+  reset|()V
+ CommonTokenStream
+  LT|(I)Lorg/antlr/runtime/Token;
+org.bouncycastle.crypto.digests
+ GeneralDigest
+  finish|()V
+  reset|()V
+  update
+   (B)V
+   ([BII)V
+ SHA1Digest
+  doFinal|([BI)I
+  reset
+   ()V
+   (Lorg/bouncycastle/util/Memoable;)V
+org.bouncycastle.crypto.macs
+ HMac
+  doFinal|([BI)I
+  update|([BII)V
+org.bouncycastle.crypto.util|Pack|intToBigEndian|(I[BI)V
+org.castor.core.util
+ CycleBreaker
+  releaseCycleHandle|(Ljava/lang/Object;)V
+  startingToCycle|(Ljava/lang/Object;)Z
+org.eclipse.jetty.server
+ HttpOutput
+  write|([BII)V
+ Response
+  isAllContentWritten|(J)Z
+org.eclipse.jetty.util
+ BufferUtil
+  fill|(Ljava/nio/ByteBuffer;[BII)I
+  flipToFill|(Ljava/nio/ByteBuffer;)I
+  flipToFlush|(Ljava/nio/ByteBuffer;I)V
+  hasContent|(Ljava/nio/ByteBuffer;)Z
+  isEmpty|(Ljava/nio/ByteBuffer;)Z
+  isFull|(Ljava/nio/ByteBuffer;)Z
+  length|(Ljava/nio/ByteBuffer;)I
+org.eclipse.osgi.internal.resolver|ExportPackageDescriptionImpl|setDirective|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+org.eclipse.osgi.internal.serviceregistry|ServiceRegistrationImpl|compareTo|(Lorg/eclipse/osgi/internal/serviceregistry/ServiceRegistrationImpl;)I
+org.eclipse.osgi.util
+ ManifestElement
+  getArrayFromList|(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;
+  getAttribute|(Ljava/lang/String;)Ljava/lang/String;
+  getDirective|(Ljava/lang/String;)Ljava/lang/String;
+org.exolab.castor.xml|Namespaces|getNamespaceURI|(Ljava/lang/String;)Ljava/lang/String;
+org.fressian
+ FressianReader
+  readInt|()J
+  readObject|()Ljava/lang/Object;
+ FressianReader$1
+  convertList|([Ljava/lang/Object;)Ljava/util/List;
+org.fressian.impl
+ Fns
+  intCast|(J)I
+  lookup|(Lorg/fressian/handlers/ILookup;Ljava/lang/Object;)Ljava/lang/Object;
+  readUTF8Chars|(Ljava/lang/StringBuffer;[BII)V
+ MapLookup
+  valAt|(Ljava/lang/Object;)Ljava/lang/Object;
+ RawInput
+  readFully|([BII)V
+  readRawByte|()I
+  readRawInt16|()J
+  readRawInt8|()J
+org.gatein.common.text
+ CharToByteEncoder$Generic
+  encode|(C)[B
+ TextTools
+  isAlphaNumeric|(C)Z
+  toHex|(I)C
+org.gatein.pc.portlet.impl.jsr168|ContentBuffer$ClosableOutputStream|write|(I)V
+org.infinispan.commons.configuration.attributes|AttributeDefinition|name|()Ljava/lang/String;
+org.jabsorb.serializer|SerializerState|getProcessedObject|(Ljava/lang/Object;)Lorg/jabsorb/serializer/ProcessedObject;
+org.jasig.cas.client.session
+ HashMapBackedSessionMappingStorage
+  removeBySessionById|(Ljava/lang/String;)V
+ SingleSignOutHttpSessionListener
+  sessionDestroyed|(Ljavax/servlet/http/HttpSessionEvent;)V
+org.jasypt.hibernate3.type
+ AbstractEncryptedAsStringType
+  deepCopy|(Ljava/lang/Object;)Ljava/lang/Object;
+  nullSafeGet|(Ljava/sql/ResultSet;[Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+org.jdom|Verifier|isXMLCharacter|(I)Z
+org.jdom.output|Format$DefaultEscapeStrategy|shouldEscape|(C)Z
+org.jfree.chart.axis|TickUnit|compareTo|(Ljava/lang/Object;)I
+org.jfree.data|DefaultKeyedValues|getIndex|(Ljava/lang/Comparable;)I
+org.jfree.ui|RectangleEdge|isTopOrBottom|(Lorg/jfree/ui/RectangleEdge;)Z
+org.jfree.util|ObjectList|get|(I)Ljava/lang/Object;
+org.jnp.interfaces|FastNamingProperties|getProperty|(Ljava/lang/String;)Ljava/lang/String;
+org.jrobin.core
+ RrdDb
+  createSample
+   ()Lorg/jrobin/core/Sample;
+   (J)Lorg/jrobin/core/Sample;
+  getDsIndex|(Ljava/lang/String;)I
+ RrdDbPool
+  requestRrdDb|(Ljava/lang/String;)Lorg/jrobin/core/RrdDb;
+ RrdFileBackend
+  close|()V
+ Sample
+  setValue|(Ljava/lang/String;D)Lorg/jrobin/core/Sample;
+  update|()V
+ Util
+  equal|(DD)Z
+  fileExists|(Ljava/lang/String;)Z
+  getCanonicalPath|(Ljava/lang/String;)Ljava/lang/String;
+  max|(DD)D
+  normalize|(JJ)J
+  sum|(DD)D
+org.mapdb
+ BTreeMap$1
+  compare
+   (Ljava/lang/Comparable;Ljava/lang/Comparable;)I
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+ DataInput2
+  readUnsignedByte|()I
+  unpackInt|(Ljava/io/DataInput;)I
+ DataOutput2
+  ensureAvail|(I)V
+ LongHashMap
+  longHash|(J)I
+ SerializerBase$FastArrayList
+  add|(Ljava/lang/Object;)V
+ Volume$FileChannelVol
+  getLong|(J)J
+org.mozilla.classfile
+ ClassFileWriter
+  add
+   (I)V
+   (II)V
+  addALoad|(I)V
+  addInvoke|(ILjava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+  addLineNumberEntry|(S)V
+  addLoadConstant|(Ljava/lang/String;)V
+  addPush
+   (I)V
+   (Ljava/lang/String;)V
+  getLabelPC|(I)I
+  markTableSwitchCase|(III)V
+org.mybatis.spring
+ SqlSessionUtils
+  closeSqlSession|(Lorg/apache/ibatis/session/SqlSession;Lorg/apache/ibatis/session/SqlSessionFactory;)V
+  getSqlSession|(Lorg/apache/ibatis/session/SqlSessionFactory;Lorg/apache/ibatis/session/ExecutorType;Lorg/springframework/dao/support/PersistenceExceptionTranslator;)Lorg/apache/ibatis/session/SqlSession;
+  isSqlSessionTransactional|(Lorg/apache/ibatis/session/SqlSession;Lorg/apache/ibatis/session/SqlSessionFactory;)Z
+org.ofbiz.core.entity.model|ModelEntity|getField|(Ljava/lang/String;)Lorg/ofbiz/core/entity/model/ModelField;
+org.osgi.framework
+ FrameworkUtil$FilterImpl
+  match|(Lorg/osgi/framework/ServiceReference;)Z
+  matches|(Ljava/util/Map;)Z
+ FrameworkUtil$ServiceReferenceMap
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ Version
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/osgi/framework/Version;)I
+org.osgi.util.tracker|ServiceTracker$Tracked|serviceChanged|(Lorg/osgi/framework/ServiceEvent;)V
+org.owasp.esapi.codecs
+ PushbackString
+  mark|()V
+  next|()Ljava/lang/Character;
+  reset|()V
+org.primefaces.component.api
+ UIData
+  getClientId|(Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+  getContainerClientId|(Ljavax/faces/context/FacesContext;)Ljava/lang/String;
+org.primefaces.util
+ ComponentUtils
+  getConverter|(Ljavax/faces/context/FacesContext;Ljavax/faces/component/UIComponent;)Ljavax/faces/convert/Converter;
+  isValueBlank|(Ljava/lang/String;)Z
+org.reflext.api.introspection|AnnotationIntrospector$Bluh|leave|(Lorg/reflext/api/ClassTypeInfo;)V
+org.reflext.core|ClassTypeInfoImpl|getDeclaredMethod|(Lorg/reflext/api/MethodSignature;)Lorg/reflext/api/MethodInfo;
+org.reflext.jlr|JavaLangReflectMethodModel|getDeclaredAnnotation|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
+org.richfaces.model
+ ListRowKey
+  depth|()I
+ TreeDataModel
+  locateTreeNode
+   (Lorg/richfaces/model/TreeRowKey;)Ljava/lang/Object;
+   (Lorg/richfaces/model/TreeRowKey;Z)Ljava/lang/Object;
+org.saxpath.helpers
+ XPathReaderFactory
+  createReader
+   ()Lorg/saxpath/XPathReader;
+   (Ljava/lang/String;)Lorg/saxpath/XPathReader;
+org.teiid.query.parser|JavaCharStream|readChar|()C
+org.wildfly.common
+ Assert
+  assertNotNull|(Ljava/lang/Object;)Ljava/lang/Object;
+  checkNotNullParam|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+org.xmlpull.mxp1
+ MXParser
+  getAttributeValue|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+  getNamespace|(Ljava/lang/String;)Ljava/lang/String;
+  next|()I
+  nextToken|()I
+  parseEndTag|()I
+  parseStartTag|()I
+org.xmlpull.v1|XmlSerializer|ignorableWhitespace|(Ljava/lang/String;)V
+org.xnio
+ ByteBufferPool$DefaultCache
+  allocate|()Ljava/nio/ByteBuffer;
+  free|(Ljava/nio/ByteBuffer;)V

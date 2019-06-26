@@ -1,1 +1,0 @@
-org.jabsorb.serializer|SerializerState|getProcessedObject|(Ljava/lang/Object;)Lorg/jabsorb/serializer/ProcessedObject;

@@ -1,4 +1,0 @@
-org.xnio
- ByteBufferPool$DefaultCache
-  allocate|()Ljava/nio/ByteBuffer;
-  free|(Ljava/nio/ByteBuffer;)V

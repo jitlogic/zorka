@@ -1,5 +1,0 @@
-org.saxpath.helpers
- XPathReaderFactory
-  createReader
-   ()Lorg/saxpath/XPathReader;
-   (Ljava/lang/String;)Lorg/saxpath/XPathReader;

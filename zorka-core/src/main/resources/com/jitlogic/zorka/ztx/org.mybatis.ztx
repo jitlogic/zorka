@@ -1,5 +1,0 @@
-org.mybatis.spring
- SqlSessionUtils
-  closeSqlSession|(Lorg/apache/ibatis/session/SqlSession;Lorg/apache/ibatis/session/SqlSessionFactory;)V
-  getSqlSession|(Lorg/apache/ibatis/session/SqlSessionFactory;Lorg/apache/ibatis/session/ExecutorType;Lorg/springframework/dao/support/PersistenceExceptionTranslator;)Lorg/apache/ibatis/session/SqlSession;
-  isSqlSessionTransactional|(Lorg/apache/ibatis/session/SqlSession;Lorg/apache/ibatis/session/SqlSessionFactory;)Z

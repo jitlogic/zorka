@@ -1,4 +1,0 @@
-org.jfree.chart.axis|TickUnit|compareTo|(Ljava/lang/Object;)I
-org.jfree.data|DefaultKeyedValues|getIndex|(Ljava/lang/Comparable;)I
-org.jfree.ui|RectangleEdge|isTopOrBottom|(Lorg/jfree/ui/RectangleEdge;)Z
-org.jfree.util|ObjectList|get|(I)Ljava/lang/Object;

@@ -1,9 +1,0 @@
-org.xmlpull.mxp1
- MXParser
-  getAttributeValue|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
-  getNamespace|(Ljava/lang/String;)Ljava/lang/String;
-  next|()I
-  nextToken|()I
-  parseEndTag|()I
-  parseStartTag|()I
-org.xmlpull.v1|XmlSerializer|ignorableWhitespace|(Ljava/lang/String;)V

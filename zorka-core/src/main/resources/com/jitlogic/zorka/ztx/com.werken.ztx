@@ -1,5 +1,0 @@
-com.werken.saxpath
- XPathLexer
-  nextToken|()Lcom/werken/saxpath/Token;
- XPathReader
-  parse|(Ljava/lang/String;)V

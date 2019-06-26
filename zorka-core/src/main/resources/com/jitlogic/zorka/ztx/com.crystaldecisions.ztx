@@ -1,0 +1,54 @@
+com.crystaldecisions.celib.properties
+ CaseInsensComparator
+  compare|(Ljava/lang/Object;Ljava/lang/Object;)I
+ IDHelper
+  object2Integer|(Ljava/lang/Object;)Ljava/lang/Integer;
+ PropertyBag
+  getItem|(Ljava/lang/Object;)Lcom/crystaldecisions/celib/properties/Property;
+ QBSet$Query
+  addTerm|(Ljava/lang/Integer;Ljava/lang/Object;)V
+com.crystaldecisions.enterprise.ocaframework|FrameworkPropertyBag$1|makeProperty|(Ljava/lang/Integer;Ljava/lang/Object;IILcom/crystaldecisions/celib/properties/PropertyBag;)Lcom/crystaldecisions/celib/properties/Property;
+com.crystaldecisions.thirdparty.com.ooc.CORBA
+ InputStream
+  _OB_codeConverters|(Lcom/crystaldecisions/thirdparty/com/ooc/OB/CodeConverters;Z)V
+  _OB_readEndian|()V
+  _OB_readLongUnchecked|()I
+  read_boolean|()Z
+  read_long|()I
+  read_octet|()B
+  read_octet_array|([BII)V
+  read_short|()S
+  read_string|()Ljava/lang/String;
+  read_ulong|()I
+  read_ushort|()S
+  read_wchar|()C
+ OutputStream
+  write_long|(I)V
+  write_octet|(B)V
+  write_octet_array|([BII)V
+  write_short|(S)V
+  write_ulong|(I)V
+  write_ushort|(S)V
+com.crystaldecisions.thirdparty.com.ooc.OB
+ Assert
+  assertTrue|(Z)V
+ CodeConverter
+  convert_wchar_from|(C)C
+  convert_wchar_to|(C)C
+ ConnectionPoolPolicy_impl
+  policy_type|()I
+ ConnectionReusePolicy_impl
+  policy_type|()I
+ Downcall
+  profileInfo|()Lcom/crystaldecisions/thirdparty/com/ooc/OCI/ProfileInfo;
+ LocalCodeConverter
+  instanceChar|()Lcom/crystaldecisions/thirdparty/com/ooc/OB/LocalCodeConverter;
+  instanceWchar|()Lcom/crystaldecisions/thirdparty/com/ooc/OB/LocalCodeConverter;
+ RetryPolicy_impl
+  policy_type|()I
+ TenantCategoryPolicy_impl
+  policy_type|()I
+com.crystaldecisions.thirdparty.com.ooc.OCI
+ Buffer
+  pos|(I)V
+  realloc|(I)V

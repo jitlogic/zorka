@@ -1,7 +1,0 @@
-org.eclipse.osgi.internal.resolver|ExportPackageDescriptionImpl|setDirective|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
-org.eclipse.osgi.internal.serviceregistry|ServiceRegistrationImpl|compareTo|(Lorg/eclipse/osgi/internal/serviceregistry/ServiceRegistrationImpl;)I
-org.eclipse.osgi.util
- ManifestElement
-  getArrayFromList|(Ljava/lang/String;Ljava/lang/String;)[Ljava/lang/String;
-  getAttribute|(Ljava/lang/String;)Ljava/lang/String;
-  getDirective|(Ljava/lang/String;)Ljava/lang/String;

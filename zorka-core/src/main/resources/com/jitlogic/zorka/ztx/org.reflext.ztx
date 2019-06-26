@@ -1,3 +1,0 @@
-org.reflext.api.introspection|AnnotationIntrospector$Bluh|leave|(Lorg/reflext/api/ClassTypeInfo;)V
-org.reflext.core|ClassTypeInfoImpl|getDeclaredMethod|(Lorg/reflext/api/MethodSignature;)Lorg/reflext/api/MethodInfo;
-org.reflext.jlr|JavaLangReflectMethodModel|getDeclaredAnnotation|(Ljava/lang/reflect/Method;Ljava/lang/Class;)Ljava/lang/annotation/Annotation;
