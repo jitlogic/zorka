@@ -121,6 +121,12 @@ public abstract class Metric implements Serializable {
     }
 
 
+    /**
+     * Returns metric output value at current time
+     * @param clock clock (milliseconds since Epoch)
+     * @param value input (raw) value
+     * @return
+     */
     public abstract Number getValue(long clock, Object value);
 
 

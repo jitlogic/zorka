@@ -16,7 +16,6 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,9 +25,7 @@ import java.util.Map;
  */
 public class TimedDeltaMetric extends RawDeltaMetric {
 
-    /**
-     * Timestamp of last measurement
-     */
+    /** Timestamp of last measurement (nanoseconds since Epoch) */
     private long lastClock;
 
     public TimedDeltaMetric(int id, String name, String description, String domain,
