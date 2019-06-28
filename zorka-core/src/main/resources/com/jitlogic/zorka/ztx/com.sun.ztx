@@ -399,6 +399,8 @@ com.sun.jmx.mbeanserver
   descriptorForElement|(Ljava/lang/reflect/AnnotatedElement;)Ljavax/management/Descriptor;
  JmxMBeanServer
   getAttribute|(Ljavax/management/ObjectName;Ljava/lang/String;)Ljava/lang/Object;
+  getMBeanInfo|(Ljavax/management/ObjectName;)Ljavax/management/MBeanInfo;
+  queryNames|(Ljavax/management/ObjectName;Ljavax/management/QueryExp;)Ljava/util/Set;
  MBeanSupport
   getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
  Repository

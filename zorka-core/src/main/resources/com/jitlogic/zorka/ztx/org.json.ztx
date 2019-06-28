@@ -1,11 +1,17 @@
 org.json
  JSONArray
   get|(I)Ljava/lang/Object;
+  getJSONObject|(I)Lorg/json/JSONObject;
+  getString|(I)Ljava/lang/String;
   join|(Ljava/lang/String;)Ljava/lang/String;
   length|()I
   opt|(I)Ljava/lang/Object;
   put|(Ljava/lang/Object;)Lorg/json/JSONArray;
  JSONObject
+  get|(Ljava/lang/String;)Ljava/lang/Object;
+  getJSONArray|(Ljava/lang/String;)Lorg/json/JSONArray;
+  getString|(Ljava/lang/String;)Ljava/lang/String;
+  has|(Ljava/lang/String;)Z
   keys|()Ljava/util/Iterator;
   numberToString|(Ljava/lang/Number;)Ljava/lang/String;
   opt|(Ljava/lang/String;)Ljava/lang/Object;

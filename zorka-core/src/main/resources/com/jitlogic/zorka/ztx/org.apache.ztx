@@ -1024,34 +1024,195 @@ org.apache.poi.xssf.util
  NumericRanges
   getOverlappingRange|([J[J)[J
   getOverlappingType|([J[J)I
+org.apache.solr.analysis|SolrAnalyzer|getPositionIncrementGap|(Ljava/lang/String;)I
+org.apache.solr.common
+ SolrDocument
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
+  keySet|()Ljava/util/Set;
+  size|()I
+ SolrInputDocument
+  addField
+   (Ljava/lang/String;Ljava/lang/Object;)V
+   (Ljava/lang/String;Ljava/lang/Object;F)V
+  getField|(Ljava/lang/String;)Lorg/apache/solr/common/SolrInputField;
+  getFieldValues|(Ljava/lang/String;)Ljava/util/Collection;
+ SolrInputField
+  addValue|(Ljava/lang/Object;F)V
+  iterator|()Ljava/util/Iterator;
+ SolrInputField$1
+  next|()Ljava/lang/Object;
+org.apache.solr.common.params
+ DefaultSolrParams
+  get|(Ljava/lang/String;)Ljava/lang/String;
+  getParams|(Ljava/lang/String;)[Ljava/lang/String;
+ MapSolrParams
+  get|(Ljava/lang/String;)Ljava/lang/String;
+  getParams|(Ljava/lang/String;)[Ljava/lang/String;
+ ModifiableSolrParams
+  get|(Ljava/lang/String;)Ljava/lang/String;
+  getParams|(Ljava/lang/String;)[Ljava/lang/String;
+  set|(Ljava/lang/String;[Ljava/lang/String;)Lorg/apache/solr/common/params/ModifiableSolrParams;
+ MultiMapSolrParams
+  getParams|(Ljava/lang/String;)[Ljava/lang/String;
+ SolrParams
+  getBool|(Ljava/lang/String;Z)Z
 org.apache.solr.common.util
+ ByteUtils
+  UTF16toUTF8|(Ljava/lang/CharSequence;II[BI)I
+  UTF8toUTF16
+   ([BIILorg/noggit/CharArr;)V
+   ([BII[CI)I
  FastInputStream
+  read|([BII)I
   readByte|()B
+  readFully|([BII)V
  FastOutputStream
-  write|(B)V
+  write
+   (B)V
+   ([BII)V
   writeByte|(I)V
  IteratorChain
+  addIterator|(Ljava/util/Iterator;)V
   next|()Ljava/lang/Object;
+ JavaBinCodec
+  readExternString|(Lorg/apache/solr/common/util/DataInputInputStream;)Ljava/lang/String;
+  readSize|(Lorg/apache/solr/common/util/DataInputInputStream;)I
+  readStr|(Lorg/apache/solr/common/util/DataInputInputStream;)Ljava/lang/String;
+  readVInt|(Lorg/apache/solr/common/util/DataInputInputStream;)I
+  readVal|(Lorg/apache/solr/common/util/DataInputInputStream;)Ljava/lang/Object;
+  writeExternString|(Ljava/lang/String;)V
+  writeKnownType|(Ljava/lang/Object;)Z
+  writePrimitive|(Ljava/lang/Object;)Z
+  writeStr|(Ljava/lang/String;)V
+  writeTag|(BI)V
+  writeVInt|(ILorg/apache/solr/common/util/FastOutputStream;)V
+  writeVal|(Ljava/lang/Object;)V
  NamedList
+  add|(Ljava/lang/String;Ljava/lang/Object;)V
   clone|()Ljava/lang/Object;
+  get
+   (Ljava/lang/String;)Ljava/lang/Object;
+   (Ljava/lang/String;I)Ljava/lang/Object;
   getName|(I)Ljava/lang/String;
+  getVal|(I)Ljava/lang/Object;
+  size|()I
+ StrUtils
+  partialURLEncodeVal|(Ljava/lang/Appendable;Ljava/lang/String;)V
+org.apache.solr.response
+ JSONWriter
+  writeArraySeparator|()V
+  writeFloat|(Ljava/lang/String;Ljava/lang/String;)V
+  writeLong|(Ljava/lang/String;Ljava/lang/String;)V
+  writeMapCloser|()V
+  writeMapOpener|(I)V
+  writeMapSeparator|()V
+  writeSolrDocument|(Ljava/lang/String;Lorg/apache/solr/common/SolrDocument;Lorg/apache/solr/search/ReturnFields;I)V
+  writeStr|(Ljava/lang/String;Ljava/lang/String;Z)V
+ ResponseWriterUtil
+  toSolrDocument|(Lorg/apache/lucene/document/Document;Lorg/apache/solr/schema/IndexSchema;)Lorg/apache/solr/common/SolrDocument;
+ SolrQueryResponse
+  add|(Ljava/lang/String;Ljava/lang/Object;)V
+ TextResponseWriter
+  decLevel|()I
+  incLevel|()I
+  indent|()V
+  toSolrDocument|(Lorg/apache/lucene/document/Document;)Lorg/apache/solr/common/SolrDocument;
+  writeFloat|(Ljava/lang/String;F)V
+  writeVal|(Ljava/lang/String;Ljava/lang/Object;)V
+org.apache.solr.response.transform|ScoreAugmenter|transform|(Lorg/apache/solr/common/SolrDocument;I)V
 org.apache.solr.schema
+ FieldType
+  checkSchemaField|(Lorg/apache/solr/schema/SchemaField;)V
+  createField|(Lorg/apache/solr/schema/SchemaField;Ljava/lang/Object;F)Lorg/apache/lucene/index/IndexableField;
+  createFields|(Lorg/apache/solr/schema/SchemaField;Ljava/lang/Object;F)Ljava/util/List;
+  toInternal|(Ljava/lang/String;)Ljava/lang/String;
+ FieldType$DefaultAnalyzer$1
+  incrementToken|()Z
+ IndexSchema
+  getCopyFieldsList|(Ljava/lang/String;)Ljava/util/List;
+  getDynamicFieldType|(Ljava/lang/String;)Lorg/apache/solr/schema/FieldType;
+  getFieldOrNull|(Ljava/lang/String;)Lorg/apache/solr/schema/SchemaField;
+  getFieldTypeByName|(Ljava/lang/String;)Lorg/apache/solr/schema/FieldType;
+  isCopyFieldTarget|(Lorg/apache/solr/schema/SchemaField;)Z
  IndexSchema$DynamicReplacement
   matches|(Ljava/lang/String;)Z
  SchemaField
   indexed|()Z
+  multiValued|()Z
+  omitNorms|()Z
+  omitPositions|()Z
+  omitTermFreqAndPositions|()Z
+  storeOffsetsWithPositions|()Z
+  storeTermOffsets|()Z
+  storeTermPositions|()Z
+  storeTermVector|()Z
+  stored|()Z
+ StrField
+  checkSchemaField|(Lorg/apache/solr/schema/SchemaField;)V
+  createFields|(Lorg/apache/solr/schema/SchemaField;Ljava/lang/Object;F)Ljava/util/List;
+ TrieField
+  createField|(Lorg/apache/solr/schema/SchemaField;Ljava/lang/Object;F)Lorg/apache/lucene/index/IndexableField;
+  createFields|(Lorg/apache/solr/schema/SchemaField;Ljava/lang/Object;F)Ljava/util/List;
+  toObject|(Lorg/apache/lucene/index/IndexableField;)Ljava/lang/Object;
+  write|(Lorg/apache/solr/response/TextResponseWriter;Ljava/lang/String;Lorg/apache/lucene/index/IndexableField;)V
 org.apache.solr.search
+ BitDocSet
+  addUnique|(I)V
+  exists|(I)Z
+ BitDocSet$2
+  getDocIdSet|(Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/DocIdSet;
+ BitDocSet$2$1
+  bits|()Lorg/apache/lucene/util/Bits;
+  iterator|()Lorg/apache/lucene/search/DocIdSetIterator;
  BitDocSet$2$1$1
+  advance|(I)I
   cost|()J
+  nextDoc|()I
  BitDocSet$2$1$2
   get|(I)Z
  DocSetCollector
+  acceptsDocsOutOfOrder|()Z
   collect|(I)V
+ DocSlice$1
+  nextDoc|()I
+  score|()F
+ LRUCache
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+  put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+ SolrIndexSearcher
+  cacheLookup|(Ljava/lang/String;Ljava/lang/Object;)Ljava/lang/Object;
+  doc|(ILjava/util/Set;)Lorg/apache/lucene/document/Document;
+  maxDoc|()I
+ SolrIndexSearcher$SetNonLazyFieldSelector
+  longField|(Lorg/apache/lucene/index/FieldInfo;J)V
+  needsField|(Lorg/apache/lucene/index/FieldInfo;)Lorg/apache/lucene/index/StoredFieldVisitor$Status;
+ SolrReturnFields
+  wantsField|(Ljava/lang/String;)Z
+ SortedIntDocSet
+  iterator|()Lorg/apache/solr/search/DocIterator;
  SortedIntDocSet$1
   next|()Ljava/lang/Integer;
+  nextDoc|()I
+org.apache.solr.servlet|SolrRequestParsers$2|read|()I
 org.apache.solr.spelling|WordBreakSolrSpellChecker|getSuggestions|(Lorg/apache/solr/spelling/SpellingOptions;)Lorg/apache/solr/spelling/SpellingResult;
 org.apache.solr.update|LoggingInfoStream|isEnabled|(Ljava/lang/String;)Z
-org.apache.solr.util|FastWriter|write|(C)V
+org.apache.solr.util
+ ConcurrentLRUCache
+  get|(Ljava/lang/Object;)Ljava/lang/Object;
+ ConcurrentLRUCache$CacheEntry
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/apache/solr/util/ConcurrentLRUCache$CacheEntry;)I
+ FastWriter
+  write
+   (C)V
+   (I)V
+   (Ljava/lang/String;II)V
+org.apache.solr.util.stats
+ EWMA
+  tick|()V
+  update|(J)V
 org.apache.taglibs.standard.tlv
  JstlCoreTLV$Handler
   characters|([CII)V

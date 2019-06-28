@@ -165,6 +165,7 @@ org.alfresco.repo.dictionary
   getAspect|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AspectDefinition;
   getClass|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/ClassDefinition;
   getDataType|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/DataTypeDefinition;
+  getModel|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/repo/dictionary/CompiledModel;
   getModelsForUri|(Ljava/lang/String;)Ljava/util/List;
   getNamespaceURI|(Ljava/lang/String;)Ljava/lang/String;
   getPrefixes|(Ljava/lang/String;)Ljava/util/Collection;
@@ -182,6 +183,7 @@ org.alfresco.repo.dictionary
   getAspect|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AspectDefinition;
   getAssociations|(Lorg/alfresco/service/namespace/QName;)Ljava/util/Collection;
   getClass|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/ClassDefinition;
+  getDataTypes|(Lorg/alfresco/service/namespace/QName;)Ljava/util/Collection;
   getMessage|(Ljava/lang/String;Ljava/util/Locale;)Ljava/lang/String;
   getProperty
    (Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
@@ -191,7 +193,9 @@ org.alfresco.repo.dictionary
  DictionaryDAOImpl
   getAspect|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/AspectDefinition;
   getClass|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/ClassDefinition;
+  getCompiledModel|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/repo/dictionary/CompiledModel;
   getConstraints|(Lorg/alfresco/service/namespace/QName;Z)Ljava/util/Collection;
+  getDataTypes|(Lorg/alfresco/service/namespace/QName;)Ljava/util/Collection;
   getDictionaryRegistry|(Ljava/lang/String;)Lorg/alfresco/repo/dictionary/DictionaryRegistry;
   getNamespaceURI|(Ljava/lang/String;)Ljava/lang/String;
   getPrefixes|(Ljava/lang/String;)Ljava/util/Collection;
@@ -429,12 +433,33 @@ org.alfresco.repo.policy
   invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
  PolicyFactory$NOOPHandler
   invoke|(Ljava/lang/Object;Ljava/lang/reflect/Method;[Ljava/lang/Object;)Ljava/lang/Object;
+org.alfresco.repo.search.impl
+ QueryParserUtils
+  expandQName|(Ljava/lang/String;Lorg/alfresco/service/namespace/NamespacePrefixResolver;Ljava/lang/String;)Ljava/lang/String;
+  matchPropertyDefinition|(Ljava/lang/String;Lorg/alfresco/service/namespace/NamespacePrefixResolver;Lorg/alfresco/service/cmr/dictionary/DictionaryService;Ljava/lang/String;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
 org.alfresco.repo.search.impl.lucene.analysis
  MLAnalayser$MLTokenizer
   incrementToken|()Z
  MLTokenDuplicator
   buildIterator|(Lorg/apache/lucene/analysis/Token;)Ljava/util/Iterator;
+  end|()V
   incrementToken|()Z
+ PathTokenFilter
+  end|()V
+  incrementToken|()Z
+  next|()Lorg/apache/lucene/analysis/Token;
+  reset|()V
+org.alfresco.repo.search.impl.parsers
+ FTSLexer
+  emit|(Lorg/antlr/runtime/Token;)V
+  mTokens|()V
+  nextToken|()Lorg/antlr/runtime/Token;
+  nextTokenImpl|()Lorg/antlr/runtime/Token;
+ FTSParser
+  fieldReference|()Lorg/alfresco/repo/search/impl/parsers/FTSParser$fieldReference_return;
+  identifier|()Lorg/alfresco/repo/search/impl/parsers/FTSParser$identifier_return;
+ FTSParser$DFA17
+  specialStateTransition|(ILorg/antlr/runtime/IntStream;)I
 org.alfresco.repo.security.authentication
  AuthenticatedAuthenticationPassthroughProvider
   authenticate|(Lnet/sf/acegisecurity/Authentication;)Lnet/sf/acegisecurity/Authentication;
@@ -556,6 +581,7 @@ org.alfresco.service.namespace
    (Ljava/lang/String;Ljava/lang/String;Lorg/alfresco/service/namespace/NamespacePrefixResolver;)Lorg/alfresco/service/namespace/QName;
    (Ljava/lang/String;Lorg/alfresco/service/namespace/NamespacePrefixResolver;)Lorg/alfresco/service/namespace/QName;
   createValidLocalName|(Ljava/lang/String;)Ljava/lang/String;
+  resolveToQName|(Lorg/alfresco/service/namespace/NamespacePrefixResolver;Ljava/lang/String;)Lorg/alfresco/service/namespace/QName;
   resolveToQNameString|(Lorg/alfresco/service/namespace/NamespacePrefixResolver;Ljava/lang/String;)Ljava/lang/String;
   toPrefixString
    ()Ljava/lang/String;
@@ -563,18 +589,43 @@ org.alfresco.service.namespace
  QNameMap
   get|(Ljava/lang/Object;)Ljava/lang/Object;
   put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-org.alfresco.solr|InformationServer|reindexNodeByQuery|(Ljava/lang/String;)V
+org.alfresco.solr
+ AlfrescoSolrDataModel
+  getDictionaryService|(Ljava/lang/String;)Lorg/alfresco/repo/dictionary/DictionaryComponent;
+  getIndexedFieldNamesForProperty|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/solr/AlfrescoSolrDataModel$IndexedField;
+  getPropertyDefinition|(Lorg/alfresco/service/namespace/QName;)Lorg/alfresco/service/cmr/dictionary/PropertyDefinition;
+  getTransactionDocumentId|(Ljava/lang/Long;)Ljava/lang/String;
+ AlfrescoSolrDataModel$IndexedField
+  addField|(Ljava/lang/String;ZZ)V
+ BoundedDeque
+  add|(Ljava/lang/Object;)V
+ InformationServer
+  reindexNodeByQuery|(Ljava/lang/String;)V
+ SolrInformationServer
+  isInIndex|(Ljava/lang/String;)Z
+org.alfresco.solr.client
+ SOLRAPIClient$SOLRDeserializer
+  deserializeValue|(Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
+ SOLRAPIClient$SOLRTypeConverter
+  convert|(Ljava/lang/Class;Ljava/lang/Object;)Ljava/lang/Object;
+ SOLRAPIClient$SOLRTypeConverter$10
+  convert
+   (Ljava/lang/Object;)Ljava/lang/Object;
+   (Ljava/lang/String;)Lorg/alfresco/service/namespace/QName;
 org.alfresco.solr.query
  AbstractAuthoritySetQuery$AllAccessCollector
   collect|(I)V
  AbstractSolrCachingScorer
   docID|()I
   freq|()I
+  nextDoc|()I
  AbstractStructuredFieldPosition
   linkSelf|()Z
   matchesAll|()Z
  AnyStructuredFieldPosition
   matches|(III)I
+ BitsFilter
+  getDocIdSet|(Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/DocIdSet;
  CachingTermPositions
   advance|(I)I
   docID|()I
@@ -582,6 +633,8 @@ org.alfresco.solr.query
   nextDoc|()I
   nextPosition|()I
   reset|()V
+ DocValuesCache
+  getNumericDocValues|(Ljava/lang/String;Lorg/apache/lucene/index/AtomicReader;)Lorg/apache/lucene/index/NumericDocValues;
  DocValuesCache$IntValues
   get|(I)J
  HybridBitSet
@@ -592,6 +645,7 @@ org.alfresco.solr.query
   linkSelf|()Z
   matches|(III)I
  SolrAuthoritySetQuery$BitsFilterCollector
+  acceptsDocsOutOfOrder|()Z
   collect|(I)V
  SolrContainerScorer
   advance|(I)I
@@ -601,10 +655,16 @@ org.alfresco.solr.query
   score|()F
  SolrPathQuery$StructuredFieldWeight
   explain|(Lorg/apache/lucene/index/AtomicReaderContext;I)Lorg/apache/lucene/search/Explanation;
+  scorer|(Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/Scorer;
  SolrPathScorer
   advance|(I)I
+  createPathScorer|(Lorg/alfresco/solr/query/SolrPathQuery;Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/search/Weight;Lorg/alfresco/service/cmr/dictionary/DictionaryService;Z)Lorg/alfresco/solr/query/SolrPathScorer;
   nextDoc|()I
   score|()F
+org.alfresco.solr.tracker
+ TrackerStats$Bucket
+  error|()D
+  mergeError|(Lorg/alfresco/solr/tracker/TrackerStats$Bucket;)D
 org.alfresco.traitextender
  ExtenderImpl
   getExtension|(Lorg/alfresco/traitextender/Extensible;Lorg/alfresco/traitextender/ExtensionPoint;)Ljava/lang/Object;
@@ -623,6 +683,10 @@ org.alfresco.util
   debug|(Ljava/lang/Object;)V
  LogTee
   debug|(Ljava/lang/Object;Ljava/lang/Throwable;)V
+ NumericEncoder
+  encode
+   (J)Ljava/lang/String;
+   (Ljava/lang/Long;)Ljava/lang/String;
  ParameterCheck
   mandatory|(Ljava/lang/String;Ljava/lang/Object;)V
  PathMapper

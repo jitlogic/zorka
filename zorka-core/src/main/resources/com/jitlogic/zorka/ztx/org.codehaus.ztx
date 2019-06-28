@@ -105,6 +105,7 @@ org.codehaus.jackson.impl
 org.codehaus.jackson.io
  NumberInput
   parseInt|([CII)I
+  parseLong|([CII)J
  NumberOutput
   outputInt|(I[BI)I
   outputLong|(J[BI)I
@@ -162,4 +163,5 @@ org.codehaus.jackson.util
  BufferRecycler
   releaseByteBuffer|(Lorg/codehaus/jackson/util/BufferRecycler$ByteBufferType;[B)V
  TextBuffer
+  emptyAndGetCurrentSegment|()[C
   resetWithShared|([CII)V

@@ -1,13 +1,44 @@
 org.apache.lucene.analysis
  Analyzer
-  getOffsetGap|(Lorg/apache/lucene/document/Fieldable;)I
+  getOffsetGap
+   (Ljava/lang/String;)I
+   (Lorg/apache/lucene/document/Fieldable;)I
+  getPositionIncrementGap|(Ljava/lang/String;)I
+  tokenStream
+   (Ljava/lang/String;Ljava/io/Reader;)Lorg/apache/lucene/analysis/TokenStream;
+   (Ljava/lang/String;Ljava/lang/String;)Lorg/apache/lucene/analysis/TokenStream;
+ Analyzer$GlobalReuseStrategy
+  getReusableComponents|(Lorg/apache/lucene/analysis/Analyzer;Ljava/lang/String;)Lorg/apache/lucene/analysis/Analyzer$TokenStreamComponents;
+ AnalyzerWrapper
+  getOffsetGap|(Ljava/lang/String;)I
+  getPositionIncrementGap|(Ljava/lang/String;)I
+  initReader|(Ljava/lang/String;Ljava/io/Reader;)Ljava/io/Reader;
  CharArrayMap
   containsKey|(Ljava/lang/CharSequence;)Z
   put|([CLjava/lang/Object;)Ljava/lang/Object;
+ DelegatingAnalyzerWrapper$DelegatingReuseStrategy
+  getReusableComponents|(Lorg/apache/lucene/analysis/Analyzer;Ljava/lang/String;)Lorg/apache/lucene/analysis/Analyzer$TokenStreamComponents;
+ NumericTokenStream
+  incrementToken|()Z
+  reset|()V
+  setLongValue|(J)Lorg/apache/lucene/analysis/NumericTokenStream;
+ NumericTokenStream$NumericTermAttributeImpl
+  clear|()V
+  fillBytesRef|()V
+  incShift|()I
+  init|(JIII)V
  ReusableStringReader
+  close|()V
   read
    ()I
    ([CII)I
+ TokenStream
+  close|()V
+  end|()V
+  reset|()V
+ Tokenizer
+  close|()V
+  reset|()V
 org.apache.lucene.analysis.core|LowerCaseFilter|incrementToken|()Z
 org.apache.lucene.analysis.en
  EnglishPossessiveFilter
@@ -55,10 +86,13 @@ org.apache.lucene.analysis.standard
   getText|(Lorg/apache/lucene/analysis/tokenattributes/CharTermAttribute;)V
   yychar|()I
   yylength|()I
+  yyreset|(Ljava/io/Reader;)V
 org.apache.lucene.analysis.synonym|SynonymMap$Builder|build|()Lorg/apache/lucene/analysis/synonym/SynonymMap;
 org.apache.lucene.analysis.tokenattributes
  CharTermAttributeImpl
   append
+   (Ljava/lang/CharSequence;)Lorg/apache/lucene/analysis/tokenattributes/CharTermAttribute;
+   (Ljava/lang/CharSequence;II)Lorg/apache/lucene/analysis/tokenattributes/CharTermAttribute;
    (Ljava/lang/String;)Lorg/apache/lucene/analysis/tokenattributes/CharTermAttribute;
    (Ljava/lang/StringBuilder;)Lorg/apache/lucene/analysis/tokenattributes/CharTermAttribute;
   buffer|()[C
@@ -75,6 +109,7 @@ org.apache.lucene.analysis.tokenattributes
   clear|()V
  OffsetAttributeImpl
   clear|()V
+  endOffset|()I
  PackedTokenAttributeImpl
   clear|()V
   clone
@@ -103,10 +138,32 @@ org.apache.lucene.analysis.util
 org.apache.lucene.codecs
  BlockTermState
   copyFrom|(Lorg/apache/lucene/index/TermState;)V
+ DocValuesConsumer$1$1
+  next|()Ljava/lang/Number;
+ DocValuesConsumer$10$1
+  next
+   ()Ljava/lang/Number;
+   ()Ljava/lang/Object;
+ DocValuesConsumer$6$1
+  next|()Ljava/lang/Number;
+ DocValuesConsumer$8$1
+  next|()Ljava/lang/Number;
+ DocValuesConsumer$9$1
+  next|()Ljava/lang/Number;
  MappingMultiDocsAndPositionsEnum
   freq|()I
   nextDoc|()I
   nextPosition|()I
+ MappingMultiDocsEnum
+  freq|()I
+  nextDoc|()I
+ MultiLevelSkipListReader
+  init|(JI)V
+  skipTo|(I)I
+ MultiLevelSkipListReader$SkipBuffer
+  readByte|()B
+ MultiLevelSkipListWriter
+  bufferSkip|(I)V
 org.apache.lucene.codecs.blocktree
  BlockTreeTermsReader
   terms|(Ljava/lang/String;)Lorg/apache/lucene/index/Terms;
@@ -119,6 +176,7 @@ org.apache.lucene.codecs.blocktree
   freeze|([Lorg/apache/lucene/util/fst/Builder$UnCompiledNode;ILorg/apache/lucene/util/IntsRef;)V
  FieldReader
   iterator|(Lorg/apache/lucene/index/TermsEnum;)Lorg/apache/lucene/index/TermsEnum;
+  ramBytesUsed|()J
  IntersectTermsEnum
   next|()Lorg/apache/lucene/util/BytesRef;
   seekExact|(J)V
@@ -128,25 +186,50 @@ org.apache.lucene.codecs.blocktree
   nextNonLeaf|()Z
  SegmentTermsEnum
   docFreq|()I
+  docs|(Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/index/DocsEnum;I)Lorg/apache/lucene/index/DocsEnum;
+  docsAndPositions|(Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/index/DocsAndPositionsEnum;I)Lorg/apache/lucene/index/DocsAndPositionsEnum;
   next|()Lorg/apache/lucene/util/BytesRef;
   ord|()J
-  seekExact|(Lorg/apache/lucene/util/BytesRef;)Z
+  seekCeil|(Lorg/apache/lucene/util/BytesRef;)Lorg/apache/lucene/index/TermsEnum$SeekStatus;
+  seekExact
+   (Lorg/apache/lucene/util/BytesRef;)Z
+   (Lorg/apache/lucene/util/BytesRef;Lorg/apache/lucene/index/TermState;)V
+  term|()Lorg/apache/lucene/util/BytesRef;
+  termState|()Lorg/apache/lucene/index/TermState;
+  totalTermFreq|()J
  SegmentTermsEnumFrame
   decodeMetaData|()V
   next|()Z
   nextLeaf|()Z
   nextNonLeaf|()Z
   scanToFloorFrame|(Lorg/apache/lucene/util/BytesRef;)V
+  scanToSubBlock|(J)V
   scanToTerm|(Lorg/apache/lucene/util/BytesRef;Z)Lorg/apache/lucene/index/TermsEnum$SeekStatus;
   scanToTermLeaf|(Lorg/apache/lucene/util/BytesRef;Z)Lorg/apache/lucene/index/TermsEnum$SeekStatus;
+  scanToTermNonLeaf|(Lorg/apache/lucene/util/BytesRef;Z)Lorg/apache/lucene/index/TermsEnum$SeekStatus;
+org.apache.lucene.codecs.compressing
+ CompressingStoredFieldsReader
+  visitDocument|(ILorg/apache/lucene/index/StoredFieldVisitor;)V
+ CompressingStoredFieldsWriter
+  finishDocument|()V
+  startDocument|()V
+  writeField|(Lorg/apache/lucene/index/FieldInfo;Lorg/apache/lucene/index/IndexableField;)V
+ CompressionMode$4
+  decompress|(Lorg/apache/lucene/store/DataInput;IIILorg/apache/lucene/util/BytesRef;)V
+ LZ4
+  decompress|(Lorg/apache/lucene/store/DataInput;I[BI)I
 org.apache.lucene.codecs.lucene40
  BitVector
   get|(I)Z
+ Lucene40LiveDocsFormat
+  files|(Lorg/apache/lucene/index/SegmentCommitInfo;Ljava/util/Collection;)V
  Lucene40TermVectorsWriter
   finish|(Lorg/apache/lucene/index/FieldInfos;I)V
 org.apache.lucene.codecs.lucene41
  Lucene41PostingsReader
   decodeTerm|([JLorg/apache/lucene/store/DataInput;Lorg/apache/lucene/index/FieldInfo;Lorg/apache/lucene/codecs/BlockTermState;Z)V
+  docs|(Lorg/apache/lucene/index/FieldInfo;Lorg/apache/lucene/codecs/BlockTermState;Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/index/DocsEnum;I)Lorg/apache/lucene/index/DocsEnum;
+  docsAndPositions|(Lorg/apache/lucene/index/FieldInfo;Lorg/apache/lucene/codecs/BlockTermState;Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/index/DocsAndPositionsEnum;I)Lorg/apache/lucene/index/DocsAndPositionsEnum;
   newTermState|()Lorg/apache/lucene/codecs/BlockTermState;
  Lucene41PostingsReader$BlockDocsAndPositionsEnum
   advance|(I)I
@@ -158,8 +241,13 @@ org.apache.lucene.codecs.lucene41
   nextPosition|()I
   reset|(Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/codecs/lucene41/Lucene41PostingsWriter$IntBlockTermState;)Lorg/apache/lucene/index/DocsAndPositionsEnum;
  Lucene41PostingsReader$BlockDocsEnum
+  advance|(I)I
+  canReuse|(Lorg/apache/lucene/store/IndexInput;Lorg/apache/lucene/index/FieldInfo;)Z
+  cost|()J
   docID|()I
+  freq|()I
   nextDoc|()I
+  reset|(Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/codecs/lucene41/Lucene41PostingsWriter$IntBlockTermState;I)Lorg/apache/lucene/index/DocsEnum;
  Lucene41PostingsReader$EverythingEnum
   nextPosition|()I
  Lucene41PostingsWriter
@@ -173,42 +261,96 @@ org.apache.lucene.codecs.lucene41
   startDoc|(II)V
   startTerm|()V
  Lucene41PostingsWriter$IntBlockTermState
+  clone
+   ()Lorg/apache/lucene/codecs/lucene41/Lucene41PostingsWriter$IntBlockTermState;
+   ()Lorg/apache/lucene/index/TermState;
   copyFrom|(Lorg/apache/lucene/index/TermState;)V
+ Lucene41SkipReader
+  init|(JJJJI)V
  Lucene41SkipWriter
+  initSkip|()V
   resetSkip|()V
 org.apache.lucene.codecs.lucene410
+ Lucene410Codec
+  liveDocsFormat|()Lorg/apache/lucene/codecs/LiveDocsFormat;
  Lucene410DocValuesProducer$1
   get|(J)J
  Lucene410DocValuesProducer$3
   get|(J)J
+ Lucene410DocValuesProducer$6
+  getOrd|(I)I
  Lucene410DocValuesProducer$8
   lookupTerm|(Lorg/apache/lucene/util/BytesRef;)J
   nextOrd|()J
+ Lucene410DocValuesProducer$9
+  get|(I)Z
+ Lucene410DocValuesProducer$CompressedBinaryDocValues$CompressedBinaryTermsEnum
+  next|()Lorg/apache/lucene/util/BytesRef;
+  ord|()J
+  seekExact|(J)V
+  term|()Lorg/apache/lucene/util/BytesRef;
+org.apache.lucene.codecs.lucene49
+ Lucene49NormsConsumer$NormMap
+  add|(J)Z
+  getOrd|(J)I
 org.apache.lucene.codecs.perfield|PerFieldPostingsFormat$FieldsReader|terms|(Ljava/lang/String;)Lorg/apache/lucene/index/Terms;
 org.apache.lucene.document
  AbstractField
   name|()Ljava/lang/String;
  Document
-  add|(Lorg/apache/lucene/document/Fieldable;)V
+  add
+   (Lorg/apache/lucene/document/Fieldable;)V
+   (Lorg/apache/lucene/index/IndexableField;)V
   getBinaryValue|(Ljava/lang/String;)Lorg/apache/lucene/util/BytesRef;
   getFields|(Ljava/lang/String;)[Lorg/apache/lucene/index/IndexableField;
  Field
+  binaryValue|()Lorg/apache/lucene/util/BytesRef;
+  boost|()F
   fieldType
    ()Lorg/apache/lucene/document/FieldType;
    ()Lorg/apache/lucene/index/IndexableFieldType;
   name|()Ljava/lang/String;
+  numericValue|()Ljava/lang/Number;
+  readerValue|()Ljava/io/Reader;
   stringValue|()Ljava/lang/String;
+  tokenStream|(Lorg/apache/lucene/analysis/Analyzer;Lorg/apache/lucene/analysis/TokenStream;)Lorg/apache/lucene/analysis/TokenStream;
+ Field$StringTokenStream
+  close|()V
+  end|()V
+  incrementToken|()Z
+  reset|()V
  Field$TermVector$1
   withOffsets|()Z
   withPositions|()Z
  FieldType
+  docValueType|()Lorg/apache/lucene/index/FieldInfo$DocValuesType;
   indexOptions|()Lorg/apache/lucene/index/FieldInfo$IndexOptions;
   indexed|()Z
+  numericPrecisionStep|()I
+  numericType|()Lorg/apache/lucene/document/FieldType$NumericType;
   omitNorms|()Z
+  storeTermVectorOffsets|()Z
+  storeTermVectorPayloads|()Z
+  storeTermVectorPositions|()Z
+  storeTermVectors|()Z
   stored|()Z
+  tokenized|()Z
+ LazyDocument
+  getField|(Lorg/apache/lucene/index/FieldInfo;)Lorg/apache/lucene/index/IndexableField;
+ LazyDocument$LazyField
+  name|()Ljava/lang/String;
 org.apache.lucene.index
+ AtomicReader
+  termPositionsEnum|(Lorg/apache/lucene/index/Term;)Lorg/apache/lucene/index/DocsAndPositionsEnum;
+  terms|(Ljava/lang/String;)Lorg/apache/lucene/index/Terms;
  AtomicReaderContext
-  reader|()Lorg/apache/lucene/index/AtomicReader;
+  leaves|()Ljava/util/List;
+  reader
+   ()Lorg/apache/lucene/index/AtomicReader;
+   ()Lorg/apache/lucene/index/IndexReader;
+ BaseCompositeReader
+  document|(ILorg/apache/lucene/index/StoredFieldVisitor;)V
+  maxDoc|()I
  ByteBlockPool
   newSlice|(I)I
  ByteSliceReader
@@ -218,19 +360,43 @@ org.apache.lucene.index
    (Lorg/apache/lucene/util/ByteBlockPool;II)V
   nextSlice|()V
   readByte|()B
+ CoalescedUpdates$2$1
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/apache/lucene/index/BufferedUpdatesStream$QueryAndLimit;
+ CompositeReaderContext
+  leaves|()Ljava/util/List;
+ DefaultIndexingChain$PerField
+  finish|()V
+  invert|(Lorg/apache/lucene/index/IndexableField;Z)V
  DocFieldProcessorPerThread$1
   compare
    (Ljava/lang/Object;Ljava/lang/Object;)I
    (Lorg/apache/lucene/index/DocFieldProcessorPerField;Lorg/apache/lucene/index/DocFieldProcessorPerField;)I
+ DocValues$2
+  get|(I)J
+ DocValues$3
+  getOrd|(I)I
  FieldInfo
+  attributes|()Ljava/util/Map;
+  getAttribute|(Ljava/lang/String;)Ljava/lang/String;
   omitsNorms|()Z
+  putAttribute|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
  FieldInfos
-  fieldInfo|(I)Lorg/apache/lucene/index/FieldInfo;
+  fieldInfo
+   (I)Lorg/apache/lucene/index/FieldInfo;
+   (Ljava/lang/String;)Lorg/apache/lucene/index/FieldInfo;
   fieldName|(I)Ljava/lang/String;
   size|()I
  FieldInfos$Builder
   add|(Lorg/apache/lucene/index/FieldInfo;)Lorg/apache/lucene/index/FieldInfo;
   fieldInfo|(Ljava/lang/String;)Lorg/apache/lucene/index/FieldInfo;
+ FilteredTermsEnum
+  docFreq|()I
+  docs|(Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/index/DocsEnum;I)Lorg/apache/lucene/index/DocsEnum;
+  next|()Lorg/apache/lucene/util/BytesRef;
+  termState|()Lorg/apache/lucene/index/TermState;
+  totalTermFreq|()J
  FilteredTermsEnum$AcceptStatus
   values|()[Lorg/apache/lucene/index/FilteredTermsEnum$AcceptStatus;
  FreqProxFieldMergeState
@@ -240,6 +406,7 @@ org.apache.lucene.index
   compareTo
    (Ljava/lang/Object;)I
    (Lorg/apache/lucene/index/FreqProxTermsWriterPerField;)I
+  newPostingsArray|()V
  IndexFileDeleter$RefCount
   DecRef|()I
   IncRef|()I
@@ -247,17 +414,36 @@ org.apache.lucene.index
   fileNameFromGeneration|(Ljava/lang/String;Ljava/lang/String;J)Ljava/lang/String;
   matchesExtension|(Ljava/lang/String;Ljava/lang/String;)Z
   segmentFileName|(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+ IndexReader
+  decRef|()V
+  leaves|()Ljava/util/List;
+ IndexWriter
+  numDeletedDocs|(Lorg/apache/lucene/index/SegmentCommitInfo;)I
+ IndexWriter$ReaderPool
+  get|(Lorg/apache/lucene/index/SegmentCommitInfo;Z)Lorg/apache/lucene/index/ReadersAndUpdates;
  IndexableFieldType
   storeTermVectorOffsets|()Z
   storeTermVectorPositions|()Z
+ MergeState$CheckAbort
+  work|(D)V
  MergeState$DocMap$1
   get|(I)I
  MergeState$NoDelDocMap
   get|(I)I
+ MultiBits
+  getMatchingSub|(Lorg/apache/lucene/index/ReaderSlice;)Lorg/apache/lucene/index/MultiBits$SubResult;
+ MultiDocValues$OrdinalMap$1
+  get|(J)J
  MultiDocsAndPositionsEnum
   canReuse|(Lorg/apache/lucene/index/MultiTermsEnum;)Z
   nextPosition|()I
   reset|([Lorg/apache/lucene/index/MultiDocsAndPositionsEnum$EnumWithSlice;I)Lorg/apache/lucene/index/MultiDocsAndPositionsEnum;
+ MultiDocsEnum
+  canReuse|(Lorg/apache/lucene/index/MultiTermsEnum;)Z
+ MultiFields
+  getFields|(Lorg/apache/lucene/index/IndexReader;)Lorg/apache/lucene/index/Fields;
+  getTerms|(Lorg/apache/lucene/index/IndexReader;Ljava/lang/String;)Lorg/apache/lucene/index/Terms;
+  terms|(Ljava/lang/String;)Lorg/apache/lucene/index/Terms;
  MultiTermsEnum
   reset|([Lorg/apache/lucene/index/MultiTermsEnum$TermsEnumIndex;)Lorg/apache/lucene/index/TermsEnum;
  MultiTermsEnum$TermsEnumWithSlice
@@ -268,30 +454,80 @@ org.apache.lucene.index
    ()Ljava/lang/Object;
  OrdTermState
   copyFrom|(Lorg/apache/lucene/index/TermState;)V
+ PrefixCodedTerms$PrefixCodedTermsIterator
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/apache/lucene/index/Term;
  ReaderUtil
   getTopLevelContext|(Lorg/apache/lucene/index/IndexReaderContext;)Lorg/apache/lucene/index/IndexReaderContext;
+  subIndex|(I[I)I
+ SegmentCommitInfo
+  files|()Ljava/util/Collection;
+  sizeInBytes|()J
  SegmentInfo
-  files|()Ljava/util/List;
+  files
+   ()Ljava/util/List;
+   ()Ljava/util/Set;
   hasSeparateNorms|(I)Z
  SegmentInfos
-  info|(I)Lorg/apache/lucene/index/SegmentInfo;
+  info
+   (I)Lorg/apache/lucene/index/SegmentCommitInfo;
+   (I)Lorg/apache/lucene/index/SegmentInfo;
  SegmentNorms
   decRef|()V
  SegmentReader
   directory|()Lorg/apache/lucene/store/Directory;
+  document|(ILorg/apache/lucene/index/StoredFieldVisitor;)V
   fields|()Lorg/apache/lucene/index/Fields;
+  getNormValues|(Ljava/lang/String;)Lorg/apache/lucene/index/NumericDocValues;
+  getNumericDocValues|(Ljava/lang/String;)Lorg/apache/lucene/index/NumericDocValues;
   maxDoc|()I
+ SingletonSortedSetDocValues
+  nextOrd|()J
+ SortedDocValuesTermsEnum
+  ord|()J
+ SortedDocValuesWriter$OrdsIterator
+  next
+   ()Ljava/lang/Number;
+   ()Ljava/lang/Object;
+ SortedDocValuesWriter$ValuesIterator
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/apache/lucene/util/BytesRef;
+ SortedSetDocValuesTermsEnum
+  ord|()J
+ SortedSetDocValuesWriter
+  addValue|(ILorg/apache/lucene/util/BytesRef;)V
+ SortedSetDocValuesWriter$OrdCountIterator
+  next
+   ()Ljava/lang/Number;
+   ()Ljava/lang/Object;
  SortedSetDocValuesWriter$OrdsIterator
   next
    ()Ljava/lang/Number;
    ()Ljava/lang/Object;
+ SortedSetDocValuesWriter$ValuesIterator
+  next
+   ()Ljava/lang/Object;
+   ()Lorg/apache/lucene/util/BytesRef;
  Term
+  bytes|()Lorg/apache/lucene/util/BytesRef;
+  compareTo
+   (Ljava/lang/Object;)I
+   (Lorg/apache/lucene/index/Term;)I
   createTerm|(Ljava/lang/String;)Lorg/apache/lucene/index/Term;
   field|()Ljava/lang/String;
  TermBuffer
   compareTo|(Lorg/apache/lucene/index/TermBuffer;)I
  TermContext
+  build|(Lorg/apache/lucene/index/IndexReaderContext;Lorg/apache/lucene/index/Term;)Lorg/apache/lucene/index/TermContext;
+  docFreq|()I
+  get|(I)Lorg/apache/lucene/index/TermState;
+  register|(Lorg/apache/lucene/index/TermState;IIJ)V
   totalTermFreq|()J
+ TermsEnum
+  docs|(Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/index/DocsEnum;)Lorg/apache/lucene/index/DocsEnum;
+  docsAndPositions|(Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/index/DocsAndPositionsEnum;)Lorg/apache/lucene/index/DocsAndPositionsEnum;
  TermsEnum$2
   docs|(Lorg/apache/lucene/util/Bits;Lorg/apache/lucene/index/DocsEnum;I)Lorg/apache/lucene/index/DocsEnum;
   next|()Lorg/apache/lucene/util/BytesRef;
@@ -301,28 +537,147 @@ org.apache.lucene.index
    (Lorg/apache/lucene/index/TermsHashPerField;)I
   initReader|(Lorg/apache/lucene/index/ByteSliceReader;II)V
   reset|()V
+ TermsHashPerField$PostingsBytesStartArray
+  bytesUsed|()Lorg/apache/lucene/util/Counter;
+  clear|()[I
+  grow|()[I
+ TieredMergePolicy$SegmentByteSizeDescending
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Lorg/apache/lucene/index/SegmentCommitInfo;Lorg/apache/lucene/index/SegmentCommitInfo;)I
+org.apache.lucene.queryparser.classic
+ FastCharStream
+  BeginToken|()C
+  GetImage|()Ljava/lang/String;
+ Token
+  newToken|(ILjava/lang/String;)Lorg/apache/lucene/queryparser/classic/Token;
 org.apache.lucene.search
+ BitsFilteredDocIdSet
+  wrap|(Lorg/apache/lucene/search/DocIdSet;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/DocIdSet;
+ BooleanQuery
+  add
+   (Lorg/apache/lucene/search/BooleanClause;)V
+   (Lorg/apache/lucene/search/Query;Lorg/apache/lucene/search/BooleanClause$Occur;)V
+  rewrite|(Lorg/apache/lucene/index/IndexReader;)Lorg/apache/lucene/search/Query;
+ BooleanQuery$BooleanWeight
+  bulkScorer|(Lorg/apache/lucene/index/AtomicReaderContext;ZLorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/BulkScorer;
+  coord|(II)F
+  scorer|(Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/Scorer;
+ BooleanTopLevelScorers$BoostedScorer
+  score|()F
  CollectionStatistics
+  field|()Ljava/lang/String;
+  maxDoc|()J
   sumDocFreq|()J
+ ConjunctionScorer
+  advance|(I)I
+  docID|()I
+  nextDoc|()I
+  score|()F
+ ConjunctionScorer$1
+  compare
+   (Ljava/lang/Object;Ljava/lang/Object;)I
+   (Lorg/apache/lucene/search/ConjunctionScorer$DocsAndFreqs;Lorg/apache/lucene/search/ConjunctionScorer$DocsAndFreqs;)I
+ ConstantScoreAutoRewrite$CutOffTermCollector
+  collect|(Lorg/apache/lucene/util/BytesRef;)Z
  ConstantScoreQuery$ConstantScorer
   advance|(I)I
   cost|()J
   nextDoc|()I
- DocIdSet
-  ramBytesUsed|()J
- FieldComparator$ByteComparator
-  compareBottom|(I)I
- FilteredDocIdSet
-  bits|()Lorg/apache/lucene/util/Bits;
- FilteredDocIdSetIterator
-  nextDoc|()I
- MatchAllDocsQuery$MatchAllScorer
-  nextDoc|()I
- TermScorer
+  score|()F
+ ConstantScoreQuery$ConstantWeight
+  bulkScorer|(Lorg/apache/lucene/index/AtomicReaderContext;ZLorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/BulkScorer;
+  scorer|(Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/Scorer;
+ DisjunctionScorer
+  advance|(I)I
+  cost|()J
   docID|()I
   nextDoc|()I
+  score|()F
+ DocIdSet
+  ramBytesUsed|()J
+ FieldCache$9
+  parseLong|(Lorg/apache/lucene/util/BytesRef;)J
+ FieldCacheImpl
+  getLongs|(Lorg/apache/lucene/index/AtomicReader;Ljava/lang/String;Lorg/apache/lucene/search/FieldCache$LongParser;Z)Lorg/apache/lucene/search/FieldCache$Longs;
+ FieldCacheImpl$DoubleCache$1
+  visitDoc|(I)V
+ FieldCacheImpl$LongCache$1
+  visitDoc|(I)V
+  visitTerm|(Lorg/apache/lucene/util/BytesRef;)V
+ FieldComparator$ByteComparator
+  compareBottom|(I)I
+ FieldComparator$LongComparator
+  compare|(II)I
+  setNextReader|(Lorg/apache/lucene/index/AtomicReaderContext;)Lorg/apache/lucene/search/FieldComparator;
+ FieldComparator$NumericComparator
+  setNextReader|(Lorg/apache/lucene/index/AtomicReaderContext;)Lorg/apache/lucene/search/FieldComparator;
+ FilterScorer
+  advance|(I)I
+  nextDoc|()I
+ FilteredDocIdSet
+  bits|()Lorg/apache/lucene/util/Bits;
+  iterator|()Lorg/apache/lucene/search/DocIdSetIterator;
+ FilteredDocIdSetIterator
+  nextDoc|()I
+ FilteredQuery$LeapFrogScorer
+  nextDoc|()I
+  score|()F
+ IndexSearcher
+  collectionStatistics|(Ljava/lang/String;)Lorg/apache/lucene/search/CollectionStatistics;
+  createNormalizedWeight|(Lorg/apache/lucene/search/Query;)Lorg/apache/lucene/search/Weight;
+  rewrite|(Lorg/apache/lucene/search/Query;)Lorg/apache/lucene/search/Query;
+  termStatistics|(Lorg/apache/lucene/index/Term;Lorg/apache/lucene/index/TermContext;)Lorg/apache/lucene/search/TermStatistics;
+ MatchAllDocsQuery$MatchAllDocsWeight
+  scorer|(Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/Scorer;
+ MatchAllDocsQuery$MatchAllScorer
+  nextDoc|()I
+ NumericRangeQuery$NumericRangeTermsEnum$1
+  addRange|(Lorg/apache/lucene/util/BytesRef;Lorg/apache/lucene/util/BytesRef;)V
+ Query
+  rewrite|(Lorg/apache/lucene/index/IndexReader;)Lorg/apache/lucene/search/Query;
+ QueryWrapperFilter
+  getDocIdSet|(Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/DocIdSet;
+ QueryWrapperFilter$1
+  iterator|()Lorg/apache/lucene/search/DocIdSetIterator;
+ ReqExclScorer
+  advance|(I)I
+ TermQuery
+  createWeight|(Lorg/apache/lucene/search/IndexSearcher;)Lorg/apache/lucene/search/Weight;
+ TermQuery$TermWeight
+  normalize|(FF)V
+  scorer|(Lorg/apache/lucene/index/AtomicReaderContext;Lorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/Scorer;
+ TermScorer
+  advance|(I)I
+  cost|()J
+  docID|()I
+  nextDoc|()I
+  score|()F
+ TermStatistics
+  docFreq|()J
+ TopFieldCollector
+  acceptsDocsOutOfOrder|()Z
+ TopScoreDocCollector$InOrderTopScoreDocCollector
+  acceptsDocsOutOfOrder|()Z
+  collect|(I)V
  TopTermsRewrite
   rewrite|(Lorg/apache/lucene/index/IndexReader;Lorg/apache/lucene/search/MultiTermQuery;)Lorg/apache/lucene/search/Query;
+ Weight
+  bulkScorer|(Lorg/apache/lucene/index/AtomicReaderContext;ZLorg/apache/lucene/util/Bits;)Lorg/apache/lucene/search/BulkScorer;
+org.apache.lucene.search.similarities
+ DefaultSimilarity
+  coord|(II)F
+  idf|(JJ)F
+  queryNorm|(F)F
+  tf|(F)F
+ TFIDFSimilarity
+  computeWeight|(FLorg/apache/lucene/search/CollectionStatistics;[Lorg/apache/lucene/search/TermStatistics;)Lorg/apache/lucene/search/similarities/Similarity$SimWeight;
+  idfExplain|(Lorg/apache/lucene/search/CollectionStatistics;Lorg/apache/lucene/search/TermStatistics;)Lorg/apache/lucene/search/Explanation;
+  simScorer|(Lorg/apache/lucene/search/similarities/Similarity$SimWeight;Lorg/apache/lucene/index/AtomicReaderContext;)Lorg/apache/lucene/search/similarities/Similarity$SimScorer;
+ TFIDFSimilarity$IDFStats
+  normalize|(FF)V
+ TFIDFSimilarity$TFIDFSimScorer
+  score|(IF)F
 org.apache.lucene.search.spans
  NearSpansUnordered
   doc|()I
@@ -368,11 +723,13 @@ org.apache.lucene.store
   readByte|()B
   readBytes|([BII)V
   readInt|()I
+  readLong|()J
   readVInt|()I
   readVLong|()J
   reset
    ([B)V
    ([BII)V
+  rewind|()V
   skipBytes|(J)V
  ByteArrayDataOutput
   reset
@@ -384,40 +741,69 @@ org.apache.lucene.store
   clone|()Lorg/apache/lucene/store/ByteBufferIndexInput;
   readByte|()B
   readBytes|([BII)V
+  readInt
+   ()I
+   (J)I
   readLong|()J
   seek|(J)V
+ ByteBufferIndexInput$DefaultImpl
+  clone|()Lorg/apache/lucene/store/IndexInput;
  ByteBufferIndexInput$SingleBufferImpl
   clone|()Lorg/apache/lucene/store/IndexInput;
   readByte|(J)B
+  readInt|(J)I
+  readLong|(J)J
   readShort|(J)S
   seek|(J)V
+ ByteBufferIndexInput$WithOffsetImpl
+  readInt|(J)I
  ChecksumIndexOutput
   writeByte|(B)V
   writeBytes|([BII)V
  DataInput
+  clone|()Lorg/apache/lucene/store/DataInput;
   readInt|()I
+  readLong|()J
+  readShort|()S
   readString|()Ljava/lang/String;
+  readStringStringMap|()Ljava/util/Map;
   readVInt|()I
   readVLong|()J
  DataOutput
   writeBytes|([BI)V
   writeInt|(I)V
+  writeLong|(J)V
   writeString|(Ljava/lang/String;)V
+  writeStringStringMap|(Ljava/util/Map;)V
   writeVInt|(I)V
   writeVLong|(J)V
+ FSDirectory
+  fileLength|(Ljava/lang/String;)J
  FSDirectory$FSIndexOutput$1
   write|([BII)V
+ IndexInput
+  clone|()Lorg/apache/lucene/store/IndexInput;
+ IndexInput$1
+  readByte|(J)B
  MMapDirectory
   openInput|(Ljava/lang/String;Lorg/apache/lucene/store/IOContext;)Lorg/apache/lucene/store/IndexInput;
  MMapDirectory$MMapIndexInput
   readByte|()B
   readBytes|([BII)V
   seek|(J)V
+ NRTCachingDirectory
+  fileLength|(Ljava/lang/String;)J
  OutputStreamIndexOutput
   writeByte|(B)V
   writeBytes|([BII)V
+ RAMDirectory
+  fileExists|(Ljava/lang/String;)Z
  RAMInputStream
+  length|()J
   readByte|()B
+  readBytes|([BII)V
+  seek|(J)V
+ RAMInputStream$1
   seek|(J)V
  RAMOutputStream
   flush|()V
@@ -446,12 +832,15 @@ org.apache.lucene.util
   compare
    (Ljava/lang/Comparable;Ljava/lang/Comparable;)I
    (Ljava/lang/Object;Ljava/lang/Object;)I
+ AttributeFactory$StaticImplementationAttributeFactory
+  createAttributeInstance|(Ljava/lang/Class;)Lorg/apache/lucene/util/AttributeImpl;
  AttributeImpl
   clone
    ()Ljava/lang/Object;
    ()Lorg/apache/lucene/util/AttributeImpl;
  AttributeSource
   addAttribute|(Ljava/lang/Class;)Lorg/apache/lucene/util/Attribute;
+  addAttributeImpl|(Lorg/apache/lucene/util/AttributeImpl;)V
   captureState|()Lorg/apache/lucene/util/AttributeSource$State;
   clearAttributes|()V
   copyTo|(Lorg/apache/lucene/util/AttributeSource;)V
@@ -460,6 +849,13 @@ org.apache.lucene.util
   restoreState|(Lorg/apache/lucene/util/AttributeSource$State;)V
  AttributeSource$State
   clone|()Lorg/apache/lucene/util/AttributeSource$State;
+ BitUtil
+  bitCount|(B)I
+  zigZagDecode|(J)J
+ Bits$MatchAllBits
+  get|(I)Z
+ Bits$MatchNoBits
+  get|(I)Z
  ByteBlockPool
   allocSlice|([BI)I
   append|(Lorg/apache/lucene/util/BytesRef;)V
@@ -469,6 +865,7 @@ org.apache.lucene.util
   reset|(ZZ)V
  BytesRef
   bytesEquals|(Lorg/apache/lucene/util/BytesRef;)Z
+  compareTo|(Lorg/apache/lucene/util/BytesRef;)I
   copyBytes|(Lorg/apache/lucene/util/BytesRef;)V
   deepCopyOf|(Lorg/apache/lucene/util/BytesRef;)Lorg/apache/lucene/util/BytesRef;
   grow|(I)V
@@ -482,37 +879,93 @@ org.apache.lucene.util
  BytesRefArray$2
   next|()Lorg/apache/lucene/util/BytesRef;
  BytesRefBuilder
+  append
+   (Lorg/apache/lucene/util/BytesRef;)V
+   ([BII)V
   byteAt|(I)B
   bytes|()[B
+  clear|()V
+  copyBytes|(Lorg/apache/lucene/util/BytesRef;)V
+  copyChars|([CII)V
   grow|(I)V
   length|()I
  BytesRefHash
   add|(Lorg/apache/lucene/util/BytesRef;)I
   byteStart|(I)I
+  clear|(Z)V
+  get|(ILorg/apache/lucene/util/BytesRef;)Lorg/apache/lucene/util/BytesRef;
+  reinit|()V
+  size|()I
+  sort|(Ljava/util/Comparator;)[I
  CharacterUtils$Java4CharacterUtils
   codePointAt|([CI)I
  CharacterUtils$Java5CharacterUtils
   codePointAt|([CI)I
+ CloseableThreadLocal
+  close|()V
  Counter
   addAndGet|(J)J
   newCounter|()Lorg/apache/lucene/util/Counter;
  Counter$SerialCounter
   addAndGet|(J)J
  FixedBitSet
+  bits2words|(I)I
   get|(I)Z
+  iterator|()Lorg/apache/lucene/search/DocIdSetIterator;
   length|()I
   nextSetBit|(I)I
+  or|(Lorg/apache/lucene/util/FixedBitSet;)V
   unionCount|(Lorg/apache/lucene/util/FixedBitSet;Lorg/apache/lucene/util/FixedBitSet;)J
  FixedBitSet$FixedBitSetIterator
+  advance|(I)I
   nextDoc|()I
+ GrowableByteArrayDataOutput
+  writeByte|(B)V
+  writeBytes|([BII)V
+ IOUtils
+  close|([Ljava/io/Closeable;)V
+  reThrow|(Ljava/lang/Throwable;)V
+  reThrowUnchecked|(Ljava/lang/Throwable;)V
  InPlaceMergeSorter
+  sort|(II)V
+ IntroSorter
   sort|(II)V
  IntsRef
   clone|()Ljava/lang/Object;
   copyInts|(Lorg/apache/lucene/util/IntsRef;)V
   grow|(I)V
+ IntsRefBuilder
+  append|(I)V
+  clear|()V
+  copyInts
+   (Lorg/apache/lucene/util/IntsRef;)V
+   ([III)V
+  grow|(I)V
+  intAt|(I)I
+  length|()I
+ LongBitSet
+  get|(J)Z
  LongValues
   get|(I)J
+ LongValues$1
+  get|(J)J
+ MathUtil
+  gcd|(JJ)J
+  log|(JI)I
+ MergedIterator
+  next
+   ()Ljava/lang/Comparable;
+   ()Ljava/lang/Object;
+ NamedSPILoader
+  lookup|(Ljava/lang/String;)Lorg/apache/lucene/util/NamedSPILoader$NamedSPI;
+ NumericUtils
+  getPrefixCodedLongShift|(Lorg/apache/lucene/util/BytesRef;)I
+  longToPrefixCoded|(JILorg/apache/lucene/util/BytesRefBuilder;)V
+  longToPrefixCodedBytes|(JILorg/apache/lucene/util/BytesRefBuilder;)V
+  prefixCodedToLong|(Lorg/apache/lucene/util/BytesRef;)J
+  splitLongRange|(Lorg/apache/lucene/util/NumericUtils$LongRangeBuilder;IJJ)V
+ NumericUtils$LongRangeBuilder
+  addRange|(JJI)V
  OfflineSorter$ByteSequencesReader
   read
    ()[B
@@ -526,11 +979,20 @@ org.apache.lucene.util
   pop|()Ljava/lang/Object;
   size|()I
   top|()Ljava/lang/Object;
+  updateTop|()Ljava/lang/Object;
  RamUsageEstimator
   alignObjectSize|(J)J
+  shallowSizeOf|([Ljava/lang/Object;)J
+  sizeOf
+   ([B)J
+   ([I)J
+   ([J)J
+ RefCount
+  decRef|()V
  SimpleStringInterner
   intern|(Ljava/lang/String;)Ljava/lang/String;
  StringHelper
+  bytesDifference|(Lorg/apache/lucene/util/BytesRef;Lorg/apache/lucene/util/BytesRef;)I
   endsWith|(Lorg/apache/lucene/util/BytesRef;Lorg/apache/lucene/util/BytesRef;)Z
   intern|(Ljava/lang/String;)Ljava/lang/String;
   murmurhash3_x86_32
@@ -544,7 +1006,9 @@ org.apache.lucene.util
  UnicodeUtil
   UTF16toUTF8
    (Ljava/lang/CharSequence;IILorg/apache/lucene/util/BytesRef;)V
+   (Ljava/lang/CharSequence;II[B)I
    ([CIILorg/apache/lucene/util/BytesRef;)V
+   ([CII[B)I
    ([CILorg/apache/lucene/util/UnicodeUtil$UTF8Result;)V
   UTF8toUTF16|([BIILorg/apache/lucene/util/UnicodeUtil$UTF16Result;)V
  UnicodeUtil$UTF16Result
@@ -555,6 +1019,8 @@ org.apache.lucene.util
   newHashMap|(Z)Lorg/apache/lucene/util/WeakIdentityMap;
   put|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
   reap|()V
+ WeakIdentityMap$1
+  next|()Ljava/lang/Object;
 org.apache.lucene.util.automaton
  Automata
   appendChar|(Lorg/apache/lucene/util/automaton/Automaton;II)I
@@ -600,6 +1066,7 @@ org.apache.lucene.util.automaton
  Operations$TransitionList
   add|(Lorg/apache/lucene/util/automaton/Transition;)V
  RunAutomaton
+  isAccept|(I)Z
   step|(II)I
  SortedIntSet
   computeHash|()V
@@ -626,6 +1093,9 @@ org.apache.lucene.util.fst
   common
    (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
    (Lorg/apache/lucene/util/BytesRef;Lorg/apache/lucene/util/BytesRef;)Lorg/apache/lucene/util/BytesRef;
+  ramBytesUsed
+   (Ljava/lang/Object;)J
+   (Lorg/apache/lucene/util/BytesRef;)J
   read
    (Lorg/apache/lucene/store/DataInput;)Ljava/lang/Object;
    (Lorg/apache/lucene/store/DataInput;)Lorg/apache/lucene/util/BytesRef;
@@ -641,6 +1111,7 @@ org.apache.lucene.util.fst
  BytesStore
   copyBytes|(JJI)V
   finish|()V
+  ramBytesUsed|()J
   reverse|(JJ)V
   skipBytes|(I)V
   writeByte|(B)V
@@ -652,6 +1123,7 @@ org.apache.lucene.util.fst
  FST
   findTargetArc|(ILorg/apache/lucene/util/fst/FST$Arc;Lorg/apache/lucene/util/fst/FST$Arc;Lorg/apache/lucene/util/fst/FST$BytesReader;)Lorg/apache/lucene/util/fst/FST$Arc;
   getFirstArc|(Lorg/apache/lucene/util/fst/FST$Arc;)Lorg/apache/lucene/util/fst/FST$Arc;
+  ramBytesUsed|()J
   readFirstRealTargetArc|(JLorg/apache/lucene/util/fst/FST$Arc;Lorg/apache/lucene/util/fst/FST$BytesReader;)Lorg/apache/lucene/util/fst/FST$Arc;
   readFirstTargetArc|(Lorg/apache/lucene/util/fst/FST$Arc;Lorg/apache/lucene/util/fst/FST$Arc;Lorg/apache/lucene/util/fst/FST$BytesReader;)Lorg/apache/lucene/util/fst/FST$Arc;
   readLabel|(Lorg/apache/lucene/store/DataInput;)I
@@ -691,16 +1163,24 @@ org.apache.lucene.util.fst
   readBytes|([BII)V
   skipBytes|(J)V
  Util
-  toIntsRef|(Lorg/apache/lucene/util/BytesRef;Lorg/apache/lucene/util/IntsRef;)Lorg/apache/lucene/util/IntsRef;
+  toIntsRef
+   (Lorg/apache/lucene/util/BytesRef;Lorg/apache/lucene/util/IntsRef;)Lorg/apache/lucene/util/IntsRef;
+   (Lorg/apache/lucene/util/BytesRef;Lorg/apache/lucene/util/IntsRefBuilder;)Lorg/apache/lucene/util/IntsRef;
 org.apache.lucene.util.packed
  AbstractAppendingLongBuffer$Iterator
   next|()J
+ AbstractBlockPackedWriter
+  add|(J)V
  AbstractPagedMutable
   get|(J)J
   size|()J
  BulkOperation
+  computeIterations|(II)I
   of|(Lorg/apache/lucene/util/packed/PackedInts$Format;I)Lorg/apache/lucene/util/packed/BulkOperation;
  BulkOperationPacked
+  byteBlockCount|()I
+  byteValueCount|()I
+  decode|([BI[III)V
   encode
    ([II[BII)V
    ([JI[BII)V
@@ -708,14 +1188,42 @@ org.apache.lucene.util.packed
   longValueCount|()I
  BulkOperationPacked1
   decode|([BI[III)V
+ BulkOperationPacked10
+  decode|([BI[III)V
+ BulkOperationPacked11
+  decode|([BI[III)V
+ BulkOperationPacked12
+  decode|([BI[III)V
+ BulkOperationPacked13
+  decode|([BI[III)V
+ BulkOperationPacked14
+  decode|([BI[III)V
+ BulkOperationPacked15
+  decode|([BI[III)V
+ BulkOperationPacked16
+  decode|([BI[III)V
+ BulkOperationPacked17
+  decode|([BI[III)V
+ BulkOperationPacked18
+  decode|([BI[III)V
  BulkOperationPacked19
-  decode|([JI[JII)V
+  decode
+   ([BI[III)V
+   ([JI[JII)V
+ BulkOperationPacked2
+  decode|([BI[JII)V
  BulkOperationPacked20
-  decode|([JI[JII)V
+  decode
+   ([BI[III)V
+   ([JI[JII)V
  BulkOperationPacked21
-  decode|([JI[JII)V
+  decode
+   ([BI[III)V
+   ([JI[JII)V
  BulkOperationPacked22
-  decode|([JI[JII)V
+  decode
+   ([BI[III)V
+   ([JI[JII)V
  BulkOperationPacked23
   decode|([JI[JII)V
  BulkOperationPacked3
@@ -723,23 +1231,48 @@ org.apache.lucene.util.packed
    ([BI[III)V
    ([BI[JII)V
  BulkOperationPacked5
-  decode|([JI[JII)V
+  decode
+   ([BI[III)V
+   ([JI[JII)V
+ BulkOperationPacked6
+  decode
+   ([BI[III)V
+   ([BI[JII)V
  BulkOperationPacked7
-  decode|([BI[JII)V
+  decode
+   ([BI[III)V
+   ([BI[JII)V
  BulkOperationPacked8
-  decode|([BI[JII)V
+  decode
+   ([BI[III)V
+   ([BI[JII)V
+ BulkOperationPacked9
+  decode|([BI[III)V
  BulkOperationPackedSingleBlock
   decode
    ([BI[III)V
    ([JI[JII)V
+  encode|([II[BII)V
   longBlockCount|()I
  Direct16
   get|(I)J
  Direct8
   get|(I)J
+ DirectPackedReader
+  get|(I)J
  DirectReader
   getInstance|(Lorg/apache/lucene/store/RandomAccessInput;I)Lorg/apache/lucene/util/LongValues;
+ DirectReader$DirectPackedReader1
+  get|(J)J
  DirectReader$DirectPackedReader16
+  get|(J)J
+ DirectReader$DirectPackedReader2
+  get|(J)J
+ DirectReader$DirectPackedReader20
+  get|(J)J
+ DirectReader$DirectPackedReader24
+  get|(J)J
+ DirectReader$DirectPackedReader28
   get|(J)J
  DirectReader$DirectPackedReader4
   get|(J)J
@@ -750,6 +1283,10 @@ org.apache.lucene.util.packed
  GrowableWriter
   get|(I)J
   size|()I
+ MonotonicBlockPackedReader
+  get|(J)J
+ MonotonicBlockPackedWriter
+  add|(J)V
  Packed64
   get
    (I)J
@@ -759,6 +1296,10 @@ org.apache.lucene.util.packed
   create|(II)Lorg/apache/lucene/util/packed/Packed64SingleBlock;
   get|(I[JII)I
   isSupported|(I)Z
+ Packed64SingleBlock$Packed64SingleBlock1
+  get|(I)J
+ Packed64SingleBlock$Packed64SingleBlock2
+  get|(I)J
  Packed64SingleBlock$Packed64SingleBlock4
   get|(I)J
  Packed8ThreeBlocks
@@ -768,11 +1309,14 @@ org.apache.lucene.util.packed
   set|(I[JII)I
  PackedInts
   bitsRequired|(J)I
+  checkVersion|(I)V
   copy|(Lorg/apache/lucene/util/packed/PackedInts$Reader;ILorg/apache/lucene/util/packed/PackedInts$Mutable;III)V
   fastestFormatAndBits|(IIF)Lorg/apache/lucene/util/packed/PackedInts$FormatAndBits;
+  getDirectReaderNoHeader|(Lorg/apache/lucene/store/IndexInput;Lorg/apache/lucene/util/packed/PackedInts$Format;III)Lorg/apache/lucene/util/packed/PackedInts$Reader;
   getMutable
    (IIF)Lorg/apache/lucene/util/packed/PackedInts$Mutable;
    (IILorg/apache/lucene/util/packed/PackedInts$Format;)Lorg/apache/lucene/util/packed/PackedInts$Mutable;
+  getReaderIteratorNoHeader|(Lorg/apache/lucene/store/DataInput;Lorg/apache/lucene/util/packed/PackedInts$Format;IIII)Lorg/apache/lucene/util/packed/PackedInts$ReaderIterator;
   maxValue|(I)J
   unsignedBitsRequired|(J)I
  PackedInts$Format
@@ -786,11 +1330,24 @@ org.apache.lucene.util.packed
   set|(I[JII)I
  PackedInts$MutableImpl
   size|()I
+ PackedInts$NullReader
+  get|(I)J
  PackedInts$Reader
   get|(I[JII)I
  PackedInts$ReaderIteratorImpl
   next|()J
+ PackedLongValues
+  get|(J)J
+  size|()J
+ PackedLongValues$Builder
+  add|(J)Lorg/apache/lucene/util/packed/PackedLongValues$Builder;
+  ramBytesUsed|()J
+  size|()J
+ PackedLongValues$Iterator
+  next|()J
  PackedReaderIterator
   next|(I)Lorg/apache/lucene/util/LongsRef;
+ PackedWriter
+  add|(J)V
  PagedGrowableWriter
   ramBytesUsed|()J

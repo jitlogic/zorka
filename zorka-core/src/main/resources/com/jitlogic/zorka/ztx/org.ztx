@@ -3,16 +3,59 @@ org.LatencyUtils
   recordInterval|(J)V
  TimeServices
   nanoTime|()J
+org.antlr.misc
+ OrderedHashSet
+  add|(Ljava/lang/Object;)Z
+  iterator|()Ljava/util/Iterator;
+  toArray|()[Ljava/lang/Object;
 org.antlr.runtime
  ANTLRStringStream
   LA|(I)I
+  consume|()V
+  index|()I
+  mark|()I
+  release|(I)V
+  rewind|(I)V
+  seek|(I)V
+ BaseRecognizer
+  match|(Lorg/antlr/runtime/IntStream;ILorg/antlr/runtime/BitSet;)Ljava/lang/Object;
  BitSet
   lengthInLongWords|()I
  BufferedTokenStream
   LA|(I)I
+  index|()I
+  mark|()I
   reset|()V
+  rewind
+   ()V
+   (I)V
+  seek|(I)V
  CommonTokenStream
   LT|(I)Lorg/antlr/runtime/Token;
+  consume|()V
+ DFA
+  predict|(Lorg/antlr/runtime/IntStream;)I
+ Lexer
+  emit|()Lorg/antlr/runtime/Token;
+  matchRange|(II)V
+org.antlr.runtime.tree
+ BaseTree
+  addChild|(Lorg/antlr/runtime/tree/Tree;)V
+  getChild|(I)Lorg/antlr/runtime/tree/Tree;
+ BaseTreeAdaptor
+  addChild|(Ljava/lang/Object;Ljava/lang/Object;)V
+  becomeRoot|(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+  create|(ILjava/lang/String;)Ljava/lang/Object;
+  nil|()Ljava/lang/Object;
+  rulePostProcessing|(Ljava/lang/Object;)Ljava/lang/Object;
+ CommonTreeAdaptor
+  create|(Lorg/antlr/runtime/Token;)Ljava/lang/Object;
+  createToken|(ILjava/lang/String;)Lorg/antlr/runtime/Token;
+ RewriteRuleElementStream
+  add|(Ljava/lang/Object;)V
+  nextTree|()Ljava/lang/Object;
+  reset|()V
+  size|()I
 org.bouncycastle.crypto.digests
  GeneralDigest
   finish|()V
@@ -154,6 +197,11 @@ org.mybatis.spring
   closeSqlSession|(Lorg/apache/ibatis/session/SqlSession;Lorg/apache/ibatis/session/SqlSessionFactory;)V
   getSqlSession|(Lorg/apache/ibatis/session/SqlSessionFactory;Lorg/apache/ibatis/session/ExecutorType;Lorg/springframework/dao/support/PersistenceExceptionTranslator;)Lorg/apache/ibatis/session/SqlSession;
   isSqlSessionTransactional|(Lorg/apache/ibatis/session/SqlSession;Lorg/apache/ibatis/session/SqlSessionFactory;)Z
+org.noggit
+ CharArr
+  reserve|(I)V
+  reset|()V
+  size|()I
 org.ofbiz.core.entity.model|ModelEntity|getField|(Ljava/lang/String;)Lorg/ofbiz/core/entity/model/ModelField;
 org.osgi.framework
  FrameworkUtil$FilterImpl

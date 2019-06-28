@@ -178,12 +178,17 @@ javax.faces.view.facelets
   applyNextHandler|(Ljavax/faces/view/facelets/FaceletContext;Ljavax/faces/component/UIComponent;)V
 javax.management
  ImmutableDescriptor
+  clone
+   ()Ljava/lang/Object;
+   ()Ljavax/management/Descriptor;
   getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
   union|([Ljavax/management/Descriptor;)Ljavax/management/ImmutableDescriptor;
  ObjectName
   apply|(Ljavax/management/ObjectName;)Z
   getInstance|(Ljavax/management/ObjectName;)Ljavax/management/ObjectName;
   getKeyProperty|(Ljava/lang/String;)Ljava/lang/String;
+ StandardMBean
+  getAttribute|(Ljava/lang/String;)Ljava/lang/Object;
 javax.management.modelmbean|DescriptorSupport|getFieldValue|(Ljava/lang/String;)Ljava/lang/Object;
 javax.management.openmbean
  ArrayType
