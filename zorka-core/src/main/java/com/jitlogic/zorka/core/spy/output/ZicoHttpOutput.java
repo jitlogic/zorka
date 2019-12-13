@@ -27,7 +27,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Random;
 
-import static com.jitlogic.zorka.cbor.HttpConstants.*;
+import static com.jitlogic.zorka.common.cbor.HttpConstants.*;
 import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
 
 public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {

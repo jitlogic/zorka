@@ -16,12 +16,12 @@
 
 package com.jitlogic.zorka.common.codec;
 
-import com.jitlogic.zorka.cbor.CborDataWriter;
+import com.jitlogic.zorka.common.cbor.CborDataWriter;
 
 import java.util.Map;
 
-import static com.jitlogic.zorka.cbor.CBOR.*;
-import static com.jitlogic.zorka.cbor.TraceDataTags.*;
+import static com.jitlogic.zorka.common.cbor.CBOR.*;
+import static com.jitlogic.zorka.common.cbor.TraceDataTags.*;
 
 /**
  *

@@ -16,8 +16,6 @@
 package com.jitlogic.zorka.core.spy.plugins;
 
 import com.jitlogic.zorka.common.tracedata.DTraceContext;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.SpyProcessor;
 import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.core.spy.TracerLib;
@@ -30,7 +28,6 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.jitlogic.zorka.cbor.TraceAttributes.*;
 import static com.jitlogic.zorka.core.spy.TracerLib.*;
 
 /**

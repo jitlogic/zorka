@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.cbor;
+package com.jitlogic.zorka.common.cbor;
 
 public class CborResendException extends RuntimeException {
 }

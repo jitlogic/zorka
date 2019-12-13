@@ -19,7 +19,7 @@ package com.jitlogic.zorka.common.codec;
 
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 
-import static com.jitlogic.zorka.cbor.CBOR.*;
+import static com.jitlogic.zorka.common.cbor.CBOR.*;
 
 /**
  *

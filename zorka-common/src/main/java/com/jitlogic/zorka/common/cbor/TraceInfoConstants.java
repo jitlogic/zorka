@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.cbor;
+package com.jitlogic.zorka.common.cbor;
 
 /**
  * Keys for TraceInfo records as stored in TDB storage.

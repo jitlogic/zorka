@@ -16,12 +16,12 @@
 
 package com.jitlogic.zorka.core.spy.stracer;
 
-import com.jitlogic.zorka.cbor.TraceRecordFlags;
+import com.jitlogic.zorka.common.cbor.TraceRecordFlags;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.DTraceContext;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.cbor.CBOR;
+import com.jitlogic.zorka.common.cbor.CBOR;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.jitlogic.zorka.cbor.TraceDataTags.*;
+import static com.jitlogic.zorka.common.cbor.TraceDataTags.*;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.*;
 
 /**

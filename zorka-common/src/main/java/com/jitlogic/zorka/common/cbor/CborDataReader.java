@@ -14,7 +14,7 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.cbor;
+package com.jitlogic.zorka.common.cbor;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.cbor.CBOR.*;
+import static com.jitlogic.zorka.common.cbor.CBOR.*;
 
 public class CborDataReader {
 

@@ -1,4 +1,4 @@
-package com.jitlogic.zorka.cbor;
+package com.jitlogic.zorka.common.cbor;
 
 /**
  * Set of standard attribute names for traces.

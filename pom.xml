@@ -48,7 +48,6 @@
         <module>zorka-bsh-core</module>
         <module>zorka-bsh-shell</module>
         <module>zorka-slf4j</module>
-        <module>zorka-cbor</module>
         <module>zorka-common</module>
         <module>zorka-core</module>
         <module>zorka-agent</module>

@@ -1,6 +1,6 @@
 package com.jitlogic.zorka.common.codec;
 
-import com.jitlogic.zorka.cbor.CborDataWriter;
+import com.jitlogic.zorka.common.cbor.CborDataWriter;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 
 import java.util.Map;

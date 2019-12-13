@@ -1,8 +1,8 @@
-package com.jitlogic.zorka.cbor.test;
+package com.jitlogic.zorka.common.test.cbor;
 
 
-import com.jitlogic.zorka.cbor.Base64FormattingStream;
-import com.jitlogic.zorka.cbor.ByteArrayCborInput;
+import com.jitlogic.zorka.common.cbor.Base64FormattingStream;
+import com.jitlogic.zorka.common.cbor.ByteArrayCborInput;
 import org.junit.Test;
 
 import javax.xml.bind.DatatypeConverter;

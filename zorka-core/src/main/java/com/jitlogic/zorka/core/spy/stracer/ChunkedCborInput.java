@@ -1,6 +1,6 @@
 package com.jitlogic.zorka.core.spy.stracer;
 
-import com.jitlogic.zorka.cbor.CborInput;
+import com.jitlogic.zorka.common.cbor.CborInput;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 
 import java.util.ArrayList;

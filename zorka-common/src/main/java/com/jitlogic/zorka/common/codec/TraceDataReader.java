@@ -25,8 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.cbor.CBOR.*;
-import static com.jitlogic.zorka.cbor.TraceDataTags.*;
+import static com.jitlogic.zorka.common.cbor.CBOR.*;
+import static com.jitlogic.zorka.common.cbor.TraceDataTags.*;
 import static com.jitlogic.zorka.common.codec.Debug.TRACE_ENABLED;
 
 

@@ -16,16 +16,16 @@
 
 package com.jitlogic.zorka.core.spy.output;
 
-import com.jitlogic.zorka.cbor.CBOR;
-import com.jitlogic.zorka.cbor.CborDataWriter;
+import com.jitlogic.zorka.common.cbor.CBOR;
+import com.jitlogic.zorka.common.cbor.CborDataWriter;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
-import com.jitlogic.zorka.cbor.CborResendException;
+import com.jitlogic.zorka.common.cbor.CborResendException;
 
-import static com.jitlogic.zorka.cbor.TraceDataTags.*;
-import static com.jitlogic.zorka.cbor.TraceRecordFlags.*;
-import static com.jitlogic.zorka.cbor.TextIndexTypeMarkers.*;
+import static com.jitlogic.zorka.common.cbor.TraceDataTags.*;
+import static com.jitlogic.zorka.common.cbor.TraceRecordFlags.*;
+import static com.jitlogic.zorka.common.cbor.TextIndexTypeMarkers.*;
 
 import java.util.*;
 

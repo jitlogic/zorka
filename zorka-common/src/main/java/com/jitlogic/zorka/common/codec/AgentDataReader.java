@@ -19,9 +19,9 @@ package com.jitlogic.zorka.common.codec;
 
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 
-import static com.jitlogic.zorka.cbor.CBOR.*;
-import static com.jitlogic.zorka.cbor.TraceDataTags.TAG_METHOD_DEF;
-import static com.jitlogic.zorka.cbor.TraceDataTags.TAG_STRING_DEF;
+import static com.jitlogic.zorka.common.cbor.CBOR.*;
+import static com.jitlogic.zorka.common.cbor.TraceDataTags.TAG_METHOD_DEF;
+import static com.jitlogic.zorka.common.cbor.TraceDataTags.TAG_STRING_DEF;
 
 
 /**

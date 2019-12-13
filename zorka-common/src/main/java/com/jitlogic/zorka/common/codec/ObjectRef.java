@@ -16,10 +16,10 @@
 
 package com.jitlogic.zorka.common.codec;
 
-import com.jitlogic.zorka.cbor.CborDataWriter;
-import com.jitlogic.zorka.cbor.CborObject;
+import com.jitlogic.zorka.common.cbor.CborDataWriter;
+import com.jitlogic.zorka.common.cbor.CborObject;
 
-import static com.jitlogic.zorka.cbor.TraceDataTags.TAG_STRING_REF;
+import static com.jitlogic.zorka.common.cbor.TraceDataTags.TAG_STRING_REF;
 
 
 /**

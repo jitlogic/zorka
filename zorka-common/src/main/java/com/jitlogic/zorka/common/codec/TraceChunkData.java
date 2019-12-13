@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.jitlogic.zorka.cbor.TraceRecordFlags.TF_ERROR_MARK;
+import static com.jitlogic.zorka.common.cbor.TraceRecordFlags.TF_ERROR_MARK;
 
 /**
  * Metadata describing given trace chunk. Some attributes are stored in MetadataQuickIndex,
@@ -51,7 +51,7 @@ public class TraceChunkData {
     /** Parent ID */
     private long parentId;
 
-    /** Trace flags. See com.jitlogic.zorka.cbor.TraceRecordFlags for reference. */
+    /** Trace flags. See com.jitlogic.zorka.common.cbor.TraceRecordFlags for reference. */
     private int tflags;
 
     /** Trace timestamp (time when trace started in milliseconds since Epoch). */

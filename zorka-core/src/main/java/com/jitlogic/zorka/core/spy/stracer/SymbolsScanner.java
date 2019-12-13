@@ -16,9 +16,9 @@
 
 package com.jitlogic.zorka.core.spy.stracer;
 
-import com.jitlogic.zorka.cbor.CBOR;
-import com.jitlogic.zorka.cbor.CborDataWriter;
-import com.jitlogic.zorka.cbor.TagProcessor;
+import com.jitlogic.zorka.common.cbor.CBOR;
+import com.jitlogic.zorka.common.cbor.CborDataWriter;
+import com.jitlogic.zorka.common.cbor.TagProcessor;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.util.*;
 import org.slf4j.Logger;
@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.cbor.TraceDataTags.*;
-import static com.jitlogic.zorka.cbor.TextIndexTypeMarkers.*;
+import static com.jitlogic.zorka.common.cbor.TraceDataTags.*;
+import static com.jitlogic.zorka.common.cbor.TextIndexTypeMarkers.*;
 
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.BYTE_ARRAY_OFFS;
 import static com.jitlogic.zorka.core.util.ZorkaUnsafe.UNSAFE;

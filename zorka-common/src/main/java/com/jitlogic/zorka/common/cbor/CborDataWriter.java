@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.jitlogic.zorka.cbor;
+package com.jitlogic.zorka.common.cbor;
 
 
 
 import java.util.List;
 import java.util.Map;
 
-import static com.jitlogic.zorka.cbor.CBOR.*;
+import static com.jitlogic.zorka.common.cbor.CBOR.*;
 
 public class CborDataWriter {
 
