@@ -22,28 +22,4 @@ import java.lang.reflect.Field;
 
 public class ZorkaUnsafe {
 
-    @SuppressWarnings("restriction")
-    private static Unsafe getUnsafe() {
-        try {
-
-            Field f = Unsafe.class.getDeclaredField("theUnsafe");
-            f.setAccessible(true);
-            return (Unsafe) f.get(null);
-
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(e);
-        } catch (SecurityException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static final Unsafe UNSAFE = getUnsafe();
-
-    public static final long BYTE_ARRAY_OFFS = UNSAFE.arrayBaseOffset(byte[].class);
-
-
 }

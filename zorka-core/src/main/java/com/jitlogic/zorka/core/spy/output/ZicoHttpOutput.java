@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.common.http.HttpConfig;
+import com.jitlogic.zorka.common.http.HttpHandler;
 import com.jitlogic.zorka.common.http.HttpMessage;
 import com.jitlogic.zorka.common.http.HttpClient;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
@@ -27,7 +28,7 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Random;
 
-import static com.jitlogic.zorka.common.cbor.HttpConstants.*;
+import static com.jitlogic.zorka.common.tracedata.HttpConstants.*;
 import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
 
 public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
@@ -46,11 +47,11 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
     protected ZorkaConfig config;
 
     protected HttpConfig httpConfig;
-    protected HttpClient httpClient;
+    protected HttpHandler httpClient;
 
     protected Random rand = new Random();
 
-    public ZicoHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, MethodCallStatistics stats) {
+    public ZicoHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, HttpHandler httpClient) {
         super("ZORKA-CBOR-OUTPUT", parseInt(conf.get("http.qlen"), 64, "tracer.http.qlen"), 1);
 
         this.config = config;
@@ -69,7 +70,7 @@ public abstract class ZicoHttpOutput extends ZorkaAsyncThread<SymbolicRecord> {
         this.httpConfig = new HttpConfig();
         httpConfig.setKeepAliveTimeout(timeout);
 
-        this.httpClient = HttpClient.fromMap(conf, stats);
+        this.httpClient = httpClient;
 
         this.sessionID = String.format("%016x", rand.nextLong());
     }

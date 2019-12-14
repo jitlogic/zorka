@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.spy.stracer;
 
+import com.jitlogic.zorka.common.http.HttpClient;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
@@ -43,7 +44,7 @@ public class STracerLib extends TracerLib {
 
 
     public ZorkaAsyncThread<SymbolicRecord> toCbor(Map<String, String> config) {
-        return new STraceHttpOutput(this.config, config, symbolRegistry, stats);
+        return new STraceHttpOutput(this.config, config, symbolRegistry, HttpClient.fromMap(config, stats));
     }
 
 

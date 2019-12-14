@@ -1,16 +1,15 @@
 package com.jitlogic.zorka.core.spy.output;
 
-import com.jitlogic.zorka.common.cbor.CborDataReader;
-import com.jitlogic.zorka.common.cbor.CborInput;
-import com.jitlogic.zorka.common.cbor.CborResendException;
-import com.jitlogic.zorka.common.cbor.SimpleValResolver;
+import com.jitlogic.zorka.common.cbor.*;
+import com.jitlogic.zorka.common.http.HttpClient;
+import com.jitlogic.zorka.common.http.HttpHandler;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistrySenderVisitor;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.core.spy.stracer.ChunkedCborInput;
 import com.jitlogic.zorka.core.spy.stracer.STraceBufChunk;
-import com.jitlogic.zorka.core.spy.stracer.SymbolsScanner;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,9 @@ import java.util.Map;
 
 public class STraceHttpOutput extends ZicoHttpOutput {
 
-    private final SymbolsScanner scanner;
+    private TraceDataScanner scanner;
+    private SymbolRegistrySenderVisitor visitor;
+    private CborDataWriter writer;
 
     public static int chunksLength(STraceBufChunk chunks) {
         int len = 0;
@@ -28,35 +29,24 @@ public class STraceHttpOutput extends ZicoHttpOutput {
         return len;
     }
 
-    public static byte[] chunksMerge(STraceBufChunk chunks) {
-        byte[] buf = new byte[chunksLength(chunks)];
 
-        for (STraceBufChunk c = chunks; c != null; c = c.getNext()) {
-            System.arraycopy(c.getBuffer(), 0, buf, c.getExtOffset(), c.getPosition());
-        }
-
-        return buf;
+    public STraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, HttpHandler httpClient) {
+        super(config, conf, registry, httpClient);
+        writer = new CborDataWriter(65536, 65536);
+        visitor = new SymbolRegistrySenderVisitor(registry, new TraceDataWriter(writer));
+        scanner = new TraceDataScanner(visitor, null);
     }
 
-    public STraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, MethodCallStatistics stats) {
-        super(config, conf, registry, stats);
-        scanner = new SymbolsScanner(registry);
-    }
 
     private void resetState() {
         if (log.isDebugEnabled()) {
             log.debug("Resetting state ...");
         }
-        scanner.reset();
+        visitor.reset();
+        writer.reset();
         isClean = true;
     }
 
-    private static SimpleValResolver svr = new SimpleValResolver() {
-        @Override
-        public Object resolve(int sv) {
-            return null;
-        }
-    };
 
     @Override
     protected void process(List<SymbolicRecord> obj) {
@@ -66,12 +56,11 @@ public class STraceHttpOutput extends ZicoHttpOutput {
                 STraceBufChunk chunk = (STraceBufChunk) sr;
                 try {
                     synchronized (scanner) {
-                        scanner.clear();
                         CborInput input = new ChunkedCborInput(chunk);
-                        CborDataReader rdr = new CborDataReader(input, scanner, svr);
-                        while (!input.eof()) rdr.read();
-                        if (scanner.getPosition() > 0) {
-                            send(scanner.getBuf(), scanner.getPosition(), submitAgentUrl, 0L, 0L, isClean);
+                        new TraceDataReader(new CborDataReader(input), new TraceDataScanner(visitor, null)).run();
+                        if (writer.position() > 0) {
+                            send(writer.getBuf(), writer.position(), submitAgentUrl, 0L, 0L, isClean);
+                            writer.reset();
                             isClean = false;
                         }
                     }

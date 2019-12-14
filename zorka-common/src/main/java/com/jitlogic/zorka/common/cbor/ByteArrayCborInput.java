@@ -1,9 +1,12 @@
 package com.jitlogic.zorka.common.cbor;
 
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
+
 public class ByteArrayCborInput extends CborInput {
 
     private byte[] buf;
     private int pos;
+    private int offs;
     private int lim;
 
     public ByteArrayCborInput(byte[] buf) {
@@ -13,24 +16,57 @@ public class ByteArrayCborInput extends CborInput {
     public ByteArrayCborInput(byte[] buf, int offs, int size) {
         this.buf = buf;
         this.pos = offs;
+        this.offs = offs;
         this.lim = offs + size;
     }
 
-    public byte readB() { return pos < lim ? buf[pos++] : -1; }
-
-    public int readI() {
-        return pos < lim ? buf[pos++] & 0xff : -1;
+    @Override
+    public byte peekB() {
+        if (pos >= lim) throw new ZorkaRuntimeException("Unexpected EOD");
+        return buf[pos];
     }
 
+    public byte readB() {
+        if (pos >= lim) throw new ZorkaRuntimeException("Unexpected EOD");
+        return buf[pos++];
+    }
+
+    @Override
+    public byte[] readB(int len) {
+        if (pos+len > lim) throw new ZorkaRuntimeException("Unexpected EOD");
+        byte[] b = new byte[len];
+        System.arraycopy(buf, pos, b, 0, len);
+        pos += len;
+        return b;
+    }
+
+    @Override
+    public int readI() {
+        if (pos >= lim) throw new ZorkaRuntimeException("Unexpected EOD");
+        return buf[pos++] & 0xff;
+    }
+
+    @Override
     public long readL() {
-        return pos < lim ? buf[pos++] & 0xffL : -1;
+        if (pos >= lim) throw new ZorkaRuntimeException("Unexpected EOD");
+        return buf[pos++] & 0xffL;
     }
 
     public int size() {
-        return lim - pos;
+        return lim - offs;
     }
 
     public boolean eof() {
         return pos < lim;
+    }
+
+    @Override
+    public int position() {
+        return pos;
+    }
+
+    @Override
+    public void position(int pos) {
+        this.pos = pos;
     }
 }

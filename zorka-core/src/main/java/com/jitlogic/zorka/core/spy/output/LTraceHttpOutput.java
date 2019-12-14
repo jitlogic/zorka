@@ -16,16 +16,14 @@
 
 package com.jitlogic.zorka.core.spy.output;
 
-import com.jitlogic.zorka.common.cbor.CBOR;
 import com.jitlogic.zorka.common.cbor.CborDataWriter;
+import com.jitlogic.zorka.common.cbor.TraceDataWriter;
+import com.jitlogic.zorka.common.http.HttpClient;
+import com.jitlogic.zorka.common.http.HttpHandler;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.cbor.CborResendException;
-
-import static com.jitlogic.zorka.common.cbor.TraceDataTags.*;
-import static com.jitlogic.zorka.common.cbor.TraceRecordFlags.*;
-import static com.jitlogic.zorka.common.cbor.TextIndexTypeMarkers.*;
 
 import java.util.*;
 
@@ -49,10 +47,11 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
     private int TBUFSZ = 512 * 1024, ABUFSZ = 128 * 1024;
 
-    private CborDataWriter awriter = new CborDataWriter(ABUFSZ, ABUFSZ), twriter = new CborDataWriter(TBUFSZ, TBUFSZ);
+    private CborDataWriter adw = new CborDataWriter(ABUFSZ, ABUFSZ), tdw = new CborDataWriter(TBUFSZ, TBUFSZ);
+    private TraceDataWriter atdw = new TraceDataWriter(adw), ttdw = new TraceDataWriter(tdw);
 
-    public LTraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, MethodCallStatistics stats) {
-        super(config, conf, registry, stats);
+    public LTraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, HttpHandler httpClient) {
+        super(config, conf, registry, httpClient);
     }
 
     private static long cms2key(int classId, int methodId, int signatureId) {
@@ -63,16 +62,12 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         return (int)((cms >>> shift) & K_MASK);
     }
 
-    private int ref(int id, int type) {
+    private int ref(int id) {
 
         if (!symbolsSent.get(id)) {
             String s = registry.symbolName(id);
             if (s != null) {
-                awriter.writeTag(TAG_STRING_DEF);
-                awriter.writeUInt(CBOR.ARR_BASE, 3);
-                awriter.writeInt(id);
-                awriter.writeString(s);
-                awriter.writeInt(type);
+                atdw.stringRef(id, s);
             }
             symbolsSent.set(id);
         }
@@ -81,9 +76,9 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
     }
 
     private int mid(TraceRecord tr) {
-        int classId = ref(tr.getClassId(), CLASS_TYPE);
-        int methodId = ref(tr.getMethodId(), METHOD_TYPE);
-        int signatureId = ref(tr.getSignatureId(), SIGN_TYPE);
+        int classId = ref(tr.getClassId());
+        int methodId = ref(tr.getMethodId());
+        int signatureId = ref(tr.getSignatureId());
 
         long key = cms2key(classId, methodId, signatureId);
 
@@ -93,77 +88,29 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             lastMid++;
             mid = lastMid;
             mids.put(key, mid);
-
-            awriter.writeTag(TAG_METHOD_DEF);
-            awriter.writeUInt(CBOR.ARR_BASE, 4);
-            awriter.writeInt(mid);
-            awriter.writeInt(classId);
-            awriter.writeInt(methodId);
-            awriter.writeInt(signatureId);
+            atdw.methodRef(mid, classId, methodId, signatureId);
         }
 
         return mid;
     }
 
     private void processTraceRecord(long t, TraceRecord tr) {
-        long methodId = mid(tr);
+        ttdw.traceStart(tdw.position(), t, mid(tr));
 
-        // Leading tag and Array Start
-        twriter.writeTag(TAG_TRACE_START);
-        twriter.write(CBOR.ARR_VCODE);
-
-        // Trace Prolog
-        twriter.writeTag(TAG_PROLOG_BE);
-        twriter.writeUInt(CBOR.BYTES_BASE, 8);
-        long prolog = ((t >>> 16) & 0xFFFFFFFFFFL) | (methodId << 40);
-        twriter.writeRawLong(prolog, false);
-
-
-        // Trace Marker (if this is trace beginning)
+        TraceMarker tm = tr.getMarker();
         if (tr.hasFlag(TraceRecord.TRACE_BEGIN)) {
-            TraceMarker tm = tr.getMarker();
-            twriter.writeTag(TAG_TRACE_BEGIN);
-            int l = 2;
             DTraceContext ds = tm.getDstate();
-            if (ds != null && ds.getParentId() != 0) l++;
-
-            twriter.writeUInt(CBOR.ARR_BASE, l);
-            twriter.writeLong(tm.getClock());
-            if (ds != null && ds.getSpanId() != 0) {
-                twriter.writeLong(ds.getSpanId());
-            } else {
-                twriter.writeLong(rand.nextLong());
-            }
-
-            if (ds != null) {
-                if (ds.getParentId() != 0) twriter.writeLong(ds.getParentId());
-            }
-            if (tm.hasFlag(TraceMarker.ERROR_MARK)) {
-                twriter.writeTag(TAG_TRACE_FLAGS);
-                twriter.writeInt(TF_ERROR_MARK);
-            }
+            ttdw.traceBegin(tm.getClock(), ref(tm.getTraceId()),
+                ds != null ? ds.getSpanId() : 0L,
+                ds != null ? ds.getParentId() : 0L);
         }
 
         Map<Integer,Object> attrs = tr.getAttrs();
 
         // Attributes (if any)
         if (attrs != null) {
-            twriter.writeTag(TAG_TRACE_ATTR);
-            twriter.writeUInt(CBOR.MAP_BASE, attrs.size());
             for (Map.Entry<Integer,Object> e : attrs.entrySet()) {
-                twriter.writeTag(TAG_STRING_REF); // TODO get rid of this tag
-                twriter.writeInt(ref(e.getKey(), STRING_TYPE));
-                Object v = e.getValue();
-                if (v == null) {
-                    twriter.writeNull();
-                } else if (v.getClass() == String.class) {
-                    twriter.writeString((String)v);
-                } else if (v.getClass() == Integer.class || v.getClass() == Long.class
-                    || v.getClass() == Short.class || v.getClass() == Byte.class) {
-                    twriter.writeLong(((Number)v).longValue());
-                } else {
-                    twriter.writeString(v.toString());
-                }
+                ttdw.traceAttr(ref(e.getKey()), e.getValue());
             }
         }
 
@@ -181,36 +128,19 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
         if (tr.getException() != null) {
             SymbolicException se = (SymbolicException)(tr.getException());
-            twriter.writeTag(TAG_EXCEPTION);
-            twriter.writeUInt(CBOR.ARR_BASE, 5);
-            twriter.writeInt(++nExceptions);    // just allocating sequential exception IDs for now
-            twriter.writeTag(TAG_STRING_REF);
-            twriter.writeInt(ref(se.getClassId(), CLASS_TYPE));
-            twriter.writeString(se.getMessage());
-            twriter.writeInt(0); // TODO generate proper CauseID
-            twriter.writeUInt(CBOR.ARR_BASE, se.getStackTrace().length);
-            for (SymbolicStackElement el : se.getStackTrace()) {
-                twriter.writeUInt(CBOR.ARR_BASE, 4);
-                twriter.writeInt(ref(el.getClassId(), CLASS_TYPE));
-                twriter.writeInt(ref(el.getMethodId(), METHOD_TYPE));
-                twriter.writeInt(ref(el.getFileId(), STRING_TYPE));
-                twriter.writeInt(el.getLineNum() >= 0 ? el.getLineNum() : 0);
+
+            List<int[]> stack = new ArrayList<int[]>(se.getStackTrace().length);
+
+            for (SymbolicStackElement ste : se.getStackTrace()) {
+                stack.add(new int[] { ste.getClassId(), ste.getMethodId(), ste.getFileId(), ste.getLineNum() });
             }
+
+            // TODO generate proper causeID and proper binding between nException and causeId
+            ttdw.exception(++nExceptions, se.getClassId(), se.getMessage(), 0, stack, null);
         }
 
-        // Epilog
         t += tr.getTime();
-        long calls = tr.getCalls() < 0x1000000 ? tr.getCalls() : 0;
-        twriter.writeTag(TAG_EPILOG_BE);
-        twriter.writeULong(CBOR.BYTES_BASE, calls != 0 ? 8 : 16);
-        twriter.writeRawLong(((t >>> 16) & 0xFFFFFFFFFFL) | (calls << 40), false);
-        if (calls == 0) {
-            twriter.writeRawLong(tr.getCalls(), false);
-        }
-
-        // Array Finish
-        twriter.write(CBOR.BREAK_CODE);
-
+        ttdw.traceEnd(t, tr.getCalls(), tm != null ? tm.getFlags() : 0);
     } // processTraceRecord()
 
 
@@ -228,8 +158,8 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             long rt = retryTime;
             for (int i = 0; i < retries+1; i++) {
                 try {
-                    awriter.reset();
-                    twriter.reset();
+                    adw.reset();
+                    tdw.reset();
                     nExceptions = 0;
 
                     if (sr instanceof TraceRecord) {
@@ -237,13 +167,13 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
                         processTraceRecord(0, tr);
                     }
 
-                    if (awriter.position() > 0) {
-                        byte[] data = ZorkaUtil.clipArray(awriter.getBuf(), awriter.position()); // TODO get rid of this allocation
+                    if (adw.position() > 0) {
+                        byte[] data = ZorkaUtil.clipArray(adw.getBuf(), adw.position()); // TODO get rid of this allocation
                         send(data, data.length, submitAgentUrl, 0, 0, isClean);
                         isClean = false;
                     }
 
-                    if (twriter.position() > 0) {
+                    if (tdw.position() > 0) {
                         long traceId1 = 0, traceId2 = 0;
                         if (sr instanceof TraceRecord) {
                             TraceMarker tm = ((TraceRecord)sr).getMarker();
@@ -255,7 +185,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
                                 traceId2 = rand.nextLong();
                             }
                         }
-                        byte[] data = ZorkaUtil.clipArray(twriter.getBuf(), twriter.position()); // TODO get rid of this allocation
+                        byte[] data = ZorkaUtil.clipArray(tdw.getBuf(), tdw.position()); // TODO get rid of this allocation
                         send(data, data.length, submitTraceUrl, traceId1, traceId2, false);
                     }
 

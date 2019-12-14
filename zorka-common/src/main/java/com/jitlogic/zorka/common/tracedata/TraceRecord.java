@@ -63,17 +63,17 @@ public class TraceRecord implements SymbolicRecord, Serializable {
     /**
      * Class ID refers to class name in symbol registry.
      */
-    private int classId;
+    private int classId; // TODO get rid of this attribute
 
     /**
      * Method ID refers to method name in symbol registry.
      */
-    private int methodId;
+    private int methodId;  // TODO get rid of this attribute
 
     /**
      * Signature ID refers to signature string in symbol registry.
      */
-    private int signatureId;
+    private int signatureId;   // TODO get rid of this attribute
 
     /**
      * Class-method-signature ID (agent internal, transient);

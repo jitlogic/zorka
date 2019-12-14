@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import static com.jitlogic.zorka.common.cbor.CBOR.*;
 import static com.jitlogic.zorka.common.cbor.TraceDataTags.*;
-import static com.jitlogic.zorka.core.util.ZorkaUnsafe.*;
 
 /**
  * Efficient implementation of trace handler that produces CBOR data stream.
@@ -70,26 +70,9 @@ public class STraceHandler extends TraceHandler {
     public static final long TF_ERROR_MARK    = ((long)TraceRecordFlags.TF_ERROR_MARK) << TF_BITS;
 
 
-    public static final long TSTART_FUZZ = System.currentTimeMillis() - (System.nanoTime() / 1000000L);
 
-    /**
-     * This is pre-computed 4-byte trace record header.
-     */
-    public static final int TREC_HEADER;
-    public static final int TREC_EPILOG;
-
-    /**
-     * Initial fragment of trace record header (four bytes):
-     * - 0xd8 - TRACE_START tag
-     * - 0x9f - VCODE - unbounded array start
-     * - 0xda/0xdb - PROLOG_BE/PROLOG_LE
-     * - 0x48 - prolog start (byte array of length 8)
-     */
-    public static final int TREC_HEADER_BE = 0xc89fca48;
-    public static final int TREC_HEADER_LE = 0x48cb9fc8;
-
-    private final long minMethodTime;   // Default minimum duration = 4 ticks = ~250us
-    private long minTraceTime = 16384; // Approximately 1s
+    private final long minMethodTime;
+    private long minTraceTime = 1000000; // Approximately 1s
 
     /**
      * If true, streaming mode will be enabled. In streaming mode tracer
@@ -163,10 +146,9 @@ public class STraceHandler extends TraceHandler {
     public STraceHandler(boolean streamingEnabled, STraceBufManager bufManager,
                          SymbolRegistry symbols, TracerTuner tracerTuner, ZorkaSubmitter<SymbolicRecord> output) {
 
-        long mmt = TraceHandler.minMethodTime >>> 16;
 
         this.streamingEnabled = streamingEnabled;
-        this.minMethodTime = mmt;
+        this.minMethodTime = TraceHandler.minMethodTime;
 
         this.bufManager = bufManager;
         this.tuner = tracerTuner;
@@ -189,22 +171,20 @@ public class STraceHandler extends TraceHandler {
             extendStack();
         }
 
-        if (bufLen - bufPos < 12) {
+        if (bufLen - bufPos < 16) {
             nextChunk();
         }
 
-        long tst = tstamp >>> 16;
-        long tr0 = tst | ((long)methodId << TSTAMP_BITS);
-
         lastPos = bufPos;
-        UNSAFE.putInt(buffer, BYTE_ARRAY_OFFS+bufPos, TREC_HEADER);
-        UNSAFE.putLong(buffer, BYTE_ARRAY_OFFS+bufPos+4, tr0);
+        buffer[bufPos++] = (byte)0xc3;   // TAG_TRACE_START
+        buffer[bufPos++] = (byte)0x82;   // ARR_BASE+3
+        writeUInt(UINT_BASE, methodId);  // TODO rozwinąć ręcznie
+        writeULong(UINT_BASE, tstamp);   // TODO rozwinąć ręcznie
 
-        stack[stackPos] = tst;
+        stack[stackPos] = tstamp;
         stack[stackPos+1] = 1 + ((long)(bufPos + bufOffs) << 32);
         stack[stackPos+2] = methodId;
 
-        bufPos += 12;
         stackPos += 3;
 
         disabled = false;
@@ -218,13 +198,11 @@ public class STraceHandler extends TraceHandler {
 
         disabled = true;
 
-        long tst = tstamp >>> 16;
-
         long w2 = stack[stackPos-W2_OFF];
         long w1 = stack[stackPos-W1_OFF];
         long w0 = stack[stackPos-W0_OFF];
 
-        long dur = tst - (w0 & TSTAMP_MASK);
+        long dur = tstamp - (w0 & TSTAMP_MASK);
         int tid = (int)((w0 & TRACEID_MASK) >> TSTAMP_BITS);
         int pos = (int)(w1 >> TPOS_BITS);
         long calls = w1 & CALLS_MASK;
@@ -236,35 +214,14 @@ public class STraceHandler extends TraceHandler {
         }
 
         if (dur >= minMethodTime || fsm || pos < bufOffs || tid != 0) {
-
             // Output trace flags (if any)
             int flags = (int)(w1 >>> TF_BITS);
-            if (flags != 0) {
-                if (bufLen - bufPos < 2) nextChunk();
-                buffer[bufPos] = (byte)(CBOR.TAG_BASE+TAG_TRACE_FLAGS);
-                buffer[bufPos+1] = (byte)flags;
-                bufPos += 2;
-            }
-
-            // Output epilog
-            if (calls < 0x1000000) {
-                if (bufLen - bufPos < 12) nextChunk();
-                writeUInt(CBOR.TAG_BASE, TREC_EPILOG);
-                tst |= (calls << TSTAMP_BITS);
-                buffer[bufPos]   = (byte) (CBOR.BYTES_BASE+8);
-                UNSAFE.putLong(buffer, BYTE_ARRAY_OFFS+bufPos+1, tst);
-                buffer[bufPos+9] = (byte) CBOR.BREAK_CODE;
-                bufPos += 10;
-            } else {
-                if (bufLen - bufPos < 20) nextChunk();
-                writeUInt(CBOR.TAG_BASE, TREC_EPILOG);
-                buffer[bufPos]   = (byte) CBOR.BYTES_BASE+16;
-                long p = BYTE_ARRAY_OFFS+bufPos+1;
-                UNSAFE.putLong(buffer, p, tst);
-                UNSAFE.putLong(buffer, p+8, calls);
-                buffer[bufPos+17] = (byte) CBOR.BREAK_CODE;
-                bufPos += 18;
-            }
+            writeUInt(TAG_BASE, TAG_TRACE_END);
+            writeUInt(ARR_BASE, flags != 0 ? 3 : 2);
+            writeULong(UINT_BASE, tstamp);
+            writeULong(UINT_BASE, calls);
+            if (flags != 0) writeUInt(UINT_BASE, flags);
+            write(BREAK_CODE);
         } else {
             bufPos = pos - bufOffs;
         }
@@ -319,32 +276,15 @@ public class STraceHandler extends TraceHandler {
         if (id == exceptionId) {
             // Known (already written) exception - save reference to it;
             writeUInt(CBOR.TAG_BASE, TAG_EXCEPTION_REF);
-            writeUInt(CBOR.UINT_BASE, id);
+            writeUInt(UINT_BASE, id);
         } else {
             // Unknown exception
-            buffer[bufPos] = (byte) (CBOR.TAG_CODE1);
-            buffer[bufPos + 1] = (byte) TAG_EXCEPTION;
-            buffer[bufPos + 2] = (byte) (CBOR.ARR_CODE0 + 5);
-            bufPos += 3;
-
-            // Object identity (useful for determining
+            writeUInt(TAG_BASE, TAG_EXCEPTION);
+            writeUInt(ARR_BASE, 5);
             writeInt(id);
-
-            // Class name (as string ref)
-            if (bufLen - bufPos < 1) nextChunk();
-            buffer[bufPos++] = (byte) (CBOR.TAG_CODE0 + TAG_STRING_REF);
             writeInt(symbols.symbolId(e.getClass().getName()));
-
-            // Message
             writeString(e.getMessage() != null ? e.getMessage() : "");
-
             writeInt(0); // TODO generate proper causeId
-            //Throwable cause = e.getCause();
-            //if (cause != null) {
-            //    serializeException(cause);
-            //} else {
-            //    write(CBOR.NULL_CODE);
-            //}
 
             // Stack trace
             StackTraceElement[] stk = e.getStackTrace();
@@ -356,7 +296,6 @@ public class STraceHandler extends TraceHandler {
                 writeInt(symbols.symbolId(el.getFileName()));
                 writeInt(el.getLineNumber() >= 0 ? el.getLineNumber() : 0);
             }
-
         }
     }
 
@@ -403,10 +342,6 @@ public class STraceHandler extends TraceHandler {
         long w0 = stack[stackPos-W0_OFF];
         stack[stackPos-W0_OFF] = (w0 & TSTAMP_MASK) | ((long)traceId << TSTAMP_BITS);
 
-        writeUInt(CBOR.TAG_BASE, TAG_TRACE_BEGIN);
-        writeUInt(CBOR.ARR_BASE, 1);
-        writeLong(clock);
-
         if (tracePos == 0) {
             traceId1 = random.nextLong();
             traceId2 = random.nextLong();
@@ -419,6 +354,13 @@ public class STraceHandler extends TraceHandler {
             }
         }
 
+        writeUInt(CBOR.TAG_BASE, TAG_TRACE_BEGIN);
+        writeUInt(CBOR.ARR_BASE, 3);
+        writeLong(clock);
+        writeInt(traceId);
+        writeLong(spanId);  // TODO ensure that spanId sign does not break things ...
+        // TODO parentId
+
         tracePos++;
     }
 
@@ -428,19 +370,15 @@ public class STraceHandler extends TraceHandler {
             attrVal = ((String)attrVal).substring(0, maxAttrLen-3) + "...";
         }
         if (traceId >= 0) {
-            writeUInt(CBOR.TAG_BASE, TAG_TRACE_UP_ATTR);
-            if (bufLen - bufPos < 2) nextChunk();
-            buffer[bufPos++] = (byte) (CBOR.ARR_BASE+2);
+            writeUInt(TAG_BASE, TAG_TRACE_ATTR);
+            writeUInt(ARR_BASE, 3);
             writeInt(traceId);
         } else {
             writeUInt(CBOR.TAG_BASE, TAG_TRACE_ATTR);
+            writeUInt(ARR_BASE, 2);
         }
-        if (bufLen - bufPos < 2) nextChunk();
-        buffer[bufPos++] = (byte) (CBOR.MAP_BASE+1);
-        buffer[bufPos++] = (byte)(CBOR.TAG_BASE + TAG_STRING_REF);
         stack[stackPos-W0_OFF] |= TF_SUBMIT_METHOD; // TODO submit force behavior is controlled by API, make this thing configurable as in LTracer
-
-        writeUInt(0,attrId);
+        writeUInt(UINT_BASE,attrId);
         writeObject(attrVal);
     }
 
@@ -516,11 +454,6 @@ public class STraceHandler extends TraceHandler {
     /** Returns current wallclock time. */
     protected long clock() { return System.currentTimeMillis(); }
 
-
-    protected void writeStringRef(String s) {
-        writeUInt(CBOR.TAG_BASE, TAG_STRING_REF);
-        writeUInt(CBOR.UINT_BASE, symbols.symbolId(s));
-    }
 
 
 
@@ -756,20 +689,4 @@ public class STraceHandler extends TraceHandler {
             throw new RuntimeException("Unsupported data type: " + c);
         }
     }
-
-    static {
-        /* Determine byte order here. */
-        byte[] b = new byte[2];
-        UNSAFE.putShort(b, BYTE_ARRAY_OFFS, (short)0x0102);
-        if (b[0] == 0x01) {
-            // Big Endian
-            TREC_HEADER = TREC_HEADER_BE;
-            TREC_EPILOG = TAG_EPILOG_BE;
-        } else {
-            // Little endian
-            TREC_HEADER = TREC_HEADER_LE;
-            TREC_EPILOG = TAG_EPILOG_LE;
-        }
-    }
-
 }

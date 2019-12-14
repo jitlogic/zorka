@@ -90,7 +90,7 @@ public class CborDataWriter {
     }
 
 
-    public void writeUInt(int prefix, int i) {
+    public void write(int prefix, int i) {
         ensure(5);
         if (i < 0x18) {
             write(prefix + i);
@@ -113,9 +113,9 @@ public class CborDataWriter {
     }
 
 
-    public void writeULong(int prefix, long l) {
+    public void write(int prefix, long l) {
         if (l < Integer.MAX_VALUE) {
-            writeUInt(prefix, (int)l);
+            write(prefix, (int)l);
         } else {
             ensure(9);
             byte[] b = new byte[9];
@@ -135,24 +135,24 @@ public class CborDataWriter {
 
     public void writeInt(int i) {
         if (i >= 0) {
-            writeUInt(0, i);
+            write(0, i);
         } else {
-            writeUInt(0x20, Math.abs(i)-1);
+            write(0x20, Math.abs(i)-1);
         }
     }
 
 
     public void writeLong(long l) {
         if (l >= 0) {
-            writeULong(0, l);
+            write(0, l);
         } else {
-            writeULong(CBOR.NINT_BASE, Math.abs(l)-1L);
+            write(CBOR.NINT_BASE, Math.abs(l)-1L);
         }
     }
 
 
     public void writeBytes(byte[] b) {
-        writeUInt(CBOR.ARR_BASE, b.length);
+        write(CBOR.ARR_BASE, b.length);
         write(b);
     }
 
@@ -160,7 +160,7 @@ public class CborDataWriter {
     public void writeString(String s) {
         if (s != null) {
             byte[] b = s.getBytes();
-            writeUInt(CBOR.STR_BASE, b.length);
+            write(CBOR.STR_BASE, b.length);
             write(b);
         } else {
             writeNull();
@@ -169,12 +169,12 @@ public class CborDataWriter {
 
 
     public void writeTag(int tag) {
-        writeUInt(CBOR.TAG_BASE, tag);
+        write(CBOR.TAG_BASE, tag);
     }
 
 
     public void writeSimpleToken(int token) {
-        writeUInt(CBOR.SIMPLE_BASE, token);
+        write(CBOR.SIMPLE_BASE, token);
     }
 
 
@@ -187,17 +187,15 @@ public class CborDataWriter {
             writeLong((Long) obj);
         } else if (obj.getClass() == String.class) {
             writeString((String) obj);
-        } else if (obj instanceof CborObject) {
-            ((CborObject)obj).write(this);
         } else if (obj instanceof List) {
             List lst = (List)obj;
-            writeUInt(CBOR.ARR_BASE, lst.size());
+            write(CBOR.ARR_BASE, lst.size());
             for (Object o : lst) {
                 writeObj(o);
             }
         } else if (obj instanceof Map) {
             Map<Object,Object> m = (Map<Object,Object>)obj;
-            writeUInt(CBOR.MAP_BASE, m.size());
+            write(CBOR.MAP_BASE, m.size());
             for (Map.Entry<Object,Object> e : m.entrySet()) {
                 writeObj(e.getKey());
                 writeObj(e.getValue());
@@ -216,29 +214,6 @@ public class CborDataWriter {
     public void writeNull() {
         write(CBOR.NULL_CODE);
     }
-
-    public void writeRawLong(long v, boolean littleEndian) {
-        if (littleEndian) {
-            write ((int)(v & 0xff));
-            write ((int)((v >>> 8) & 0xff));
-            write ((int)((v >>> 16) & 0xff));
-            write ((int)((v >>> 24) & 0xff));
-            write ((int)((v >>> 32) & 0xff));
-            write ((int)((v >>> 40) & 0xff));
-            write ((int)((v >>> 48) & 0xff));
-            write ((int)((v >>> 56) & 0xff));
-        } else {
-            write ((int)((v >>> 56) & 0xff));
-            write ((int)((v >>> 48) & 0xff));
-            write ((int)((v >>> 40) & 0xff));
-            write ((int)((v >>> 32) & 0xff));
-            write ((int)((v >>> 24) & 0xff));
-            write ((int)((v >>> 16) & 0xff));
-            write ((int)((v >>> 8) & 0xff));
-            write ((int)(v & 0xff));
-        }
-    }
-
 
     public void position(int pos) {
         this.pos = pos;

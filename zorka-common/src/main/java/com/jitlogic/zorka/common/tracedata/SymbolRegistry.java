@@ -16,11 +16,18 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
+import com.jitlogic.zorka.common.collector.SymbolMapper;
+import com.jitlogic.zorka.common.collector.SymbolResolver;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SymbolRegistry {
+public class SymbolRegistry implements SymbolMapper, SymbolResolver {
 
     /**
      * ID of last symbol added to registry.
@@ -74,22 +81,11 @@ public class SymbolRegistry {
             id = symbolIds.putIfAbsent(symbol, newid);
             if (id == null) {
                 symbolNames.put(newid, symbol);
-                persist(newid, symbol);
                 id = newid;
             }
         }
 
         return id;
-    }
-
-    public int trySymbolId(String symbol) {
-
-        if (symbol == null) {
-            return 0;
-        }
-
-        Integer sym = symbolIds.get(symbol);
-        return sym != null ? sym : 0;
     }
 
     /**
@@ -105,6 +101,10 @@ public class SymbolRegistry {
         String sym = symbolNames.get(symbolId);
 
         return sym != null ? sym : "<?>";
+    }
+
+    public boolean hasSymbol(int symbolId) {
+        return symbolNames.containsKey(symbolId);
     }
 
     public String methodDesc(int mid) {
@@ -133,7 +133,7 @@ public class SymbolRegistry {
      * @param symbolId symbol ID
      * @param symbol   symbol name
      */
-    public void put(int symbolId, String symbol) {
+    public void putSymbol(int symbolId, String symbol) {
 
         symbolIds.put(symbol, symbolId);
         symbolNames.put(symbolId, symbol);
@@ -141,8 +141,6 @@ public class SymbolRegistry {
         if (symbolId > lastSymbolId.get()) {
             lastSymbolId.set(symbolId);
         }
-
-        persist(symbolId, symbol);
     }
 
     private final static long MDEF_MASK = 0x00000000001FFFFFL;
@@ -180,8 +178,8 @@ public class SymbolRegistry {
     }
 
 
-    public void putMethod(int methodId, String className, String methodName, String methodSignature) {
-        putMethod(methodId, symbolId(className), symbolId(methodName), symbolId(methodSignature));
+    public boolean hasMethod(int methodId) {
+        return methodDefs.containsKey(methodId);
     }
 
 
@@ -205,23 +203,49 @@ public class SymbolRegistry {
         }
     }
 
-    protected void persist(int id, String name) {
+    @Override
+    public Map<Integer, Integer> newSymbols(Map<Integer, String> newSymbols) {
+        Map<Integer,Integer> rslt = new TreeMap<Integer,Integer>();
+        for (Map.Entry<Integer,String> e : newSymbols.entrySet()) {
+            rslt.put(e.getKey(), symbolId(e.getValue()));
+        }
+        return rslt;
     }
 
-    public int size() {
-        return symbolIds.size();
+    @Override
+    public Map<Integer, Integer> newMethods(Map<Integer, int[]> newMethods) {
+        Map<Integer,Integer> rslt = new TreeMap<Integer, Integer>();
+        for (Map.Entry<Integer,int[]> e : newMethods.entrySet()) {
+            int[] v = e.getValue();
+            rslt.put(e.getKey(), methodId(v[0], v[1], v[2]));
+        }
+        return rslt;
     }
 
-    public int methodCount() { return methodIds.size(); }
-
-
-    public int lastSymbolId() {
-        return lastSymbolId.get();
+    @Override
+    public Map<Integer, String> resolveSymbols(Set<Integer> symbolIds) {
+        Map<Integer,String> rslt = new TreeMap<Integer, String>();
+        for (int id : symbolIds) {
+            String name = symbolName(id);
+            rslt.put(id, name != null ? name : "<?>");
+        }
+        return rslt;
     }
 
-
-    public int lastMethodId() {
-        return lastMethodId.get();
+    @Override
+    public Map<Integer,String> resolveMethods(Set<Integer> methodIds) {
+        Map<Integer,String> rslt = new TreeMap<Integer,String>();
+        for (int mid : methodIds) {
+            int[] md = methodDef(mid);
+            if (md != null) {
+                // Poor man's method resolver - for result and argument types use one with asm-util dependency;
+                String className = symbolName(md[0]);
+                String methodName = symbolName(md[1]);
+                rslt.put(mid, String.format("%s.%s()", className, methodName));
+            } else {
+                rslt.put(mid, "<?>");
+            }
+        }
+        return rslt;
     }
-
 }
