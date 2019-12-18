@@ -43,7 +43,7 @@ public class TraceDataProcessingUnitTest {
         tdw.traceAttr(2, 3, "bar");
         tdw.exception(1, 2, "test", 4, Arrays.asList(new int[]{1,2,3,4},new int[]{5,6,7,8}),null);
         tdw.exceptionRef(42);
-        tdw.traceEnd(200L, 1, 0);
+        tdw.traceEnd(0, 200L, 1, 0);
 
         CborDataReader cdr = new CborDataReader(cdw.toByteArray());
         TapTraceDataProcessor tap = new TapTraceDataProcessor();
@@ -99,7 +99,7 @@ public class TraceDataProcessingUnitTest {
 
         ssp.exceptionRef(51);
 
-        ssp.traceEnd(200L, 61, 0);
+        ssp.traceEnd(0, 200L, 61, 0);
         assertFalse(visitor.hasSymbol(61));
 
         CborDataReader cdr = new CborDataReader(cdw.toByteArray());

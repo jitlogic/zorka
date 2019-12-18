@@ -26,6 +26,7 @@ public class AgentDataHandler implements TraceDataProcessor {
 
     @Override
     public void stringRef(int symbolId, String symbol) {
+        //System.out.println("Symbol: " + symbolId + " -> " + symbol);
         if (!registry.hasSymbol(symbolId)) {
             newSymbols.put(symbolId,symbol);
             registry.putSymbol(symbolId, symbol);
@@ -46,7 +47,7 @@ public class AgentDataHandler implements TraceDataProcessor {
     }
 
     @Override
-    public void traceEnd(long tstop, long calls, int flags) {
+    public void traceEnd(int pos, long tstop, long calls, int flags) {
         throw new ZorkaRuntimeException("This is not allowed in agent state data.");
     }
 

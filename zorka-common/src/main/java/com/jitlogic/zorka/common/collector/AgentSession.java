@@ -5,13 +5,14 @@ import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
 public class AgentSession implements TraceDataScannerVisitor {
 
-    private SymbolRegistry registry;
-    private SymbolMapper mapper;
+    private SymbolRegistry agentSymbols;
+    private SymbolMapper collectorMapper;
     private TraceChunkStore store;
 
     /** Map: agentSymbolId -> collectorSymbolId */
@@ -23,14 +24,14 @@ public class AgentSession implements TraceDataScannerVisitor {
     private String sessionId;
 
     public AgentSession(String sessionId, SymbolMapper mapper, TraceChunkStore store) {
-        this.registry = new SymbolRegistry();
+        this.agentSymbols = new SymbolRegistry();
         this.sessionId = sessionId;
-        this.mapper = mapper;
+        this.collectorMapper = mapper;
         this.store = store;
     }
 
     public SymbolRegistry getRegistry() {
-        return registry;
+        return agentSymbols;
     }
 
     public String getSessionId() {
@@ -38,23 +39,27 @@ public class AgentSession implements TraceDataScannerVisitor {
     }
 
     public synchronized void handleAgentData(byte[] data) {
-        AgentDataHandler adh = new AgentDataHandler(registry);
+        AgentDataHandler adh = new AgentDataHandler(agentSymbols);
         new TraceDataReader(new CborDataReader(data), adh).run();
-        symbolsMap.putAll(mapper.newSymbols(adh.getNewSymbols()));
-        methodsMap.putAll(mapper.newMethods(adh.getNewMethods()));
+        Map<Integer, String> newSymbols = adh.getNewSymbols();
+        Map<Integer, Integer> mappedSymbols = collectorMapper.newSymbols(newSymbols);
+        symbolsMap.putAll(mappedSymbols);
+        methodsMap.putAll(collectorMapper.newMethods(adh.getNewMethods()));
     }
 
     public synchronized void handleTraceData(byte[] data, String traceId, int chunkNum) {
         long tid1 = new BigInteger(traceId.substring(0,16), 16).longValue();
         long tid2 = new BigInteger(traceId.substring(16), 16).longValue();
-        TraceChunkData tcd = new TraceChunkData(tid1, tid2, 0, 0, chunkNum);
+        TraceChunkData tcd = new TraceChunkData(tid1, tid2, 0, 0, chunkNum); // TODO continuation here
         CborDataWriter cbw = new CborDataWriter(data.length+1024, 4096);
         TraceDataWriter tdw = new TraceDataWriter(cbw);
-        TraceMetadataIndexer tme = new TraceMetadataIndexer(registry, tcd, tdw);
-        TraceDataScanner ssp = new TraceDataScanner(this, tme);
-        new TraceDataReader(new CborDataReader(data), ssp).run();
+        TraceDataScanner ssp = new TraceDataScanner(this, tdw);
+        TraceMetadataIndexer tme = new TraceMetadataIndexer(agentSymbols, ssp);
+        tme.init(data, tid1, tid2, chunkNum);
+        new TraceDataReader(new CborDataReader(data), tme).run();
         tcd.setTraceData(cbw.toByteArray());
-        store.add(tcd);
+        List<TraceChunkData> result = tme.getChunks();
+        store.addAll(result);
     }
 
     @Override

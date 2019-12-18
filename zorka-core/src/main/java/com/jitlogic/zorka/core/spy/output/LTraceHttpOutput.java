@@ -18,9 +18,7 @@ package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.common.cbor.CborDataWriter;
 import com.jitlogic.zorka.common.cbor.TraceDataWriter;
-import com.jitlogic.zorka.common.http.HttpClient;
 import com.jitlogic.zorka.common.http.HttpHandler;
-import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.cbor.CborResendException;
@@ -110,6 +108,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         // Attributes (if any)
         if (attrs != null) {
             for (Map.Entry<Integer,Object> e : attrs.entrySet()) {
+                //System.out.println("ATTR: " + ref(e.getKey()) + " -> " + e.getValue());
                 ttdw.traceAttr(ref(e.getKey()), e.getValue());
             }
         }
@@ -140,7 +139,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         }
 
         t += tr.getTime();
-        ttdw.traceEnd(t, tr.getCalls(), tm != null ? tm.getFlags() : 0);
+        ttdw.traceEnd(0, t, tr.getCalls(), tm != null ? tm.getFlags() : 0);
     } // processTraceRecord()
 
 

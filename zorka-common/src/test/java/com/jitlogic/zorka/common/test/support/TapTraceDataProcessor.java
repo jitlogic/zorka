@@ -62,9 +62,9 @@ public class TapTraceDataProcessor implements TraceDataProcessor {
     }
 
     @Override
-    public void traceEnd(long tstop, long calls, int flags) {
+    public void traceEnd(int pos, long tstop, long calls, int flags) {
         tap.add("traceEnd|" + tstop + "|" + calls + "|" + flags);
-        if (next != null) next.traceEnd(tstop, calls, flags);
+        if (next != null) next.traceEnd(pos, tstop, calls, flags);
     }
 
     @Override

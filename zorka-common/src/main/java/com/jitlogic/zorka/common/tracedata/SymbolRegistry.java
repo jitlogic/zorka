@@ -248,4 +248,12 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
         }
         return rslt;
     }
+
+    public ConcurrentMap<String, Integer> getSymbolIds() {
+        return symbolIds;
+    }
+
+    public ConcurrentMap<Integer, String> getSymbolNames() {
+        return symbolNames;
+    }
 }

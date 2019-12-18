@@ -97,14 +97,14 @@ public class TraceDataReader implements Runnable {
             case TAG_TRACE_END: {
                 int code = reader.read();
                 checked(code == (ARR_BASE+2) || code == (ARR_BASE+3), "Expected 2 or 3-element array.");
-                if (code == ARR_BASE+2) {
-                    // [TAG=0x04](tstart,calls)
-                    output.traceEnd(reader.readLong(), reader.readLong(), 0);
-                } else {
-                    // [TAG=0x04](tstart,calls,flags)
-                    output.traceEnd(reader.readLong(), reader.readLong(), reader.readInt());
+                long tstop = reader.readLong();
+                long calls = reader.readLong();
+                int flags = 0;
+                if (code == ARR_BASE+3) {
+                    flags = reader.readInt();
                 }
                 checked(reader.read() == BREAK_CODE, "Expected BREAK code.");
+                output.traceEnd(reader.position(), tstop, calls, flags);
                 break;
             }
             case TAG_TRACE_BEGIN: {

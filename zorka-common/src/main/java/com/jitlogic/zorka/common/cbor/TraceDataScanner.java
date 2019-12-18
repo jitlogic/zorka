@@ -44,8 +44,8 @@ public class TraceDataScanner implements TraceDataProcessor {
     }
 
     @Override
-    public void traceEnd(long tstop, long calls, int flags) {
-        if (output != null) output.traceEnd(tstop, calls, flags);
+    public void traceEnd(int pos, long tstop, long calls, int flags) {
+        if (output != null) output.traceEnd(pos, tstop, calls, flags);
     }
 
     @Override

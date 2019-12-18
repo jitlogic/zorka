@@ -62,7 +62,7 @@ public class TraceDataWriter implements TraceDataProcessor {
 
 
     @Override
-    public void traceEnd(long tstop, long calls, int flags) {
+    public void traceEnd(int pos, long tstop, long calls, int flags) {
         writer.writeTag(TAG_TRACE_END);
         writer.write(ARR_BASE, flags != 0 ? 3 : 2);
         writer.writeLong(tstop);

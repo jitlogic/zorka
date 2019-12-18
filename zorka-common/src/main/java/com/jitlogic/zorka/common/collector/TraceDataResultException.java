@@ -19,6 +19,12 @@ public class TraceDataResultException {
     /** Cause (if any) */
     private TraceDataResultException cause;
 
+    public TraceDataResultException(long excId, String className, String message) {
+        this.id = excId;
+        this.className = className;
+        this.message = message;
+    }
+
     public long getId() {
         return id;
     }

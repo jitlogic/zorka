@@ -59,11 +59,12 @@ public interface TraceDataProcessor {
     /**
      * Wire format: [TAG=0x04](tstart,calls,flags)
      *
+     * @param pos - end position (in data stream, after tag)
      * @param tstop - start time (System.nanoTime());
      * @param calls - method ID;
      * @param flags (optional) - trace flag bits: 0x01 - error,
      */
-    void traceEnd(long tstop, long calls, int flags);
+    void traceEnd(int pos, long tstop, long calls, int flags);
 
     /**
      * Wire format: [TAG=0x05](tstamp,ttypeId,spanId,parentId)

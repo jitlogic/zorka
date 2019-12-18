@@ -42,7 +42,7 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
     }
 
     @Override
-    public void traceEnd(long tstop, long calls, int flags) {
+    public void traceEnd(int pos, long tstop, long calls, int flags) {
         top.setTstop(tstop);
         top.setCalls(calls);
         if (0 != (flags & TraceRecordFlags.TF_ERROR_MARK)) top.setErrors(1);
@@ -80,10 +80,7 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
 
     @Override
     public void exception(long excId, int classId, String message, long cause, List<int[]> stackTrace, Map<Integer, Object> attrs) {
-        TraceDataResultException ex = new TraceDataResultException();
-        ex.setId(excId);
-        ex.setClassName(symbols.get(classId));
-        ex.setMessage(message);
+        TraceDataResultException ex = new TraceDataResultException(excId, symbols.get(classId), message);
         if (cause != 0) ex.setCause(exceptions.get(cause));
         for (int[] si : stackTrace) {
             String className = symbols.get(si[0]);

@@ -28,6 +28,7 @@ import static com.jitlogic.zorka.common.cbor.TraceRecordFlags.TF_ERROR_MARK;
  */
 public class TraceChunkData {
 
+    private TraceChunkData parent;
 
     /** Trace ID (high word) */
     private long traceId1;
@@ -59,6 +60,8 @@ public class TraceChunkData {
     /** Initial stack depth (should be 0 for top level traces, more than 0 for all embedded traces). */
     private int stackDepth;
 
+    private int ttypeId;
+
     /** Number of method calls processed (but not always recorded) by tracer. */
     private int calls;
 
@@ -85,6 +88,9 @@ public class TraceChunkData {
     /** Search terms (deeper inside trace) */
     private Set<String> terms;
 
+    /** Root method of trace call tree. */
+    private String method;
+
     /** List of all methods found in this chunk */
     private Set<Integer> methods;
 
@@ -94,9 +100,11 @@ public class TraceChunkData {
     /** Children spans. */
     private transient List<TraceChunkData> children = null;
 
+    private TraceDataResultException exception;
+
     @Override
     public String toString() {
-        return "ChunkMetadata(tid=" + getTraceIdHex() + ",sid=" + getSpanIdHex() + ",chn=" + getChunkNum()
+        return "ChunkMetadata(" + getMethod() +  " tid=" + getTraceIdHex() + ",sid=" + getSpanIdHex() + ",chn=" + getChunkNum()
             + ",pid=" + getParentIdHex() + ")";
     }
 
@@ -106,6 +114,14 @@ public class TraceChunkData {
         this.parentId = parentId;
         this.chunkNum = chunkNum;
         this.spanId = spanId;
+    }
+
+    public TraceChunkData getParent() {
+        return parent;
+    }
+
+    public void setParent(TraceChunkData parent) {
+        this.parent = parent;
     }
 
     public long getTraceId1() {
@@ -234,6 +250,14 @@ public class TraceChunkData {
         this.stackDepth = stackDepth;
     }
 
+    public int getTtypeId() {
+        return ttypeId;
+    }
+
+    public void setTtypeId(int ttypeId) {
+        this.ttypeId = ttypeId;
+    }
+
     public int getCalls() {
         return calls;
     }
@@ -327,8 +351,29 @@ public class TraceChunkData {
         this.traceData = traceData;
     }
 
+    public TraceDataResultException getException() {
+        return exception;
+    }
+
+    public void setException(TraceDataResultException exception) {
+        this.exception = exception;
+    }
+
     public Set<Integer> getMethods() {
         if (methods == null) methods = new HashSet<Integer>();
         return methods;
+    }
+
+    public void addMethod(int methodId) {
+        if (methods == null) methods = new HashSet<Integer>();
+        methods.add(methodId);
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 }
