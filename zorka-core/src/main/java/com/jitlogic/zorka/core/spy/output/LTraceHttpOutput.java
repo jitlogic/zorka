@@ -101,7 +101,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         if (tr.hasFlag(TraceRecord.TRACE_BEGIN)) {
             DTraceContext ds = tm.getDstate();
             ttdw.traceBegin(tm.getClock(), ref(tm.getTraceId()),
-                ds != null ? ds.getSpanId() : 0L,
+                ds != null ? ds.getSpanId() : rand.nextLong(),
                 ds != null ? ds.getParentId() : 0L);
         }
 

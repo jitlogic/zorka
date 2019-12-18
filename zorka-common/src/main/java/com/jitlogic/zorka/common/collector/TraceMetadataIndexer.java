@@ -58,6 +58,7 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
 
     @Override
     public void traceBegin(long tstamp, int ttypeId, long spanId, long parentId) {
+        chunk.setSpanId(spanId);
         if (output != null) output.traceBegin(tstamp, ttypeId, spanId, parentId);
     }
 

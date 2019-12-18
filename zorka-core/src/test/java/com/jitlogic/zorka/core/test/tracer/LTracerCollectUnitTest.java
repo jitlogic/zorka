@@ -1,14 +1,12 @@
 package com.jitlogic.zorka.core.test.tracer;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
-import com.jitlogic.zorka.common.collector.TraceChunkData;
-import com.jitlogic.zorka.common.collector.TraceDataExtractor;
-import com.jitlogic.zorka.common.collector.TraceDataResult;
+import com.jitlogic.zorka.common.collector.*;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.spy.ltracer.TraceHandler;
 import com.jitlogic.zorka.core.spy.output.LTraceHttpOutput;
-import com.jitlogic.zorka.common.collector.MemoryCollector;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +21,9 @@ import static org.junit.Assert.*;
 
 public class LTracerCollectUnitTest extends ZorkaFixture {
 
-    private MemoryCollector collector;
+    private SymbolRegistry collectorRegistry;
+    private MemoryChunkStore collectorStore;
+    private Collector collector;
     private ZorkaSubmitter<SymbolicRecord> output;
 
     private Map<String,String> HTTP_CONF = ZorkaUtil.map(
@@ -36,8 +36,10 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
 
     @Before
     public void initOutput() {
-        collector = new MemoryCollector();
-        output = new LTraceHttpOutput(config, HTTP_CONF, symbols, collector);
+        collectorRegistry = new SymbolRegistry();
+        collectorStore = new MemoryChunkStore();
+        collector = new Collector(collectorRegistry, collectorStore, false);
+        output = new LTraceHttpOutput(config, HTTP_CONF, symbols, new CollectorLocalClient(collector));
     }
 
     @Test
@@ -56,13 +58,24 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
 
         assertEquals(1, collector.getAgdCount());
         assertEquals(1, collector.getTrcCount());
-        assertEquals(1, collector.getStore().size());
+        assertEquals(1, collectorStore.size());
 
-        TraceChunkData cd = collector.getStore().get(0);
+        TraceChunkData cd = collectorStore.get(0);
         assertNotNull(cd.getTraceData());
         assertTrue(cd.getTraceData().length > 0);
 
-        TraceDataExtractor extractor = new TraceDataExtractor(collector.getRegistry());
+        assertEquals("TEST", cd.getAttr("component"));
+        assertNotNull(cd.getAttr("thread.name"));
+
+        assertNotNull(cd.getMethods());
+        assertEquals(cd.getMethods().size(), 1);
+
+        assertNotEquals(cd.getTraceId1(), 0);
+        assertNotEquals(cd.getTraceId2(), 0);
+        assertNotEquals(cd.getSpanId(), 0);
+        assertEquals(cd.getParentId(), 0L);
+
+        TraceDataExtractor extractor = new TraceDataExtractor(collectorRegistry);
         TraceDataResult tr = extractor.extract(Collections.singletonList(cd));
         assertNotNull(tr);
         assertNotEquals("<?>", tr.getMethod());
@@ -71,6 +84,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         assertEquals("TEST", tr.getAttr("component"));
         assertNotNull(tr.getAttr("thread.name"));
         assertNotNull(tr.getAttr("thread.id"));
+        assertNotEquals(tr.getSpanId(), 0);
     }
 
     @Test
@@ -90,13 +104,13 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
 
         assertEquals(1, collector.getAgdCount());
         assertEquals(1, collector.getTrcCount());
-        assertEquals(1, collector.getStore().size());
+        assertEquals(1, collectorStore.size());
 
-        TraceChunkData cd = collector.getStore().get(0);
+        TraceChunkData cd = collectorStore.get(0);
         assertNotNull(cd.getTraceData());
         assertTrue(cd.getTraceData().length > 0);
 
-        TraceDataExtractor extractor = new TraceDataExtractor(collector.getRegistry());
+        TraceDataExtractor extractor = new TraceDataExtractor(collectorRegistry);
         TraceDataResult tr = extractor.extract(Collections.singletonList(cd));
         assertNotNull(tr);
 

@@ -291,6 +291,10 @@ public class TraceChunkData {
         return attrs;
     }
 
+    public String getAttr(String attrName) {
+        return attrs != null ? attrs.get(attrName) : null;
+    }
+
     public List<TraceChunkData> getChunks() {
         return chunks;
     }
