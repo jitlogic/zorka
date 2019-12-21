@@ -148,7 +148,7 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
         c.setTstamp(tstamp);
         c.addRecs(1);
         c.addMethod(lastMethodId);
-        c.setMethod(registry.getMethod(lastMethodId));
+        c.setMethod(registry.methodDesc(lastMethodId));
         c.setTtypeId(ttypeId);
         push(c);
 

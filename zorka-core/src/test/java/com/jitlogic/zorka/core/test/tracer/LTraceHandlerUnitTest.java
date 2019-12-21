@@ -57,9 +57,9 @@ public class LTraceHandlerUnitTest extends ZorkaFixture {
     private int a1 = symbols.symbolId("ATTR1");
     private int a2 = symbols.symbolId("ATTR2");
 
-    private int mi111 = symbols.methodId(c1,m1,s1);
-    private int mi121 = symbols.methodId(c1,m2,s1);
-    private int mi131 = symbols.methodId(c1,m3,s1);
+    private int mi111 = symbols.methodId(new SymbolicMethod(c1,m1,s1));
+    private int mi121 = symbols.methodId(new SymbolicMethod(c1,m2,s1));
+    private int mi131 = symbols.methodId(new SymbolicMethod(c1,m3,s1));
 
     @Before
     public void setUp() {

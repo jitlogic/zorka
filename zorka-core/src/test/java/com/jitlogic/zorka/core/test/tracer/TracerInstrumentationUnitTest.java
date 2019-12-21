@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.core.test.tracer;
 
+import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
 import com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture;
 import com.jitlogic.zorka.core.test.support.CoreTestUtil;
 import org.junit.Assert;
@@ -71,10 +72,10 @@ public class TracerInstrumentationUnitTest extends BytecodeInstrumentationFixtur
 
         assertEquals(2, traceBuilder.size());
         assertEquals(1, submitter.size());
-        int[] cms = symbols.methodDef((Integer)traceBuilder.getData().get(0).get("mid"));
+        SymbolicMethod cms = symbols.methodDef((Integer)traceBuilder.getData().get(0).get("mid"));
         assertNotNull(cms);
-        assertEquals(TCLASS1, symbols.symbolName(cms[0]));
-        assertEquals("trivialMethod", symbols.symbolName(cms[1]));
+        assertEquals(TCLASS1, symbols.symbolName(cms.getClassId()));
+        assertEquals("trivialMethod", symbols.symbolName(cms.getMethodId()));
     }
 
 

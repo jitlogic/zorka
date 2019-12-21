@@ -37,12 +37,12 @@ public class SymbolRegistrySenderVisitor implements TraceDataScannerVisitor {
     @Override
     public int methodId(int mid) {
         if (!methodsSent.get(mid)) {
-            int[] md = registry.methodDef(mid);
+            SymbolicMethod md = registry.methodDef(mid);
             if (md != null) {
-                symbolId(md[0]);
-                symbolId(md[1]);
-                symbolId(md[2]);
-                output.methodRef(mid, md[0], md[1], md[2]);
+                symbolId(md.getClassId());
+                symbolId(md.getMethodId());
+                symbolId(md.getSignatureId());
+                output.methodRef(mid, md.getClassId(), md.getMethodId(), md.getSignatureId());
                 methodsSent.set(mid);
             }
         }

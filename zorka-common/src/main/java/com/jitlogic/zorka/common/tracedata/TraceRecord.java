@@ -541,11 +541,11 @@ public class TraceRecord implements SymbolicRecord, Serializable {
 
         if (classId == 0 && mid != 0) {
             // TODO get rid of allocation here, use raw values & parse functions
-            int[] cms = symbols.methodDef(mid);
+            SymbolicMethod cms = symbols.methodDef(mid);
             if (cms != null) {
-                classId = cms[0];
-                methodId = cms[1];
-                signatureId = cms[2];
+                classId = cms.getClassId();
+                methodId = cms.getMethodId();
+                signatureId = cms.getSignatureId();
             }
         }
 

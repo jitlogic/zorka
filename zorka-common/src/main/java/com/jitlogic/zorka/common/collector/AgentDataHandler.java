@@ -2,6 +2,7 @@ package com.jitlogic.zorka.common.collector;
 
 import com.jitlogic.zorka.common.cbor.TraceDataProcessor;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 
 import java.util.*;
@@ -10,13 +11,13 @@ public class AgentDataHandler implements TraceDataProcessor {
 
     private SymbolRegistry registry;
     private Map<Integer,String> newSymbols = new HashMap<Integer,String>();
-    private Map<Integer,int[]> newMethods = new HashMap<Integer,int[]>();
+    private Map<Integer, SymbolicMethod> newMethods = new HashMap<Integer,SymbolicMethod>();
 
     public Map<Integer,String> getNewSymbols() {
         return newSymbols;
     }
 
-    public Map<Integer,int[]> getNewMethods() {
+    public Map<Integer,SymbolicMethod> getNewMethods() {
         return newMethods;
     }
 
@@ -36,7 +37,7 @@ public class AgentDataHandler implements TraceDataProcessor {
     @Override
     public void methodRef(int symbolId, int classId, int methodId, int signatureId) {
         if (!registry.hasMethod(symbolId)) {
-            newMethods.put(symbolId, new int[]{classId,methodId,signatureId});
+            newMethods.put(symbolId, new SymbolicMethod(classId,methodId,signatureId));
             registry.putMethod(symbolId, classId, methodId, signatureId);
         }
     }

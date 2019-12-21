@@ -1,5 +1,7 @@
 package com.jitlogic.zorka.common.collector;
 
+import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
+
 import java.util.Map;
 
 public interface SymbolMapper {
@@ -11,6 +13,6 @@ public interface SymbolMapper {
      */
     Map<Integer,Integer> newSymbols(Map<Integer,String> newSymbols);
 
-    Map<Integer,Integer> newMethods(Map<Integer,int[]> newMethods);
+    Map<Integer,Integer> newMethods(Map<Integer,SymbolicMethod> newMethods);
 
 }

@@ -108,21 +108,21 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
     }
 
     public String methodDesc(int mid) {
-        int[] cms = methodDef(mid);
-        return cms != null ? symbolName(cms[0]) + "." + symbolName(cms[1]) + "()" : "<?>";
+        SymbolicMethod cms = methodDef(mid);
+        return cms != null ? symbolName(cms.getClassId()) + "." + symbolName(cms.getMethodId()) + "()" : "<?>";
     }
 
     public String methodXDesc(int mid) {
-        int[] cms = methodDef(mid);
+        SymbolicMethod cms = methodDef(mid);
         if (cms != null) {
             String pkgName = "";
-            String className = symbolName(cms[0]);
+            String className = symbolName(cms.getClassId());
             int ix = className.lastIndexOf('.');
             if (ix > 0) {
                 pkgName = className.substring(0, ix);
                 className = className.substring(ix+1);
             }
-            return pkgName + "|" + className + "|" +  symbolName(cms[1]) + "|" + symbolName(cms[2]);
+            return pkgName + "|" + className + "|" +  symbolName(cms.getMethodId()) + "|" + symbolName(cms.getSignatureId());
         }
         return "?";
     }
@@ -147,14 +147,12 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
 
 
     public int methodId(String className, String methodName, String methodDescription) {
-        return methodId(symbolId(className), symbolId(methodName), symbolId(methodDescription));
+        return methodId(new SymbolicMethod(symbolId(className), symbolId(methodName), symbolId(methodDescription)));
     }
 
 
-    public int methodId(int className, int methodName, int methodDescription) {
-        long mdef = (className & MDEF_MASK)
-                | ((methodName & MDEF_MASK) << 21)
-                | ((methodDescription & MDEF_MASK) << 42);
+    public int methodId(SymbolicMethod sm) {
+        long mdef = sm.mdef();
         Integer id = methodIds.get(mdef);
         if (id == null) {
             int newid = lastMethodId.incrementAndGet();
@@ -168,13 +166,9 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
     }
 
 
-    public int[] methodDef(int methodId) {
+    public SymbolicMethod methodDef(int methodId) {
         Long mdef = methodDefs.get(methodId);
-        return mdef != null ? new int[]{
-                (int)(mdef & MDEF_MASK),
-                (int)((mdef >> 21) & MDEF_MASK),
-                (int)((mdef >> 42) & MDEF_MASK) }
-                : null;
+        return mdef != null ? new SymbolicMethod(mdef) : null;
     }
 
 
@@ -194,15 +188,6 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
         }
     }
 
-    public String getMethod(int mid) {
-        int[] m = methodDef(mid);
-        if (m != null) {
-            return symbolName(m[0]) + "." + symbolName(m[1]) + "()";
-        } else {
-            return "<?>";
-        }
-    }
-
     @Override
     public Map<Integer, Integer> newSymbols(Map<Integer, String> newSymbols) {
         Map<Integer,Integer> rslt = new TreeMap<Integer,Integer>();
@@ -213,11 +198,10 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
     }
 
     @Override
-    public Map<Integer, Integer> newMethods(Map<Integer, int[]> newMethods) {
+    public Map<Integer, Integer> newMethods(Map<Integer,SymbolicMethod> newMethods) {
         Map<Integer,Integer> rslt = new TreeMap<Integer, Integer>();
-        for (Map.Entry<Integer,int[]> e : newMethods.entrySet()) {
-            int[] v = e.getValue();
-            rslt.put(e.getKey(), methodId(v[0], v[1], v[2]));
+        for (Map.Entry<Integer,SymbolicMethod> e : newMethods.entrySet()) {
+            rslt.put(e.getKey(), methodId(e.getValue()));
         }
         return rslt;
     }
@@ -236,11 +220,11 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
     public Map<Integer,String> resolveMethods(Set<Integer> methodIds) {
         Map<Integer,String> rslt = new TreeMap<Integer,String>();
         for (int mid : methodIds) {
-            int[] md = methodDef(mid);
+            SymbolicMethod md = methodDef(mid);
             if (md != null) {
                 // Poor man's method resolver - for result and argument types use one with asm-util dependency;
-                String className = symbolName(md[0]);
-                String methodName = symbolName(md[1]);
+                String className = symbolName(md.getClassId());
+                String methodName = symbolName(md.getMethodId());
                 rslt.put(mid, String.format("%s.%s()", className, methodName));
             } else {
                 rslt.put(mid, "<?>");
