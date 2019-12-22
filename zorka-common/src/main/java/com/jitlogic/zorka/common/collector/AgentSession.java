@@ -12,8 +12,12 @@ import java.util.Map;
 public class AgentSession implements TraceDataScannerVisitor {
 
     private SymbolRegistry agentSymbols;
-    private SymbolMapper collectorMapper;
-    private TraceChunkStore store;
+
+    private volatile long tstamp;
+
+    private volatile int tsnum;
+    private volatile SymbolMapper mapper;
+    private volatile TraceChunkStore store;
 
     /** Map: agentSymbolId -> collectorSymbolId */
     private Map<Integer,Integer> symbolsMap = new HashMap<Integer, Integer>();
@@ -23,11 +27,21 @@ public class AgentSession implements TraceDataScannerVisitor {
 
     private String sessionId;
 
-    public AgentSession(String sessionId, SymbolMapper mapper, TraceChunkStore store) {
+    public AgentSession(String sessionId, int tsnum, SymbolMapper mapper, TraceChunkStore store) {
         this.agentSymbols = new SymbolRegistry();
         this.sessionId = sessionId;
-        this.collectorMapper = mapper;
+        this.tsnum = tsnum;
+        this.mapper = mapper;
         this.store = store;
+        this.tstamp = System.currentTimeMillis();
+    }
+
+    public synchronized void reset(int tsnum, SymbolMapper mapper, TraceChunkStore store) {
+        this.tsnum = tsnum;
+        this.mapper = mapper;
+        this.store = store;
+        symbolsMap.clear();
+        methodsMap.clear();
     }
 
     public SymbolRegistry getRegistry() {
@@ -42,9 +56,10 @@ public class AgentSession implements TraceDataScannerVisitor {
         AgentDataHandler adh = new AgentDataHandler(agentSymbols);
         new TraceDataReader(new CborDataReader(data), adh).run();
         Map<Integer, String> newSymbols = adh.getNewSymbols();
-        Map<Integer, Integer> mappedSymbols = collectorMapper.newSymbols(newSymbols);
+        Map<Integer, Integer> mappedSymbols = mapper.newSymbols(newSymbols);
         symbolsMap.putAll(mappedSymbols);
-        methodsMap.putAll(collectorMapper.newMethods(adh.getNewMethods()));
+        methodsMap.putAll(mapper.newMethods(adh.getNewMethods()));
+        this.tstamp = System.currentTimeMillis();
     }
 
     public synchronized void handleTraceData(byte[] data, String traceId, int chunkNum) {
@@ -60,6 +75,7 @@ public class AgentSession implements TraceDataScannerVisitor {
         tcd.setTraceData(cbw.toByteArray());
         List<TraceChunkData> result = tme.getChunks();
         store.addAll(result);
+        this.tstamp = System.currentTimeMillis();
     }
 
     @Override
@@ -72,5 +88,9 @@ public class AgentSession implements TraceDataScannerVisitor {
     public int methodId(int methodId) {
         Integer rslt = methodsMap.get(methodId);
         return rslt != null ? rslt : 0;
+    }
+
+    public int getTsnum() {
+        return tsnum;
     }
 }

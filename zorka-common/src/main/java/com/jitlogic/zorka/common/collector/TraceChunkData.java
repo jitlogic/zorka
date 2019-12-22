@@ -319,6 +319,11 @@ public class TraceChunkData {
         return attrs != null ? attrs.get(attrName) : null;
     }
 
+    public void setAttr(String attrName, String attrVal) {
+        if (attrs == null) attrs = new HashMap<String, String>();
+        attrs.put(attrName, attrVal);
+    }
+
     public List<TraceChunkData> getChunks() {
         return chunks;
     }
@@ -375,5 +380,20 @@ public class TraceChunkData {
 
     public void setMethod(String method) {
         this.method = method;
+    }
+
+    public Set<String> getTerms() {
+        if (terms == null) terms = new HashSet<String>();
+        return terms;
+    }
+
+    public void setTerms(Set<String> terms) {
+        if (terms == null) terms = new HashSet<String>();
+        this.terms = terms;
+    }
+
+    public void addTerm(String term) {
+        if (terms == null) terms = new HashSet<String>();
+        terms.add(term);
     }
 }

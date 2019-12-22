@@ -40,7 +40,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
     public void initOutput() {
         collectorRegistry = new SymbolRegistry();
         collectorStore = new MemoryChunkStore();
-        collector = new Collector(collectorRegistry, collectorStore, false);
+        collector = new Collector(1, collectorRegistry, collectorStore, false);
         output = new LTraceHttpOutput(config, HTTP_CONF, symbols, new CollectorLocalClient(collector));
     }
 
