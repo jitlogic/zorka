@@ -18,6 +18,7 @@ package com.jitlogic.zorka.core.spy.tuner;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
 import com.jitlogic.zorka.common.util.KVSortingHeap;
 import com.jitlogic.zorka.common.util.ZorkaAsyncThread;
 import com.jitlogic.zorka.common.util.ZorkaConfig;
@@ -134,11 +135,11 @@ public class TracerTuner extends ZorkaAsyncThread<TraceTuningStats> {
         for (rc = 0; rc < Math.min(nitems, rankList.size()); rc++) {
             RankItem ri = rankList.get(rc);
             int mid = ri.getMid();
-            int[] cms = registry.methodDef(mid);
+            SymbolicMethod cms = registry.methodDef(mid);
             if (cms != null && ri.getRank() > minMethodRank && !tracerMatcherSet.isExcluded(mid)) {
-                String className = registry.symbolName(cms[0]);
-                String methodName = registry.symbolName(cms[1]);
-                String methodSignature = registry.symbolName(cms[2]);
+                String className = registry.symbolName(cms.getClassId());
+                String methodName = registry.symbolName(cms.getMethodId());
+                String methodSignature = registry.symbolName(cms.getSignatureId());
                 log.debug("Exclusion: " + className + "|" + methodName + "|" + methodSignature);
                 classNames.add(className);
                 tracerMatcherSet.add(className, methodName, methodSignature);

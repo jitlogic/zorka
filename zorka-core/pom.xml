@@ -16,11 +16,6 @@
         </dependency>
         <dependency>
             <groupId>com.jitlogic.zorka</groupId>
-            <artifactId>zorka-cbor</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jitlogic.zorka</groupId>
             <artifactId>zorka-common</artifactId>
             <version>${project.version}</version>
         </dependency>

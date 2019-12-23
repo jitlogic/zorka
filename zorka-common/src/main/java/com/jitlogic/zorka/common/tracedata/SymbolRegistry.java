@@ -16,11 +16,18 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
+import com.jitlogic.zorka.common.collector.SymbolMapper;
+import com.jitlogic.zorka.common.collector.SymbolResolver;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SymbolRegistry {
+public class SymbolRegistry implements SymbolMapper, SymbolResolver {
 
     /**
      * ID of last symbol added to registry.
@@ -74,22 +81,11 @@ public class SymbolRegistry {
             id = symbolIds.putIfAbsent(symbol, newid);
             if (id == null) {
                 symbolNames.put(newid, symbol);
-                persist(newid, symbol);
                 id = newid;
             }
         }
 
         return id;
-    }
-
-    public int trySymbolId(String symbol) {
-
-        if (symbol == null) {
-            return 0;
-        }
-
-        Integer sym = symbolIds.get(symbol);
-        return sym != null ? sym : 0;
     }
 
     /**
@@ -107,22 +103,26 @@ public class SymbolRegistry {
         return sym != null ? sym : "<?>";
     }
 
+    public boolean hasSymbol(int symbolId) {
+        return symbolNames.containsKey(symbolId);
+    }
+
     public String methodDesc(int mid) {
-        int[] cms = methodDef(mid);
-        return cms != null ? symbolName(cms[0]) + "." + symbolName(cms[1]) + "()" : "<?>";
+        SymbolicMethod cms = methodDef(mid);
+        return cms != null ? symbolName(cms.getClassId()) + "." + symbolName(cms.getMethodId()) + "()" : "<?>";
     }
 
     public String methodXDesc(int mid) {
-        int[] cms = methodDef(mid);
+        SymbolicMethod cms = methodDef(mid);
         if (cms != null) {
             String pkgName = "";
-            String className = symbolName(cms[0]);
+            String className = symbolName(cms.getClassId());
             int ix = className.lastIndexOf('.');
             if (ix > 0) {
                 pkgName = className.substring(0, ix);
                 className = className.substring(ix+1);
             }
-            return pkgName + "|" + className + "|" +  symbolName(cms[1]) + "|" + symbolName(cms[2]);
+            return pkgName + "|" + className + "|" +  symbolName(cms.getMethodId()) + "|" + symbolName(cms.getSignatureId());
         }
         return "?";
     }
@@ -133,7 +133,7 @@ public class SymbolRegistry {
      * @param symbolId symbol ID
      * @param symbol   symbol name
      */
-    public void put(int symbolId, String symbol) {
+    public void putSymbol(int symbolId, String symbol) {
 
         symbolIds.put(symbol, symbolId);
         symbolNames.put(symbolId, symbol);
@@ -141,22 +141,18 @@ public class SymbolRegistry {
         if (symbolId > lastSymbolId.get()) {
             lastSymbolId.set(symbolId);
         }
-
-        persist(symbolId, symbol);
     }
 
     private final static long MDEF_MASK = 0x00000000001FFFFFL;
 
 
     public int methodId(String className, String methodName, String methodDescription) {
-        return methodId(symbolId(className), symbolId(methodName), symbolId(methodDescription));
+        return methodId(new SymbolicMethod(symbolId(className), symbolId(methodName), symbolId(methodDescription)));
     }
 
 
-    public int methodId(int className, int methodName, int methodDescription) {
-        long mdef = (className & MDEF_MASK)
-                | ((methodName & MDEF_MASK) << 21)
-                | ((methodDescription & MDEF_MASK) << 42);
+    public int methodId(SymbolicMethod sm) {
+        long mdef = sm.mdef();
         Integer id = methodIds.get(mdef);
         if (id == null) {
             int newid = lastMethodId.incrementAndGet();
@@ -170,18 +166,14 @@ public class SymbolRegistry {
     }
 
 
-    public int[] methodDef(int methodId) {
+    public SymbolicMethod methodDef(int methodId) {
         Long mdef = methodDefs.get(methodId);
-        return mdef != null ? new int[]{
-                (int)(mdef & MDEF_MASK),
-                (int)((mdef >> 21) & MDEF_MASK),
-                (int)((mdef >> 42) & MDEF_MASK) }
-                : null;
+        return mdef != null ? new SymbolicMethod(mdef) : null;
     }
 
 
-    public void putMethod(int methodId, String className, String methodName, String methodSignature) {
-        putMethod(methodId, symbolId(className), symbolId(methodName), symbolId(methodSignature));
+    public boolean hasMethod(int methodId) {
+        return methodDefs.containsKey(methodId);
     }
 
 
@@ -196,32 +188,56 @@ public class SymbolRegistry {
         }
     }
 
-    public String getMethod(int mid) {
-        int[] m = methodDef(mid);
-        if (m != null) {
-            return symbolName(m[0]) + "." + symbolName(m[1]) + "()";
-        } else {
-            return "<?>";
+    @Override
+    public Map<Integer, Integer> newSymbols(Map<Integer, String> newSymbols) {
+        Map<Integer,Integer> rslt = new TreeMap<Integer,Integer>();
+        for (Map.Entry<Integer,String> e : newSymbols.entrySet()) {
+            rslt.put(e.getKey(), symbolId(e.getValue()));
         }
+        return rslt;
     }
 
-    protected void persist(int id, String name) {
+    @Override
+    public Map<Integer, Integer> newMethods(Map<Integer,SymbolicMethod> newMethods) {
+        Map<Integer,Integer> rslt = new TreeMap<Integer, Integer>();
+        for (Map.Entry<Integer,SymbolicMethod> e : newMethods.entrySet()) {
+            rslt.put(e.getKey(), methodId(e.getValue()));
+        }
+        return rslt;
     }
 
-    public int size() {
-        return symbolIds.size();
+    @Override
+    public Map<Integer, String> resolveSymbols(Set<Integer> symbolIds) {
+        Map<Integer,String> rslt = new TreeMap<Integer, String>();
+        for (int id : symbolIds) {
+            String name = symbolName(id);
+            rslt.put(id, name != null ? name : "<?>");
+        }
+        return rslt;
     }
 
-    public int methodCount() { return methodIds.size(); }
-
-
-    public int lastSymbolId() {
-        return lastSymbolId.get();
+    @Override
+    public Map<Integer,String> resolveMethods(Set<Integer> methodIds) {
+        Map<Integer,String> rslt = new TreeMap<Integer,String>();
+        for (int mid : methodIds) {
+            SymbolicMethod md = methodDef(mid);
+            if (md != null) {
+                // Poor man's method resolver - for result and argument types use one with asm-util dependency;
+                String className = symbolName(md.getClassId());
+                String methodName = symbolName(md.getMethodId());
+                rslt.put(mid, String.format("%s.%s()", className, methodName));
+            } else {
+                rslt.put(mid, "<?>");
+            }
+        }
+        return rslt;
     }
 
-
-    public int lastMethodId() {
-        return lastMethodId.get();
+    public ConcurrentMap<String, Integer> getSymbolIds() {
+        return symbolIds;
     }
 
+    public ConcurrentMap<Integer, String> getSymbolNames() {
+        return symbolNames;
+    }
 }

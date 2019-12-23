@@ -17,7 +17,7 @@
 package com.jitlogic.zorka.core.test.spy.support.cbor;
 
 
-import com.jitlogic.zorka.cbor.SimpleValResolver;
+import com.jitlogic.zorka.common.cbor.SimpleValResolver;
 
 public class TestValResolver implements SimpleValResolver {
 

@@ -1,6 +1,6 @@
 package com.jitlogic.zorka.core.spy.stracer;
 
-import com.jitlogic.zorka.cbor.CborInput;
+import com.jitlogic.zorka.common.cbor.CborInput;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class ChunkedCborInput extends CborInput {
     /** Limit in current chunk byte buffer */
     private int lim;
 
-    private int size = 0;
+    private int size = 0, len;
 
     private List<STraceBufChunk> chunks = new ArrayList<STraceBufChunk>();
 
@@ -61,10 +61,36 @@ public class ChunkedCborInput extends CborInput {
     }
 
     @Override
-    public byte readB() {
-        size--;
+    public byte peekB() {
         if (pos >= lim) nextChunk();
-        return pos < lim ? buf[pos++] : -1;
+        if (pos >= lim) throw new ZorkaRuntimeException("Unexpected EOD");
+        return buf[pos];
+    }
+
+    @Override
+    public byte readB() {
+        if (pos >= lim) nextChunk();
+        if (pos >= lim) throw new ZorkaRuntimeException("Unexpected EOD");
+        size--;
+        return buf[pos++];
+    }
+
+    @Override
+    public byte[] readB(int len) {
+        if (len > size) throw new ZorkaRuntimeException("Unexpected EOD");
+        byte[] rslt = new byte[len];
+        int rpos = 0;
+        while (rpos < len) {
+            if (pos >= lim) nextChunk();
+            if (pos < lim && size > 0) {
+                int cl = Math.min(len-rpos, lim-pos);
+                System.arraycopy(buf, pos, rslt, rpos, cl);
+                pos += cl; size -= cl; rpos += cl;
+            } else {
+                throw new ZorkaRuntimeException("Unexpected EOD");
+            }
+        }
+        return rslt;
     }
 
     @Override
@@ -90,6 +116,16 @@ public class ChunkedCborInput extends CborInput {
         return size <= 0;
     }
 
+    @Override
+    public int position() {
+        return len-size;
+    }
+
+    @Override
+    public void position(int pos) {
+        throw new ZorkaRuntimeException("Internal error: ChunkedCborInput.position(int) not implemented TBD");
+    }
+
     public void reset() {
         ccidx = 0;
         size = 0;
@@ -97,6 +133,8 @@ public class ChunkedCborInput extends CborInput {
         for (STraceBufChunk c : chunks) {
             size += c.size();
         }
+
+        len = size;
 
         nextChunk();
     }

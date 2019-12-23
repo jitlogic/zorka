@@ -63,17 +63,17 @@ public class TraceRecord implements SymbolicRecord, Serializable {
     /**
      * Class ID refers to class name in symbol registry.
      */
-    private int classId;
+    private int classId; // TODO get rid of this attribute
 
     /**
      * Method ID refers to method name in symbol registry.
      */
-    private int methodId;
+    private int methodId;  // TODO get rid of this attribute
 
     /**
      * Signature ID refers to signature string in symbol registry.
      */
-    private int signatureId;
+    private int signatureId;   // TODO get rid of this attribute
 
     /**
      * Class-method-signature ID (agent internal, transient);
@@ -541,11 +541,11 @@ public class TraceRecord implements SymbolicRecord, Serializable {
 
         if (classId == 0 && mid != 0) {
             // TODO get rid of allocation here, use raw values & parse functions
-            int[] cms = symbols.methodDef(mid);
+            SymbolicMethod cms = symbols.methodDef(mid);
             if (cms != null) {
-                classId = cms[0];
-                methodId = cms[1];
-                signatureId = cms[2];
+                classId = cms.getClassId();
+                methodId = cms.getMethodId();
+                signatureId = cms.getSignatureId();
             }
         }
 

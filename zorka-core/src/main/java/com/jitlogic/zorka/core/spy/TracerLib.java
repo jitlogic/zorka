@@ -31,12 +31,11 @@ import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import static com.jitlogic.zorka.cbor.TraceAttributes.*;
+import static com.jitlogic.zorka.common.cbor.TraceAttributes.*;
 
 public abstract class TracerLib {
 

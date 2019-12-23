@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.spy;
 
 import com.jitlogic.zorka.common.stats.AgentDiagnostics;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
 import org.objectweb.asm.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -431,7 +432,7 @@ public class SpyMethodVisitor extends MethodVisitor {
      */
     private int emitTraceEnter(int classId, int methodId, int signatureId) {
 
-        int mid = symbolRegistry.methodId(classId, methodId, signatureId);
+        int mid = symbolRegistry.methodId(new SymbolicMethod(classId, methodId, signatureId));
 
         emitLoadInt(mid);
 
