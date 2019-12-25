@@ -72,7 +72,8 @@ public class HttpEncoder implements HttpHandler {
 
     private void requestLine(String httpVersion, HttpMethod method, String url, String query) {
         StringBuilder sb = new StringBuilder();
-        sb.append(method).append(SP).append(uriPrefix).append(url);
+        sb.append(method).append(SP).append(uriPrefix);
+        sb.append(uriPrefix.endsWith("/") && url.startsWith("/") ? url.substring(1) : url);
         if (query != null) sb.append("?").append(query);
         sb.append(SP).append(httpVersion).append(CRLF);
         if (log.isDebugEnabled()) {
