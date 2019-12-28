@@ -18,6 +18,7 @@ package com.jitlogic.zorka.common.collector;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import static com.jitlogic.zorka.common.cbor.TraceRecordFlags.TF_ERROR_MARK;
@@ -62,6 +63,8 @@ public class TraceChunkData {
 
     private int ttypeId;
 
+    private String ttype;
+
     /** Number of method calls processed (but not always recorded) by tracer. */
     private int calls;
 
@@ -88,7 +91,10 @@ public class TraceChunkData {
     /** Search terms (deeper inside trace) */
     private Set<String> terms;
 
-    /** Root method of trace call tree. */
+    /** Root method of trace call tree - class name */
+    private String klass;
+
+    /** Root method of trace call tree - method name */
     private String method;
 
     /** List of all methods found in this chunk */
@@ -106,6 +112,19 @@ public class TraceChunkData {
     public String toString() {
         return "ChunkMetadata(" + getMethod() +  " tid=" + getTraceIdHex() + ",sid=" + getSpanIdHex() + ",chn=" + getChunkNum()
             + ",pid=" + getParentIdHex() + ")";
+    }
+
+    public TraceChunkData(String traceid, String spanid, String parentid, Integer chnum) {
+        if (traceid.length() == 16) {
+            traceId1 = new BigInteger(traceid, 16).longValue();
+            traceId2 = 0L;
+        } else if (traceid.length() == 32) {
+            traceId1 = new BigInteger(traceid.substring(0, 16), 16).longValue();
+            traceId2 = new BigInteger(traceid.substring(16,32), 16).longValue();
+        }
+        spanId = new BigInteger(spanid, 16).longValue();
+        if (parentid != null) parentId = new BigInteger(parentid, 16).longValue();
+        if (chnum != null) chunkNum = chnum;
     }
 
     public TraceChunkData(long traceId1, long traceId2, long parentId, long spanId, int chunkNum) {
@@ -258,6 +277,14 @@ public class TraceChunkData {
         this.ttypeId = ttypeId;
     }
 
+    public String getTtype() {
+        return ttype;
+    }
+
+    public void setTtype(String ttype) {
+        this.ttype = ttype;
+    }
+
     public int getCalls() {
         return calls;
     }
@@ -372,6 +399,14 @@ public class TraceChunkData {
     public void addMethod(int methodId) {
         if (methods == null) methods = new HashSet<Integer>();
         methods.add(methodId);
+    }
+
+    public String getKlass() {
+        return klass;
+    }
+
+    public void setKlass(String klass) {
+        this.klass = klass;
     }
 
     public String getMethod() {

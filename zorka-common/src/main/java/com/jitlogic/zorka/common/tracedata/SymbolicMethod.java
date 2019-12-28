@@ -36,6 +36,18 @@ public class SymbolicMethod implements SymbolicRecord {
         return signatureId;
     }
 
+    public void setClassId(int classId) {
+        this.classId = classId;
+    }
+
+    public void setMethodId(int methodId) {
+        this.methodId = methodId;
+    }
+
+    public void setSignatureId(int signatureId) {
+        this.signatureId = signatureId;
+    }
+
     public long mdef() {
         return (classId & MDEF_MASK)
             | ((methodId & MDEF_MASK) << 21)

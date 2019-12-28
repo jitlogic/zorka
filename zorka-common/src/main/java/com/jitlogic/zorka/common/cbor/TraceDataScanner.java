@@ -5,16 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 
-public class TraceDataScanner implements TraceDataProcessor {
+public class TraceDataScanner implements BufferedTraceDataProcessor {
 
     private TraceDataScannerVisitor visitor;
-    private TraceDataProcessor output;
+    private BufferedTraceDataProcessor output;
 
     public TraceDataScanner(TraceDataScannerVisitor visitor) {
         this(visitor, null);
     }
 
-    public TraceDataScanner(TraceDataScannerVisitor visitor, TraceDataProcessor output) {
+    public TraceDataScanner(TraceDataScannerVisitor visitor, BufferedTraceDataProcessor output) {
         this.visitor = visitor;
         this.output = output;
     }
@@ -83,4 +83,13 @@ public class TraceDataScanner implements TraceDataProcessor {
         if (output != null) output.exceptionRef(excId);
     }
 
+    @Override
+    public int size() {
+        return output.size();
+    }
+
+    @Override
+    public byte[] chunk(int offs, int len) {
+        return output.chunk(offs, len);
+    }
 }

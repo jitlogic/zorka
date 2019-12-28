@@ -81,6 +81,8 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         assertNotNull(cd.getTraceData());
         assertTrue(cd.getTraceData().length > 0);
 
+        assertTrue(cd.getTstart() < cd.getTstop());
+
         assertEquals("TEST", cd.getAttr("component"));
         assertNotNull(cd.getAttr("thread.name"));
 

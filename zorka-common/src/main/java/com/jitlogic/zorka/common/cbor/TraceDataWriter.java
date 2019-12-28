@@ -25,7 +25,7 @@ import static com.jitlogic.zorka.common.cbor.TraceDataTags.*;
 /**
  *
  */
-public class TraceDataWriter implements TraceDataProcessor {
+public class TraceDataWriter implements BufferedTraceDataProcessor {
 
     private CborDataWriter writer;
 
@@ -132,4 +132,13 @@ public class TraceDataWriter implements TraceDataProcessor {
         writer.writeLong(excId);
     }
 
+    @Override
+    public int size() {
+        return writer.position();
+    }
+
+    @Override
+    public byte[] chunk(int offs, int len) {
+        return writer.toByteArray(offs, len);
+    }
 }

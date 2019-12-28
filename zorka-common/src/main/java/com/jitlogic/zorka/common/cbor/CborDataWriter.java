@@ -18,6 +18,8 @@ package com.jitlogic.zorka.common.cbor;
 
 
 
+import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
+
 import java.util.List;
 import java.util.Map;
 
@@ -235,6 +237,13 @@ public class CborDataWriter {
         if (pos == 0) return new byte[0];
         byte[] rslt = new byte[pos];
         System.arraycopy(buf, 0, rslt, 0, pos);
+        return rslt;
+    }
+
+    public byte[] toByteArray(int offs, int len) {
+        if (offs+len > pos) throw new ZorkaRuntimeException("Tried to read outside of output buffer.");
+        byte[] rslt = new byte[len];
+        System.arraycopy(buf, offs, rslt, 0, len);
         return rslt;
     }
 }

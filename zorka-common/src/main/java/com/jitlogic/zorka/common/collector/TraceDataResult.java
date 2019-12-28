@@ -215,4 +215,9 @@ public class TraceDataResult {
     public void setChildren(List<TraceDataResult> children) {
         this.children = children;
     }
+
+    @Override
+    public String toString() {
+        return "T(" + getMethod() + ", " + (getChildren() != null ? getChildren() : "[]") + ")";
+    }
 }

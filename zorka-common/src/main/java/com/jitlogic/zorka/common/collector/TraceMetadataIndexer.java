@@ -1,8 +1,10 @@
 package com.jitlogic.zorka.common.collector;
 
+import com.jitlogic.zorka.common.cbor.BufferedTraceDataProcessor;
 import com.jitlogic.zorka.common.cbor.TraceDataProcessor;
 import com.jitlogic.zorka.common.cbor.TraceRecordFlags;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +32,6 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
 
     private int chunkNum;
 
-    private byte[] chunkBytes;
-
     /** Indexing result */
     private List<TraceChunkData> result = new ArrayList<TraceChunkData>();
 
@@ -39,7 +39,7 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
     private TraceChunkData top;
 
     private SymbolRegistry registry;
-    private TraceDataProcessor output;
+    private BufferedTraceDataProcessor output;
 
     /** Last received start time */
     private long tstart = Long.MAX_VALUE;
@@ -49,14 +49,13 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
 
     private Map<Long,TraceDataResultException> exceptions = new TreeMap<Long, TraceDataResultException>();
 
-    public TraceMetadataIndexer(SymbolRegistry registry, TraceDataProcessor output) {
+    public TraceMetadataIndexer(SymbolRegistry registry, BufferedTraceDataProcessor output) {
         this.registry = registry;
         this.output = output;
     }
 
-    public void init(byte[] chunkBytes, long traceId1, long traceId2, int chunkNum) {
+    public void init(long traceId1, long traceId2, int chunkNum) {
         startOffs += currentPos;
-        this.chunkBytes = chunkBytes;
         this.traceId1 = traceId1;
         this.traceId2 = traceId2;
         this.chunkNum = chunkNum;
@@ -91,15 +90,9 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
             if (c.getParentId() == 0 && top.getParent() != null) {
                 c.setParentId(top.getParent().getSpanId());
             }
-            if (c.getStartOffs() == 0 && pos == chunkBytes.length) {
-                c.setTraceData(chunkBytes);
-            } else {
-                int len = pos - c.getStartOffs();
-                if (len > 0) {
-                    byte[] chunk = new byte[len];
-                    System.arraycopy(chunkBytes, c.getStartOffs(), chunk, 0, len);
-                    c.setTraceData(chunk);
-                }
+            int len = pos - c.getStartOffs();
+            if (len > 0) {
+                c.setTraceData(output.chunk(c.getStartOffs(), len));
             }
             // TODO uwaga: tylko zakończone fragmenty są zapisywane; zaimplementować tymczasowy zapis niezakończonych fragmentów;
             result.add(c);
@@ -114,6 +107,7 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
 
     @Override
     public void traceStart(int pos, long tstart, int methodId) {
+        if (output != null) pos = output.size();
         stackDepth++;
         this.currentPos = pos;
         this.tstart = tstart;
@@ -124,18 +118,25 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
 
     @Override
     public void traceEnd(int pos, long tstop, long calls, int flags) {
-        if (top != null && top.getStackDepth() == stackDepth) {
-            pop(pos);
+        if (output != null) {
+            output.traceEnd(pos, tstop, calls, flags);
+            pos = output.size();
         }
-        stackDepth--;
         this.currentPos = pos;
         this.tstop = tstop;
-        if (top != null) top.addCalls((int)calls+1);
-        if (0 != (flags & TraceRecordFlags.TF_ERROR_MARK) && top != null) {
-            top.addErrors(1);
-            if (top.getStackDepth() == stackDepth) top.setError(true);
+        if (top != null) {
+            top.addCalls((int)calls+1);
+            if (0 != (flags & TraceRecordFlags.TF_ERROR_MARK)) {
+                top.addErrors(1);
+                if (top.getStackDepth() == stackDepth) top.setError(true);
+            }
+            if (top.getStackDepth() == stackDepth) {
+                top.setTstop(tstop);
+                top.setDuration(top.getTstop()-top.getTstart());
+                pop(pos);
+            }
         }
-        if (output != null) output.traceEnd(pos, tstop, calls, flags);
+        stackDepth--;
     }
 
     @Override
@@ -146,10 +147,15 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
         c.setStackDepth(stackDepth);
         c.setTstart(tstart);
         c.setTstamp(tstamp);
+        c.setStartOffs(this.currentPos);
+        c.addCalls(1);
         c.addRecs(1);
         c.addMethod(lastMethodId);
-        c.setMethod(registry.methodDesc(lastMethodId));
+        SymbolicMethod mdef = registry.methodDef(lastMethodId);
+        c.setKlass(registry.symbolName(mdef.getClassId()));
+        c.setMethod(registry.symbolName(mdef.getMethodId()));
         c.setTtypeId(ttypeId);
+        c.setTtype(registry.symbolName(ttypeId));
         push(c);
 
         if (output != null) output.traceBegin(tstamp, ttypeId, spanId, parentId);
