@@ -43,6 +43,8 @@ public class TraceChunkData {
     /** Chunk sequential number. */
     private int chunkNum;
 
+    private int tsNum;
+
     /** Parent ID */
     private long parentId;
 
@@ -251,6 +253,14 @@ public class TraceChunkData {
 
     public void setChunkNum(int chunkNum) {
         this.chunkNum = chunkNum;
+    }
+
+    public int getTsNum() {
+        return tsNum;
+    }
+
+    public void setTsNum(int tsNum) {
+        this.tsNum = tsNum;
     }
 
     public int getStartOffs() {

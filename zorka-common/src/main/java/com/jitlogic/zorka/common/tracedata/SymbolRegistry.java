@@ -207,7 +207,7 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
     }
 
     @Override
-    public Map<Integer, String> resolveSymbols(Set<Integer> symbolIds) {
+    public Map<Integer, String> resolveSymbols(Set<Integer> symbolIds, int tsnum) {
         Map<Integer,String> rslt = new TreeMap<Integer, String>();
         for (int id : symbolIds) {
             String name = symbolName(id);
@@ -217,7 +217,7 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
     }
 
     @Override
-    public Map<Integer,String> resolveMethods(Set<Integer> methodIds) {
+    public Map<Integer,String> resolveMethods(Set<Integer> methodIds, int tsnum) {
         Map<Integer,String> rslt = new TreeMap<Integer,String>();
         for (int mid : methodIds) {
             SymbolicMethod md = methodDef(mid);

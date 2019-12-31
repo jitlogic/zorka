@@ -75,4 +75,8 @@ public class Collector {
     public long getTrcCount() {
         return trcCount.longValue();
     }
+
+    public int getTsnum() {
+        return tsnum;
+    }
 }

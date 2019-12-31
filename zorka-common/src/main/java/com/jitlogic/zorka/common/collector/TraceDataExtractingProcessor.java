@@ -17,7 +17,7 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
 
     private Map<Long,TraceDataResultException> exceptions = new TreeMap<Long, TraceDataResultException>();
 
-    public TraceDataExtractingProcessor(Map<Integer,String> symbols, Map<Integer,String> methods) {
+    public void setSymbolMaps(Map<Integer,String> symbols, Map<Integer,String> methods) {
         this.symbols = symbols;
         this.methods = methods;
     }

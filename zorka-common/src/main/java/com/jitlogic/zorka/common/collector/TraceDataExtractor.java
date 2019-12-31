@@ -19,20 +19,16 @@ public class TraceDataExtractor {
 
     public TraceDataResult extract(List<TraceChunkData> chunks) {
 
+        TraceDataExtractingProcessor tdep = new TraceDataExtractingProcessor();
+
         // Extract symbol and method ids
-        SymbolsScanningVisitor ssv = new SymbolsScanningVisitor();
-        TraceDataScanner tds = new TraceDataScanner(ssv);
         for (TraceChunkData c : chunks) {
+            SymbolsScanningVisitor ssv = new SymbolsScanningVisitor();
+            TraceDataScanner tds = new TraceDataScanner(ssv);
             new TraceDataReader(new CborDataReader(c.getTraceData()), tds).run();
-        }
-
-        // Resolve symbols and methods
-        Map<Integer,String> symbols = resolver.resolveSymbols(ssv.getSymbolIds());
-        Map<Integer,String> methods = resolver.resolveMethods(ssv.getMethodIds());
-
-        // Extract trace execution tree
-        TraceDataExtractingProcessor tdep = new TraceDataExtractingProcessor(symbols, methods);
-        for (TraceChunkData c : chunks) {
+            Map<Integer,String> symbols = resolver.resolveSymbols(ssv.getSymbolIds(), c.getTsNum());
+            Map<Integer,String> methods = resolver.resolveMethods(ssv.getMethodIds(), c.getTsNum());
+            tdep.setSymbolMaps(symbols, methods);
             new TraceDataReader(new CborDataReader(c.getTraceData()), tdep).run();
         }
 
