@@ -34,4 +34,30 @@ public class TestClass9 {
         Thread.sleep(5*N);
     }
 
+    public void err() {
+        try {
+            bork3();
+        } catch (Exception e) {
+        }
+    }
+
+    public void bork3() throws Exception {
+        Thread.sleep(2*N);
+        try {
+            bork2();
+        } catch (Exception e) {
+            throw new RuntimeException("Borken: ", e);
+        }
+    }
+
+    public void bork2() throws Exception {
+        Thread.sleep(2*N);
+        bork1();
+    }
+
+    public void bork1() throws Exception {
+        Thread.sleep(2*N);
+        throw new RuntimeException("BORK!");
+    }
+
 }

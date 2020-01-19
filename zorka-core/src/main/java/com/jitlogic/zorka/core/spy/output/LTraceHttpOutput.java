@@ -134,7 +134,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             }
 
             // TODO generate proper causeID and proper binding between nException and causeId
-            ttdw.exception(++nExceptions, se.getClassId(), se.getMessage(), 0, stack, null);
+            ttdw.exception(++nExceptions, se.getClassId(), ""+se.getMessage(), 0, stack, null);
         }
 
         t += tr.getTime();

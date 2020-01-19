@@ -446,4 +446,18 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         assertTrue(tr5.getTstop()-tr5.getTstart() > 0);
     }
 
+    @Test
+    public void testRetrieveTraceWithExceptions() throws Exception {
+        TraceHandler.setMinMethodTime(0);
+        tracer.include(spy.byClass(TCLASS+9));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST", 0)).include(spy.byMethod(TCLASS+9, "err")));
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS+9);
+        invoke(obj, "err");
+
+        assertEquals("should return one trace", 1, collectorStore.size());
+
+    }
+
 }

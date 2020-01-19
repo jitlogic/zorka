@@ -134,7 +134,8 @@ public class CborDataReader {
     public String readStr() {
         int type = peekType();
         if (type != STR_BASE) {
-            throw new ZorkaRuntimeException("Expected string data but got type=" + type);
+            if (peek() == NULL_CODE) return null;
+            throw new ZorkaRuntimeException("Expected string data but got type=" + type + " (v=" + peek() + ")");
         }
         return new String(readBytes());
     }

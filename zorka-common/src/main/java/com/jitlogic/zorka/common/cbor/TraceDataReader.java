@@ -145,8 +145,9 @@ public class TraceDataReader implements Runnable {
                 String msg = reader.readStr();
                 long cause = reader.readLong();
 
-                checked((reader.peek() & TYPE_MASK) == ARR_BASE, "Expected array");
-                int stackSize = reader.readInt();
+                int pk = reader.peek();
+                checked((pk & TYPE_MASK) == ARR_BASE || pk == NULL_CODE, "Expected array or null, got peek=" + pk);
+                int stackSize = pk != NULL_CODE ? reader.readInt() : 0;
                 List<int[]> stackTrace = new ArrayList<int[]>(stackSize);
                 for (int i = 0; i < stackSize; i++) {
                     if (reader.read() != (ARR_BASE+4)) throw new ZorkaRuntimeException("Expected 4-element tuple");
