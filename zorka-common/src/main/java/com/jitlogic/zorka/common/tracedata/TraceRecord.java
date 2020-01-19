@@ -85,10 +85,11 @@ public class TraceRecord implements SymbolicRecord, Serializable {
      */
     private int flags;
 
-    /**
-     * Method execution time.
-     */
-    private long time;
+    /** Method start time (nanos since JVM start) */
+    private long tstart;
+
+    /** Method finish time (nanos since JVM start) */
+    private long tstop;
 
     /**
      * Number of instrumented method calls performed from this method (and recursively from all subsequent calls.
@@ -151,7 +152,8 @@ public class TraceRecord implements SymbolicRecord, Serializable {
         tr.methodId = methodId;
         tr.signatureId = signatureId;
         tr.flags = flags;
-        tr.time = time;
+        tr.tstart = tstart;
+        tr.tstop = tstop;
         tr.mid = mid;
         tr.calls = calls;
         tr.errors = errors;
@@ -350,15 +352,25 @@ public class TraceRecord implements SymbolicRecord, Serializable {
     }
 
 
-    public long getTime() {
-        return time;
+    public long getTstart() {
+        return tstart;
     }
 
-
-    public void setTime(long time) {
-        this.time = time;
+    public void setTstart(long tstart) {
+        this.tstart = tstart;
     }
 
+    public long getTstop() {
+        return tstop;
+    }
+
+    public void setTstop(long tstop) {
+        this.tstop = tstop;
+    }
+
+    public long getDuration() {
+        return tstart < tstop ? tstop-tstart : 0;
+    }
 
     public Object getException() {
         return exception;
@@ -468,7 +480,7 @@ public class TraceRecord implements SymbolicRecord, Serializable {
      * be reused while tracing subsequent method calls.
      */
     public void clean() {
-        time = 0;
+        tstart = tstop = 0;
         classId = methodId = signatureId = mid = 0;
         attrs = null;
         children = null;

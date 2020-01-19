@@ -188,7 +188,7 @@ public class ZorkaFixture extends CommonFixture {
         tr.setCalls(calls);
         tr.setErrors(errors);
         tr.setFlags(flags);
-        tr.setTime(time);
+        tr.setTstop(time);
 
         for (TraceRecord child : children) {
             child.setParent(tr);

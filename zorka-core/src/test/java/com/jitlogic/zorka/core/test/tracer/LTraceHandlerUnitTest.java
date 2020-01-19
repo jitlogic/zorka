@@ -460,7 +460,7 @@ public class LTraceHandlerUnitTest extends ZorkaFixture {
         TraceRecord tr = records.get(0);
 
         assertEquals(3, tr.getCalls());
-        assertEquals(15L, tr.getChild(0).getTime());
+        assertEquals(15L, tr.getChild(0).getDuration());
     }
 
 
@@ -483,7 +483,7 @@ public class LTraceHandlerUnitTest extends ZorkaFixture {
         b.traceReturn(40);
 
         checkRC(1, 1, 0);
-        assertEquals(16L, records.get(0).getChild(0).getTime());
+        assertEquals(16L, records.get(0).getChild(0).getDuration());
     }
 
 

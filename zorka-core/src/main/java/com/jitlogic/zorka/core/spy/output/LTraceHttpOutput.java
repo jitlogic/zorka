@@ -92,8 +92,8 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         return mid;
     }
 
-    private void processTraceRecord(long t, TraceRecord tr) {
-        ttdw.traceStart(tdw.position(), t, mid(tr));
+    private void processTraceRecord(TraceRecord tr) {
+        ttdw.traceStart(tdw.position(), tr.getTstart(), mid(tr));
 
         TraceMarker tm = tr.getMarker();
         if (tr.hasFlag(TraceRecord.TRACE_BEGIN)) {
@@ -119,8 +119,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         // Child trace records (if any)
         if (ctrs != null) {
             for (TraceRecord ctr : ctrs) {
-                processTraceRecord(t + dt, ctr);
-                dt += ctr.getTime();
+                processTraceRecord(ctr);
             }
         }
 
@@ -137,8 +136,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             ttdw.exception(++nExceptions, se.getClassId(), ""+se.getMessage(), 0, stack, null);
         }
 
-        t += tr.getTime();
-        ttdw.traceEnd(0, t, tr.getCalls(), tm != null ? tm.getFlags() : 0);
+        ttdw.traceEnd(0, tr.getTstop(), tr.getCalls(), tm != null ? tm.getFlags() : 0);
     } // processTraceRecord()
 
 
@@ -162,7 +160,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
                     if (sr instanceof TraceRecord) {
                         TraceRecord tr = (TraceRecord) sr;
-                        processTraceRecord(0, tr);
+                        processTraceRecord(tr);
                     }
 
                     if (adw.position() > 0) {

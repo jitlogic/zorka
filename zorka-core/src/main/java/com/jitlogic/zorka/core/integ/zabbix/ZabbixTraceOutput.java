@@ -343,7 +343,7 @@ public class ZabbixTraceOutput extends ZorkaAsyncThread<SymbolicRecord> implemen
 		result.setHost(hostname);
 		result.setKey(key + ".time");
 		/* nanoseconds -> milliseconds */
-		result.setValue(String.valueOf(traceRecord.getTime() / 1000000l));
+		result.setValue(String.valueOf(traceRecord.getDuration() / 1000000L));
 		result.setLastlogsize(0);
 		result.setClock(clock);
 		list.add(result);

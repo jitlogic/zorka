@@ -106,7 +106,7 @@ public class LTraceHandler extends TraceHandler {
         }
 
         ttop.setMid(mid);
-        ttop.setTime(tstamp);
+        ttop.setTstart(tstamp);
         ttop.setCalls(ttop.getCalls() + 1);
 
         if (numRecords > maxTraceRecords) {
@@ -137,11 +137,11 @@ public class LTraceHandler extends TraceHandler {
         }
 
 
-        long ttime = tstamp - ttop.getTime();
-        ttop.setTime(ttime);
+        ttop.setTstop(tstamp);
 
-        if (tuningEnabled)
-            tuningProbe(ttop.getMid(), tstamp, ttime);
+        if (tuningEnabled) {
+            tuningProbe(ttop.getMid(), tstamp, tstamp - ttop.getTstart());
+        }
 
         pop();
     }
@@ -168,11 +168,11 @@ public class LTraceHandler extends TraceHandler {
         }
 
         ttop.setException(exception);
-        long ttime = tstamp - ttop.getTime();
-        ttop.setTime(ttime);
+        ttop.setTstop(tstamp);
         ttop.setErrors(ttop.getErrors() + 1);
 
         if (tuningEnabled) {
+            long ttime = tstamp - ttop.getTstart();
             tuningProbe(ttop.getMid(), tstamp, ttime);
             tunStats.markRank(ttop.getMid(), ERROR_PENALTY);
         }
@@ -255,7 +255,7 @@ public class LTraceHandler extends TraceHandler {
         // Submit data if trace marker found
         if (ttop.hasFlag(TraceRecord.TRACE_BEGIN)) {
             int flags = ttop.getMarker().getFlags();
-            if (((ttop.getTime() >= ttop.getMarker().getMinimumTime() || ttop.getCalls() >= minTraceCalls)
+            if (((ttop.getDuration() >= ttop.getMarker().getMinimumTime() || ttop.getCalls() >= minTraceCalls)
                 && 0 == (flags & TraceMarker.DROP_TRACE)) || 0 != (flags & TraceMarker.SUBMIT_TRACE)) {
                 submit(ttop);
                 AgentDiagnostics.inc(AgentDiagnostics.TRACES_SUBMITTED);
@@ -272,7 +272,7 @@ public class LTraceHandler extends TraceHandler {
 
         // Determine how the top of stack should be rolled back
         if (parent != null) {
-            if ((ttop.getTime() > minMethodTime || ttop.getErrors() > 0 || ttop.hasFlag(TraceRecord.FORCE_TRACE))
+            if ((ttop.getDuration() > minMethodTime || ttop.getErrors() > 0 || ttop.hasFlag(TraceRecord.FORCE_TRACE))
                     || 0 != (ttop.getMarker().getFlags() & TraceMarker.ALL_METHODS)) {
 
 
@@ -322,7 +322,7 @@ public class LTraceHandler extends TraceHandler {
     private void reparentTop(TraceRecord parent) {
         // Drop interim record if necessary
         if (ttop.getMarker().hasFlag(TraceMarker.DROP_INTERIM) && ttop.isInterimDroppable()
-                && ttop.getTime() - ttop.getChild(0).getTime() < minMethodTime) {
+                && ttop.getDuration() - ttop.getChild(0).getDuration() < minMethodTime) {
             TraceRecord child = ttop.getChild(0);
             child.setCalls(ttop.getCalls());
             child.setErrors(ttop.getErrors());

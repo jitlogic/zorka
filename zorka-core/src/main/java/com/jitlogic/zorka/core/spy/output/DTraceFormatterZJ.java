@@ -65,7 +65,7 @@ public class DTraceFormatterZJ implements DTraceFormatter {
                     "traceId", ds.getTraceIdHex(),
                     "name", symbols.symbolName(tr.getTraceId()),
                     "timestamp", ds.getTstart() * 1000,
-                    "duration", tr.getTime() / 1000
+                    "duration", tr.getDuration() / 1000
             );
 
             String kind = getKind(ds.getFlags());
