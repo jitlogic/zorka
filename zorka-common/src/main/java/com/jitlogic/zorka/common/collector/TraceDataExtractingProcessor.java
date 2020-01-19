@@ -46,6 +46,7 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
         top.setTstop(tstop);
         top.setCalls(calls);
         if (0 != (flags & TraceRecordFlags.TF_ERROR_MARK)) top.setErrors(1);
+        top = top.getParent();
     }
 
     @Override

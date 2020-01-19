@@ -15,8 +15,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.TCLASS1;
-import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.TCLASS4;
+import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.*;
 import static com.jitlogic.zorka.core.test.support.CoreTestUtil.instantiate;
 import static com.jitlogic.zorka.core.test.support.CoreTestUtil.invoke;
 import static org.junit.Assert.*;
@@ -395,5 +394,56 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         // TODO assertEquals("trace should not register recursive1 method", 0, results.get(0).numChildren());
     }
 
+    @Test
+    public void testRetrieveTraceCheckTimes() throws Exception {
+        TraceHandler.setMinMethodTime(0);
+        tracer.include(spy.byClass(TCLASS+9));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST", 0)).include(spy.byMethod(TCLASS+9, "run")));
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS+9);
+        invoke(obj, "run");
+
+        assertEquals("should return one trace", 1, collectorStore.size());
+
+        TraceChunkData tcd = collectorStore.get(0);
+        assertEquals(TCLASS+9, tcd.getKlass());
+
+        TraceDataExtractor tex = new TraceDataExtractor(collectorRegistry);
+
+        TraceDataResult tr0 = tex.extract(Collections.singletonList(tcd));
+        assertEquals(TCLASS+9+".run()", tr0.getMethod());
+        assertTrue(tr0.getTstop()-tr0.getTstart() > 0);
+
+        assertEquals(1, tr0.getChildren().size());
+        TraceDataResult tr1 = tr0.getChildren().get(0);
+        assertEquals(TCLASS+9+".step1()", tr1.getMethod());
+        assertEquals(1, tr1.getChildren().size());
+        assertTrue(tr1.getTstop()-tr1.getTstart() > 0);
+
+        assertEquals(1, tr1.getChildren().size());
+        TraceDataResult tr2 = tr1.getChildren().get(0);
+        assertEquals(TCLASS+9+".step2()", tr2.getMethod());
+        assertEquals(1, tr2.getChildren().size());
+        assertTrue(tr2.getTstop()-tr2.getTstart() > 0);
+
+        assertEquals(1, tr2.getChildren().size());
+        TraceDataResult tr3 = tr2.getChildren().get(0);
+        assertEquals(TCLASS+9+".step3()", tr3.getMethod());
+        assertEquals(1, tr3.getChildren().size());
+        assertTrue(tr3.getTstop()-tr3.getTstart() > 0);
+
+        assertEquals(1, tr3.getChildren().size());
+        TraceDataResult tr4 = tr3.getChildren().get(0);
+        assertEquals(TCLASS+9+".step4()", tr4.getMethod());
+        assertEquals(1, tr4.getChildren().size());
+        assertTrue(tr4.getTstop()-tr4.getTstart() > 0);
+
+        assertEquals(1, tr4.getChildren().size());
+        TraceDataResult tr5 = tr4.getChildren().get(0);
+        assertEquals(TCLASS+9+".step5()", tr5.getMethod());
+        assertNull(tr5.getChildren());
+        assertTrue(tr5.getTstop()-tr5.getTstart() > 0);
+    }
 
 }
