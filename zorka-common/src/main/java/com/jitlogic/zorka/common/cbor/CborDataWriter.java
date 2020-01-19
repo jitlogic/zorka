@@ -27,14 +27,20 @@ import static com.jitlogic.zorka.common.cbor.CBOR.*;
 
 public class CborDataWriter {
 
+    protected boolean strict = true;
     protected byte[] buf;
     protected int pos, limit, delta;
 
     public CborDataWriter(int buflen, int delta) {
+        this(buflen, delta, true);
+    }
+
+    public CborDataWriter(int buflen, int delta, boolean strict) {
         this.buf = new byte[buflen];
         this.pos = 0;
         this.limit = buf.length;
         this.delta = delta;
+        this.strict = strict;
     }
 
     public CborDataWriter(byte[] buf) {
@@ -206,7 +212,7 @@ public class CborDataWriter {
             write(Boolean.TRUE.equals(obj) ? TRUE_CODE : FALSE_CODE);
         } else if (obj.getClass() == Short.class || obj.getClass() == Byte.class) {
             writeInt(((Number)obj).intValue());
-        } else if (obj.getClass() == Float.class || obj.getClass() == Double.class) {
+        } else if (obj.getClass() == Float.class || obj.getClass() == Double.class || !strict) {
             writeString(""+obj); // TODO handle float values properly
         } else {
             throw new RuntimeException("Unsupported data type: " + obj.getClass());

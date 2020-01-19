@@ -45,7 +45,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
 
     private int TBUFSZ = 512 * 1024, ABUFSZ = 128 * 1024;
 
-    private CborDataWriter adw = new CborDataWriter(ABUFSZ, ABUFSZ), tdw = new CborDataWriter(TBUFSZ, TBUFSZ);
+    private CborDataWriter adw = new CborDataWriter(ABUFSZ, ABUFSZ, false), tdw = new CborDataWriter(TBUFSZ, TBUFSZ, false);
     private TraceDataWriter atdw = new TraceDataWriter(adw), ttdw = new TraceDataWriter(tdw);
 
     public LTraceHttpOutput(ZorkaConfig config, Map<String,String> conf, SymbolRegistry registry, HttpHandler httpClient) {
@@ -108,8 +108,7 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
         // Attributes (if any)
         if (attrs != null) {
             for (Map.Entry<Integer,Object> e : attrs.entrySet()) {
-                //System.out.println("ATTR: " + ref(e.getKey()) + " -> " + e.getValue());
-                ttdw.traceAttr(ref(e.getKey()), e.getValue());
+                ttdw.traceAttr(ref(e.getKey()), ""+e.getValue());
             }
         }
 
