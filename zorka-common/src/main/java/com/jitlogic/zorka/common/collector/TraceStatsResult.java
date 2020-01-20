@@ -101,4 +101,9 @@ public class TraceStatsResult {
     public void setMethod(String method) {
         this.method = method;
     }
+
+    @Override
+    public String toString() {
+        return "TSR(" + method + ",dmin=" + minDuration + ",dmax=" + maxDuration + ",dsum" + sumDuration + ")";
+    }
 }

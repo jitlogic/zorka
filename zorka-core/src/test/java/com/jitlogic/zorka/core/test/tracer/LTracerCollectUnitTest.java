@@ -12,8 +12,7 @@ import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.*;
 import static com.jitlogic.zorka.core.test.support.CoreTestUtil.instantiate;
@@ -457,7 +456,32 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         invoke(obj, "err");
 
         assertEquals("should return one trace", 1, collectorStore.size());
+    }
 
+    @Test
+    public void testTraceStats() throws Exception {
+        TraceHandler.setMinMethodTime(0);
+        tracer.include(spy.byClass(TCLASS+9));
+        spy.add(spy.instance("1").onEnter(tracer.begin("TEST", 0)).include(spy.byMethod(TCLASS+9, "run")));
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS+9);
+        invoke(obj, "run");
+
+        assertEquals("should return one trace", 1, collectorStore.size());
+
+        TraceStatsExtractor extractor = new TraceStatsExtractor(collectorRegistry);
+        List<TraceStatsResult> rslt = new ArrayList<TraceStatsResult>(
+            extractor.extract(Collections.singletonList(collectorStore.get(0))));
+
+        assertFalse(rslt.isEmpty());
+
+        for (TraceStatsResult tsr : rslt) {
+            assertNotNull(tsr.getMethod());
+            assertTrue(tsr.getMinDuration() > 0);
+            assertTrue(tsr.getMaxDuration() > 0);
+            assertTrue(tsr.getSumDuration() > 0);
+        }
     }
 
 }
