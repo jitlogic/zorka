@@ -256,7 +256,7 @@ public class LTraceHandlerUnitTest extends ZorkaFixture {
 
         checkRC(1, 2);
         assertEquals(5L, records.get(0).getCalls());
-        assertEquals(TraceMarker.OVERFLOW_FLAG | TraceMarker.DROP_INTERIM, records.get(0).getMarker().getFlags());
+        assertEquals(TraceMarker.OVERFLOW_FLAG|TraceMarker.DROP_INTERIM|TraceMarker.SENT_MARK, records.get(0).getMarker().getFlags());
     }
 
 
@@ -285,7 +285,7 @@ public class LTraceHandlerUnitTest extends ZorkaFixture {
         b.traceReturn(11 * MS);
 
         checkRC(1, 1, 1, 0);
-        assertEquals(TraceMarker.OVERFLOW_FLAG | TraceMarker.DROP_INTERIM, records.get(0).getMarker().getFlags());
+        assertEquals(TraceMarker.OVERFLOW_FLAG|TraceMarker.DROP_INTERIM|TraceMarker.SENT_MARK, records.get(0).getMarker().getFlags());
     }
 
 
@@ -324,7 +324,7 @@ public class LTraceHandlerUnitTest extends ZorkaFixture {
 
         checkRC(1, 1, 2, 0);
 
-        assertEquals(TraceMarker.OVERFLOW_FLAG | TraceMarker.DROP_INTERIM, records.get(0).getMarker().getFlags());
+        assertEquals(TraceMarker.OVERFLOW_FLAG|TraceMarker.DROP_INTERIM|TraceMarker.SENT_MARK, records.get(0).getMarker().getFlags());
     }
 
 

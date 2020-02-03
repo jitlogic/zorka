@@ -5,6 +5,7 @@ import com.jitlogic.zorka.common.cbor.TraceDataProcessor;
 import com.jitlogic.zorka.common.cbor.TraceRecordFlags;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +96,7 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
                 c.setTraceData(output.chunk(c.getStartOffs(), len));
             }
             // TODO uwaga: tylko zakończone fragmenty są zapisywane; zaimplementować tymczasowy zapis niezakończonych fragmentów;
-            result.add(c);
+            if (top.getParent() == null || !top.hasFlag(TraceMarker.SENT_MARK)) { result.add(c); }
             top = top.getParent();
             if (top != null) {
                 top.addRecs(c.getRecs());
@@ -126,7 +127,7 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
         this.tstop = tstop;
         if (top != null) {
             top.addCalls((int)calls+1);
-            if (0 != (flags & TraceRecordFlags.TF_ERROR_MARK)) {
+            if (0 != (flags & TraceMarker.ERROR_MARK)) {
                 top.addErrors(1);
                 if (top.getStackDepth() == stackDepth) top.setError(true);
             }

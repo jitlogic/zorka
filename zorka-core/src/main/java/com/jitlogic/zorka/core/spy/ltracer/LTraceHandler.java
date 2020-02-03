@@ -340,6 +340,7 @@ public class LTraceHandler extends TraceHandler {
         if (record.getException() != null || record.hasFlag(TraceRecord.EXCEPTION_PASS)) {
             record.getMarker().markFlags(TraceMarker.ERROR_MARK);
         }
+        record.getMarker().markFlags(TraceMarker.SENT_MARK);
         output.submit(record);
     }
 

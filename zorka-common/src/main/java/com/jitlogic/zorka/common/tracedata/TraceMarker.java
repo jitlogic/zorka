@@ -71,6 +71,11 @@ public class TraceMarker implements SymbolicRecord, Serializable {
     public static final int ERROR_MARK = 0x1000;
 
     /**
+     * Sent record mark. This flag is marked when trace is sent.
+     */
+    public static final int SENT_MARK = 0x2000;
+
+    /**
      * Trace ID (refers to symbol containing trace name)
      */
     private int traceId;
