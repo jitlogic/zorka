@@ -83,12 +83,17 @@ public class TraceCollectorUnitTest {
         TraceChunkData tcd0 = store.get(0);
         assertEquals("execute", tcd0.getMethod());
 
+        assertEquals(1, tcd0.getRecs());
+
         TraceDataResult tdr1 = tex.extract(Collections.singletonList(tcd0));
         assertEquals("mydb.PStatement.execute()", tdr1.getMethod());
         assertNull(tdr1.getChildren());
 
         TraceChunkData tcd1 = store.get(1);
         assertEquals("invoke", tcd1.getMethod());
+
+        assertEquals(0, tcd1.getErrors());
+        assertEquals(3, tcd1.getRecs());
 
         TraceDataResult tdr2 = tex.extract(Collections.singletonList(tcd1));
         assertEquals("myweb.Valve.invoke()", tdr2.getMethod());

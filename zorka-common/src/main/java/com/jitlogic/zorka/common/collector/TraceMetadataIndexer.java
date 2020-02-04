@@ -127,6 +127,7 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
         this.tstop = tstop;
         if (top != null) {
             top.addCalls((int)calls+1);
+            top.addRecs(1);
             if (0 != (flags & TraceMarker.ERROR_MARK)) {
                 top.addErrors(1);
                 if (top.getStackDepth() == stackDepth) top.setError(true);
@@ -149,8 +150,6 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
         c.setTstart(tstart);
         c.setTstamp(tstamp);
         c.setStartOffs(this.currentPos);
-        c.addCalls(1);
-        c.addRecs(1);
         c.addMethod(lastMethodId);
         SymbolicMethod mdef = registry.methodDef(lastMethodId);
         c.setKlass(registry.symbolName(mdef.getClassId()));
