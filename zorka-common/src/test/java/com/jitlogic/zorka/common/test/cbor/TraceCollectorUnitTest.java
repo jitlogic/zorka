@@ -51,7 +51,7 @@ public class TraceCollectorUnitTest {
     public void testCollectRetrieveTrace() {
         collector.handleAgentData("1234", true, agd1);
         collector.handleTraceData("1234", "9234567812345001", 0, trc1);
-        assertEquals(1, store.size());
+        assertEquals(1, store.length());
         TraceDataExtractor tex = new TraceDataExtractor(registry);
         TraceChunkData tcd = store.get(0);
         assertNotEquals(Base64.encode(trc1, false), Base64.encode(tcd.getTraceData(), false));
@@ -77,7 +77,7 @@ public class TraceCollectorUnitTest {
     public void testCollectRetrieveEmbeddedTrace() {
         collector.handleAgentData("1234", true, agd1);
         collector.handleTraceData("1234", "9234567812345001", 0, trc2);
-        assertEquals(2, store.size());
+        assertEquals(2, store.length());
         TraceDataExtractor tex = new TraceDataExtractor(registry);
 
         TraceChunkData tcd0 = store.get(0);

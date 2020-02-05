@@ -82,8 +82,6 @@ public class TraceChunkData {
     /** Chunk end timestamp (nanoseconds since trace start). */
     private long tstop = Long.MAX_VALUE;
 
-    private boolean hasChildren;
-
     /** Trace data (CBOR encoded and compressed) */
     private byte[] traceData;
 
@@ -102,13 +100,9 @@ public class TraceChunkData {
     /** List of all methods found in this chunk */
     private Set<Integer> methods;
 
-    /** If there are more chunks in this span, this list contains them */
-    private transient List<TraceChunkData> chunks = null;
-
-    /** Children spans. */
-    private transient List<TraceChunkData> children = null;
-
     private TraceDataResultException exception;
+
+    private volatile int size = -1;
 
     @Override
     public String toString() {
@@ -135,6 +129,27 @@ public class TraceChunkData {
         this.parentId = parentId;
         this.chunkNum = chunkNum;
         this.spanId = spanId;
+    }
+
+    public int size() {
+        if (size == -1) {
+            synchronized (this) {
+                int rslt = 256 + (traceData != null ? traceData.length : 0);
+                if (attrs != null) {
+                    for (Map.Entry<String,String> e : attrs.entrySet()) {
+                        rslt += 64 + (e.getKey() != null ? e.getKey().length() : 0) + (e.getValue() != null ? e.getValue().length() : 0);
+                    }
+                }
+                if (terms != null) {
+                    rslt += 64;
+                    for (String term : terms) {
+                        rslt += 16 + (term != null ? term.length() : 0);
+                    }
+                }
+                this.size = rslt;
+            }
+        }
+        return size;
     }
 
     public TraceChunkData getParent() {
@@ -359,30 +374,6 @@ public class TraceChunkData {
     public void setAttr(String attrName, String attrVal) {
         if (attrs == null) attrs = new HashMap<String, String>();
         attrs.put(attrName, attrVal);
-    }
-
-    public List<TraceChunkData> getChunks() {
-        return chunks;
-    }
-
-    public void setChunks(List<TraceChunkData> chunks) {
-        this.chunks = chunks;
-    }
-
-    public List<TraceChunkData> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<TraceChunkData> children) {
-        this.children = children;
-    }
-
-    public void setHasChildren(boolean hasChildren) {
-        this.hasChildren = hasChildren;
-    }
-
-    public boolean isHasChildren() {
-        return hasChildren || (children != null && !children.isEmpty());
     }
 
     public byte[] getTraceData() {

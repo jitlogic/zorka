@@ -53,7 +53,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals("should return begin, trace", 0, collectorStore.size());
+        assertEquals("should return begin, trace", 0, collectorStore.length());
     }
 
 
@@ -73,7 +73,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
 
         assertEquals(1, collector.getAgdCount());
         assertEquals(1, collector.getTrcCount());
-        assertEquals(1, collectorStore.size());
+        assertEquals(1, collectorStore.length());
 
         TraceChunkData cd = collectorStore.get(0);
         assertNotNull(cd.getTraceData());
@@ -121,7 +121,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
 
         assertEquals(1, collector.getAgdCount());
         assertEquals(1, collector.getTrcCount());
-        assertEquals(1, collectorStore.size());
+        assertEquals(1, collectorStore.length());
 
         TraceChunkData cd = collectorStore.get(0);
         assertNotNull(cd.getTraceData());
@@ -151,7 +151,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS1);
         invoke(obj, "trivialMethod");
 
-        assertEquals(1, collectorStore.size());
+        assertEquals(1, collectorStore.length());
         TraceChunkData cd = collectorStore.get(0);
         assertNotNull(cd.getTraceData());
         assertTrue(cd.getTraceData().length > 0);
@@ -172,7 +172,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return two embeded traces and top trace", 3, collectorStore.size());
+        assertEquals("should return two embeded traces and top trace", 3, collectorStore.length());
 
         TraceChunkData cd = collectorStore.get(2);
         assertEquals("TEST1", cd.getAttr("component"));
@@ -195,7 +195,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return two embeded traces and top trace", 3, collectorStore.size());
+        assertEquals("should return two embeded traces and top trace", 3, collectorStore.length());
         assertEquals("TEST2", collectorStore.get(1).getAttr("component"));
         assertEquals("XXX", collectorStore.get(1).getAttr("X"));
     }
@@ -216,7 +216,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals(3, collectorStore.size());
+        assertEquals(3, collectorStore.length());
         assertNull(collectorStore.get(0).getAttr("X"));
         assertNull(collectorStore.get(1).getAttr("X"));
         assertNull(collectorStore.get(2).getAttr("X"));
@@ -235,7 +235,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals(1, collectorStore.size());
+        assertEquals(1, collectorStore.length());
         assertEquals("TEST1", collectorStore.get(0).getAttr("component"));
         assertEquals("XXX", collectorStore.get(0).getAttr("X"));
     }
@@ -254,7 +254,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals(1, collectorStore.size());
+        assertEquals(1, collectorStore.length());
         assertEquals("TEST1", collectorStore.get(0).getAttr("component"));
         assertEquals("XXX", collectorStore.get(0).getAttr("X"));
     }
@@ -277,7 +277,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals(3, collectorStore.size());
+        assertEquals(3, collectorStore.length());
 
         // TODO assertTrue("Error flag should be enabled for TEST1 trace", collectorStore.get(2).hasError());
         // TODO assertFalse("Error flag should be disabled for TEST2 trace", collectorStore.get(1).hasError());
@@ -300,7 +300,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return one trace", 1, collectorStore.size());
+        assertEquals("should return one trace", 1, collectorStore.length());
 
         assertEquals("YES", collectorStore.get(0).getAttr("IN"));
     }
@@ -322,7 +322,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return one trace", 1, collectorStore.size());
+        assertEquals("should return one trace", 1, collectorStore.length());
 
         assertNull(collectorStore.get(0).getAttr("IN"));
     }
@@ -345,7 +345,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return one trace", 1, collectorStore.size());
+        assertEquals("should return one trace", 1, collectorStore.length());
         // TODO assertEquals("trace should also register recursive1 method", 1, results.get(0).numChildren());
     }
 
@@ -367,7 +367,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return no trace", 0, collectorStore.size());
+        assertEquals("should return no trace", 0, collectorStore.length());
     }
 
     @Test
@@ -389,7 +389,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return one trace", 1, collectorStore.size());
+        assertEquals("should return one trace", 1, collectorStore.length());
         // TODO assertEquals("trace should not register recursive1 method", 0, results.get(0).numChildren());
     }
 
@@ -403,7 +403,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS+9);
         invoke(obj, "run");
 
-        assertEquals("should return one trace", 1, collectorStore.size());
+        assertEquals("should return one trace", 1, collectorStore.length());
 
         TraceChunkData tcd = collectorStore.get(0);
         assertEquals(TCLASS+9, tcd.getKlass());
@@ -455,7 +455,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS+9);
         invoke(obj, "err");
 
-        assertEquals("should return one trace", 1, collectorStore.size());
+        assertEquals("should return one trace", 1, collectorStore.length());
     }
 
     @Test
@@ -468,7 +468,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS+9);
         invoke(obj, "run");
 
-        assertEquals("should return one trace", 1, collectorStore.size());
+        assertEquals("should return one trace", 1, collectorStore.length());
 
         TraceStatsExtractor extractor = new TraceStatsExtractor(collectorRegistry);
         List<TraceStatsResult> rslt = new ArrayList<TraceStatsResult>(
