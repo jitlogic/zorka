@@ -96,7 +96,9 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
                 c.setTraceData(output.chunk(c.getStartOffs(), len));
             }
             // TODO uwaga: tylko zakończone fragmenty są zapisywane; zaimplementować tymczasowy zapis niezakończonych fragmentów;
-            if (top.getParent() == null || !top.hasFlag(TraceMarker.SENT_MARK)) { result.add(c); }
+            if (top.getParent() == null || !top.hasFlag(TraceMarker.SENT_MARK)) {
+                result.add(c);
+            }
             top = top.getParent();
             if (top != null) {
                 top.addRecs(c.getRecs());
@@ -128,6 +130,7 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
         if (top != null) {
             top.addCalls((int)calls+1);
             top.addRecs(1);
+            top.setFlags(flags);
             if (0 != (flags & TraceMarker.ERROR_MARK)) {
                 top.addErrors(1);
                 if (top.getStackDepth() == stackDepth) top.setError(true);

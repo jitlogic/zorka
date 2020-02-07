@@ -172,9 +172,9 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return two embeded traces and top trace", 3, collectorStore.length());
+        assertEquals("should return two embeded traces and top trace", 2, collectorStore.length());
 
-        TraceChunkData cd = collectorStore.get(2);
+        TraceChunkData cd = collectorStore.get(1);
         assertEquals("TEST1", cd.getAttr("component"));
         assertEquals("XXX", cd.getAttr("X"));
     }
@@ -195,9 +195,10 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals("should return two embeded traces and top trace", 3, collectorStore.length());
-        assertEquals("TEST2", collectorStore.get(1).getAttr("component"));
-        assertEquals("XXX", collectorStore.get(1).getAttr("X"));
+        assertEquals("should return two embeded traces and top trace", 2, collectorStore.length());
+        assertEquals("TEST2", collectorStore.get(0).getAttr("component"));
+        assertEquals("TEST1", collectorStore.get(1).getAttr("component"));
+        assertEquals("XXX", collectorStore.get(0).getAttr("X"));
     }
 
     @Test
@@ -216,10 +217,9 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals(3, collectorStore.length());
+        assertEquals(2, collectorStore.length());
         assertNull(collectorStore.get(0).getAttr("X"));
         assertNull(collectorStore.get(1).getAttr("X"));
-        assertNull(collectorStore.get(2).getAttr("X"));
     }
 
     @Test
@@ -277,7 +277,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS4);
         invoke(obj, "recursive3");
 
-        assertEquals(3, collectorStore.length());
+        assertEquals(2, collectorStore.length());
 
         // TODO assertTrue("Error flag should be enabled for TEST1 trace", collectorStore.get(2).hasError());
         // TODO assertFalse("Error flag should be disabled for TEST2 trace", collectorStore.get(1).hasError());
