@@ -88,9 +88,6 @@ public class TraceChunkData {
     /** String attributes */
     private Map<String,String> attrs;
 
-    /** Search terms (deeper inside trace) */
-    private Set<String> terms;
-
     /** Root method of trace call tree - class name */
     private String klass;
 
@@ -138,12 +135,6 @@ public class TraceChunkData {
                 if (attrs != null) {
                     for (Map.Entry<String,String> e : attrs.entrySet()) {
                         rslt += 64 + (e.getKey() != null ? e.getKey().length() : 0) + (e.getValue() != null ? e.getValue().length() : 0);
-                    }
-                }
-                if (terms != null) {
-                    rslt += 64;
-                    for (String term : terms) {
-                        rslt += 16 + (term != null ? term.length() : 0);
                     }
                 }
                 this.size = rslt;
@@ -416,20 +407,5 @@ public class TraceChunkData {
 
     public void setMethod(String method) {
         this.method = method;
-    }
-
-    public Set<String> getTerms() {
-        if (terms == null) terms = new HashSet<String>();
-        return terms;
-    }
-
-    public void setTerms(Set<String> terms) {
-        if (terms == null) terms = new HashSet<String>();
-        this.terms = terms;
-    }
-
-    public void addTerm(String term) {
-        if (terms == null) terms = new HashSet<String>();
-        terms.add(term);
     }
 }
