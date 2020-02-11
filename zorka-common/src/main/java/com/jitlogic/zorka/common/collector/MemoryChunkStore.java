@@ -47,7 +47,7 @@ public class MemoryChunkStore implements TraceChunkStore {
     }
 
     @Override
-    public void addAll(List<TraceChunkData> tcds) {
+    public synchronized void addAll(List<TraceChunkData> tcds) {
         chunks.addAll(tcds);
         for (TraceChunkData tcd : tcds) {
             tcd.setParent(null);
