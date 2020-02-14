@@ -3,6 +3,7 @@ package com.jitlogic.zorka.common.collector;
 import com.jitlogic.zorka.common.cbor.*;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -81,7 +82,7 @@ public class AgentSession implements TraceDataScannerVisitor {
         TraceMetadataIndexer tme = new TraceMetadataIndexer(agentSymbols, ssp);
         tme.init(tid1, tid2, chunkNum);
         new TraceDataReader(new CborDataReader(data), tme).run();
-        tcd.setTraceData(cbw.toByteArray());
+        tcd.setTraceData(ZorkaUtil.gzip(cbw.toByteArray()));
         List<TraceChunkData> result = tme.getChunks();
         store.addAll(result);
         this.tstamp = System.currentTimeMillis();

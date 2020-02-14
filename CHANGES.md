@@ -1,7 +1,7 @@
 Zorka 1.90.8 (2020-??-??)
 -------------------------
 
-* 
+* collector: trace data compression;
 
 
 Zorka 1.90.7 (2020-02-11)

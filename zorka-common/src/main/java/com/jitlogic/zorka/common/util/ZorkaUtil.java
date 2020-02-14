@@ -28,6 +28,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 
 /**
@@ -968,6 +970,28 @@ public class ZorkaUtil {
             } catch (IOException e) {
                 log.warn("Cannot close", e);
             }
+        }
+    }
+
+    public static byte[] gzip(byte[] buf) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            GZIPOutputStream gos = new GZIPOutputStream(bos);
+            gos.write(buf);
+            gos.finish();
+            return bos.toByteArray();
+        } catch (Exception e) {
+            throw new ZorkaRuntimeException("Error gzipping data", e);
+        }
+    }
+
+    public static byte[] gunzip(byte[] buf) {
+        try {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(buf));
+            return slurp(gis);
+        } catch (Exception e) {
+            throw new ZorkaRuntimeException("Error unzipping data", e);
         }
     }
 

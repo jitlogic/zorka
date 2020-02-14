@@ -2,6 +2,7 @@ package com.jitlogic.zorka.common.collector;
 
 import com.jitlogic.zorka.common.cbor.CborDataReader;
 import com.jitlogic.zorka.common.cbor.TraceDataReader;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -21,7 +22,8 @@ public class TraceStatsExtractor {
         Map<String,TraceStatsResult> rslt = new HashMap<String, TraceStatsResult>();
         for (TraceChunkData c : chunks) {
             TraceStatsExtractingProcessor tsp = new TraceStatsExtractingProcessor();
-            new TraceDataReader(new CborDataReader(c.getTraceData()), tsp).run();
+            byte[] data = ZorkaUtil.gunzip(c.getTraceData());
+            new TraceDataReader(new CborDataReader(data), tsp).run();
             Map<Integer,TraceStatsResult> mstats = tsp.getStats();
             Map<Integer,String> mids = resolver.resolveMethods(mstats.keySet(), c.getTsNum());
             for (Map.Entry<Integer,TraceStatsResult> e : mstats.entrySet()) {

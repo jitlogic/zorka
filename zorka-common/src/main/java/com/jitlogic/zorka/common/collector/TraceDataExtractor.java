@@ -4,6 +4,7 @@ package com.jitlogic.zorka.common.collector;
 import com.jitlogic.zorka.common.cbor.CborDataReader;
 import com.jitlogic.zorka.common.cbor.TraceDataReader;
 import com.jitlogic.zorka.common.cbor.TraceDataScanner;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -25,11 +26,12 @@ public class TraceDataExtractor {
         for (TraceChunkData c : chunks) {
             SymbolsScanningVisitor ssv = new SymbolsScanningVisitor();
             TraceDataScanner tds = new TraceDataScanner(ssv);
-            new TraceDataReader(new CborDataReader(c.getTraceData()), tds).run();
+            byte[] data = ZorkaUtil.gunzip(c.getTraceData());
+            new TraceDataReader(new CborDataReader(data), tds).run();
             Map<Integer,String> symbols = resolver.resolveSymbols(ssv.getSymbolIds(), c.getTsNum());
             Map<Integer,String> methods = resolver.resolveMethods(ssv.getMethodIds(), c.getTsNum());
             tdep.setSymbolMaps(symbols, methods);
-            new TraceDataReader(new CborDataReader(c.getTraceData()), tdep).run();
+            new TraceDataReader(new CborDataReader(data), tdep).run();
         }
 
         return tdep.getRoot();
