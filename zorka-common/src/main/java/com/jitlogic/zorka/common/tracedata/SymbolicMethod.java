@@ -12,6 +12,10 @@ public class SymbolicMethod implements SymbolicRecord {
 
     private int signatureId;
 
+    public static SymbolicMethod of(int classId, int methodId, int signatureId) {
+        return new SymbolicMethod(classId, methodId, signatureId);
+    }
+
     public SymbolicMethod(long mdef) {
         classId = (int)(mdef & MDEF_MASK);
         methodId = (int)((mdef >> 21) & MDEF_MASK);
