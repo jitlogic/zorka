@@ -21,6 +21,8 @@ public class AgentSession implements TraceDataScannerVisitor {
     /** Map: agentMethodId -> collectorMethodId */
     private Map<Integer,Integer> methodsMap = new HashMap<Integer, Integer>();
 
+    private volatile long tstamp = System.currentTimeMillis();
+
     public SymbolRegistry getRegistry() {
         return agentSymbols;
     }
@@ -40,6 +42,7 @@ public class AgentSession implements TraceDataScannerVisitor {
         }
         Map<Integer, Integer> mappedMethods = mapper.newMethods(newMethods);
         methodsMap.putAll(mappedMethods);
+        tstamp = System.currentTimeMillis();
     }
 
     public synchronized void handleTraceData(byte[] data, String traceId, int chunkNum, TraceChunkStore store) {
@@ -55,6 +58,7 @@ public class AgentSession implements TraceDataScannerVisitor {
         tcd.setTraceData(ZorkaUtil.gzip(cbw.toByteArray()));
         List<TraceChunkData> result = tme.getChunks();
         store.addAll(result);
+        tstamp = System.currentTimeMillis();
     }
 
     @Override
@@ -67,5 +71,9 @@ public class AgentSession implements TraceDataScannerVisitor {
     public int methodId(int methodId) {
         Integer rslt = methodsMap.get(methodId);
         return rslt != null ? rslt : 0;
+    }
+
+    public long getTstamp() {
+        return tstamp;
     }
 }

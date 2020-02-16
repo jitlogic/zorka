@@ -2,7 +2,10 @@ package com.jitlogic.zorka.common.collector;
 
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -63,5 +66,21 @@ public class Collector {
 
     public long getTrcCount() {
         return trcCount.longValue();
+    }
+
+    public int cleanup(long timeout) {
+        int nsessions = 0;
+        long t = System.currentTimeMillis();
+        for (Map.Entry<String,AgentSession> e : sessions.entrySet()) {
+            if (e.getValue().getTstamp() + timeout < t) {
+                sessions.remove(e.getKey());
+                nsessions++;
+            }
+        }
+        return nsessions;
+    }
+
+    public void remove(String sid) {
+        sessions.remove(sid);
     }
 }
