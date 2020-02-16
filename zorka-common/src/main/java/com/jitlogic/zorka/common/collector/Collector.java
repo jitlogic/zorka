@@ -16,8 +16,6 @@ public class Collector {
 
     private final Map<String, AgentSession> sessions = new ConcurrentHashMap<String, AgentSession>();
 
-    private volatile int tsnum;
-
     private volatile TraceChunkStore store;
 
     private volatile SymbolMapper mapper;
@@ -27,22 +25,15 @@ public class Collector {
     private AtomicLong agdCount = new AtomicLong();
     private AtomicLong trcCount = new AtomicLong();
 
-    public Collector(int tsnum, SymbolMapper mapper, TraceChunkStore chunkStore, boolean skipAgentData) {
-        this.tsnum = tsnum;
+    public Collector(SymbolMapper mapper, TraceChunkStore chunkStore, boolean skipAgentData) {
         this.mapper = mapper;
         this.skipAgentData = skipAgentData;
         this.store = chunkStore;
     }
 
-    public synchronized void reset(int tsnum, SymbolMapper mapper, TraceChunkStore store) {
-        this.tsnum = tsnum;
-        this.mapper = mapper;
-        this.store = store;
-    }
-
     public AgentSession getSession(String sessionId, boolean reset) {
         if (reset) {
-            sessions.put(sessionId, new AgentSession(sessionId, tsnum, mapper, store));
+            sessions.put(sessionId, new AgentSession());
         }
         return sessions.get(sessionId);
     }
@@ -52,8 +43,7 @@ public class Collector {
         AgentSession ses = getSession(sessionId, reset);
         if (ses == null) throw new ZorkaRuntimeException("No such session: " + sessionId);
         synchronized (ses) {
-            if (ses.getTsnum() != tsnum) ses.reset(tsnum, mapper, store);
-            ses.handleAgentData(data);
+            ses.handleAgentData(data, mapper);
             agdCount.incrementAndGet();
         }
     }
@@ -62,8 +52,7 @@ public class Collector {
         AgentSession ses = getSession(sessionId, false);
         if (ses == null) throw new ZorkaRuntimeException("No such session: " + sessionId);
         synchronized (ses) {
-            if (ses.getTsnum() != tsnum) ses.reset(tsnum, mapper, store);
-            ses.handleTraceData(data, traceId, chunkNum);
+            ses.handleTraceData(data, traceId, chunkNum, store);
             trcCount.incrementAndGet();
         }
     }
@@ -74,9 +63,5 @@ public class Collector {
 
     public long getTrcCount() {
         return trcCount.longValue();
-    }
-
-    public int getTsnum() {
-        return tsnum;
     }
 }

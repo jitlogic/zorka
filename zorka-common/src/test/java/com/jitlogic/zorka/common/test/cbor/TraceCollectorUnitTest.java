@@ -23,7 +23,7 @@ public class TraceCollectorUnitTest {
     public void initOutput() {
         registry = new SymbolRegistry();
         store = new MemoryChunkStore();
-        collector = new Collector(1, registry, store, false);
+        collector = new Collector(registry, store, false);
     }
 
     private byte[] agd1 = trace(
