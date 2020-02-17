@@ -1,11 +1,6 @@
 package com.jitlogic.zorka.common.collector;
 
-import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
-
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -44,7 +39,7 @@ public class Collector {
     public void handleAgentData(String sessionId, boolean reset, byte[] data) {
         if (skipAgentData) return;
         AgentSession ses = getSession(sessionId, reset);
-        if (ses == null) throw new ZorkaRuntimeException("No such session: " + sessionId);
+        if (ses == null) throw new NoSuchSessionException(sessionId);
         synchronized (ses) {
             ses.handleAgentData(data, mapper);
             agdCount.incrementAndGet();
@@ -53,7 +48,7 @@ public class Collector {
 
     public void handleTraceData(String sessionId, String traceId, int chunkNum, byte[] data) {
         AgentSession ses = getSession(sessionId, false);
-        if (ses == null) throw new ZorkaRuntimeException("No such session: " + sessionId);
+        if (ses == null) throw new NoSuchSessionException(sessionId);
         synchronized (ses) {
             ses.handleTraceData(data, traceId, chunkNum, store);
             trcCount.incrementAndGet();
