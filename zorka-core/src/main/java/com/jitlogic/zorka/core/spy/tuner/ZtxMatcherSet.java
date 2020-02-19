@@ -157,7 +157,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
                 BufferedReader rdr = new BufferedReader(new InputStreamReader(is));
                 for (String pkg = rdr.readLine(); pkg != null; pkg = rdr.readLine()) {
                     if (pkg.trim().length() > 0) {
-                        ztxs.put(pkg, "classpath:/com/jitlogic/zorka/ztx/" + pkg.trim() + ".ztx");
+                        ztxs.put(pkg.substring(0, pkg.length()-4), "classpath:/com/jitlogic/zorka/ztx/" + pkg.trim());
                     }
                 }
             } catch (IOException e) {
@@ -210,7 +210,7 @@ public class ZtxMatcherSet implements SpyMatcherSet {
     }
 
 
-    private synchronized boolean probe(String className) {
+    private synchronized void probe(String className) {
 
         Set<String> found = null;
 
@@ -227,8 +227,6 @@ public class ZtxMatcherSet implements SpyMatcherSet {
                 ztxs.remove(s);
             }
         }
-
-        return found != null;
     }
 
 
