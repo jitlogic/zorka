@@ -164,7 +164,7 @@ public class UtilLib {
     }
 
     public String base64(byte[] buf) {
-        return Base64.encode(buf, false);
+        return  com.jitlogic.zorka.common.util.Base64.encode(buf, false);
     }
 
     public TapInputStream tapInputStream(InputStream is, long init, long limit) {
