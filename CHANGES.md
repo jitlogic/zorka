@@ -1,7 +1,9 @@
-Zorka 1.90.8 (2020-??-??)
+Zorka 1.90.8 (2020-02-20)
 -------------------------
 
 * collector: trace data compression;
+* new functions for password encryption;
+* fix: built-in tracer exclusions not loading properly;
 
 
 Zorka 1.90.7 (2020-02-11)
