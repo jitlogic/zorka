@@ -20,10 +20,15 @@ package com.jitlogic.zorka.common.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.*;
 import java.net.Socket;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Pattern;
@@ -858,6 +863,27 @@ public class ZorkaUtil {
 
     private static final char[] HEX = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
+    public static int h2i(char c) {
+        if (c >= '0' && c <= '9') {
+            return c-'0';
+        } else if (c >= 'a' && c <= 'f') {
+            return c-'a'+10;
+        } else if (c >= 'A' && c <= 'F') {
+            return c-'A'+10;
+        } else {
+            throw new ZorkaRuntimeException("This is not hex character: '" + c + "'");
+        }
+    }
+
+    public static byte[] hex(String s) {
+        if (0 != (s.length()&0x01)) throw new ZorkaRuntimeException("Malformed hex string: " + s);
+        byte[] rslt = new byte[s.length()>>1];
+        for (int i = 0; i < s.length(); i+=2) {
+            rslt[i>>1] = (byte)((h2i(s.charAt(i))<<4)|h2i(s.charAt(i+1)));
+        }
+        return rslt;
+    }
+
     public static String hex(byte[] input) {
         return hex(input, input.length);
     }
@@ -913,6 +939,47 @@ public class ZorkaUtil {
         return null;
     }
 
+    public static String generateKey() {
+        SecureRandom rand = new SecureRandom();
+        byte[] key = new byte[16];
+        byte[] iv = new byte[16];
+        rand.nextBytes(key);
+        rand.nextBytes(iv);
+
+        return ZorkaUtil.hex(key) + "." + ZorkaUtil.hex(iv);
+    }
+
+
+    public static byte[][] parseKey(String s) {
+        String[] parts = s.split("\\.");
+        if (parts.length != 2 || parts[0].length() != 32 || parts[1].length() != 32) {
+            throw new ZorkaRuntimeException("Malformed encyrption key: " + s);
+        }
+        return new byte[][]{hex(parts[0]),hex(parts[1])};
+    }
+
+
+    public static byte[] aes(int mode, byte[] data, byte[][] kv) {
+        try {
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            SecretKeySpec sks = new SecretKeySpec(kv[0], "AES");
+            IvParameterSpec ips = new IvParameterSpec(kv[1]);
+            cipher.init(mode, sks, ips);
+            return cipher.doFinal(data);
+        } catch (NoSuchAlgorithmException e) {
+            throw new ZorkaRuntimeException("in ZorkaUtil.encrypt()", e);
+        } catch (NoSuchPaddingException e) {
+            throw new ZorkaRuntimeException("in ZorkaUtil.encrypt()", e);
+        } catch (InvalidAlgorithmParameterException e) {
+            throw new ZorkaRuntimeException("in ZorkaUtil.encrypt()", e);
+        } catch (InvalidKeyException e) {
+            throw new ZorkaRuntimeException("in ZorkaUtil.encrypt()", e);
+        } catch (BadPaddingException e) {
+            throw new ZorkaRuntimeException("in ZorkaUtil.encrypt()", e);
+        } catch (IllegalBlockSizeException e) {
+            throw new ZorkaRuntimeException("in ZorkaUtil.encrypt()", e);
+        }
+    }
 
     public static void sleep(long interval) {
         try {

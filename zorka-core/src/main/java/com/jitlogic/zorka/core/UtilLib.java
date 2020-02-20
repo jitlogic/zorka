@@ -16,14 +16,9 @@
 package com.jitlogic.zorka.core;
 
 
-import com.jitlogic.zorka.common.util.JSONWriter;
-import com.jitlogic.zorka.common.util.ObjectInspector;
-import com.jitlogic.zorka.common.util.StringMatcher;
-import com.jitlogic.zorka.common.util.TapInputStream;
-import com.jitlogic.zorka.common.util.TapOutputStream;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
-import com.jitlogic.zorka.common.util.Base64;
+import com.jitlogic.zorka.common.util.*;
 
+import javax.crypto.Cipher;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -195,4 +190,35 @@ public class UtilLib {
     public String uuid() {
         return UUID.randomUUID().toString();
     }
+
+    private static final String KV = "c5f0b16b6d6471e466140bffecad2090.8029d4dd5110c1b5f2bb575780a95982";
+
+    public String pwdenc(String s) {
+        String kvk = System.getenv("ZORKA_KVK");
+        if (kvk == null) kvk = KV;
+        byte[][] kv = ZorkaUtil.parseKey(kvk);
+        byte[] sb = s.getBytes();
+        int len = (sb.length + 16) & 0xfff0;
+        if (len > 256) throw new ZorkaRuntimeException("Password too long.");
+        byte[] b = new byte[len];
+        b[0] = (byte)sb.length;
+        System.arraycopy(sb, 0, b, 1, sb.length);
+        return "ENC:" + ZorkaUtil.hex(ZorkaUtil.aes(Cipher.ENCRYPT_MODE, b, kv));
+    }
+
+    public String pwddec(String s) {
+        String kvk = System.getenv("ZORKA_KVK");
+        if (kvk == null) kvk = KV;
+        if (s.startsWith("ENC:")) {
+            byte[][] kv = ZorkaUtil.parseKey(kvk);
+            byte[] b = ZorkaUtil.aes(Cipher.DECRYPT_MODE, ZorkaUtil.hex(s.substring(4)), kv);
+            int len = b[0] & 0xff;
+            byte[] sb = new byte[len];
+            System.arraycopy(b, 1, sb, 0, len);
+            return new String(sb);
+        } else {
+            return s;
+        }
+    }
+
 }

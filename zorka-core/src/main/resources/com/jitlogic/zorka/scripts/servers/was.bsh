@@ -38,7 +38,7 @@ __was() {
       zorka.logInfo("Authenticating agent as " + wasUser);
       callback = class_loader.loadClass("com.ibm.websphere.security.auth.callback.WSCallbackHandlerImpl")
         .getConstructor(String.class,String.class,String.class)
-        .newInstance(zorka.stringCfg("was.user"), zorka.stringCfg("was.role", "Monitor"), zorka.stringCfg("was.pass"));
+        .newInstance(zorka.stringCfg("was.user"), zorka.stringCfg("was.role", "Monitor"), util.pwddec(zorka.stringCfg("was.pass")));
 
       lc = new javax.security.auth.login.LoginContext("WSLogin", callback);
       lc.login();

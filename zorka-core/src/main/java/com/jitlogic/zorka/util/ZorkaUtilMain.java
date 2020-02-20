@@ -35,6 +35,8 @@ public class ZorkaUtilMain {
     public static void main(String[] args) throws IOException {
         if (args.length == 0) {
             help("Missing command.");
+        } else if ("crypt".equalsIgnoreCase(args[0])) {
+            CryptCommand.main(args);
         } else if ("ztx".equalsIgnoreCase(args[0])) {
             ZtxProcCommand.main(args);
         } else if ("zico".equalsIgnoreCase(args[0])) {

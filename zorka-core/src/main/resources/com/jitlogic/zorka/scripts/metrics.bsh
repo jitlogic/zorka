@@ -114,7 +114,7 @@ __metrics() {
     params = util.map("db", cfg.get("db"), "precision", "ms");
     url = cfg.get("url"); url += (url.endsWith("/") ? "" : "/") + "write"; cfg.put("url", url);
     if (cfg.get("user") != null) params.put("u", cfg.get("user"));
-    if (cfg.get("pass") != null) params.put("p", cfg.get("pass"));
+    if (cfg.get("pass") != null) params.put("p", util.pwddec(cfg.get("pass")));
     httpOut = perfmon.httpTextOutput("INFLUXDB-PUSH-HTTP", cfg, params, null);
     influxOutput = perfmon.influxPushOutput(cfg, _agent_attrs, _attrFilter, _sampleFilter, httpOut);
     tracer.output(influxOutput);

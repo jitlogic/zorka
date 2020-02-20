@@ -16,6 +16,7 @@
 package com.jitlogic.zorka.core.test.agent;
 
 import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.core.UtilLib;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import org.junit.Test;
@@ -120,5 +121,14 @@ public class ZorkaLibUnitTest extends ZorkaFixture {
         assertEquals("Hello world", zorka.jmxc("test", "test:type=ZorkaLib,name=test1", "someOp", ""));
         assertEquals("Hello borg", zorka.jmxc("test", "test:type=ZorkaLib,name=test1", "someOp", "T", "borg"));
         assertEquals("Hello J23", zorka.jmxc("test", "test:type=ZorkaLib,name=test1", "someOp", "Ti", "J", "23"));
+    }
+
+    @Test
+    public void testEncryptDecryptPasswd() {
+        UtilLib util = new UtilLib();
+        String enc = util.pwdenc("foobar");
+        String dec = util.pwddec(enc);
+        assertEquals("foobar", dec);
+        assertEquals("bork", util.pwddec("bork"));
     }
 }

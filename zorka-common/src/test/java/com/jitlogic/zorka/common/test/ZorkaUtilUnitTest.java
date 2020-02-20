@@ -15,13 +15,18 @@
  * along with this software. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jitlogic.zorka.core.test.common;
+package com.jitlogic.zorka.common.test;
 
 
 import com.jitlogic.zorka.common.stats.MethodCallStatistic;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import org.junit.Assert;
 import org.junit.Test;
+
+import javax.xml.crypto.dom.DOMCryptoContext;
+import java.util.Random;
+
+import static org.junit.Assert.*;
 
 // TODO move this test to zorka-common some day
 
@@ -35,33 +40,48 @@ public class ZorkaUtilUnitTest {
 
     @Test
     public void testInstanceOf1() throws Exception {
-        Assert.assertTrue("immediate implements",
+        assertTrue("immediate implements",
                 ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf2() throws Exception {
-        Assert.assertTrue("subinterface implements",   // TODO find better example (as this one doesn't matter anymore)
+        assertTrue("subinterface implements",   // TODO find better example (as this one doesn't matter anymore)
                 ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf3() throws Exception {
-        Assert.assertTrue("superclass implements subinterface", // TODO find better example (as this one doesn't matter anymore)
+        assertTrue("superclass implements subinterface", // TODO find better example (as this one doesn't matter anymore)
                 ZorkaUtil.instanceOf(TestCallStatistic.class, "com.jitlogic.zorka.common.stats.ZorkaStat"));
     }
 
     @Test
     public void testInstanceOf4() throws Exception {
-        Assert.assertFalse("should not implement",
+        assertFalse("should not implement",
                 ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.ValGetter"));
     }
 
     @Test
     public void testInstanceOf5() throws Exception {
-        Assert.assertTrue("immediate implements",
+        assertTrue("immediate implements",
                 ZorkaUtil.instanceOf(MethodCallStatistic.class, "com.jitlogic.zorka.common.stats.MethodCallStatistic"));
     }
 
+    @Test
+    public void testHexUnhex() throws Exception {
+        byte[] b1 = new byte[32];
+        new Random().nextBytes(b1);
+        String s = ZorkaUtil.hex(b1);
+        byte[] b2 = ZorkaUtil.hex(s);
+        assertArrayEquals(b1, b2);
+    }
 
+    @Test
+    public void testGenRestoreCryptKey() {
+        String k = ZorkaUtil.generateKey();
+        byte[][] kv = ZorkaUtil.parseKey(k);
+        assertTrue(k.startsWith(ZorkaUtil.hex(kv[0])));
+        assertTrue(k.endsWith(ZorkaUtil.hex(kv[1])));
+    }
 }
