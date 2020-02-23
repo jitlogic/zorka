@@ -3,14 +3,20 @@ package com.jitlogic.zorka.common.collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.jitlogic.zorka.common.util.ZorkaUtil.GB;
 import static com.jitlogic.zorka.common.util.ZorkaUtil.MB;
 
+/**
+ * Simple, memory-only implementation of trace chunk store. Implements
+ * standard TraceChunkStore interface along with automatic clean up of
+ * excess data and provides ways to search and extract chunks.
+ *
+ * Memory chunk store is intended to work in small setups and unit tests,
+ * so performance is not a priority here. Also concurrency is rather coarse,
+ * impacting performance when adding and searching at the same time.
+ */
 public class MemoryChunkStore implements TraceChunkStore {
 
     private static Logger log = LoggerFactory.getLogger(MemoryChunkStore.class);
@@ -86,5 +92,73 @@ public class MemoryChunkStore implements TraceChunkStore {
     /** Returns number of chunks */
     public synchronized int length() {
         return chunks.size();
+    }
+
+    public List<TraceChunkData> search(TraceChunkSearchQuery q) {
+        List<TraceChunkData> rslt = new ArrayList<TraceChunkData>(1024);
+
+        List<TraceChunkData> cs; // copy array, so we won't block threads adding new chunks
+
+        synchronized (this) {
+            cs = new ArrayList<TraceChunkData>(chunks);
+        }
+
+        for (TraceChunkData c : cs) {
+            // Various small properties
+            if (!q.isSpansOnly() && c.getParentId() != 0) continue;
+            if ((q.getTraceId1() != 0 || q.getTraceId2() != 0)
+                && (q.getTraceId1() != c.getTraceId1() || q.getTraceId2() != c.getTraceId2())) continue;
+            if (q.getSpanId() != 0 && q.getSpanId() != c.getSpanId()) continue;
+            if (q.isErrorsOnly() && !c.hasError()) continue;
+            if (c.getDuration() < q.getMinDuration()) continue;
+            if (c.getTstamp() < q.getMinTstamp()) continue;
+            if (c.getTstamp() > q.getMaxTstamp()) continue;
+
+            // Full text search
+            if (q.getText() != null) {
+                String text = q.getText();
+                boolean matches = false;
+                if ((c.getKlass() + "." + c.getMethod()).contains(text)) {
+                    matches = true;
+                } else if (c.getAttrs() != null) {
+                    for (Map.Entry<String,String> e : c.getAttrs().entrySet()) {
+                        if (e.getKey().contains(text) || e.getValue().contains(text)) {
+                            matches = true; break;
+                        }
+                    }
+                }
+                if (!matches) continue;
+            }
+
+            // Attribute matches
+            if (!q.getAttrmatches().isEmpty()) {
+                boolean matches = true;
+                for (Map.Entry<String,String> e : q.getAttrmatches().entrySet()) {
+                    if (!c.getAttr(e.getKey()).equals(e.getValue())) {
+                        matches = false; break;
+                    }
+                }
+                if (!matches) continue;
+            }
+
+            rslt.add(c);
+        }
+
+        if (q.getOffset()  >= rslt.size()) return Collections.emptyList();
+
+        if (q.isSortByDuration()) {
+            Collections.sort(rslt,
+                new Comparator<TraceChunkData>() {
+                    @Override
+                    public int compare(TraceChunkData o1, TraceChunkData o2) {
+                        if (o1.getDuration() < o2.getDuration()) return -1;
+                        if (o1.getDuration() > o2.getDuration()) return 1;
+                        return 0;
+                    }
+                });
+            return rslt.subList(q.getOffset(), Math.min(rslt.size(), q.getOffset()+q.getLimit()));
+        } else {
+            return rslt.subList(Math.max(0, rslt.size()-q.getOffset()-q.getLimit()), rslt.size()-q.getOffset());
+        }
     }
 }

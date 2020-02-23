@@ -31,6 +31,7 @@ import java.net.Socket;
 import java.security.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 import java.util.zip.GZIPInputStream;
@@ -906,6 +907,33 @@ public class ZorkaUtil {
 
     public static String hex(long l1, long l2) {
         return String.format("%08x%08x%08x%08x", l1 >>> 32, l1 & 0xffffffffL, l2 >>> 32, l2 & 0xffffffffL);
+    }
+
+    public static final Pattern RE_HEX64 = Pattern.compile("([0-9a-fA-F]{8})([0-9a-fA-F]{8})");
+
+    public static long unhex64(String hstr) {
+        if (hstr == null) throw new NullPointerException("Null HEX64 string");
+        Matcher m = RE_HEX64.matcher(hstr);
+        if (m.matches()) {
+            return Long.parseLong(m.group(1),16) << 32 | Long.parseLong(m.group(2),16);
+        } else {
+            throw new ZorkaRuntimeException("Invalid HEX64 string: '" + hstr + "'");
+        }
+    }
+
+    public static final Pattern RE_HEX128 = Pattern.compile("([0-9a-fA-F]{8})([0-9a-fA-F]{8})([0-9a-fA-F]{8})([0-9a-fA-F]{8})");
+
+    public static long[] unhex128(String hstr) {
+        if (hstr == null) throw new NullPointerException("Null HEX128 string");
+        Matcher m = RE_HEX128.matcher(hstr);
+        if (m.matches()) {
+            return new long[] {
+                Long.parseLong(m.group(1),16) << 32 | Long.parseLong(m.group(2),16),
+                Long.parseLong(m.group(3),16) << 32 | Long.parseLong(m.group(4),16)
+            };
+        } else {
+            throw new ZorkaRuntimeException("Invalid HEX128 string");
+        }
     }
 
 

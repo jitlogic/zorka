@@ -28,7 +28,7 @@ public class TraceBuildUtil {
         };
     }
 
-    public static TraceBuildBlock start(final int pos, final int tstart, final int methodId, final TraceBuildBlock...tbs) {
+    public static TraceBuildBlock start(final int pos, final long tstart, final int methodId, final TraceBuildBlock...tbs) {
         return new TraceBuildBlock() {
             @Override
             public void visit(TraceDataProcessor tdp) {
