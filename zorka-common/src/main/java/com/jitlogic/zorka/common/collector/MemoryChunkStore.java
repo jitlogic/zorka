@@ -161,4 +161,12 @@ public class MemoryChunkStore implements TraceChunkStore {
             return rslt.subList(Math.max(0, rslt.size()-q.getOffset()-q.getLimit()), rslt.size()-q.getOffset());
         }
     }
+
+    public synchronized void setMaxSize(long maxSize) {
+        this.maxSize = maxSize;
+    }
+
+    public synchronized void setDelSize(long delSize) {
+        this.delSize = delSize;
+    }
 }
