@@ -19,10 +19,7 @@ package com.jitlogic.zorka.common.tracedata;
 import com.jitlogic.zorka.common.collector.SymbolMapper;
 import com.jitlogic.zorka.common.collector.SymbolResolver;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,6 +30,8 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
      * ID of last symbol added to registry.
      */
     protected AtomicInteger lastSymbolId;
+
+    protected AtomicInteger lastSymbolNew;
 
     /**
      * Symbol name to ID map
@@ -46,16 +45,20 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
 
     protected AtomicInteger lastMethodId;
 
+    protected AtomicInteger lastMethodNew;
+
     protected ConcurrentMap<Long, Integer> methodIds;
 
     protected ConcurrentMap<Integer, Long> methodDefs;
 
     public SymbolRegistry() {
         lastSymbolId = new AtomicInteger(0);
+        lastSymbolNew = new AtomicInteger(0);
         symbolIds = new ConcurrentHashMap<String, Integer>();
         symbolNames = new ConcurrentHashMap<Integer, String>();
 
         lastMethodId = new AtomicInteger(0);
+        lastMethodNew = new AtomicInteger(0);
         methodIds = new ConcurrentHashMap<Long, Integer>();
         methodDefs = new ConcurrentHashMap<Integer, Long>();
     }
@@ -239,5 +242,32 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
 
     public ConcurrentMap<Integer, String> getSymbolNames() {
         return symbolNames;
+    }
+
+    public synchronized void resetNew() {
+        lastSymbolNew.set(lastSymbolId.get());
+        lastMethodNew.set(lastMethodNew.get());
+    }
+
+    public synchronized Map<Integer,String> getNewSymbols() {
+        int istart = lastSymbolNew.get(), istop = lastSymbolId.get();
+        if (istart >= istop) return Collections.emptyMap();
+        Map<Integer,String> rslt = new TreeMap<Integer, String>();
+        for (int i = istart+1; i <= istop; i++) {
+            rslt.put(i, symbolName(i));
+        }
+        lastSymbolNew.set(istop);
+        return rslt;
+    }
+
+    public synchronized Map<Integer,SymbolicMethod> getNewMethods() {
+        int istart = lastMethodNew.get(), istop = lastMethodNew.get();
+        if (istart >= istop) return Collections.emptyMap();
+        Map<Integer,SymbolicMethod> rslt = new TreeMap<Integer, SymbolicMethod>();
+        for (int i = istart+1; i <= istop; i++) {
+            rslt.put(i, methodDef(i));
+        }
+        lastMethodNew.set(istop);
+        return rslt;
     }
 }
