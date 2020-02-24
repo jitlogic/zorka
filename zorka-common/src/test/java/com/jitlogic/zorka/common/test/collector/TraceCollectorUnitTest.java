@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.Collections;
 import java.util.List;
 
+import static com.jitlogic.zorka.common.collector.TraceDataExtractingProcessor.extractTrace;
 import static org.junit.Assert.*;
 
 import static com.jitlogic.zorka.common.test.support.TraceBuildUtil.*;
@@ -24,7 +25,7 @@ public class TraceCollectorUnitTest {
     public void initOutput() {
         registry = new SymbolRegistry();
         store = new MemoryChunkStore();
-        collector = new Collector(registry, store, false);
+        collector = new Collector(store, false);
     }
 
     private byte[] agd1 = trace(
@@ -54,10 +55,9 @@ public class TraceCollectorUnitTest {
         collector.handleAgentData("1234", true, agd1);
         collector.handleTraceData("1234", "9234567812345001", 0, trc1);
         assertEquals(1, store.length());
-        TraceDataExtractor tex = new TraceDataExtractor(registry);
         TraceChunkData tcd = store.get(0);
         assertNotEquals(Base64.encode(trc1, false), Base64.encode(tcd.getTraceData(), false));
-        TraceDataResult tdr = tex.extract(Collections.singletonList(tcd));
+        TraceDataResult tdr = extractTrace(Collections.singletonList(tcd));
         assertNotNull(tdr);
         assertEquals("mydb.PStatement.execute()", tdr.getMethod());
         assertEquals("db", tdr.getAttr("component"));
@@ -80,14 +80,14 @@ public class TraceCollectorUnitTest {
         collector.handleAgentData("1234", true, agd1);
         collector.handleTraceData("1234", "9234567812345001", 0, trc2);
         assertEquals(2, store.length());
-        TraceDataExtractor tex = new TraceDataExtractor(registry);
+
 
         TraceChunkData tcd0 = store.get(0);
         assertEquals("execute", tcd0.getMethod());
 
         assertEquals(1, tcd0.getRecs());
 
-        TraceDataResult tdr1 = tex.extract(Collections.singletonList(tcd0));
+        TraceDataResult tdr1 = extractTrace(Collections.singletonList(tcd0));
         assertEquals("mydb.PStatement.execute()", tdr1.getMethod());
         assertNull(tdr1.getChildren());
 
@@ -97,7 +97,7 @@ public class TraceCollectorUnitTest {
         assertEquals(0, tcd1.getErrors());
         assertEquals(3, tcd1.getRecs());
 
-        TraceDataResult tdr2 = tex.extract(Collections.singletonList(tcd1));
+        TraceDataResult tdr2 = extractTrace(Collections.singletonList(tcd1));
         assertEquals("myweb.Valve.invoke()", tdr2.getMethod());
         assertNotNull(tdr2.getChildren());
 

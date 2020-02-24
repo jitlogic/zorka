@@ -14,17 +14,14 @@ public class Collector {
 
     private final Map<String, AgentSession> sessions = new ConcurrentHashMap<String, AgentSession>();
 
-    private volatile TraceChunkStore store;
-
-    private volatile SymbolMapper mapper;
+    private TraceChunkStore store;
 
     private boolean skipAgentData;
 
     private AtomicLong agdCount = new AtomicLong();
     private AtomicLong trcCount = new AtomicLong();
 
-    public Collector(SymbolMapper mapper, TraceChunkStore chunkStore, boolean skipAgentData) {
-        this.mapper = mapper;
+    public Collector(TraceChunkStore chunkStore, boolean skipAgentData) {
         this.skipAgentData = skipAgentData;
         this.store = chunkStore;
     }
@@ -41,7 +38,7 @@ public class Collector {
         AgentSession ses = getSession(sessionId, reset);
         if (ses == null) throw new NoSuchSessionException(sessionId);
         synchronized (ses) {
-            ses.handleAgentData(data, mapper);
+            ses.handleAgentData(data);
             agdCount.incrementAndGet();
         }
     }

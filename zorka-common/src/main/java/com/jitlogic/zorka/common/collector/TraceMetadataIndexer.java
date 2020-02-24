@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import static com.jitlogic.zorka.common.collector.SymbolDataExtractor.extractSymbolData;
+
 /** Extracts additional metadata needed to properly index trace. */
 public class TraceMetadataIndexer implements TraceDataProcessor {
 
@@ -94,7 +96,9 @@ public class TraceMetadataIndexer implements TraceDataProcessor {
             }
             int len = pos - c.getStartOffs();
             if (len > 0) {
-                c.setTraceData(ZorkaUtil.gzip(output.chunk(c.getStartOffs(), len)));
+                byte[] traceData = output.chunk(c.getStartOffs(), len);
+                c.setTraceData(ZorkaUtil.gzip(traceData));
+                c.setSymbolData(extractSymbolData(registry, traceData));
             }
             // TODO uwaga: tylko zakończone fragmenty są zapisywane; zaimplementować tymczasowy zapis niezakończonych fragmentów;
             if (top.getParent() == null || !top.hasFlag(TraceMarker.SENT_MARK)) {

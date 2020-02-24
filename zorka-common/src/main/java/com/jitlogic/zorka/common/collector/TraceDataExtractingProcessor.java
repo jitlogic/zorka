@@ -1,7 +1,12 @@
 package com.jitlogic.zorka.common.collector;
 
+import com.jitlogic.zorka.common.cbor.CborDataReader;
 import com.jitlogic.zorka.common.cbor.TraceDataProcessor;
+import com.jitlogic.zorka.common.cbor.TraceDataReader;
 import com.jitlogic.zorka.common.cbor.TraceRecordFlags;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -12,14 +17,13 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
     private TraceDataResult root;
     private TraceDataResult top;
 
-    private Map<Integer,String> symbols;
-    private Map<Integer,String> methods;
+    private SymbolRegistry registry;
+
 
     private Map<Long,TraceDataResultException> exceptions = new TreeMap<Long, TraceDataResultException>();
 
-    public void setSymbolMaps(Map<Integer,String> symbols, Map<Integer,String> methods) {
-        this.symbols = symbols;
-        this.methods = methods;
+    public void setRegistry(SymbolRegistry registry) {
+        this.registry = registry;
     }
 
     @Override
@@ -37,7 +41,11 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
         top = new TraceDataResult(top);
         top.setChunkPos(pos);
         top.setTstart(tstart);
-        top.setMethod(methods.get(methodId));
+        SymbolicMethod sm = registry.methodDef(methodId);
+        if (sm != null) {
+            String method = registry.symbolName(sm.getClassId()) + "." + registry.symbolName(sm.getMethodId()) + "()";
+            top.setMethod(method);
+        }
         if (root == null) root = top;
     }
 
@@ -52,14 +60,14 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
     @Override
     public void traceBegin(long tstamp, int ttypeId, long spanId, long parentId) {
         top.setTstamp(tstamp);
-        top.setTraceType(symbols.get(ttypeId));
+        top.setTraceType(registry.symbolName(ttypeId));
         top.setSpanId(spanId);
         top.setParentId(parentId);
     }
 
     @Override
     public void traceAttr(int attrId, Object attrVal) {
-        String attrName = symbols.get(attrId);
+        String attrName = registry.symbolName(attrId);
         if (attrName != null) {
             top.setAttr(attrName, ""+attrVal);
         }
@@ -67,8 +75,8 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
 
     @Override
     public void traceAttr(int ttypeId, int attrId, Object attrVal) {
-        String traceType = symbols.get(ttypeId);
-        String attrName = symbols.get(attrId);
+        String traceType = registry.symbolName(ttypeId);
+        String attrName = registry.symbolName(attrId);
         if (traceType != null && attrName != null) {
             for (TraceDataResult tdr = top; tdr != null; tdr = tdr.getParent()) {
                 if (traceType.equals(tdr.getTraceType())) {
@@ -81,12 +89,12 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
 
     @Override
     public void exception(long excId, int classId, String message, long cause, List<int[]> stackTrace, Map<Integer, Object> attrs) {
-        TraceDataResultException ex = new TraceDataResultException(excId, symbols.get(classId), message);
+        TraceDataResultException ex = new TraceDataResultException(excId, registry.symbolName(classId), message);
         if (cause != 0) ex.setCause(exceptions.get(cause));
         for (int[] si : stackTrace) {
-            String className = symbols.get(si[0]);
-            String methodName = symbols.get(si[1]);
-            String fileName = symbols.get(si[2]);
+            String className = registry.symbolName(si[0]);
+            String methodName = registry.symbolName(si[1]);
+            String fileName = registry.symbolName(si[2]);
             int fileLine = si[3];
             ex.getStack().add(String.format("%s.%s (%s:%d)", className, methodName, fileName, fileLine));
         }
@@ -109,4 +117,19 @@ public class TraceDataExtractingProcessor implements TraceDataProcessor {
     public TraceDataResult getRoot() {
         return root;
     }
+
+    public static TraceDataResult extractTrace(List<TraceChunkData> chunks) {
+
+        TraceDataExtractingProcessor tdep = new TraceDataExtractingProcessor();
+
+        // Extract symbol and method ids
+        for (TraceChunkData c : chunks) {
+            tdep.setRegistry(SymbolDataRetriever.retrieve(c.getSymbolData()));
+            byte[] data = ZorkaUtil.gunzip(c.getTraceData());
+            new TraceDataReader(new CborDataReader(data), tdep).run();
+        }
+
+        return tdep.getRoot();
+    }
+
 }

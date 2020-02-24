@@ -16,15 +16,11 @@
 
 package com.jitlogic.zorka.common.tracedata;
 
-import com.jitlogic.zorka.common.collector.SymbolMapper;
-import com.jitlogic.zorka.common.collector.SymbolResolver;
-
-import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class SymbolRegistry implements SymbolMapper, SymbolResolver {
+public class SymbolRegistry {
 
     /**
      * ID of last symbol added to registry.
@@ -189,85 +185,5 @@ public class SymbolRegistry implements SymbolMapper, SymbolResolver {
         if (methodId > lastMethodId.get()) {
             lastMethodId.set(methodId);
         }
-    }
-
-    @Override
-    public Map<Integer, Integer> newSymbols(Map<Integer, String> newSymbols) {
-        Map<Integer,Integer> rslt = new TreeMap<Integer,Integer>();
-        for (Map.Entry<Integer,String> e : newSymbols.entrySet()) {
-            rslt.put(e.getKey(), symbolId(e.getValue()));
-        }
-        return rslt;
-    }
-
-    @Override
-    public Map<Integer, Integer> newMethods(Map<Integer,SymbolicMethod> newMethods) {
-        Map<Integer,Integer> rslt = new TreeMap<Integer, Integer>();
-        for (Map.Entry<Integer,SymbolicMethod> e : newMethods.entrySet()) {
-            rslt.put(e.getKey(), methodId(e.getValue()));
-        }
-        return rslt;
-    }
-
-    @Override
-    public Map<Integer, String> resolveSymbols(Set<Integer> symbolIds, int tsnum) {
-        Map<Integer,String> rslt = new TreeMap<Integer, String>();
-        for (int id : symbolIds) {
-            String name = symbolName(id);
-            rslt.put(id, name != null ? name : "<?>");
-        }
-        return rslt;
-    }
-
-    @Override
-    public Map<Integer,String> resolveMethods(Set<Integer> methodIds, int tsnum) {
-        Map<Integer,String> rslt = new TreeMap<Integer,String>();
-        for (int mid : methodIds) {
-            SymbolicMethod md = methodDef(mid);
-            if (md != null) {
-                // Poor man's method resolver - for result and argument types use one with asm-util dependency;
-                String className = symbolName(md.getClassId());
-                String methodName = symbolName(md.getMethodId());
-                rslt.put(mid, String.format("%s.%s()", className, methodName));
-            } else {
-                rslt.put(mid, "<?>");
-            }
-        }
-        return rslt;
-    }
-
-    public ConcurrentMap<String, Integer> getSymbolIds() {
-        return symbolIds;
-    }
-
-    public ConcurrentMap<Integer, String> getSymbolNames() {
-        return symbolNames;
-    }
-
-    public synchronized void resetNew() {
-        lastSymbolNew.set(lastSymbolId.get());
-        lastMethodNew.set(lastMethodNew.get());
-    }
-
-    public synchronized Map<Integer,String> getNewSymbols() {
-        int istart = lastSymbolNew.get(), istop = lastSymbolId.get();
-        if (istart >= istop) return Collections.emptyMap();
-        Map<Integer,String> rslt = new TreeMap<Integer, String>();
-        for (int i = istart+1; i <= istop; i++) {
-            rslt.put(i, symbolName(i));
-        }
-        lastSymbolNew.set(istop);
-        return rslt;
-    }
-
-    public synchronized Map<Integer,SymbolicMethod> getNewMethods() {
-        int istart = lastMethodNew.get(), istop = lastMethodNew.get();
-        if (istart >= istop) return Collections.emptyMap();
-        Map<Integer,SymbolicMethod> rslt = new TreeMap<Integer, SymbolicMethod>();
-        for (int i = istart+1; i <= istop; i++) {
-            rslt.put(i, methodDef(i));
-        }
-        lastMethodNew.set(istop);
-        return rslt;
     }
 }

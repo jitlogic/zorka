@@ -14,6 +14,8 @@ import org.junit.Test;
 
 import java.util.*;
 
+import static com.jitlogic.zorka.common.collector.TraceDataExtractingProcessor.extractTrace;
+import static com.jitlogic.zorka.common.collector.TraceStatsExtractingProcessor.extractStats;
 import static com.jitlogic.zorka.core.test.support.BytecodeInstrumentationFixture.*;
 import static com.jitlogic.zorka.core.test.support.CoreTestUtil.instantiate;
 import static com.jitlogic.zorka.core.test.support.CoreTestUtil.invoke;
@@ -38,7 +40,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
     public void initOutput() {
         collectorRegistry = new SymbolRegistry();
         collectorStore = new MemoryChunkStore();
-        collector = new Collector(collectorRegistry, collectorStore, false);
+        collector = new Collector(collectorStore, false);
         output = new LTraceHttpOutput(config, HTTP_CONF, symbols, new CollectorLocalClient(collector));
     }
 
@@ -92,8 +94,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         assertNotEquals(cd.getSpanId(), 0);
         assertEquals(cd.getParentId(), 0L);
 
-        TraceDataExtractor extractor = new TraceDataExtractor(collectorRegistry);
-        TraceDataResult tr = extractor.extract(Collections.singletonList(cd));
+        TraceDataResult tr = extractTrace(Collections.singletonList(cd));
         assertNotNull(tr);
         assertNotEquals("<?>", tr.getMethod());
         assertEquals(TCLASS1 + ".trivialMethod()", tr.getMethod());
@@ -127,8 +128,8 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         assertNotNull(cd.getTraceData());
         assertTrue(cd.getTraceData().length > 0);
 
-        TraceDataExtractor extractor = new TraceDataExtractor(collectorRegistry);
-        TraceDataResult tr = extractor.extract(Collections.singletonList(cd));
+
+        TraceDataResult tr = extractTrace(Collections.singletonList(cd));
         assertNotNull(tr);
 
         assertEquals(TCLASS1 + ".trivialStrMethod()", tr.getMethod());
@@ -408,9 +409,7 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         TraceChunkData tcd = collectorStore.get(0);
         assertEquals(TCLASS+9, tcd.getKlass());
 
-        TraceDataExtractor tex = new TraceDataExtractor(collectorRegistry);
-
-        TraceDataResult tr0 = tex.extract(Collections.singletonList(tcd));
+        TraceDataResult tr0 = extractTrace(Collections.singletonList(tcd));
         assertEquals(TCLASS+9+".run()", tr0.getMethod());
         assertTrue(tr0.getTstop()-tr0.getTstart() > 0);
 
@@ -470,9 +469,9 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
 
         assertEquals("should return one trace", 1, collectorStore.length());
 
-        TraceStatsExtractor extractor = new TraceStatsExtractor(collectorRegistry);
+
         List<TraceStatsResult> rslt = new ArrayList<TraceStatsResult>(
-            extractor.extract(Collections.singletonList(collectorStore.get(0))));
+            extractStats(Collections.singletonList(collectorStore.get(0))));
 
         assertFalse(rslt.isEmpty());
 

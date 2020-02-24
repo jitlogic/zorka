@@ -1,12 +1,16 @@
 package com.jitlogic.zorka.common.collector;
 
+import com.jitlogic.zorka.common.cbor.CborDataReader;
 import com.jitlogic.zorka.common.cbor.TraceDataProcessor;
+import com.jitlogic.zorka.common.cbor.TraceDataReader;
 import com.jitlogic.zorka.common.cbor.TraceRecordFlags;
+import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import com.jitlogic.zorka.common.tracedata.SymbolicMethod;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
+
+import static com.jitlogic.zorka.common.collector.SymbolDataRetriever.retrieve;
 
 public class TraceStatsExtractingProcessor implements TraceDataProcessor {
 
@@ -76,4 +80,26 @@ public class TraceStatsExtractingProcessor implements TraceDataProcessor {
     public void exceptionRef(long excId) {
         // nothing here
     }
+
+    public static Collection<TraceStatsResult> extractStats(List<TraceChunkData> chunks) {
+        Map<String,TraceStatsResult> rslt = new HashMap<String, TraceStatsResult>();
+        for (TraceChunkData c : chunks) {
+            SymbolRegistry registry = retrieve(c.getSymbolData());
+            TraceStatsExtractingProcessor tsp = new TraceStatsExtractingProcessor();
+            byte[] data = ZorkaUtil.gunzip(c.getTraceData());
+            new TraceDataReader(new CborDataReader(data), tsp).run();
+            Map<Integer,TraceStatsResult> mstats = tsp.getStats();
+            for (Map.Entry<Integer,TraceStatsResult> e : mstats.entrySet()) {
+                SymbolicMethod sm = registry.methodDef(e.getValue().getMid());
+                if (sm != null) {
+                    String method = registry.symbolName(sm.getClassId()) + "." + registry.symbolName(sm.getMethodId()) + "()";
+                    TraceStatsResult v = e.getValue();
+                    v.setMethod(method);
+                    rslt.put(method, v);
+                }
+            }
+        }
+        return rslt.values();
+    }
+
 }

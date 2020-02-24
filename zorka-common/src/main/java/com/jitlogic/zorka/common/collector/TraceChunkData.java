@@ -85,6 +85,9 @@ public class TraceChunkData {
     /** Trace data (CBOR encoded and compressed) */
     private byte[] traceData;
 
+    /** Symbol data (CBOR encoded and compressed) - used to retrieve trace in human-readable form */
+    private byte[] symbolData;
+
     /** String attributes */
     private Map<String,String> attrs;
 
@@ -373,6 +376,14 @@ public class TraceChunkData {
 
     public void setTraceData(byte[] traceData) {
         this.traceData = traceData;
+    }
+
+    public byte[] getSymbolData() {
+        return symbolData;
+    }
+
+    public void setSymbolData(byte[] symbolData) {
+        this.symbolData = symbolData;
     }
 
     public TraceDataResultException getException() {
