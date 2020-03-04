@@ -16,12 +16,11 @@
 
 package com.jitlogic.zorka.common.collector;
 
+import com.jitlogic.zorka.common.tracedata.TraceMarker;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import java.math.BigInteger;
 import java.util.*;
-
-import static com.jitlogic.zorka.common.cbor.TraceRecordFlags.TF_ERROR_MARK;
 
 /**
  * Metadata describing given trace chunk. Some attributes are stored in MetadataQuickIndex,
@@ -245,14 +244,14 @@ public class TraceChunkData {
     }
 
     public boolean hasError() {
-        return 0 != (tflags & TF_ERROR_MARK);
+        return 0 != (tflags & TraceMarker.ERROR_MARK);
     }
 
     public void setError(boolean errorFlag) {
         if (errorFlag) {
-            tflags |= TF_ERROR_MARK;
+            tflags |= TraceMarker.ERROR_MARK;
         } else {
-            tflags &= ~TF_ERROR_MARK;
+            tflags &= ~TraceMarker.ERROR_MARK;
         }
     }
 
