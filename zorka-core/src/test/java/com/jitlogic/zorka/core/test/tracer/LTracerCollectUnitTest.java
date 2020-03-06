@@ -444,8 +444,9 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         assertTrue(tr5.getTstop()-tr5.getTstart() > 0);
     }
 
+
     @Test
-    public void testRetrieveTraceWithExceptions() throws Exception {
+    public void testRetrieveTraceWithInternalExceptions() throws Exception {
         TraceHandler.setMinMethodTime(0);
         tracer.include(spy.byClass(TCLASS+9));
         spy.add(spy.instance("1").onEnter(tracer.begin("TEST", 0)).include(spy.byMethod(TCLASS+9, "err")));
@@ -455,7 +456,36 @@ public class LTracerCollectUnitTest extends ZorkaFixture {
         invoke(obj, "err");
 
         assertEquals("should return one trace", 1, collectorStore.length());
+        TraceChunkData tcd = collectorStore.get(0);
+        assertFalse(tcd.hasError());
+
+        TraceDataResult tr0 = extractTrace(Collections.singletonList(tcd));
+        TraceDataResult tr1 = tr0.getChildren().get(0);
+        TraceDataResultException ex = tr1.getException();
+
+        assertNotNull(ex);
+        assertTrue(ex.getStack().get(0).length() > 20);
     }
+
+
+    @Test
+    public void testRetrieveTraceWithExternalExceptions() throws Exception {
+        TraceHandler.setMinMethodTime(0);
+        tracer.include(spy.byClass(TCLASS+9));
+        spy.add(spy.instance("1")
+            .onEnter(tracer.begin("TEST", 0))
+            .onError(tracer.markError())
+            .include(spy.byMethod(TCLASS+9, "err1")));
+        tracer.output(output);
+
+        Object obj = instantiate(agentInstance.getClassTransformer(), TCLASS+9);
+        invoke(obj, "err1");
+
+        assertEquals("should return one trace", 1, collectorStore.length());
+        TraceChunkData tcd = collectorStore.get(0);
+        assertTrue(tcd.hasError());
+    }
+
 
     @Test
     public void testTraceStats() throws Exception {

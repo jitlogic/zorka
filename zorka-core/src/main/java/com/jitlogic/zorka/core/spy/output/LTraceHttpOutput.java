@@ -129,11 +129,11 @@ public class LTraceHttpOutput extends ZicoHttpOutput {
             List<int[]> stack = new ArrayList<int[]>(se.getStackTrace().length);
 
             for (SymbolicStackElement ste : se.getStackTrace()) {
-                stack.add(new int[] { ste.getClassId(), ste.getMethodId(), ste.getFileId(), ste.getLineNum() });
+                stack.add(new int[] { ref(ste.getClassId()), ref(ste.getMethodId()), ref(ste.getFileId()), ste.getLineNum() });
             }
 
             // TODO generate proper causeID and proper binding between nException and causeId
-            ttdw.exception(++nExceptions, se.getClassId(), ""+se.getMessage(), 0, stack, null);
+            ttdw.exception(++nExceptions, ref(se.getClassId()), ""+se.getMessage(), 0, stack, null);
         }
 
         ttdw.traceEnd(0, tr.getTstop(), tr.getCalls(), tm != null ? tm.getFlags() : 0);

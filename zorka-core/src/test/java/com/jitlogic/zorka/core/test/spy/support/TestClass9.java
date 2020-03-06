@@ -41,6 +41,10 @@ public class TestClass9 {
         }
     }
 
+    public void err1() throws Exception {
+        bork3();
+    }
+
     public void bork3() throws Exception {
         Thread.sleep(2*N);
         try {
