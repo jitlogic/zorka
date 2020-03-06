@@ -270,8 +270,8 @@ __http() {
             ) : null)
         .onSubmit(
           spy.strTime("TIME"),
-          spy.format("STATUS", "${RESP.status}"),
-          spy.get("USER", "REQ", "remoteUser"),
+          spy.format("http.status_code", "${RESP.status}"),
+          spy.get("http.user", "REQ", "remoteUser"),
           _trace ? spy.subchain(
             _uriQualifier,
             tracer.attr("http.status_code", "STATUS"),
