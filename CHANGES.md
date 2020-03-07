@@ -1,7 +1,10 @@
-Zorka 1.90.9 (2020-??-??)
+Zorka 1.90.9 (2020-03-07)
 -------------------------
 
-*
+* search functionality in memory chunk store;
+* simplify collector: keep symbols along with trace chunk data;
+* various fixes;
+
 
 Zorka 1.90.8 (2020-02-20)
 -------------------------
