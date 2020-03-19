@@ -243,7 +243,9 @@ public final class ObjectInspector {
      */
     public static List<?> list(Object obj) {
         List<String> lst = new ArrayList<String>();
-        if (obj instanceof Map) {
+        if (obj == null) {
+            return Collections.emptyList();
+        } if (obj instanceof Map) {
             for (Object key : ((Map<?, ?>) obj).keySet()) {
                 lst.add(key.toString());
             }
