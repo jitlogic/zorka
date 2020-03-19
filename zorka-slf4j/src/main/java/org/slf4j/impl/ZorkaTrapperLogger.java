@@ -65,14 +65,14 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
     @Override
     public void trace(String msg, Object arg1) {
         if (logLevel <= TRACE_INT) {
-            trapper.trap(ZorkaLogLevel.TRACE, shortName, msg, null, arg1);
+            trapVarags(ZorkaLogLevel.TRACE, msg, arg1);
         }
     }
 
     @Override
     public void trace(String msg, Object arg1, Object arg2) {
         if (logLevel <= TRACE_INT) {
-            trapper.trap(ZorkaLogLevel.TRACE, shortName, msg, null, arg1, arg2);
+            trapVarags(ZorkaLogLevel.TRACE, msg, arg1, arg2);
         }
     }
 
@@ -105,14 +105,14 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
     @Override
     public void debug(String msg, Object arg1) {
         if (logLevel <= DEBUG_INT) {
-            trapper.trap(ZorkaLogLevel.DEBUG, shortName, msg, null, arg1);
+            trapVarags(ZorkaLogLevel.DEBUG, msg, arg1);
         }
     }
 
     @Override
     public void debug(String msg, Object arg1, Object arg2) {
         if (logLevel <= DEBUG_INT) {
-            trapper.trap(ZorkaLogLevel.DEBUG, shortName, msg, null, arg1, arg2);
+            trapVarags(ZorkaLogLevel.DEBUG, msg, arg1, arg2);
         }
     }
 
@@ -145,21 +145,21 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
     @Override
     public void info(String msg, Object arg1) {
         if (logLevel <= INFO_INT) {
-            trapper.trap(ZorkaLogLevel.INFO, shortName, msg, null, arg1);
+            trapVarags(ZorkaLogLevel.INFO,  msg, arg1);
         }
     }
 
     @Override
     public void info(String msg, Object arg1, Object arg2) {
         if (logLevel <= INFO_INT) {
-            trapper.trap(ZorkaLogLevel.INFO, shortName, msg, null, arg1, arg2);
+            trapVarags(ZorkaLogLevel.INFO,  msg, arg1, arg2);
         }
     }
 
     @Override
     public void info(String msg, Object...args) {
         if (logLevel <= INFO_INT) {
-            trapVarags(ZorkaLogLevel.INFO, msg, args);
+            trapVarags(ZorkaLogLevel.INFO,  msg, args);
         }
     }
 
@@ -185,7 +185,7 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
     @Override
     public void warn(String msg, Object arg1) {
         if (logLevel <= WARN_INT) {
-            trapper.trap(ZorkaLogLevel.WARN, shortName, msg, null, arg1);
+            trapVarags(ZorkaLogLevel.WARN, msg, arg1);
         }
     }
 
@@ -199,7 +199,7 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
     @Override
     public void warn(String msg, Object arg1, Object arg2) {
         if (logLevel <= WARN_INT) {
-            trapper.trap(ZorkaLogLevel.WARN, shortName, msg, null, arg1, arg2);
+            trapVarags(ZorkaLogLevel.WARN, msg, arg1, arg2);
         }
     }
 
@@ -225,14 +225,14 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
     @Override
     public void error(String msg, Object arg1) {
         if (logLevel <= ERROR_INT) {
-            trapper.trap(ZorkaLogLevel.ERROR, shortName, msg, null, arg1);
+            trapVarags(ZorkaLogLevel.ERROR, msg, arg1);
         }
     }
 
     @Override
     public void error(String msg, Object arg1, Object arg2) {
         if (logLevel <= ERROR_INT) {
-            trapper.trap(ZorkaLogLevel.ERROR, shortName, msg, null, arg1, arg2);
+            trapVarags(ZorkaLogLevel.ERROR, msg, arg1, arg2);
         }
     }
 
@@ -243,14 +243,12 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
         }
     }
 
-    private static final Object[] EMPTY = new Object[0];
-
     private void trapVarags(ZorkaLogLevel level, String msg, Object...args) {
-        if (args.length > 0 && args[0] instanceof Throwable) {
-            Throwable e = (Throwable)args[0];
-            trapper.trap(level, shortName, format(msg, Arrays.copyOfRange(args, 1, args.length)), e, EMPTY);
+        if (args.length > 0 && args[args.length-1] instanceof Throwable) {
+            Throwable e = (Throwable)args[args.length-1];
+            trapper.trap(level, shortName, format(msg, args), e);
         } else {
-            trapper.trap(level, shortName, format(msg, args), null, EMPTY);
+            trapper.trap(level, shortName, format(msg, args), null);
         }
 
     }
@@ -264,7 +262,7 @@ public class ZorkaTrapperLogger extends MarkerIgnoringBase implements ZorkaLogge
 
     private static final Pattern RE = Pattern.compile("\\{}");
 
-    public static String format(String msg, Object...args) {
+    public static String format(String msg, Object[] args) {
         Matcher m = RE.matcher(msg);
         int i = 0;
         StringBuffer sb = new StringBuffer();
