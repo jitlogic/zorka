@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
-import java.util.Collections;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 
 import static com.jitlogic.zorka.common.util.ZorkaConfig.*;
@@ -17,7 +17,7 @@ public class HttpService implements ZorkaService, HttpHandler {
 
     private static final Logger log = LoggerFactory.getLogger(HttpService.class);
 
-    private volatile Map<String,HttpHandler> endpoints = Collections.EMPTY_MAP;
+    private volatile Map<String,HttpHandler> endpoints = new ConcurrentHashMap<String, HttpHandler>();
 
     private HttpConfig httpconf = new HttpConfig();
     private HttpServer server;
@@ -56,6 +56,7 @@ public class HttpService implements ZorkaService, HttpHandler {
     }
 
     public synchronized void addEndpoint(String path, HttpHandler handler) {
+        log.info("Adding HTTP endpoint: " + path + " -> " + handler);
         endpoints.put(path, handler);
     }
 
@@ -70,6 +71,12 @@ public class HttpService implements ZorkaService, HttpHandler {
 
     @Override
     public HttpMessage handle(HttpMessage message) {
-        return null;
+        for (Map.Entry<String,HttpHandler> e : endpoints.entrySet()) {
+            if (e.getKey().equals(message.getUri())) {
+                System.out.println("k=" + e.getKey() + ", uri=" + message.getUri());
+                return e.getValue().handle(message);
+            }
+        }
+        return HttpMessage.RESP(404, "Page not found.");
     }
 }

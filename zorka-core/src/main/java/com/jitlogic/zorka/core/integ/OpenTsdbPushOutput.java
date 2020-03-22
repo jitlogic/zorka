@@ -17,6 +17,7 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.tracedata.PerfTextChunk;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
 import com.jitlogic.zorka.core.perfmon.PerfAttrFilter;
 import com.jitlogic.zorka.core.perfmon.PerfSampleFilter;
@@ -31,7 +32,7 @@ public class OpenTsdbPushOutput extends AbstractMetricPushOutput {
             Map<String, String> constAttrMap,
             PerfAttrFilter attrFilter,
             PerfSampleFilter filter,
-            ZorkaSubmitter<byte[]> output) {
+            ZorkaSubmitter<PerfTextChunk> output) {
 
         super(symbolRegistry, constAttrMap, attrFilter, filter, output);
 

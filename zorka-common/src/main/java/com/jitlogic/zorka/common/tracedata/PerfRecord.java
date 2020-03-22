@@ -22,13 +22,15 @@ import java.util.List;
 public class PerfRecord implements SymbolicRecord {
 
     private long clock;
+    private String label;
     private int scannerId;
     private List<PerfSample> samples;
 
 
-    public PerfRecord(long clock, int scannerId, List<PerfSample> samples) {
+    public PerfRecord(long clock, int scannerId, String label, List<PerfSample> samples) {
         this.clock = clock;
         this.scannerId = scannerId;
+        this.label = label;
         this.samples = samples;
     }
 
@@ -51,5 +53,9 @@ public class PerfRecord implements SymbolicRecord {
 
     public List<PerfSample> getSamples() {
         return samples;
+    }
+
+    public String getLabel() {
+        return label;
     }
 }

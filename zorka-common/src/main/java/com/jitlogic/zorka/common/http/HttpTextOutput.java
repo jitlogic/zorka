@@ -16,6 +16,7 @@
 
 package com.jitlogic.zorka.common.http;
 
+import com.jitlogic.zorka.common.tracedata.PerfTextChunk;
 import com.jitlogic.zorka.common.util.*;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 
@@ -33,7 +34,7 @@ import static com.jitlogic.zorka.common.util.ZorkaConfig.parseInt;
 /**
  * Generic HTTP output for text data. Accepts strings that will be
  */
-public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
+public class HttpTextOutput extends ZorkaAsyncThread<PerfTextChunk> {
 
     private String url;
     private String uri;
@@ -91,10 +92,10 @@ public class HttpTextOutput extends ZorkaAsyncThread<byte[]> {
 
 
     @Override
-    protected void process(List<byte[]> msgs) {
-        for (byte[] msg : msgs) {
+    protected void process(List<PerfTextChunk> msgs) {
+        for (PerfTextChunk p : msgs) {
             try {
-                HttpMessage req = HttpMessage.POST(uri, msg);
+                HttpMessage req = HttpMessage.POST(uri, p.getData());
 
                 for (Map.Entry<String,String> e : headers.entrySet()) {
                     req.header(e.getKey(), e.getValue());

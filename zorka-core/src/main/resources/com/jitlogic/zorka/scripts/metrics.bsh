@@ -164,8 +164,8 @@ __metrics() {
     if (_httpService != null) {
       zorka.logInfo("Publishing Prometheus URI via HTTP: /metrics");
       _promCfg = zorka.mapCfg("prometheus");
-      promHttpEndpoint = perfmon.httpTextEndpoint("/metrics");
-      _httpService.addEndpoint(promHttpEndpoint);
+      promHttpEndpoint = perfmon.httpTextEndpoint("/metrics", _interval*2, "\n");
+      _httpService.addEndpoint("/metrics", promHttpEndpoint);
       promPushOutput = perfmon.prometheusPushOutput(_promCfg, _agent_attrs, _attrFilter, _sampleFilter, promHttpEndpoint);
       tracer.output(promPushOutput);
     }

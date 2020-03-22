@@ -107,7 +107,7 @@ public class TraceOutputJmxScanner extends JmxScanner implements Runnable, Label
         AgentDiagnostics.inc(AgentDiagnostics.PMON_SAMPLES_SENT, samples.size());
 
         if (!samples.isEmpty()) {
-            output.submit(new PerfRecord(clock, id, samples));
+            output.submit(new PerfRecord(clock, id, label, samples));
         }
     }
 

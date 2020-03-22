@@ -3,6 +3,7 @@ package com.jitlogic.zorka.common.test.http;
 import com.jitlogic.zorka.common.http.*;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.test.support.CommonFixture;
+import com.jitlogic.zorka.common.tracedata.PerfTextChunk;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
 import org.junit.AfterClass;
@@ -69,7 +70,7 @@ public class HttpTextOutputUnitTest extends CommonFixture {
 
         output.start();
 
-        output.submit("FUBAR".getBytes());
+        output.submit(new PerfTextChunk("test", "FUBAR".getBytes()));
 
         synchronized (httpReqs) {
             assertEquals(1, httpReqs.size());

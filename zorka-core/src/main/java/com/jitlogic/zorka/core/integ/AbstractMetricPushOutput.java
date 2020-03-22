@@ -17,10 +17,7 @@
 package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
-import com.jitlogic.zorka.common.tracedata.PerfRecord;
-import com.jitlogic.zorka.common.tracedata.PerfSample;
-import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
-import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.core.perfmon.PerfAttrFilter;
 import com.jitlogic.zorka.core.perfmon.PerfSampleFilter;
 import org.slf4j.Logger;
@@ -43,7 +40,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
     private PerfSampleFilter filter;
 
     /** Submitted responsible for sending data to monitoring system. */
-    private ZorkaSubmitter<byte[]> output;
+    private ZorkaSubmitter<PerfTextChunk> output;
 
     /** Symbol registry. */
     private SymbolRegistry symbolRegistry;
@@ -68,7 +65,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
             Map<String,String> constAttrMap,
             PerfAttrFilter attrFilter,
             PerfSampleFilter filter,
-            ZorkaSubmitter<byte[]> output) {
+            ZorkaSubmitter<PerfTextChunk> output) {
         this.symbolRegistry = symbolRegistry;
         this.constAttrMap = constAttrMap;
         this.attrFilter = attrFilter;
@@ -188,7 +185,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                         if (log.isTraceEnabled()) {
                             log.trace("Submit: '{}'", sb);
                         }
-                        rslt &= output.submit(sb.toString().getBytes());
+                        rslt &= output.submit(new PerfTextChunk(pr.getLabel(), sb.toString().getBytes()));
                         sb = new StringBuilder(chunkSize);
                         chs = chunkStart;
                     }
@@ -202,7 +199,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                 if (log.isTraceEnabled()) {
                     log.trace("Submit: '{}'", sb);
                 }
-                rslt &= output.submit(sb.toString().getBytes());
+                rslt &= output.submit(new PerfTextChunk(pr.getLabel(), sb.toString().getBytes()));
             }
         } // if (sr instanceof PerfRecord)
 

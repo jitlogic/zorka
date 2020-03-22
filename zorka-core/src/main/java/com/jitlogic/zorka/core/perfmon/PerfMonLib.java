@@ -19,6 +19,7 @@ package com.jitlogic.zorka.core.perfmon;
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.http.HttpTextOutput;
 import com.jitlogic.zorka.common.stats.MethodCallStatistics;
+import com.jitlogic.zorka.common.tracedata.PerfTextChunk;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.core.ZorkaLib;
 import com.jitlogic.zorka.core.integ.*;
@@ -160,16 +161,20 @@ public class PerfMonLib {
         return httpOutput;
     }
 
+    public HttpTextEndpoint httpTextEndpoint(String uri, long horizon, String separator) {
+        return new HttpTextEndpoint(uri, horizon, separator);
+    }
+
     public InfluxPushOutput influxPushOutput(
             Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<byte[]> httpOutput) {
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<PerfTextChunk> httpOutput) {
         return new InfluxPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
     }
 
 
     public OpenTsdbPushOutput tsdbPushOutput(
             Map<String,String> config, Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<byte[]> httpOutput) {
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<PerfTextChunk> httpOutput) {
         return new OpenTsdbPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, httpOutput);
     }
 
@@ -177,7 +182,7 @@ public class PerfMonLib {
     public GraphitePushOutput graphitePushOutput(
             Map<String,String> config,
             Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<byte[]> tcpOutput) {
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<PerfTextChunk> tcpOutput) {
         return new GraphitePushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
     }
 
@@ -185,7 +190,7 @@ public class PerfMonLib {
     public PrometheusPushOutput prometheusPushOutput(
             Map<String,String> config,
             Map<String,String> constAttrs, PerfAttrFilter attrFilter,
-            PerfSampleFilter sampleFilter, ZorkaSubmitter<byte[]> tcpOutput) {
+            PerfSampleFilter sampleFilter, ZorkaSubmitter<PerfTextChunk> tcpOutput) {
         return new PrometheusPushOutput(symbolRegistry, config, constAttrs, attrFilter, sampleFilter, tcpOutput);
     }
 

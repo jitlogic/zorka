@@ -17,29 +17,34 @@
 package com.jitlogic.zorka.core.test.support;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
+import com.jitlogic.zorka.common.tracedata.PerfTextChunk;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestStringOutput implements ZorkaSubmitter<byte[]> {
+public class TestStringOutput implements ZorkaSubmitter<PerfTextChunk> {
 
-    private List<String> results = new ArrayList<String>();
+    private List<PerfTextChunk> results = new ArrayList<PerfTextChunk>();
 
     public List<String> getResults() {
-        return results;
+        List<String> lst = new ArrayList<String>(results.size());
+        for (PerfTextChunk c : results) {
+            lst.add(new String(c.getData(), Charset.defaultCharset()));
+        }
+        return lst;
     }
 
     @Override
-    public boolean submit(byte[] item) {
-        return results.add(new String(item, Charset.defaultCharset()));
+    public boolean submit(PerfTextChunk item) {
+        return results.add(item);
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (String r : results) {
-            sb.append(r);
+        for (PerfTextChunk r : results) {
+            sb.append(new String(r.getData(), Charset.defaultCharset()));
             sb.append('\n');
         }
         return sb.toString();
