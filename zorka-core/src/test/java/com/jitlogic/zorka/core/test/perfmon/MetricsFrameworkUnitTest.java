@@ -17,14 +17,11 @@
 package com.jitlogic.zorka.core.test.perfmon;
 
 import com.jitlogic.zorka.common.tracedata.*;
-import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.perfmon.*;
 import com.jitlogic.zorka.core.test.support.ZorkaFixture;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -43,16 +40,8 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
         QueryResult qr = qr(10L, "name", "SomeObject", "type", "SomeType");
 
         assertTrue("Should return RawDataMetric object.",
-                scanner.getMetric(perfmon.metric("", "test", "test", "test", "gauge"), qr) instanceof RawDataMetric);
+                scanner.getMetric(perfmon.metric("", "test", "test", "test", "gauge"), qr) instanceof Metric);
 
-        assertTrue("Should return RawDeltaMetric object.",
-                scanner.getMetric(perfmon.delta("", "test", "test", "test", "gauge"), qr) instanceof RawDeltaMetric);
-
-        assertTrue("Expected TimerDeltaMetric object.",
-                scanner.getMetric(perfmon.timedDelta("", "test", "test", "test", "gauge"), qr) instanceof TimedDeltaMetric);
-
-        assertTrue("Expected WindowedRateMetric",
-                scanner.getMetric(perfmon.rate("","t", "t", "t", "nom", "nom", "gauge"), qr) instanceof WindowedRateMetric);
     }
 
 
@@ -113,99 +102,6 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
         Metric m = metric(perfmon.metric("","", "", "", "gauge").multiply(1.23));
 
         assertEquals(12.3, (Double)m.getValue(0L, 10L), 0.001);
-    }
-
-
-    @Test
-    public void testDeltaMetric() {
-        Metric m = metric(perfmon.delta("","", "", "", "gauge"));
-
-        assertEquals(0L, m.getValue(0L, 10L));
-        assertEquals(5L, m.getValue(10L, 15L));
-    }
-
-
-    @Test
-    public void testDeltaMetricWithRoundedMultiplier() {
-        Metric m = metric(perfmon.delta("","", "", "", "gauge").multiply(2));
-
-        assertEquals(0L, m.getValue(0L, 10L));
-        assertEquals(10L, m.getValue(10L, 15L));
-    }
-
-
-    @Test
-    public void testDeltaMetricWithUnRoundedMultiplier() {
-        Metric m = metric(perfmon.delta("","", "", "", "gauge").multiply(2.5));
-
-        assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
-        assertEquals(12.5, (Double)m.getValue(10L, 15L), 0.001);
-    }
-
-
-    @Test
-    public void testTimedDeltaMetric() {
-        Metric m = metric(perfmon.timedDelta("","", "", "", "gauge"));
-
-        assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
-        assertEquals(2.0, (Double)m.getValue(5000L, 20L), 0.001);
-    }
-
-
-    @Test
-    public void testTimedDeltaMetricWithMultiplier() {
-        Metric m = metric(perfmon.timedDelta("","", "", "", "gauge").multiply(1.5));
-
-        assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
-        assertEquals(3.0, (Double)m.getValue(5000L, 20L), 0.001);
-    }
-
-
-    @Test
-    public void testRateMetric() {
-        Metric m = metric(perfmon.rate("", "", "", "", "a", "b", "gauge"));
-
-        Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
-        Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
-
-        assertEquals(0.0, (Double)m.getValue(0L, v1), 0.001);
-        assertEquals(5.0, (Double)m.getValue(1L, v2), 0.001);
-    }
-
-
-    @Test
-    public void testRateMetricWithMultiplier() {
-        Metric m = metric(perfmon.rate("", "", "", "", "a", "b", "gauge").multiply(0.2));
-
-        Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
-        Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
-
-        assertEquals(0.0, (Double)m.getValue(0L, v1), 0.001);
-        assertEquals(1.0, (Double)m.getValue(1L, v2), 0.001);
-
-    }
-
-
-    @Test
-    public void testRateMetricWithNullValues() {
-        Metric m = metric(perfmon.rate("","", "", "", "a", "c", "gauge"));
-
-        Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
-        Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
-
-        assertEquals(0.0, (Double)m.getValue(0L, v1), 0.001);
-        assertEquals(0.0, (Double)m.getValue(1L, v2), 0.001);
-    }
-
-    @Test
-    public void testUtilizationMetric() {
-        Metric m = metric(perfmon.util("","", "", "", "a", "b", "gauge"));
-
-        Map<String,Long> v1 = ZorkaUtil.map("a", 5L, "b", 10L);
-        Map<String,Long> v2 = ZorkaUtil.map("a", 1L, "b", 1L);
-
-        assertEquals(50.0, (Double)m.getValue(0, v1), 0.001);
-        assertEquals(100.0, (Double)m.getValue(0, v2), 0.001);
     }
 
 

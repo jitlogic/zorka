@@ -18,7 +18,6 @@ package com.jitlogic.zorka.core.test.perfmon;
 
 import com.jitlogic.zorka.common.tracedata.Metric;
 import com.jitlogic.zorka.common.tracedata.PerfSample;
-import com.jitlogic.zorka.common.tracedata.RawDataMetric;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.perfmon.PerfAttrFilter;
 import com.jitlogic.zorka.core.perfmon.PerfSampleFilter;
@@ -100,8 +99,10 @@ public class PerfSampleFilterUnitTest extends ZorkaFixture {
 
     private PerfSample sample(String name, Number value, String domain, String...attrs) {
 
-        Metric m = new RawDataMetric(lastId++, name, "", domain,
-                null); // TODO zamiast sample.attrs uzyc metric.attrs
+        final int id = lastId++;
+        final String name1 = name;
+        final String domain1 = domain;
+        Metric m = new Metric(id, name1, "", domain1, null); // TODO zamiast sample.attrs uzyc metric.attrs
 
         PerfSample sample = new PerfSample(m.getId(), value);
         sample.setMetric(m);

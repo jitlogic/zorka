@@ -29,21 +29,10 @@ import java.util.*;
  */
 public class MetricTemplate implements Serializable {
 
-    public static final int RAW_DATA = 1;
-    public static final int RAW_DELTA = 2;
-    public static final int TIMED_DELTA = 3;
-    public static final int WINDOWED_RATE = 4;
-    public static final int UTILIZATION = 5;
-
     /**
      * Template ID (automatically assigned by agent)
      */
     private int id;
-
-    /**
-     * Determines types of metrics created from this template (see above constants).
-     */
-    private int type;
 
     /**
      * Domain name (as in JMX).
@@ -68,12 +57,7 @@ public class MetricTemplate implements Serializable {
     /**
      * Data type (counter, gauge, histogram, summary)
      */
-    private String dataType;
-
-    /**
-     * Nominator and divider fields (for metrics using two components)
-     */
-    private String nomField, divField;
+    private String type;
 
     /**
      * Result multiplier
@@ -93,57 +77,15 @@ public class MetricTemplate implements Serializable {
 
     /**
      * Creates new template
-     *
-     * @param type  metric type
-     * @param description  metric description
+     *  @param description  metric description
      * @param units units of measure
      */
-    public MetricTemplate(int type, String domain, String name, String description, String units, String dataType) {
-        this(type, domain, name, description, units, null, null, dataType);
-    }
-
-
-    /**
-     * Creates new template
-     *
-     * @param id       template ID
-     * @param type     metric type
-     * @param description     metric description
-     * @param units    units of measure
-     * @param nomField nominal field
-     * @param divField divider field
-     */
-    public MetricTemplate(int id, int type, String domain, String name, String description, String units, String nomField, String divField, String dataType) {
-        this.id = id;
-        this.type = type;
+    public MetricTemplate(String domain, String name, String description, String units, String type) {
         this.name = name;
         this.domain = domain;
         this.description = description;
         this.units = units;
-        this.nomField = nomField;
-        this.divField = divField;
-        this.dataType = dataType;
-    }
-
-
-    /**
-     * Creates new template
-     *
-     * @param type     metric type
-     * @param description     metric description
-     * @param units    units of measure
-     * @param nomField nominal field
-     * @param divField divider field
-     */
-    public MetricTemplate(int type, String domain, String name, String description, String units, String nomField, String divField, String dataType) {
         this.type = type;
-        this.name = name;
-        this.domain = domain;
-        this.description = description;
-        this.units = units;
-        this.nomField = nomField;
-        this.divField = divField;
-        this.dataType = dataType;
     }
 
 
@@ -154,13 +96,10 @@ public class MetricTemplate implements Serializable {
      */
     private MetricTemplate(MetricTemplate orig) {
         this.id = orig.id;
-        this.type = orig.type;
         this.domain = orig.domain;
         this.name = orig.name;
         this.description = orig.description;
-        this.nomField = orig.nomField;
-        this.divField = orig.divField;
-        this.multiplier = orig.getMultiplier();
+        this.multiplier = orig.multiplier;
         this.dynamicAttrs = new HashSet<String>();
         this.dynamicAttrs.addAll(orig.getDynamicAttrs());
     }
@@ -170,10 +109,11 @@ public class MetricTemplate implements Serializable {
     public boolean equals(Object obj) {
         if (obj instanceof MetricTemplate) {
             MetricTemplate mt = (MetricTemplate) obj;
-            return type == mt.type
-                    && ZorkaUtil.objEquals(description, mt.description)
-                    && ZorkaUtil.objEquals(nomField, mt.nomField)
-                    && ZorkaUtil.objEquals(divField, mt.divField);
+            return ZorkaUtil.objEquals(name, mt.name)
+                && ZorkaUtil.objEquals(domain, mt.domain)
+                && ZorkaUtil.objEquals(units, mt.units)
+                && ZorkaUtil.objEquals(type, mt.getType())
+                && ZorkaUtil.objEquals(description, mt.description);
         } else {
             return false;
         }
@@ -182,19 +122,15 @@ public class MetricTemplate implements Serializable {
 
     @Override
     public int hashCode() {
-        return (1117 * type) ^ (description != null ? description.hashCode() : 0);
+        return name.hashCode() + (1117 * type.hashCode()) ^ (description != null ? description.hashCode() : 0);
     }
 
 
     @Override
     public String toString() {
-        return "MT(type=" + type + ", description=" + description + ")";
+        return "MT(name=" + name + ", description=" + description + ")";
     }
 
-
-    public int getType() {
-        return type;
-    }
 
     public String getDomain() {
         return domain;
@@ -209,15 +145,6 @@ public class MetricTemplate implements Serializable {
         return units;
     }
 
-
-    public String getNomField() {
-        return nomField;
-    }
-
-
-    public String getDivField() {
-        return divField;
-    }
 
 
     public double getMultiplier() {
@@ -320,7 +247,7 @@ public class MetricTemplate implements Serializable {
         metrics.put(key, metric);
     }
 
-    public String getDataType() {
-        return dataType;
+    public String getType() {
+        return type;
     }
 }

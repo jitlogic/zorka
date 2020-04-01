@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @author rafal.lewczuk@jitlogic.com
  */
-public abstract class Metric implements Serializable {
+public class Metric implements Serializable {
 
     /**
      * Template this metric was created from
@@ -36,7 +36,7 @@ public abstract class Metric implements Serializable {
     /**
      * Metric ID and tempalte ID
      */
-    private int id, templateId;
+    private int id;
 
     /**
      * Metric domain
@@ -85,24 +85,6 @@ public abstract class Metric implements Serializable {
     /**
      * Creates new metric
      *
-     * @param id         metric ID
-     * @param templateId template ID
-     * @param description       metric description
-     * @param attrs      metric attributes
-     */
-    public Metric(int id, int templateId, String name, String description, String domain,
-                  Map<String, Object> attrs) {
-        this.id = id;
-        this.templateId = templateId;
-        this.name = name;
-        this.description = description;
-        this.domain = domain;
-        this.attrs = attrs;
-    }
-
-    /**
-     * Creates new metric
-     *
      * @param template metric template
      * @param description     metric description
      * @param attrs    metric attributes
@@ -127,7 +109,9 @@ public abstract class Metric implements Serializable {
      * @param value input (raw) value
      * @return
      */
-    public abstract Number getValue(long clock, Object value);
+    public Number getValue(long clock, Object value) {
+        return multiply((Number) value);
+    }
 
 
     public MetricTemplate getTemplate() {
@@ -149,15 +133,6 @@ public abstract class Metric implements Serializable {
         this.id = id;
     }
 
-
-    public int getTemplateId() {
-        return templateId;
-    }
-
-
-    public void setTemplateId(int templateId) {
-        this.templateId = templateId;
-    }
 
 
     public Map<String, Integer> getDynamicAttrs() {

@@ -53,16 +53,6 @@ public class JmxScanner {
 
 
     public JmxScanner(MBeanServerRegistry mBeanServerRegistry, MetricsRegistry metricRegistry,
-                      SymbolRegistry symbols, List<QueryLister> listers) {
-
-        this.mBeanServerRegistry = mBeanServerRegistry;
-        this.metricsRegistry = metricRegistry;
-        this.symbols = symbols;
-        this.listers = listers;
-    }
-
-
-    public JmxScanner(MBeanServerRegistry mBeanServerRegistry, MetricsRegistry metricRegistry,
                       SymbolRegistry symbols, QueryDef...qdefs) {
 
         this.mBeanServerRegistry = mBeanServerRegistry;
@@ -88,35 +78,13 @@ public class JmxScanner {
 
             String description = ObjectInspector.substitute(template.getDescription(), attrs);
 
-            switch (template.getType()) {
-                case MetricTemplate.RAW_DATA:
-                    metric = metricsRegistry.getMetric(
-                            new RawDataMetric(template, template.getName(), description,
-                                    template.getDomain(), attrs));
-                    break;
-                case MetricTemplate.RAW_DELTA:
-                    metric = metricsRegistry.getMetric(
-                            new RawDeltaMetric(template, template.getName(), description,
-                                    template.getDomain(), attrs));
-                    break;
-                case MetricTemplate.TIMED_DELTA:
-                    metric = metricsRegistry.getMetric(
-                            new TimedDeltaMetric(template, template.getName(), description,
-                                    template.getDomain(), attrs));
-                    break;
-                case MetricTemplate.WINDOWED_RATE:
-                    metric = metricsRegistry.getMetric(
-                            new WindowedRateMetric(template, template.getName(), description,
-                                    template.getDomain(), attrs));
-                    break;
-                case MetricTemplate.UTILIZATION:
-                    metric = metricsRegistry.getMetric(
-                            new UtilizationMetric(template, template.getName(), description,
-                                    template.getDomain(), attrs));
-                    break;
-                default:
-                    return null;
-            }
+            final MetricTemplate template1 = template;
+            final String name = template.getName();
+            final String description1 = description;
+            final String domain = template.getDomain();
+            final Map<String, Object> attrs1 = attrs;
+            metric = metricsRegistry.getMetric(
+                new Metric(template1, name, description1, domain, attrs1));
 
             if (template.getId() == 0) {
                 metricsRegistry.getTemplate(template);
