@@ -100,7 +100,7 @@ __metrics() {
       .metric(perfmon.metric("zorka", "zorka_stats", "${ATTR.name}.${ATTR.section}.${ATTR.tag}: calls", "calls", "summary/sum").divide(1000)),
     zorka.query("java", "zorka:type=ZorkaStats,*", "type", "name")
       .listAs("**", "section").listAs("**", "tag").get("errors")
-      .metric(perfmon.metric("zorka", "zorka_", "${ATTR.name}.${ATTR.section}.${ATTR.tag}: errors", "errors", "counter")));
+      .metric(perfmon.metric("zorka", "zorka_stats", "${ATTR.name}.${ATTR.section}.${ATTR.tag}: errors", "errors", "counter")));
 
   _zorkaStatsScanner.setAttachResults(true);
   zorka.schedule(_zorkaStatsScanner, _interval, _delay);

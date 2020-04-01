@@ -99,8 +99,9 @@ public class MetricTemplate implements Serializable {
         this.domain = orig.domain;
         this.name = orig.name;
         this.description = orig.description;
+        this.units = orig.units;
+        this.type = orig.type;
         this.multiplier = orig.multiplier;
-        this.dynamicAttrs = new HashSet<String>();
         this.dynamicAttrs.addAll(orig.getDynamicAttrs());
     }
 

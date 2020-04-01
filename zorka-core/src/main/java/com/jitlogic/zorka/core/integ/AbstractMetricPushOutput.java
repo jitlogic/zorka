@@ -18,12 +18,17 @@ package com.jitlogic.zorka.core.integ;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.*;
+import com.jitlogic.zorka.common.util.ObjectInspector;
+import com.jitlogic.zorka.common.util.ZorkaUtil;
 import com.jitlogic.zorka.core.perfmon.PerfAttrFilter;
 import com.jitlogic.zorka.core.perfmon.PerfSampleFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<SymbolicRecord> {
 
@@ -59,6 +64,8 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
 
     String chunkStart = "", chunkEnd = "\n", chunkSep = "\n";
 
+    private boolean appendUnits = true;
+
 
     AbstractMetricPushOutput(
             SymbolRegistry symbolRegistry,
@@ -89,7 +96,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
         if (pr != null) {
             this.prefix = pr;
         } else {
-            this.prefix = "zorka";
+            this.prefix = "";
         }
 
         if (this.prefix.length() > 0) {
@@ -126,9 +133,24 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
         rec.append(normalize(name));
     }
 
+    protected void appendDesc(StringBuilder rec, String name, String type, String desc) { }
+
     protected abstract void appendAttr(StringBuilder rec, String key, String val, int num);
 
     protected abstract void appendFinish(StringBuilder rec, Number val, long tstamp);
+
+    public final static String GAUGE = "gauge";
+    public final static String COUNTER = "counter";
+    public final static String SUMMARY_COUNT = "summary/count";
+    public final static String SUMMARY_SUM = "summary/sum";
+
+    private String substitute(PerfSample ps, String s) {
+        if (ps.getMetric().getAttrs() != null && s != null && s.contains("${")) {
+            return ObjectInspector.substitute(s, ZorkaUtil.<String,Object>map("ATTR", ps.getMetric().getAttrs()));
+        } else {
+            return s;
+        }
+    }
 
     @Override
     public boolean submit(SymbolicRecord sr) {
@@ -143,15 +165,33 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
             }
 
             StringBuilder sb = new StringBuilder(chunkSize);
+            Set<String> labels = new TreeSet<String>();
             String chs = chunkStart;
+
             for (PerfSample ps : pr.getSamples()) {
-                if (ps.getMetric() == null) {
+                Metric metric = ps.getMetric();
+                if (metric == null) {
                     log.error("Cannot submit sample (metric description missing): {}", ps);
                     continue;
                 }
                 if (filter.matches(ps)) {
+                    MetricTemplate mt = metric.getTemplate();
+                    String name = metric.getName();
+                    if (appendUnits) name += sep + mt.getUnits();
+
                     StringBuilder rec = new StringBuilder(256);
-                    appendName(rec, ps.getMetric().getName());
+
+                    if (!labels.contains(name)) {
+                        String type = mt.getType();
+                        if (type.startsWith("summary/")) type = "summary";
+                        appendDesc(rec, name, type, substitute(ps, mt.getDescription()));
+                        labels.add(name);
+                    }
+
+                    if (SUMMARY_COUNT.equals(mt.getType())) name += sep + "count";
+                    if (SUMMARY_SUM.equals(mt.getType())) name += sep + "sum";
+
+                    appendName(rec, name);
                     int nattr = 0;
 
                     if (constAttrMap != null) {
@@ -170,8 +210,8 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                         }
                     } // if (ps.getAttrs() != null)
 
-                    if (ps.getMetric().getAttrs() != null) {
-                        for (Map.Entry<String,Object> e : ps.getMetric().getAttrs().entrySet()) {
+                    if (metric.getAttrs() != null) {
+                        for (Map.Entry<String,Object> e : metric.getAttrs().entrySet()) {
                             if (attrFilter.matches(e.getKey()) && e.getValue() != null) {
                                 appendAttr(rec, e.getKey(), e.getValue().toString(), nattr); nattr++;
                             }

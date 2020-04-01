@@ -64,7 +64,7 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         assertNotNull(zorkaAgent.get("metrics")); // Some function to check if scripts loaded properly
     }
 
-    @Ignore("TBD fix metrics push") @Test
+    @Test
     public void testSingleInfluxCycleWithZorkaStats() {
 
         configProperties.setProperty("metrics", "yes");
@@ -77,7 +77,7 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         // TODO check results in more detail: syntax, filtering (no diagnostics), attrs (no type) etc.
     }
 
-    @Ignore("TBD fix metrics push") @Test
+    @Test
     public void testSingleOpenTsdbCycleWithZorkaStats() {
 
         configProperties.setProperty("metrics", "yes");
@@ -91,7 +91,7 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
     }
 
-    @Ignore("TBD fix metrics push") @Test
+    @Test
     public void testSingleGraphiteCycleWithZorkaStats() {
         configProperties.setProperty("metrics", "yes");
         configProperties.setProperty("opentsdb.chunk.size", "256");
@@ -104,7 +104,7 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
     }
 
-    @Ignore("TBD fix metrics push") @Test
+    @Test
     public void testSinglePrometheusPushCycleWithZorkaStats() {
         configProperties.setProperty("metrics", "yes");
         runScripts();
@@ -114,6 +114,11 @@ public class MetricsPushIntegTest extends ZorkaFixture {
 
         assertEquals("Only two sets of metrics should be visible.",
                 1, httpOutput.getResults().size());
+        String s = httpOutput.getResults().get(0);
+        //System.out.println(s);
+
+        assertFalse("Does not substitute macros", s.contains("${ATTR.name}"));
+        assertFalse("Summary type should render properly", s.contains("summary/count"));
         // TODO check results in more detail: json schema, filtering (no diagnostics), attrs (no type), etc.
 
     }

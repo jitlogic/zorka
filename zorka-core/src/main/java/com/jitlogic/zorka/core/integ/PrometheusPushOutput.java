@@ -42,6 +42,20 @@ public class PrometheusPushOutput extends AbstractMetricPushOutput {
     }
 
     @Override
+    protected void appendDesc(StringBuilder rec, String name, String type, String desc) {
+        if (name != null) {
+            if (desc != null) {
+                rec.append("# HELP "); rec.append(name); rec.append(' ');
+                rec.append(desc); rec.append('\n');
+            }
+            if (type != null) {
+                rec.append("# TYPE "); rec.append(name); rec.append(' ');
+                rec.append(type); rec.append('\n');
+            }
+        }
+    }
+
+    @Override
     protected void appendAttr(StringBuilder rec, String key, String val, int nattr) {
         rec.append(nattr == 0 ? '{' : ',');
 
