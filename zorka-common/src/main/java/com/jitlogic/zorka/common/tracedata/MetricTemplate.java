@@ -66,6 +66,11 @@ public class MetricTemplate implements Serializable {
     private String units;
 
     /**
+     * Data type (counter, gauge, histogram, summary)
+     */
+    private String dataType;
+
+    /**
      * Nominator and divider fields (for metrics using two components)
      */
     private String nomField, divField;
@@ -93,8 +98,8 @@ public class MetricTemplate implements Serializable {
      * @param description  metric description
      * @param units units of measure
      */
-    public MetricTemplate(int type, String domain, String name, String description, String units) {
-        this(type, domain, name, description, units, null, null);
+    public MetricTemplate(int type, String domain, String name, String description, String units, String dataType) {
+        this(type, domain, name, description, units, null, null, dataType);
     }
 
 
@@ -108,7 +113,7 @@ public class MetricTemplate implements Serializable {
      * @param nomField nominal field
      * @param divField divider field
      */
-    public MetricTemplate(int id, int type, String domain, String name, String description, String units, String nomField, String divField) {
+    public MetricTemplate(int id, int type, String domain, String name, String description, String units, String nomField, String divField, String dataType) {
         this.id = id;
         this.type = type;
         this.name = name;
@@ -117,6 +122,7 @@ public class MetricTemplate implements Serializable {
         this.units = units;
         this.nomField = nomField;
         this.divField = divField;
+        this.dataType = dataType;
     }
 
 
@@ -129,7 +135,7 @@ public class MetricTemplate implements Serializable {
      * @param nomField nominal field
      * @param divField divider field
      */
-    public MetricTemplate(int type, String domain, String name, String description, String units, String nomField, String divField) {
+    public MetricTemplate(int type, String domain, String name, String description, String units, String nomField, String divField, String dataType) {
         this.type = type;
         this.name = name;
         this.domain = domain;
@@ -137,6 +143,7 @@ public class MetricTemplate implements Serializable {
         this.units = units;
         this.nomField = nomField;
         this.divField = divField;
+        this.dataType = dataType;
     }
 
 
@@ -313,4 +320,7 @@ public class MetricTemplate implements Serializable {
         metrics.put(key, metric);
     }
 
+    public String getDataType() {
+        return dataType;
+    }
 }

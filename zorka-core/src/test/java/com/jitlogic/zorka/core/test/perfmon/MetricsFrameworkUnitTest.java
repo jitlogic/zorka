@@ -43,22 +43,22 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
         QueryResult qr = qr(10L, "name", "SomeObject", "type", "SomeType");
 
         assertTrue("Should return RawDataMetric object.",
-                scanner.getMetric(perfmon.metric("", "test", "test", "test"), qr) instanceof RawDataMetric);
+                scanner.getMetric(perfmon.metric("", "test", "test", "test", "gauge"), qr) instanceof RawDataMetric);
 
         assertTrue("Should return RawDeltaMetric object.",
-                scanner.getMetric(perfmon.delta("", "test", "test", "test"), qr) instanceof RawDeltaMetric);
+                scanner.getMetric(perfmon.delta("", "test", "test", "test", "gauge"), qr) instanceof RawDeltaMetric);
 
         assertTrue("Expected TimerDeltaMetric object.",
-                scanner.getMetric(perfmon.timedDelta("", "test", "test", "test"), qr) instanceof TimedDeltaMetric);
+                scanner.getMetric(perfmon.timedDelta("", "test", "test", "test", "gauge"), qr) instanceof TimedDeltaMetric);
 
         assertTrue("Expected WindowedRateMetric",
-                scanner.getMetric(perfmon.rate("","t", "t", "t", "nom", "nom"), qr) instanceof WindowedRateMetric);
+                scanner.getMetric(perfmon.rate("","t", "t", "t", "nom", "nom", "gauge"), qr) instanceof WindowedRateMetric);
     }
 
 
     @Test
     public void testConstructSameAndUniqueMetrics() {
-        MetricTemplate mt = perfmon.metric("","test", "test", "test");
+        MetricTemplate mt = perfmon.metric("","test", "test", "test", "gauge");
 
         Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
         Metric m2 = scanner.getMetric(mt, qr(20L, "name", "SomeObject", "type", "SomeType"));
@@ -71,7 +71,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testConstructSameAndUniqueMetricsWithDynamicAttr() {
-        MetricTemplate mt = perfmon.metric("","test", "test", "test").dynamicAttrs("name");
+        MetricTemplate mt = perfmon.metric("","test", "test", "test", "gauge").dynamicAttrs("name");
 
         Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
         Metric m2 = scanner.getMetric(mt, qr(20L, "name", "OtherObject", "type", "SomeType"));
@@ -84,7 +84,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testConstructMetricAndCheckForProperStringTemplating() {
-        MetricTemplate mt = perfmon.metric("","test", "Very important ${name} metric.", "MT/s");
+        MetricTemplate mt = perfmon.metric("","test", "Very important ${name} metric.", "MT/s", "gauge");
 
         Metric m = scanner.getMetric(mt, qr(10L, "name", "SomeObject"));
 
@@ -94,7 +94,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testRawMetricWithoutMultiplierRetVal() {
-        Metric m = metric(perfmon.metric("","", "", ""));
+        Metric m = metric(perfmon.metric("","", "", "", "gauge"));
 
         assertEquals(10L, m.getValue(0L, 10L));
     }
@@ -102,7 +102,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testRawMetricsWithRoundedMultiplier() {
-        Metric m = metric(perfmon.metric("","", "", "").multiply(2));
+        Metric m = metric(perfmon.metric("","", "", "", "gauge").multiply(2));
 
         assertEquals(20L, m.getValue(0L, 10L));
     }
@@ -110,7 +110,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testRawMetricWithUnRoundedMultiplier() {
-        Metric m = metric(perfmon.metric("","", "", "").multiply(1.23));
+        Metric m = metric(perfmon.metric("","", "", "", "gauge").multiply(1.23));
 
         assertEquals(12.3, (Double)m.getValue(0L, 10L), 0.001);
     }
@@ -118,7 +118,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testDeltaMetric() {
-        Metric m = metric(perfmon.delta("","", "", ""));
+        Metric m = metric(perfmon.delta("","", "", "", "gauge"));
 
         assertEquals(0L, m.getValue(0L, 10L));
         assertEquals(5L, m.getValue(10L, 15L));
@@ -127,7 +127,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testDeltaMetricWithRoundedMultiplier() {
-        Metric m = metric(perfmon.delta("","", "", "").multiply(2));
+        Metric m = metric(perfmon.delta("","", "", "", "gauge").multiply(2));
 
         assertEquals(0L, m.getValue(0L, 10L));
         assertEquals(10L, m.getValue(10L, 15L));
@@ -136,7 +136,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testDeltaMetricWithUnRoundedMultiplier() {
-        Metric m = metric(perfmon.delta("","", "", "").multiply(2.5));
+        Metric m = metric(perfmon.delta("","", "", "", "gauge").multiply(2.5));
 
         assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
         assertEquals(12.5, (Double)m.getValue(10L, 15L), 0.001);
@@ -145,7 +145,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testTimedDeltaMetric() {
-        Metric m = metric(perfmon.timedDelta("","", "", ""));
+        Metric m = metric(perfmon.timedDelta("","", "", "", "gauge"));
 
         assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
         assertEquals(2.0, (Double)m.getValue(5000L, 20L), 0.001);
@@ -154,7 +154,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testTimedDeltaMetricWithMultiplier() {
-        Metric m = metric(perfmon.timedDelta("","", "", "").multiply(1.5));
+        Metric m = metric(perfmon.timedDelta("","", "", "", "gauge").multiply(1.5));
 
         assertEquals(0.0, (Double)m.getValue(0L, 10L), 0.001);
         assertEquals(3.0, (Double)m.getValue(5000L, 20L), 0.001);
@@ -163,7 +163,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testRateMetric() {
-        Metric m = metric(perfmon.rate("", "", "", "", "a", "b"));
+        Metric m = metric(perfmon.rate("", "", "", "", "a", "b", "gauge"));
 
         Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
         Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
@@ -175,7 +175,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testRateMetricWithMultiplier() {
-        Metric m = metric(perfmon.rate("", "", "", "", "a", "b").multiply(0.2));
+        Metric m = metric(perfmon.rate("", "", "", "", "a", "b", "gauge").multiply(0.2));
 
         Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
         Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
@@ -188,7 +188,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testRateMetricWithNullValues() {
-        Metric m = metric(perfmon.rate("","", "", "", "a", "c"));
+        Metric m = metric(perfmon.rate("","", "", "", "a", "c", "gauge"));
 
         Map<String,Long> v1 = ZorkaUtil.map("a", 0L, "b", 0L);
         Map<String,Long> v2 = ZorkaUtil.map("a", 10L, "b", 2L);
@@ -199,7 +199,7 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
     @Test
     public void testUtilizationMetric() {
-        Metric m = metric(perfmon.util("","", "", "", "a", "b"));
+        Metric m = metric(perfmon.util("","", "", "", "a", "b", "gauge"));
 
         Map<String,Long> v1 = ZorkaUtil.map("a", 5L, "b", 10L);
         Map<String,Long> v2 = ZorkaUtil.map("a", 1L, "b", 1L);

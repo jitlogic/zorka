@@ -60,27 +60,27 @@ public class PerfMonLib {
     }
 
 
-    public MetricTemplate metric(String domain, String name, String description, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DATA, domain, name, description, units));
+    public MetricTemplate metric(String domain, String name, String description, String units, String dtype) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DATA, domain, name, description, units, dtype));
     }
 
 
-    public MetricTemplate timedDelta(String domain, String name, String description, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.TIMED_DELTA, domain, name, description, units));
+    public MetricTemplate timedDelta(String domain, String name, String description, String units, String dtype) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.TIMED_DELTA, domain, name, description, units, dtype));
     }
 
 
-    public MetricTemplate delta(String domain, String name, String description, String units) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DELTA, domain, name, description, units));
+    public MetricTemplate delta(String domain, String name, String description, String units, String dtype) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.RAW_DELTA, domain, name, description, units, dtype));
     }
 
 
-    public MetricTemplate rate(String domain, String name, String description, String units, String nom, String div) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.WINDOWED_RATE, domain, name, description, units, nom, div));
+    public MetricTemplate rate(String domain, String name, String description, String units, String nom, String div, String dtype) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.WINDOWED_RATE, domain, name, description, units, nom, div, dtype));
     }
 
-    public MetricTemplate util(String domain, String name, String description, String units, String nom, String div) {
-        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.UTILIZATION, domain, name, description, units, nom, div));
+    public MetricTemplate util(String domain, String name, String description, String units, String nom, String div, String dtype) {
+        return metricsRegistry.getTemplate(new MetricTemplate(MetricTemplate.UTILIZATION, domain, name, description, units, nom, div, dtype));
     }
 
     /**
