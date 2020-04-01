@@ -202,14 +202,6 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                         }
                     } // if (constAttrMap != null)
 
-                    if (ps.getAttrs() != null) {
-                        for (Map.Entry<Integer,String> e : ps.getAttrs().entrySet()) {
-                            if (attrFilter.matches(e.getKey())) {
-                                appendAttr(rec, symbolRegistry.symbolName(e.getKey()), e.getValue(), nattr); nattr++;
-                            }
-                        }
-                    } // if (ps.getAttrs() != null)
-
                     if (metric.getAttrs() != null) {
                         for (Map.Entry<String,Object> e : metric.getAttrs().entrySet()) {
                             if (attrFilter.matches(e.getKey()) && e.getValue() != null) {

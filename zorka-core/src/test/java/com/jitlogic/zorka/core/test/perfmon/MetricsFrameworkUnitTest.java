@@ -59,19 +59,6 @@ public class MetricsFrameworkUnitTest extends ZorkaFixture {
 
 
     @Test
-    public void testConstructSameAndUniqueMetricsWithDynamicAttr() {
-        MetricTemplate mt = perfmon.metric("","test", "test", "test", "gauge").dynamicAttrs("name");
-
-        Metric m1 = scanner.getMetric(mt, qr(10L, "name", "SomeObject", "type", "SomeType"));
-        Metric m2 = scanner.getMetric(mt, qr(20L, "name", "OtherObject", "type", "SomeType"));
-        Metric m3 = scanner.getMetric(mt, qr(30L, "name", "SomeObject", "type", "OtherType"));
-
-        assertEquals("Should return the same metric regarless of 'name' attribute.", m1, m2);
-        assertNotEquals("Should create new metric", m1, m3);
-    }
-
-
-    @Test
     public void testConstructMetricAndCheckForProperStringTemplating() {
         MetricTemplate mt = perfmon.metric("","test", "Very important ${name} metric.", "MT/s", "gauge");
 

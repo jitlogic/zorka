@@ -66,7 +66,7 @@ public class JmxScanner {
 
 
     public Metric getMetric(MetricTemplate template, QueryResult result) {
-        String key = result.getKey(template.getDynamicAttrs());
+        String key = result.getAttrPath();
 
         Metric metric = template.getMetric(key);
         if (metric == null) {
@@ -92,14 +92,6 @@ public class JmxScanner {
 
             template.putMetric(key, metric);
             metricsRegistry.getMetric(metric);
-
-            if (template.getDynamicAttrs().size() > 0) {
-                HashMap<String, Integer> dynamicAttrs = new HashMap<String, Integer>();
-                for (String attr : template.getDynamicAttrs()) {
-                    dynamicAttrs.put(attr, symbols.symbolId(attr));
-                }
-                metric.setDynamicAttrs(dynamicAttrs);
-            }
 
             log.debug("Created new metric: " + metric);
             AgentDiagnostics.inc(AgentDiagnostics.METRICS_CREATED);
@@ -134,14 +126,6 @@ public class JmxScanner {
                 sample.setMetric(metric);
             }
 
-            // Add dynamic attributes if necessary
-            if (metric.getDynamicAttrs() != null) {
-                Map<Integer, String> attrs = new HashMap<Integer, String>();
-                for (Map.Entry<String, Integer> e : metric.getDynamicAttrs().entrySet()) {
-                    attrs.put(e.getValue(), result.getAttr(e.getKey()).toString());
-                }
-                sample.setAttrs(attrs);
-            }
 
             log.trace("Submitting sample: {}", sample);
             smpl.add(sample);

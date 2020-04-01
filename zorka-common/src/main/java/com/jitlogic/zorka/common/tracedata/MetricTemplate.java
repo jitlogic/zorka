@@ -65,11 +65,6 @@ public class MetricTemplate implements Serializable {
     private double multiplier = 1.0;
 
     /**
-     * Names of dynamic attributes.
-     */
-    private Set<String> dynamicAttrs = new HashSet<String>();
-
-    /**
      * Metrics created from this template so far
      */
     private Map<String, Metric> metrics = new HashMap<String, Metric>();
@@ -102,7 +97,6 @@ public class MetricTemplate implements Serializable {
         this.units = orig.units;
         this.type = orig.type;
         this.multiplier = orig.multiplier;
-        this.dynamicAttrs.addAll(orig.getDynamicAttrs());
     }
 
 
@@ -190,43 +184,6 @@ public class MetricTemplate implements Serializable {
         return mt;
     }
 
-
-    public Set<String> getDynamicAttrs() {
-        return dynamicAttrs;
-    }
-
-
-    /**
-     * Adds new dynamic attributes to metric template
-     * Returns new version of metric template object, original object is unchanged.
-     *
-     * @param attrs new dynamic attribute names
-     * @return altered metric template
-     */
-    public MetricTemplate dynamicAttrs(String... attrs) {
-        MetricTemplate mt = new MetricTemplate(this);
-        for (String attr : attrs) {
-            mt.dynamicAttrs.add(attr);
-        }
-        return mt;
-    }
-
-
-    /**
-     * Adds new dynamic attributes to metric template
-     * Returns new version of metric template object, original object is unchanged.
-     *
-     * @param attrs new dynamic attribute names
-     * @return altered metric template
-     */
-    public MetricTemplate dynamicAttrs(Collection<String> attrs) {
-        if (attrs == null) {
-            return this;
-        }
-        MetricTemplate mt = new MetricTemplate(this);
-        mt.dynamicAttrs.addAll(attrs);
-        return mt;
-    }
 
 
     public int getId() {

@@ -58,11 +58,6 @@ public class Metric implements Serializable {
      */
     private Map<String, Object> attrs = new HashMap<String, Object>();
 
-    /**
-     * Maps dynamic attributes to their symbol IDs
-     */
-    private Map<String, Integer> dynamicAttrs;
-
 
     /**
      * Creates new metric
@@ -131,17 +126,6 @@ public class Metric implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-
-
-    public Map<String, Integer> getDynamicAttrs() {
-        return dynamicAttrs;
-    }
-
-
-    public void setDynamicAttrs(HashMap<String, Integer> dynamicAttrs) {
-        this.dynamicAttrs = dynamicAttrs;
     }
 
 

@@ -18,8 +18,6 @@ package com.jitlogic.zorka.common.tracedata;
 
 import com.jitlogic.zorka.common.util.ZorkaUtil;
 
-import java.util.Map;
-
 public class PerfSample {
 
     public static final byte LONG_SAMPLE = 1;
@@ -37,16 +35,9 @@ public class PerfSample {
 
     private Number value;
 
-    private Map<Integer,String> attrs;
-
     public PerfSample(int metricId, Number value) {
-        this(metricId, value, null);
-    }
-
-    public PerfSample(int metricId, Number value, Map<Integer,String> attrs) {
         this.metricId = metricId;
         this.value = value;
-        this.attrs = attrs;
     }
 
 
@@ -57,16 +48,6 @@ public class PerfSample {
 
     public Number getValue() {
         return value;
-    }
-
-
-    public Map<Integer, String> getAttrs() {
-        return attrs;
-    }
-
-
-    public void setAttrs(Map<Integer, String> attrs) {
-        this.attrs = attrs;
     }
 
 
@@ -92,8 +73,7 @@ public class PerfSample {
         if (obj instanceof PerfSample) {
             PerfSample sample = (PerfSample)obj;
             return ZorkaUtil.objEquals(metric, this.metric)
-                && ZorkaUtil.objEquals(value, sample.value)
-                && ZorkaUtil.objEquals(attrs, sample.attrs);
+                && ZorkaUtil.objEquals(value, sample.value);
         } else {
             return false;
         }

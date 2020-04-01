@@ -137,23 +137,6 @@ public class QueryResult {
     }
 
 
-    public String getKey(Set<String> omitAttrs) {
-        StringBuilder sb = new StringBuilder();
-
-        if (attrs != null) {
-            for (Map.Entry<String,Object> e : attrs.entrySet()) {
-                if (!omitAttrs.contains(e.getKey())) {
-                    if (sb.length() != 0) {
-                        sb.append('.');
-                    }
-                    sb.append(e.getValue());
-                }
-            }
-        }
-
-        return sb.toString();
-    }
-
 
     public void setValue(Object value) {
         this.value = value;

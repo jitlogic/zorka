@@ -96,25 +96,6 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
 
     // TODO check for dynamic attributes being passed and attached correctly
 
-    @Test
-    public void testCheckIfDynamicAttributesArePassedCorrectly() throws Exception {
-        TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
-                new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "ATTR")
-                        .metric(
-                                perfmon.metric("","test", "test", "test", "gauge").dynamicAttrs("ATTR")));
-        ObjectInspector.setField(scanner, "output", out);
-
-        scanner.runCycle(100);
-        List<PerfSample> samples = ((PerfRecord) results.get(0)).getSamples();
-
-        Assert.assertNotNull(samples);
-        Assert.assertEquals(2, samples.size());
-
-        for (PerfSample sample : samples) {
-            Assert.assertNotNull(sample.getAttrs());
-            Assert.assertEquals(1, sample.getAttrs().size());
-        }
-    }
 
 
     @Test
@@ -122,7 +103,7 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         TraceOutputJmxScanner scanner = perfmon.scanner("TEST",
                 new QueryDef("test", "test:type=TestJmx,*", "name").getAs("Nom", "ATTR")
                         .metric(
-                                perfmon.metric("","test", "test", "test", "gauge").dynamicAttrs("ATTR")));
+                                perfmon.metric("","test", "test", "test", "gauge")));
         ObjectInspector.setField(scanner, "output", out);
 
         scanner.runCycle(100);
@@ -132,7 +113,6 @@ public class JmxAttrScanUnitTest extends ZorkaFixture {
         Assert.assertEquals(2, samples.size());
 
         for (PerfSample sample : samples) {
-            Assert.assertNotNull(sample.getAttrs());
             Assert.assertEquals(Long.class, sample.getValue().getClass());
         }
     }

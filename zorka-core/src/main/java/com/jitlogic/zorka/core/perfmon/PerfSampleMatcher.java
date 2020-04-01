@@ -100,6 +100,8 @@ public class PerfSampleMatcher {
 
     public boolean matches(PerfSample sample) {
 
+        // TODO simplify this
+
         String domain = sample.getMetric().getDomain();
 
         // Check domain
@@ -113,18 +115,7 @@ public class PerfSampleMatcher {
             return false;
         }
 
-        Map<Integer,String> sa = sample.getAttrs();
-
         int asize = 0;
-        if (sa != null) {
-            asize += sa.size();
-            for (Map.Entry<Integer, Pattern> e : attrIdPatterns.entrySet()) {
-                String v = sa.get(e.getKey());
-                if (v == null || !e.getValue().matcher(v).matches()) {
-                    return false;
-                }
-            }
-        }
 
         Map<String,Object> ma = sample.getMetric().getAttrs();
         if (ma != null) {

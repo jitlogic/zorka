@@ -113,8 +113,6 @@ public class PerfSampleFilterUnitTest extends ZorkaFixture {
             atm.put(symbols.symbolId(attrs[i-1]), attrs[i]);
         }
 
-        sample.setAttrs(atm);
-
         return sample;
     }
 
@@ -135,7 +133,6 @@ public class PerfSampleFilterUnitTest extends ZorkaFixture {
         ckm(false, s2, "zorka:type=ZorkaStats,calls,*");
 
         ckm(false, s1, "zorka:type=ZorkaStats,calls");
-        ckm(true,  s1, "zorka:type=ZorkaStats,name=HttpStats,tag=ALL,calls");
 
         ckm(true,  s1, "zorka:type=ZorkaStats,*");
         ckm(true,  s2, "zorka:type=ZorkaStats,*");
