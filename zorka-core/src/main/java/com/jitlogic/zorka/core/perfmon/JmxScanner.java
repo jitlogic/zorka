@@ -23,10 +23,7 @@ import com.jitlogic.zorka.core.mbeans.MBeanServerRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by rlewczuk on 03.05.14.
@@ -70,7 +67,7 @@ public class JmxScanner {
 
         Metric metric = template.getMetric(key);
         if (metric == null) {
-            HashMap<String, Object> attrs = new HashMap<String, Object>();
+            Map<String, Object> attrs = new TreeMap<String, Object>();
 
             for (Map.Entry<String, Object> e : result.attrSet()) {
                 attrs.put(e.getKey(), e.getValue().toString());
@@ -78,13 +75,10 @@ public class JmxScanner {
 
             String description = ObjectInspector.substitute(template.getDescription(), attrs);
 
-            final MetricTemplate template1 = template;
             final String name = template.getName();
-            final String description1 = description;
             final String domain = template.getDomain();
-            final Map<String, Object> attrs1 = attrs;
             metric = metricsRegistry.getMetric(
-                new Metric(template1, name, description1, domain, attrs1));
+                new Metric(template, name, description, domain, attrs));
 
             if (template.getId() == 0) {
                 metricsRegistry.getTemplate(template);

@@ -25,10 +25,7 @@ import com.jitlogic.zorka.core.perfmon.PerfSampleFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 
 public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<SymbolicRecord> {
 
@@ -65,6 +62,8 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
     String chunkStart = "", chunkEnd = "\n", chunkSep = "\n";
 
     private boolean appendUnits = true;
+
+    private boolean sortSamples = true;
 
 
     AbstractMetricPushOutput(
@@ -152,6 +151,32 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
         }
     }
 
+    public List<PerfSample> psort(List<PerfSample> samples) {
+        if (!sortSamples) return samples;
+        List<PerfSample> rslt = new ArrayList<PerfSample>(samples.size());
+        Map<String,List<PerfSample>> sums = new HashMap<String, List<PerfSample>>();
+
+        for (PerfSample ps : samples) {
+            if (ps.getMetric() != null && ps.getMetric().getTemplate() != null) {
+                Metric m = ps.getMetric();
+                MetricTemplate mt = m.getTemplate();
+                if (SUMMARY_COUNT.equals(mt.getType()) || SUMMARY_SUM.equals(mt.getType())) {
+                    String key = m.getName() + m.getAttrs();
+                    if (!sums.containsKey(key)) sums.put(key, new ArrayList<PerfSample>());
+                    sums.get(key).add(ps);
+                } else {
+                    rslt.add(ps);
+                }
+            }
+        }
+
+        for (Map.Entry<String,List<PerfSample>> e : sums.entrySet()) {
+            rslt.addAll(e.getValue());
+        }
+
+        return rslt;
+    }
+
     @Override
     public boolean submit(SymbolicRecord sr) {
         boolean rslt = true;
@@ -168,7 +193,7 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
             Set<String> labels = new TreeSet<String>();
             String chs = chunkStart;
 
-            for (PerfSample ps : pr.getSamples()) {
+            for (PerfSample ps : psort(pr.getSamples())) {
                 Metric metric = ps.getMetric();
                 if (metric == null) {
                     log.error("Cannot submit sample (metric description missing): {}", ps);

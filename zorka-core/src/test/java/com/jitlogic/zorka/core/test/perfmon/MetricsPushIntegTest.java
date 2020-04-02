@@ -115,7 +115,7 @@ public class MetricsPushIntegTest extends ZorkaFixture {
         assertEquals("Only two sets of metrics should be visible.",
                 1, httpOutput.getResults().size());
         String s = httpOutput.getResults().get(0);
-        //System.out.println(s);
+        System.out.println(s);
 
         assertFalse("Does not substitute macros", s.contains("${ATTR.name}"));
         assertFalse("Summary type should render properly", s.contains("summary/count"));

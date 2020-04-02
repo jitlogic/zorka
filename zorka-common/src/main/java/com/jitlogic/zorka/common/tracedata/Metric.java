@@ -17,8 +17,8 @@
 package com.jitlogic.zorka.common.tracedata;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Represents performance metric tracked by agent. Metrics are created from metric templates
@@ -56,7 +56,7 @@ public class Metric implements Serializable {
     /**
      * Dynamic attributes for this metric.
      */
-    private Map<String, Object> attrs = new HashMap<String, Object>();
+    private Map<String, Object> attrs = new TreeMap<String, Object>();
 
 
     /**
@@ -67,8 +67,7 @@ public class Metric implements Serializable {
      * @param description  metric description
      * @param attrs metric attributes
      */
-    public Metric(int id, String name, String description, String domain,
-                  Map<String, Object> attrs) {
+    public Metric(int id, String name, String description, String domain, Map<String, Object> attrs) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -84,8 +83,7 @@ public class Metric implements Serializable {
      * @param description     metric description
      * @param attrs    metric attributes
      */
-    public Metric(MetricTemplate template, String name, String description, String domain,
-                  Map<String, Object> attrs) {
+    public Metric(MetricTemplate template, String name, String description, String domain, Map<String, Object> attrs) {
         this.template = template;
 
         for (Map.Entry<String, Object> entry : attrs.entrySet()) {
