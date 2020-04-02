@@ -58,7 +58,7 @@ public class PerfSample {
 
     @Override
     public String toString() {
-        return "PerfSample(" + metric.getId() + ", " + value + ")";
+        return "PerfSample(" + metric.getName() + ", " + value + ")";
     }
 
 

@@ -44,12 +44,6 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
     /** Submitted responsible for sending data to monitoring system. */
     private ZorkaSubmitter<PerfTextChunk> output;
 
-    /** Symbol registry. */
-    private SymbolRegistry symbolRegistry;
-
-    /** Maximum amount of data per request to be sent. */
-    int chunkSize = 4096, chunkLead = 2, chunkTrail = 4;
-
     /** Prefix added to all metric names. */
     protected String prefix;
 
@@ -72,7 +66,6 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
             PerfAttrFilter attrFilter,
             PerfSampleFilter filter,
             ZorkaSubmitter<PerfTextChunk> output) {
-        this.symbolRegistry = symbolRegistry;
         this.constAttrMap = constAttrMap;
         this.attrFilter = attrFilter;
         this.filter = filter;
@@ -81,15 +74,6 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
 
 
     void configure(Map<String,String> config) {
-
-        String ps = config.get("chunk.size");
-        if (ps != null) {
-            if (ps.matches("\\d+")) {
-                chunkSize = Integer.parseInt(ps);
-            } else {
-                log.error("Invalid value of *.chunk.size: '{}' (should be integer)", ps);
-            }
-        }
 
         String pr = config.get("prefix");
         if (pr != null) {
@@ -189,40 +173,42 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                 log.trace("Received data: {}", pr);
             }
 
-            StringBuilder sb = new StringBuilder(chunkSize);
+            StringBuilder sb = new StringBuilder(4096);
             Set<String> labels = new TreeSet<String>();
             String chs = chunkStart;
 
-            for (PerfSample ps : psort(pr.getSamples())) {
+            List<PerfSample> sorted = psort(pr.getSamples());
+            for (PerfSample ps : sorted) {
+                log.debug("Samples before sort: {}, after sort: {}", pr.getSamples().size(), sorted.size());
                 Metric metric = ps.getMetric();
                 if (metric == null) {
                     log.error("Cannot submit sample (metric description missing): {}", ps);
                     continue;
                 }
                 if (filter.matches(ps)) {
+                    sb.append(chs);
+                    log.trace("Matched sample: {}", ps);
                     MetricTemplate mt = metric.getTemplate();
                     String name = metric.getName();
                     if (appendUnits) name += sep + mt.getUnits();
 
-                    StringBuilder rec = new StringBuilder(256);
-
                     if (!labels.contains(name)) {
                         String type = mt.getType();
                         if (type.startsWith("summary/")) type = "summary";
-                        appendDesc(rec, name, type, substitute(ps, mt.getDescription()));
+                        appendDesc(sb, name, type, substitute(ps, mt.getDescription()));
                         labels.add(name);
                     }
 
                     if (SUMMARY_COUNT.equals(mt.getType())) name += sep + "count";
                     if (SUMMARY_SUM.equals(mt.getType())) name += sep + "sum";
 
-                    appendName(rec, name);
+                    appendName(sb, name);
                     int nattr = 0;
 
                     if (constAttrMap != null) {
                         for (Map.Entry<String, String> e : constAttrMap.entrySet()) {
                             if (attrFilter.matches(e.getKey())) {
-                                appendAttr(rec, e.getKey(), e.getValue(), nattr); nattr++;
+                                appendAttr(sb, e.getKey(), e.getValue(), nattr); nattr++;
                             }
                         }
                     } // if (constAttrMap != null)
@@ -230,33 +216,23 @@ public abstract class AbstractMetricPushOutput implements ZorkaSubmitter<Symboli
                     if (metric.getAttrs() != null) {
                         for (Map.Entry<String,Object> e : metric.getAttrs().entrySet()) {
                             if (attrFilter.matches(e.getKey()) && e.getValue() != null) {
-                                appendAttr(rec, e.getKey(), e.getValue().toString(), nattr); nattr++;
+                                appendAttr(sb, e.getKey(), e.getValue().toString(), nattr); nattr++;
                             }
                         }
                     } // if (ps.getMetric().getAttrs() != null)
 
-                    appendFinish(rec, ps.getValue(), t);
-
-                    if (sb.length()+rec.length() > chunkSize+chunkTrail) {
-                        sb.append(chunkEnd);
-                        if (log.isTraceEnabled()) {
-                            log.trace("Submit: '{}'", sb);
-                        }
-                        rslt &= output.submit(new PerfTextChunk(pr.getLabel(), sb.toString().getBytes()));
-                        sb = new StringBuilder(chunkSize);
-                        chs = chunkStart;
-                    }
-                    sb.append(chs);
-                    sb.append(rec);
+                    appendFinish(sb, ps.getValue(), t);
                     chs = chunkSep;
-                } // if (filter.matches(ps))
+                } else { // if (filter.matches(ps))
+                    log.trace("Dropping sample: {}", ps);
+                }
             } // for (PerfSample ps : pr.getSamples)
-            if (sb.length() > chunkLead) {
+            if (sb.length() > 0) {
                 sb.append(chunkEnd);
                 if (log.isTraceEnabled()) {
                     log.trace("Submit: '{}'", sb);
                 }
-                rslt &= output.submit(new PerfTextChunk(pr.getLabel(), sb.toString().getBytes()));
+                rslt = output.submit(new PerfTextChunk(pr.getLabel(), sb.toString().getBytes()));
             }
         } // if (sr instanceof PerfRecord)
 

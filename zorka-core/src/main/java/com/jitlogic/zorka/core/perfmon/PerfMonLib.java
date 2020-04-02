@@ -29,11 +29,15 @@ import com.jitlogic.zorka.core.spy.Tracer;
 import com.jitlogic.zorka.common.tracedata.MetricTemplate;
 import com.jitlogic.zorka.common.tracedata.MetricsRegistry;
 import com.jitlogic.zorka.common.tracedata.SymbolRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 public class PerfMonLib {
+
+    private final static Logger log = LoggerFactory.getLogger(PerfMonLib.class);
 
     /** Reference to symbol registry */
     private SymbolRegistry symbolRegistry;
@@ -118,6 +122,7 @@ public class PerfMonLib {
 
 
     public PerfAttrFilter attrFilter(Map<String,String> constAttrs, List<String> include, List<String> exclude) {
+        log.debug("Creating attribute filter: include={}, exclude={}", include, exclude);
         return new PerfAttrFilter(symbolRegistry, constAttrs, include, exclude);
     }
 
@@ -128,6 +133,7 @@ public class PerfMonLib {
 
 
     public PerfSampleFilter sampleFilter(Map<String,String> include, Map<String,String> exclude) {
+        log.debug("Creating sample filter: include={}, exclude={}", include, exclude);
         return new PerfSampleFilter(symbolRegistry, include, exclude);
     }
 
