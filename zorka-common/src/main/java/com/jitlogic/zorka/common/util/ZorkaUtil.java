@@ -1090,4 +1090,16 @@ public class ZorkaUtil {
         }
     }
 
+
+    private static final Pattern RE_IPV4 = Pattern.compile("\\d+\\.\\d+\\.\\d+\\.\\d+");
+    private static final Pattern RE_IPV4P = Pattern.compile("(?:.*[^\\d])?(\\d+\\.\\d+\\.\\d+\\.\\d+)(?:[^\\d].*)?");
+
+    public static String ipv4(String ipv4, String defv) {
+        if (ipv4 == null || ipv4.isEmpty()) return defv;
+        if (RE_IPV4.matcher(ipv4).matches()) return ipv4;
+        Matcher m = RE_IPV4P.matcher(ipv4);
+        if (m.matches()) return m.group(1);
+        return defv;
+    }
+
 }

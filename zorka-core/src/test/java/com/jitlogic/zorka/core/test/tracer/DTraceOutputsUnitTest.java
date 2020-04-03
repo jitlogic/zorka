@@ -1,10 +1,7 @@
 package com.jitlogic.zorka.core.test.tracer;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
-import com.jitlogic.zorka.common.tracedata.DTraceContext;
-import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
-import com.jitlogic.zorka.common.tracedata.TraceMarker;
-import com.jitlogic.zorka.common.tracedata.TraceRecord;
+import com.jitlogic.zorka.common.tracedata.*;
 import com.jitlogic.zorka.common.util.JSONReader;
 import com.jitlogic.zorka.core.spy.TracerLib;
 import com.jitlogic.zorka.core.spy.output.DTraceFormatterZJ;
@@ -26,11 +23,11 @@ import java.util.List;
  */
 public class DTraceOutputsUnitTest extends ZorkaFixture {
 
-    private List<byte[]> results = new ArrayList<byte[]>();
+    private List<PerfTextChunk> results = new ArrayList<PerfTextChunk>();
 
-    private ZorkaSubmitter<byte[]> rawOutput = new ZorkaSubmitter<byte[]>() {
+    private ZorkaSubmitter<PerfTextChunk> rawOutput = new ZorkaSubmitter<PerfTextChunk>() {
         @Override
-        public boolean submit(byte[] item) {
+        public boolean submit(PerfTextChunk item) {
             results.add(item);
             return true;
         }
@@ -46,14 +43,14 @@ public class DTraceOutputsUnitTest extends ZorkaFixture {
         tm.setDstate(ds);
         tr.setMarker(tm);
 
-        tr.setAttr(sid("REMOTE_IP"), "1.2.3.4");
-        tr.setAttr(sid("REMOTE_PORT"), "80");
-        tr.setAttr(sid("LOCAL_IP"), "5.6.7.8");
-        tr.setAttr(sid("LOCAL_PORT"), 8080);
+        tr.setAttr(sid("peer.ipv4"), "1.2.3.4");
+        tr.setAttr(sid("peer.port"), "80");
+        tr.setAttr(sid("local.ipv4"), "5.6.7.8");
+        tr.setAttr(sid("local.port"), 8080);
 
-        tr.setAttr(sid("URL"), "/test.jsp");
-        tr.setAttr(sid("METHOD"), "GET");
-        tr.setAttr(sid("STATUS"), 200);
+        tr.setAttr(sid("http.url"), "/test.jsp");
+        tr.setAttr(sid("http.method"), "GET");
+        tr.setAttr(sid("http.status_code"), 200);
 
         return tr;
     }
@@ -71,7 +68,7 @@ public class DTraceOutputsUnitTest extends ZorkaFixture {
 
         assertEquals(1, results.size());
 
-        Object json = new JSONReader().read(new String(results.get(0)));
+        Object json = new JSONReader().read(new String(results.get(0).getData()));
 
         System.out.println(json);
 

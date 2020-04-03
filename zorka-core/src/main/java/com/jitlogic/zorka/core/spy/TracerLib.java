@@ -31,9 +31,7 @@ import com.jitlogic.zorka.core.util.OverlayClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import static com.jitlogic.zorka.common.cbor.TraceAttributes.*;
 
@@ -121,29 +119,26 @@ public abstract class TracerLib {
     protected MetricsRegistry metricsRegistry;
     protected int defaultTraceFlags = TraceMarker.DROP_INTERIM | TraceMarker.THREAD_NAME_ATTR;
 
-    public static final Map<String,String> OPENTRACING_TAGS = ZorkaUtil.constMap(
-            "REMOTE_IP", "peer.ipv4",
-            "REMOTE_IP6", "peer.ipv6",
-            "REMOTE_PORT", "peer.port",
-            "REMOTE_SVC", "peer.service",
-            "LOCAL_IP", "local.ipv4",
-            "LOCAL_IP6", "local.ipv6",
-            "LOCAL_PORT", "local.port",
-            "LOCAL_SVC", "local.service",
-            "SQL", "db.statement",
-            "DB", "db.instance",
-            // TODO db.instance - database name
-            // TODO db.type - 'sql', 'redis', 'cassandra', 'hbase', 'redis'
-            // TODO db.user
-            "METHOD", "http.method",
-            "STATUS", "http.status_code",
-            "URL", "http.url",
-            "URI", "http.uri"
-            // TODO peer.address
-            // TODO peer.hostname
-            // TODO sampling.priority - 0 or more
-            // TODO span.kind - client, server, producer, consumer
-            // TODO message_bus.destination
+    public static final List<String> OPENTRACING_TAGS = Arrays.asList(
+        "peer.ipv4",
+        "peer.ipv6",
+        "peer.port",
+        "peer.service",
+        "local.ipv4",
+        "local.ipv6",
+        "local.port",
+        "local.service",
+        "db.statement",
+        "db.instance",
+        "db.type",
+        "db.user",
+        "http.method", "http.method",
+        "http.status_code", "http.status_code",
+        "http.url", "http.url",
+        "http.uri", "http.uri",
+        "peer.address",
+        "peer.hostname",
+        "message_bus.destination"
     );
 
     public TracerLib(SymbolRegistry symbolRegistry, MetricsRegistry metricsRegistry, Tracer tracer, ZorkaConfig config) {
@@ -420,11 +415,11 @@ public abstract class TracerLib {
         return new DTraceOutputProcessor(tracer, this, delFlags, addFlags);
     }
 
-    public DTraceFormatter zipkinJsonFormatter(Map<String,String> tagMap) {
-        return new DTraceFormatterZJ(config, symbolRegistry, tagMap);
+    public DTraceFormatter zipkinJsonFormatter(List<String> tagIncludes) {
+        return new DTraceFormatterZJ(config, symbolRegistry, tagIncludes);
     }
 
-    public ZorkaSubmitter<SymbolicRecord> toDtraceOutput(DTraceFormatter formatter, ZorkaSubmitter<byte[]> sender) {
+    public ZorkaSubmitter<SymbolicRecord> toDtraceOutput(DTraceFormatter formatter, ZorkaSubmitter<PerfTextChunk> sender) {
         return new DTraceOutput(formatter, sender);
     }
 

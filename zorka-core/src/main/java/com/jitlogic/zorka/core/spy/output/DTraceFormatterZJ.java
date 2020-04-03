@@ -11,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import static com.jitlogic.zorka.common.util.ZorkaUtil.ipv4;
 import static com.jitlogic.zorka.core.spy.TracerLib.*;
 
 /** Zipkin/JSON distributed trace data formatter. */
@@ -22,28 +25,31 @@ public class DTraceFormatterZJ implements DTraceFormatter {
     private String hostname;
     private ZorkaConfig config;
     private SymbolRegistry symbols;
-    private Map<Integer,String> tagMap;
-    private Set<Integer> tagExclusions;
+
+    private Set<Integer> tagIncludeIds = new TreeSet<Integer>();
+    private List<Pattern> tagIncludeRex = new ArrayList<Pattern>();
 
     private int remoteIpAttr, remotePortAttr, localIpAttr, localPortAttr;
 
-    public DTraceFormatterZJ(ZorkaConfig config, SymbolRegistry symbols, Map<String,String> tagMap) {
+    public DTraceFormatterZJ(ZorkaConfig config, SymbolRegistry symbols, List<String> tagIncludes) {
         this.config = config;
         this.symbols = symbols;
-        this.tagMap = new HashMap<Integer, String>();
+
 
         this.hostname = this.config.stringCfg("zorka.hostname", "zorka");
 
-        for (Map.Entry<String,String> e : tagMap.entrySet()) {
-            this.tagMap.put(symbols.symbolId(e.getKey()), e.getValue());
+        for (String ti : tagIncludes) {
+            if (ti.startsWith("~")) {
+                tagIncludeRex.add(Pattern.compile(ti.substring(1)));
+            } else {
+                tagIncludeIds.add(symbols.symbolId(ti));
+            }
         }
 
-        this.remoteIpAttr = symbols.symbolId("REMOTE_IP");
-        this.remotePortAttr = symbols.symbolId("REMOTE_PORT");
-        this.localIpAttr = symbols.symbolId("LOCAL_IP");
-        this.localPortAttr = symbols.symbolId("LOCAL_PORT");
-
-        tagExclusions = ZorkaUtil.constSet(remoteIpAttr, remotePortAttr, localIpAttr, localPortAttr);
+        this.remoteIpAttr = symbols.symbolId("peer.ipv4");
+        this.remotePortAttr = symbols.symbolId("peer.port");
+        this.localIpAttr = symbols.symbolId("local.ipv4");
+        this.localPortAttr = symbols.symbolId("local.port");
     }
 
     private String getKind(int flags) {
@@ -75,7 +81,7 @@ public class DTraceFormatterZJ implements DTraceFormatter {
             if (ds.hasFlags(F_DEBUG)) span.put("debug", true);
 
             // Remote endpoint
-            String remoteIp = (String) tr.getAttr(remoteIpAttr);
+            String remoteIp = ipv4((String) tr.getAttr(remoteIpAttr), "127.0.0.1");
             Integer remotePort = ZorkaUtil.lcastInt(tr.getAttr(remotePortAttr));
             if (remoteIp != null || remotePort != null) {
                 Map<String, Object> re = new TreeMap<String, Object>();
@@ -85,7 +91,7 @@ public class DTraceFormatterZJ implements DTraceFormatter {
             }
 
             // Local endpoint
-            String localIp = (String) tr.getAttr(localIpAttr);
+            String localIp = ipv4((String) tr.getAttr(localIpAttr), "127.0.0.1");
             Integer localPort = ZorkaUtil.lcastInt(tr.getAttr(localPortAttr));
             Map<String, Object> le = new TreeMap<String, Object>();
             if (localIp != null) le.put("ipv4", remoteIp);
@@ -97,19 +103,25 @@ public class DTraceFormatterZJ implements DTraceFormatter {
             // Annotations (only error annotation is used at the moment)
             if (tr.getMarker() != null && tr.getMarker().hasFlag(TraceMarker.ERROR_MARK)) {
                 span.put("annotations", Collections.singletonList(
-                        ZorkaUtil.map("timestamp", ds.getTstart() * 1000, "error")));
+                        ZorkaUtil.map("timestamp", ds.getTstart() * 1000, "value", "error")));
             }
 
-            // Additional tags
             Map<String, String> tags = new TreeMap<String, String>();
-            for (Map.Entry<Integer, String> e : tagMap.entrySet()) {
-                if (!tagExclusions.contains(e.getKey())) {
-                    Object v = tr.getAttr(e.getKey());
-                    if (v != null) {
-                        tags.put(e.getValue(), v.toString());
+            if (tr.getAttrs() != null) {
+                for (Map.Entry<Integer,Object> e : tr.getAttrs().entrySet()) {
+                    if (tagIncludeIds.contains(e.getKey())) {
+                        tags.put(symbols.symbolName(e.getKey()), ""+e.getValue());
+                    } else if (!tagIncludeRex.isEmpty()) {
+                        String name = symbols.symbolName(e.getKey());
+                        for (Pattern re : tagIncludeRex) {
+                            if (re.matcher(name).matches()) {
+                                tags.put(name, ""+e.getValue());
+                            }
+                        }
                     }
                 }
             }
+
 
             if (tags.size() > 0) span.put("tags", tags);
 
@@ -122,6 +134,7 @@ public class DTraceFormatterZJ implements DTraceFormatter {
 
     @Override
     public byte[] format(List<TraceRecord> acc, int softLimit, int hardLimit) {
+        log.trace("Sending records: count={}, softLimit={}, hardLimit={}", acc.size(), softLimit, hardLimit);
         List<byte[]> fragments = new ArrayList<byte[]>(acc.size());
         int size = 1;
 

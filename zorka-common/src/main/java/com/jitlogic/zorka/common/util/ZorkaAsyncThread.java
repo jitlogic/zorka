@@ -111,6 +111,7 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
                         thread.setDaemon(true);
                         running.set(true);
                         thread.start();
+                        log.debug("Started new thread for output: {}", this.name);
                     }
                 } catch (Exception e) {
                     handleError("Error starting thread", e);
@@ -150,13 +151,16 @@ public abstract class ZorkaAsyncThread<T> implements Runnable, ZorkaService, Zor
      */
     public void runCycle() {
         try {
+            log.trace("runCycle: waiting for input items");
             T obj = submitQueue.take();
             if (obj != null) {
+                log.trace("runCycle: got item, looking for more");
                 List<T> lst = new ArrayList<T>(plen);
                 lst.add(obj);
                 if (plen > 1) {
                     submitQueue.drainTo(lst, plen-1);
                 }
+                log.trace("runCycle: processing {} items", lst.size());
                 process(lst);
                 flush();
             }

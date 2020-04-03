@@ -26,6 +26,7 @@ import org.junit.Test;
 import javax.xml.crypto.dom.DOMCryptoContext;
 import java.util.Random;
 
+import static com.jitlogic.zorka.common.util.ZorkaUtil.ipv4;
 import static org.junit.Assert.*;
 
 // TODO move this test to zorka-common some day
@@ -84,4 +85,13 @@ public class ZorkaUtilUnitTest {
         assertTrue(k.startsWith(ZorkaUtil.hex(kv[0])));
         assertTrue(k.endsWith(ZorkaUtil.hex(kv[1])));
     }
+
+    @Test
+    public void testIpv4Normalization() throws Exception {
+        assertEquals("127.0.0.1", ipv4("127.0.0.1", "1.2.3.4"));
+        assertEquals("127.0.0.1", ipv4("/127.0.0.1", "1.2.3.4"));
+        assertEquals("127.0.0.1", ipv4("foobar", "127.0.0.1"));
+    }
+
+
 }

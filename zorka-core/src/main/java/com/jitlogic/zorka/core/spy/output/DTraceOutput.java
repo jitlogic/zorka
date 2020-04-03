@@ -2,6 +2,7 @@ package com.jitlogic.zorka.core.spy.output;
 
 import com.jitlogic.zorka.common.ZorkaSubmitter;
 import com.jitlogic.zorka.common.tracedata.DTraceContext;
+import com.jitlogic.zorka.common.tracedata.PerfTextChunk;
 import com.jitlogic.zorka.common.tracedata.SymbolicRecord;
 import com.jitlogic.zorka.common.tracedata.TraceRecord;
 import org.slf4j.Logger;
@@ -20,9 +21,9 @@ public class DTraceOutput implements ZorkaSubmitter<SymbolicRecord> {
     private int hardLimit = 48 * 1024;
 
     private DTraceFormatter formatter;
-    private ZorkaSubmitter<byte[]> sender;
+    private ZorkaSubmitter<PerfTextChunk> sender;
 
-    public DTraceOutput(DTraceFormatter formatter, ZorkaSubmitter<byte[]> sender) {
+    public DTraceOutput(DTraceFormatter formatter, ZorkaSubmitter<PerfTextChunk> sender) {
         this.formatter = formatter;
         this.sender = sender;
     }
@@ -42,7 +43,7 @@ public class DTraceOutput implements ZorkaSubmitter<SymbolicRecord> {
                 String s = buf != null ? new String(buf) : "<null>";
                 log.trace("Submitting data to zipkin: " + s);
             }
-            if (buf != null) sender.submit(buf);
+            if (buf != null) sender.submit(new PerfTextChunk("ZIPKIN-TRACE", buf));
         }
     }
 
@@ -51,12 +52,8 @@ public class DTraceOutput implements ZorkaSubmitter<SymbolicRecord> {
         if (sr instanceof TraceRecord) {
             List<TraceRecord> acc = new LinkedList<TraceRecord>();
             process((TraceRecord) sr, acc);
-            if (log.isTraceEnabled()) {
-                log.debug("DTraceOutput: got " + acc.size() + " items to send.");
-            }
-            if (acc.size() > 0) {
-                submit(acc);
-            }
+            if (log.isTraceEnabled()) log.trace("DTraceOutput: got {} items to send.", acc.size());
+            if (acc.size() > 0) submit(acc);
             return true;
         }
         return false;
