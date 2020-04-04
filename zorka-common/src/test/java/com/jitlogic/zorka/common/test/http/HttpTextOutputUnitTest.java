@@ -47,7 +47,7 @@ public class HttpTextOutputUnitTest extends CommonFixture {
                 public HttpMessage handle(HttpMessage message) {
                     return handleReq(message);
                 }
-            }, Executors.newFixedThreadPool(2));
+            }, Executors.newFixedThreadPool(2), null);
         httpServer.start();
     }
 

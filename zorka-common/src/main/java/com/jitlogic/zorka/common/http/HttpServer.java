@@ -3,6 +3,7 @@ package com.jitlogic.zorka.common.http;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.net.ssl.SSLContext;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -29,20 +30,27 @@ public class HttpServer implements Runnable {
 
     private HttpConfig config;
 
-    public HttpServer(String name, String address, int port, HttpConfig config, HttpHandler listener, Executor executor) {
+    private SSLContext sslContext;
+
+    public HttpServer(String name, String address, int port, HttpConfig config, HttpHandler listener, Executor executor, SSLContext sslContext) {
         this.name = name;
         this.listenAddr = address;
         this.listenPort = port;
         this.listener = listener;
         this.executor = executor;
         this.config = config;
+        this.sslContext = sslContext;
     }
 
 
     public synchronized void start() {
         if (!running) {
             try {
-                socket = new ServerSocket(listenPort, 0, InetAddress.getByName(listenAddr));
+                if (sslContext != null) {
+                    socket = sslContext.getServerSocketFactory().createServerSocket(listenPort, 0, InetAddress.getByName(listenAddr));
+                } else {
+                    socket = new ServerSocket(listenPort, 0, InetAddress.getByName(listenAddr));
+                }
                 thread = new Thread(this);
                 thread.setName("ZORKA-" + name + "-http");
                 thread.setDaemon(true);

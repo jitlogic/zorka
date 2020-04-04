@@ -19,34 +19,24 @@ public class HttpService implements ZorkaService, HttpHandler {
 
     private volatile Map<String,HttpHandler> endpoints = new ConcurrentHashMap<String, HttpHandler>();
 
-    private HttpConfig httpconf = new HttpConfig();
     private HttpServer server;
-    private SSLContext sslContext = null;
 
-    private String prefix;
     private int listenPort;
     private String listenAddr;
     private boolean tlsEnabled;
 
 
     public HttpService(String prefix, Map<String,String> config, Executor executor, MethodCallStatistics stats) {
-        this.prefix = prefix;
-        listenAddr = parseStr(config.get("listen.addr"), HttpProtocol.RE_IPV4_ADDR, "0.0.0.0",
-                prefix + ".listen.addr listen address should be in IPv4 form.");
-        listenPort = parseInt(config.get("listen.port"), 8641,
-                prefix + ".listen.port should be number.");
+        listenAddr = parseStr(config.get("addr"), HttpProtocol.RE_IPV4_ADDR, "0.0.0.0",
+                prefix + ".addr listen address should be in IPv4 form.");
+        listenPort = parseInt(config.get("port"), 8641,
+                prefix + ".port should be number.");
         tlsEnabled = parseBool(config.get("tls"), false,
                 prefix + ".tls should be set to either 'yes' or 'no'");
 
-        if (tlsEnabled) {
-            String keystore = parseStr(config.get("keystore"), null, null,
-                    prefix + ".keystore should point to .jks file with SSL keystore.");
-            String keypass = parseStr(config.get("keystore.pass"), null, "changeit",
-                    prefix + ".keypass should contain proper password to keystore.");
-            sslContext = TlsContextBuilder.svrContext(keystore, keypass);
-        }
+        SSLContext sslContext = tlsEnabled ? TlsContextBuilder.fromMap("", config) : null;
 
-        this.server = new HttpServer(prefix, listenAddr, listenPort, new HttpConfig(), this, executor);
+        this.server = new HttpServer(prefix, listenAddr, listenPort, new HttpConfig(), this, executor, sslContext);
 
         log.info("{} service listening on port: {}", tlsEnabled ? "HTTPS" : "HTTP", listenPort);
     }

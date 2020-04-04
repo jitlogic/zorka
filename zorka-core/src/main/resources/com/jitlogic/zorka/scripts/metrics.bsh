@@ -157,9 +157,9 @@ __metrics() {
     tracer.output(promPushOutput);
   }
 
-  // Configure Prometheus standard gateway
+  // Configure Prometheus scrapping mode
   if (zorka.boolCfg("prometheus")) {
-    zorka.logInfo("Enabling Prometheus Scrapping Gateway.");
+    zorka.logInfo("Enabling Prometheus metrics");
     _httpService = zorka.getAgentInstance().getHttpService();
     if (_httpService != null) {
       zorka.logInfo("Publishing Prometheus URI via HTTP: /metrics");

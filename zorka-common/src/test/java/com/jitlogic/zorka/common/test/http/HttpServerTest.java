@@ -24,7 +24,7 @@ public class HttpServerTest {
                     System.err.println("REQ: " + message.getUri());
                     return HttpMessage.RESP(200, "OK");
                 }
-            }, Executors.newFixedThreadPool(2));
+            }, Executors.newFixedThreadPool(2), null);
 
         server.start();
     }
