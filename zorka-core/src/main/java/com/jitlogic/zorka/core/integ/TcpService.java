@@ -92,7 +92,7 @@ public class TcpService implements Runnable, ZorkaService {
         }
 
         if (config.boolCfg(prefix + ".tls", false)) {
-            SSLContext ctx = TlsContextBuilder.fromMap("tls", config.mapCfg(prefix));
+            SSLContext ctx = TlsContextBuilder.fromMap("tls.", config.mapCfg(prefix));
             if (ctx != null) {
                 socketFactory = ctx.getServerSocketFactory();
             } else {

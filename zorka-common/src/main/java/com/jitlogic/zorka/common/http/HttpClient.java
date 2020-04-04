@@ -21,6 +21,8 @@ import com.jitlogic.zorka.common.stats.MethodCallStatistics;
 import com.jitlogic.zorka.common.util.TlsContextBuilder;
 import com.jitlogic.zorka.common.util.ZorkaRuntimeException;
 import com.jitlogic.zorka.common.util.ZorkaUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.SocketFactory;
 import java.io.BufferedOutputStream;
@@ -39,6 +41,8 @@ import static com.jitlogic.zorka.common.http.HttpProtocol.RE_URL;
  * HTTP client using streams.
  */
 public class HttpClient implements HttpHandler, Closeable {
+
+    private static Logger log = LoggerFactory.getLogger(HttpClient.class);
 
     private int port;
     private boolean tls;
@@ -155,6 +159,7 @@ public class HttpClient implements HttpHandler, Closeable {
         HttpConfig httpConfig = new HttpConfig();
 
         if ("https".equalsIgnoreCase(m.group(REG_URL_PROTO))) {
+            log.info("Creating TLS context for: {}", url);
             httpConfig.setSslContext(TlsContextBuilder.fromMap("http.", conf));
         }
 

@@ -25,6 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -38,7 +39,7 @@ public class TlsContextBuilder {
     private KeyManager[] keyManagers = null;
     private TrustManager[] trustManagers = null;
 
-    public TlsContextBuilder(Properties props) {
+    public TlsContextBuilder(String prefix, Properties props) {
         this.props = props;
     }
 
@@ -158,7 +159,7 @@ public class TlsContextBuilder {
         for (int i = 1; i < args.length; i+=2) {
             props.setProperty(args[i-1], args[i]);
         }
-        return new TlsContextBuilder(props).get();
+        return new TlsContextBuilder("", props).get();
     }
 
     public static SSLContext svrContext(String keystorePath, String keystorePass) {
@@ -166,14 +167,17 @@ public class TlsContextBuilder {
     }
 
     public static SSLContext fromMap(String prefix, Map<String,String> conf) {
-        if (conf.containsKey(prefix + "keystore")) {
-            Properties props = new Properties();
-            props.setProperty("keystore", conf.get(prefix + "keystore"));
-            if (conf.containsKey(prefix + "keystore.pass"))
-                props.setProperty("keystore.pass", conf.get(prefix + "keystore.pass"));
-            return new TlsContextBuilder(props).get();
-        } else {
-            return null;
+        Properties props = new Properties();
+        for (Map.Entry<String,String> e : conf.entrySet()) {
+            if (e.getKey().startsWith(prefix+"keystore") || e.getKey().startsWith(prefix+"truststore")) {
+                props.setProperty(e.getKey().substring(prefix.length()), e.getValue());
+            }
+        }
+        log.debug("Creating SSLContext with from config: {} -> {}", conf, props);
+        try {
+            return props.size() > 0 ? new TlsContextBuilder(prefix, props).get() : SSLContext.getDefault();
+        } catch (NoSuchAlgorithmException e) {
+            throw new ZorkaRuntimeException("Cannot create TLS context: " + props, e);
         }
     }
 }
