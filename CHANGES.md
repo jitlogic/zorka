@@ -1,7 +1,9 @@
-Zorka 2.0.0 (2020-??-??)
+Zorka 2.0.0 (2020-04-03)
 -------------------------
 
-*
+* fix: Prometheus scrapping mode;
+* fix: zipkin/jaeger output;
+* fix: TLS support for internal HTTP server;
 
 
 Zorka 1.90.9 (2020-03-07)
