@@ -55,7 +55,7 @@ public class UtilFnProcessor implements SpyProcessor {
                 if (t instanceof Long) {
                     record.put(dstField, ZorkaUtil.strTime((Long) t));
                 } else {
-                    log.error("Cannot process value " + t + ": must be of type Long.");
+                    log.debug("Cannot process value " + t + ": must be of type Long.");
                 }
                 break;
             }
@@ -64,7 +64,7 @@ public class UtilFnProcessor implements SpyProcessor {
                 if (t instanceof Long) {
                     record.put(dstField, ZorkaUtil.strClock((Long) t));
                 } else {
-                    log.error("Cannot process value " + t + ": must be of type Long.");
+                    log.debug("Cannot process value " + t + ": must be of type Long.");
                 }
                 break;
             }
