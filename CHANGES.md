@@ -1,3 +1,9 @@
+Zorka 2.0.2 (2023-12-18)
+------------------------
+
+* JDK17 compatibility updates;
+* update asm library;
+
 Zorka 2.0.1 (2020-08-10)
 -------------------------
 
