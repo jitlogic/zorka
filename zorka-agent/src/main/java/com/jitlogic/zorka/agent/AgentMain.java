@@ -70,7 +70,7 @@ public class AgentMain {
 
         AgentConfig config = new AgentConfig(ZorkaUtil.path(home));
 
-        if (config.boolCfg("spy.reflection.enabled", true)) {
+        if (config.boolCfg("spy.reflection.enabled", false)) {
             SpyClassLookup.INSTANCE = new SpyClassLookup();
         } else {
             SpyClassLookup.INSTANCE = new SpyClassLookup(instrumentation);
