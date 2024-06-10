@@ -19,8 +19,24 @@ zorka.require("sql.bsh");
 
 __pgsql() {
 
+  _pgargsProcessor() {
+    process(rec) {
+      pgargs = util.get(rec.get("THIS"), "preparedParameters");
+      if (sql._params && pgargs != null) {
+        tracer.newAttr("args.count", ""+pgargs.getParameterCount());
+        for (int i = 1; i <= pgargs.getParameterCount(); i++) {
+          tracer.newAttr("args." + i, pgargs.toString(i, false));
+        }
+      }
+      return rec;
+    }
+    return (com.jitlogic.zorka.core.spy.SpyProcessor)this;
+  }
+
+
   spy.add(sql._instrumentStmt("PGSQL_1", "${THIS.connection.creatingURL}")
     .include(
+      spy.byMethod(0, "org.postgresql.jdbc.PgStatement", "execute*", null, "String"),
       spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, "String"),
       spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, "String")));
 
@@ -29,6 +45,10 @@ __pgsql() {
       spy.byMethod(0, "org.postgresql.jdbc2.AbstractJdbc2Statement", "execute*", null, spy.SM_NOARGS),
       spy.byMethod(0, "org.postgresql.jdbc3.AbstractJdbc3Statement", "execute*", null, spy.SM_NOARGS)));
 
+  spy.add(sql._instrumentPStmt("PGSQL_3", "${THIS.connection.creatingURL}", "${THIS.preparedQuery.query}")
+    .onSubmit(_pgargsProcessor())
+    .include(
+      spy.byMethod(0, "org.postgresql.jdbc.PgPreparedStatement", "execute", null, spy.SM_NOARGS)));
 
   if (zorka.boolCfg("tracer")) {
       tracer.exclude("org.postgresql.**");
